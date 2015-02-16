@@ -1,7 +1,7 @@
 {
     "name": "Saft/Saft.store.virtuoso",
     "type": "library",
-    "description": "Store package from the library Saft.",
+    "description": "Virtuoso adapter for store package from the library Saft.",
     "keywords": ["Saft", "TripleStore", "Virtuoso"],
     "homepage": "https://github.com/SaftIng/Saft.store.virtuoso",
     "license": "GPL2",
