@@ -3,7 +3,7 @@
     "type": "library",
     "description": "QueryCache package from the library Saft.",
     "keywords": ["Saft", "Linked Data", "Semantic Web", "SPARQL", "Cache", "Query"],
-    "homepage": "https://github.com/SaftIng/Saft.core",
+    "homepage": "https://github.com/SaftIng/Saft.querycache",
     "license": "GPL2",
     "authors": [
         {
