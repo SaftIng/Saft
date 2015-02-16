@@ -1,0 +1,31 @@
+{
+    "name": "Saft/Saft.store",
+    "type": "library",
+    "description": "Store package from the library Saft.",
+    "keywords": ["Saft", "Linked Data", "Semantic Web", "Store", "TripleStore"],
+    "homepage": "https://github.com/SaftIng/Saft.store",
+    "license": "GPL2",
+    "authors": [
+        {
+            "name": "Nathanel Arndt",
+            "homepage": "http://aksw.org/NatanaelArndt",
+            "role": "Developer"
+        },
+        {
+            "name": "Konrad Abicht",
+            "homepage": "http://www.inspirito.de",
+            "email": "hi@inspirito.de",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        
+        "Saft/Saft.core": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Saft\\": "src/Saft/"
+        }
+    }
+}
