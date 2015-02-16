@@ -1,0 +1,31 @@
+{
+    "name": "Saft/Saft.cache.file",
+    "type": "library",
+    "description": "File adapter for cache package from the library Saft.",
+    "keywords": ["Saft", "Cache", "File"],
+    "homepage": "https://github.com/SaftIng/Saft.cache.file",
+    "license": "GPL2",
+    "authors": [
+        {
+            "name": "Nathanel Arndt",
+            "homepage": "http://aksw.org/NatanaelArndt",
+            "role": "Developer"
+        },
+        {
+            "name": "Konrad Abicht",
+            "homepage": "http://www.inspirito.de",
+            "email": "hi@inspirito.de",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        
+        "Saft/Saft.core": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Saft\\": "src/Saft/"
+        }
+    }
+}
