@@ -1,0 +1,32 @@
+{
+    "name": "Saft/Saft.cache.memcached",
+    "type": "library",
+    "description": "MemcacheD adapter for cache package from the library Saft.",
+    "keywords": ["Saft", "Cache", "MemcacheD"],
+    "homepage": "https://github.com/SaftIng/Saft.cache.memcached",
+    "license": "GPL2",
+    "authors": [
+        {
+            "name": "Nathanel Arndt",
+            "homepage": "http://aksw.org/NatanaelArndt",
+            "role": "Developer"
+        },
+        {
+            "name": "Konrad Abicht",
+            "homepage": "http://www.inspirito.de",
+            "email": "hi@inspirito.de",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "php-memcached": "*",
+        
+        "Saft/Saft.core": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Saft\\": "src/Saft/"
+        }
+    }
+}
