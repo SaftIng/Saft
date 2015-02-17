@@ -10,6 +10,40 @@ class File extends \Saft\Cache\Adapter\AbstractAdapter
     protected $cacheDir;
     
     /**
+     * Checks that all requirements for this adapter are fullfilled. 
+     * 
+     * @return boolean Returns true if all requirements are fullfilled.
+     * @throws \Exception If one requirement is not fullfilled an exception will be thrown.
+     */
+    public function checkRequirements()
+    {
+        // save reference to systems temp directory
+        $this->cacheDir = sys_get_temp_dir();
+        
+        if (true === is_readable($this->cacheDir) 
+            && true === is_writable($this->cacheDir)) {
+                
+            $this->cacheDir .= "/saft-cache/";
+                
+            try {
+                // if caching folder does not exists, create it
+                if (false === file_exists($this->cacheDir)) {
+                    mkdir($this->cacheDir, 0744);
+                }
+            } catch (\Exception $e) {
+                throw new \Exception($e->getMessage());
+            }
+            
+        } else {
+            throw new \Exception(
+                "Systems temporary folder ". $this->cacheDir ." is either not readable or writable."
+            );
+        }
+        
+        return true;
+    }
+    
+    /**
      * Removes all files in the cache dir.
      */
     public function clean()
@@ -89,36 +123,13 @@ class File extends \Saft\Cache\Adapter\AbstractAdapter
     }
     
     /**
-     * Setup cache adapter
+     * Init cache adapter. It should call checkRequirements to be sure all requirements
+     * are fullfilled, before init anything.
      * 
-     * @param array $config Array containing necessary parameter to init instance.
-     * @throw \Exception
+     * @throws \Exception If checkRequirements is getting called, it can throw exceptions.
      */
     public function init(array $config)
     {
-        // save reference to systems temp directory
-        $this->cacheDir = sys_get_temp_dir();
-        
-        if (true === is_readable($this->cacheDir) 
-            && true === is_writable($this->cacheDir)) {
-                
-            $this->cacheDir .= "/saft-cache/";
-                
-            try {
-                // if caching folder does not exists, create it
-                if (false === file_exists($this->cacheDir)) {
-                    mkdir($this->cacheDir, 0744);
-                }
-            } catch (\Exception $e) {
-                throw new \Exception($e->getMessage());
-            }
-            
-            $this->config = $config;
-            
-        } else {
-            throw new \Exception(
-                "Systems temporary folder ". $this->cacheDir ." is either not readable or writable."
-            );
-        }
+        $this->checkRequirements();
     }
 }
