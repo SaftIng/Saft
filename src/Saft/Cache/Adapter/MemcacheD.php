@@ -9,22 +9,15 @@ class MemcacheD extends \Saft\Cache\Adapter\AbstractAdapter
      * 
      * @var \MemcacheD
      */
-    protected $cache;
+    protected $_cache;
     
     /**
-     * Checks that all requirements for this adapter are fullfilled. 
+     * The purpose of this string is to avoid collisions with other non-Enable
+     * related cache entries in MemcacheD.
      * 
-     * @return boolean Returns true if all requirements are fullfilled.
-     * @throws \Exception If one requirement is not fullfilled an exception will be thrown.
+     * @var string
      */
-    public function checkRequirements()
-    {
-        if (false === class_exists("\Memcached") || false === extension_loaded("memcached")) {
-            throw new \Exception("Memcached extension is not available or Memcached class does not exists.");
-        } 
-        
-        return true;
-    }
+    protected $_keyPrefix;
     
     /**
      * Removes all cached entries.
@@ -33,7 +26,7 @@ class MemcacheD extends \Saft\Cache\Adapter\AbstractAdapter
      */
     public function clean()
     {
-        return $this->cache->flush();
+        return $this->_cache->flush();
     }
     
     /**
@@ -44,7 +37,7 @@ class MemcacheD extends \Saft\Cache\Adapter\AbstractAdapter
      */
     public function delete($key)
     {
-        return $this->cache->delete($key);
+        return $this->_cache->delete($this->_keyPrefix . $key);
     }
     
     /**
@@ -55,7 +48,7 @@ class MemcacheD extends \Saft\Cache\Adapter\AbstractAdapter
      */
     public function get($key)
     {
-        return $this->cache->get($key);
+        return $this->_cache->get($this->_keyPrefix . $key);
     }  
     
     /**
@@ -65,33 +58,8 @@ class MemcacheD extends \Saft\Cache\Adapter\AbstractAdapter
      */
     public function getType()
     {
-        return "memcached";
-    }
-    
-    /**
-     * Init cache adapter. It should call checkRequirements to be sure all requirements
-     * are fullfilled, before init anything.
-     * 
-     * @throws \Exception If checkRequirements is getting called, it can throw exceptions.
-     */
-    public function init(array $config)
-    {
-        $this->cache = new \Memcached("Enable\Cache");
-        $servers = $this->cache->getServerList();
-        
-        // check if the host-port-combination is already in the server list,
-        // to avoid adding the same configuration multiple times
-        if(true === empty($servers)) {
-            $this->cache->setOption(\Memcached::OPT_RECV_TIMEOUT, 1000);
-            $this->cache->setOption(\Memcached::OPT_SEND_TIMEOUT, 3000);
-            $this->cache->setOption(\Memcached::OPT_TCP_NODELAY, true);
-            $this->cache->addServer(
-                $config["host"], $config["port"]
-            );
-        }
-        
-        $this->_config = $config;
-    } 
+        return $this->_config["type"];
+    }     
     
     /**
      * Stores a new entry in the cache or overrides an existing one.
@@ -102,6 +70,38 @@ class MemcacheD extends \Saft\Cache\Adapter\AbstractAdapter
      */
     public function set($key, $value)
     {
-        $this->cache->set($key, $value);
+        $this->_cache->set($this->_keyPrefix . $key, $value);
+    }
+    
+    /**
+     * Setup MemcacheD cache adapter.
+     * 
+     * @param array $config Array containing necessary parameter to setup the 
+     *                      server.
+     * @throw \Enable\Exception
+     */
+    public function setup(array $config)
+    {
+        if (true === class_exists("\Memcached") && true === extension_loaded("memcached")) {
+            
+            $this->_cache = new \Memcached("Enable\Cache");
+            $servers = $this->_cache->getServerList();
+            
+            // check if the host-port-combination is already in the server list,
+            // to avoid adding the same configuration multiple times
+            if(true === empty($servers)) {
+                $this->_cache->setOption(\Memcached::OPT_RECV_TIMEOUT, 1000);
+                $this->_cache->setOption(\Memcached::OPT_SEND_TIMEOUT, 3000);
+                $this->_cache->setOption(\Memcached::OPT_TCP_NODELAY, true);
+                $this->_cache->addServer(
+                    $config["host"], $config["port"]
+                );
+            }
+            
+            $this->_config = $config;
+            
+        } else {
+            throw new \Exception("Memcached extension is not available.");
+        }
     }
 }
