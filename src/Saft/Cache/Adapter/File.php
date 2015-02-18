@@ -2,78 +2,53 @@
 
 namespace Saft\Cache\Adapter;
 
-class File extends \Saft\Cache\Adapter\AbstractAdapter
+class File implements \Saft\Cache\Adapter\Base
 {
     /**
      * @var string
      */
-    protected $cacheDir;
+    protected $_cacheDir;
     
     /**
-     * Checks that all requirements for this adapter are fullfilled. 
-     * 
-     * @return boolean Returns true if all requirements are fullfilled.
-     * @throws \Exception If one requirement is not fullfilled an exception will be thrown.
+     * @var string
      */
-    public function checkRequirements()
-    {
-        // save reference to systems temp directory
-        $this->cacheDir = sys_get_temp_dir();
-        
-        if (true === is_readable($this->cacheDir) 
-            && true === is_writable($this->cacheDir)) {
-                
-            $this->cacheDir .= "/saft-cache/";
-                
-            try {
-                // if caching folder does not exists, create it
-                if (false === file_exists($this->cacheDir)) {
-                    mkdir($this->cacheDir, 0744);
-                }
-            } catch (\Exception $e) {
-                throw new \Exception($e->getMessage());
-            }
-            
-        } else {
-            throw new \Exception(
-                "Systems temporary folder ". $this->cacheDir ." is either not readable or writable."
-            );
-        }
-        
-        return true;
-    }
+    protected $_tempDir;
     
     /**
-     * Removes all files in the cache dir.
+     * 
+     * @param
+     * @return
+     * @throw
      */
     public function clean()
     {
-        $dir = new \DirectoryIterator($this->cacheDir);
+        $dir = new \DirectoryIterator($this->_cacheDir);
         foreach ($dir as $fileinfo) {
             if (!$fileinfo->isDot()) {
-                unlink($this->cacheDir . $fileinfo->getFilename());
+                unlink($this->_cacheDir . $fileinfo->getFilename());
             }
         }
     }
     
     /**
-     * Deletes entry by given $key.
      * 
-     * @param string $key
+     * @param
+     * @return
+     * @throw
      */
     public function delete($key)
     {
         $filename = hash("sha256", $key);
         
         if (true === $this->isCached($key)) {
-            unlink($this->cacheDir . $filename .".cache");
+            unlink($this->_cacheDir . $filename .".cache");
         }
     }
     
     /**
      * 
-     * @param string $key
-     * @return mixed|null
+     * @param
+     * @return
      * @throw
      */
     public function get($key)
@@ -82,10 +57,10 @@ class File extends \Saft\Cache\Adapter\AbstractAdapter
         
         if (true === $this->isCached($key)) {
             return json_decode(
-                file_get_contents($this->cacheDir . $filename . ".cache"), true
+                file_get_contents($this->_cacheDir . $filename . ".cache"), true
             );
         } else {
-            return null;
+            return false;
         }
     }  
     
@@ -94,12 +69,10 @@ class File extends \Saft\Cache\Adapter\AbstractAdapter
      */
     public function getType()
     {
-        return "file";
+        return $this->_config["type"];
     }     
     
     /**
-     * Check if key is cached.
-     * 
      * @param string $key ID of the file to check.
      * @return boolean True, if file behind given $key exists, false otherwise.
      */
@@ -107,29 +80,55 @@ class File extends \Saft\Cache\Adapter\AbstractAdapter
     {
         $filename = hash("sha256", $key);
         
-        return true === file_exists($this->cacheDir . $filename .".cache");
+        return true === file_exists($this->_cacheDir . $filename .".cache");
     }     
     
     /**
      * @param string $key ID of the value to store.
      * @param mixed $value Value to store.
+     * @return 
+     * @throw
      */
     public function set($key, $value)
     {
         $filename = hash("sha256", $key);
         $value = json_encode($value);
         
-        file_put_contents($this->cacheDir . $filename .".cache", $value);
+        file_put_contents($this->_cacheDir . $filename .".cache", $value);
     }
     
     /**
-     * Init cache adapter. It should call checkRequirements to be sure all requirements
-     * are fullfilled, before init anything.
+     * Setup File cache adapter
      * 
-     * @throws \Exception If checkRequirements is getting called, it can throw exceptions.
+     * @param array $config Array containing necessary parameter to setup the 
+     *                      server.
+     * @throw \Enable\Exception
      */
-    public function init(array $config)
+    public function setup(array $config)
     {
-        $this->checkRequirements();
+        // save reference to systems temp directory
+        $this->_tempDir = sys_get_temp_dir();
+        
+        if (true === is_readable($this->_tempDir) 
+            && true === is_writable($this->_tempDir)) {
+                
+            $this->_cacheDir = $this->_tempDir . "/enable/";
+                
+            try {
+                // if caching folder does not exists, create it
+                if (false === file_exists($this->_cacheDir)) {
+                    mkdir($this->_cacheDir, 0744);
+                }
+            } catch (\Exception $e) {
+                throw new \Enable\Exception($e->getMessage());
+            }
+            
+            $this->_config = $config;
+            
+        } else {
+            throw new \Enable\Exception(
+                "Systems temporary folder is either not readable or writable."
+            );
+        }
     }
 }
