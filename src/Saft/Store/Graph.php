@@ -3,16 +3,37 @@
 namespace Saft\Store;
 
 class Graph
-{   
+{
+    /**
+     * @var \Enable\Cache
+     */
+    protected $_cache;
+    
     /**
      * @var string
      */
-    protected $graphUri = "";
+    protected $_graphUri = "";
     
     /**
-     * @var \Saft\Store
+     * @var string
      */
-    protected $store = null;
+    protected $_graphUriHash = "";
+    
+    /**
+     * @var \Enable\Store
+     */
+    protected $_store = null;
+    
+    /**
+     * 
+     * @param
+     * @return
+     * @throw
+     */
+    public function __construct(\Saft\Store $store, $graphUri, \Saft\Cache $cache)
+    {
+        $this->init($store, $graphUri, $cache);
+    }
     
     /**
      * Adds multiple triples to this graph.
@@ -23,7 +44,7 @@ class Graph
      */
     public function addMultipleTriples(array $triples)
     {
-        return $this->store->addMultipleTriples($this->graphUri, $triples);
+        return $this->_store->addMultipleTriples($this->_graphUri, $triples);
     }
     
     /**
@@ -38,8 +59,8 @@ class Graph
      */
     public function addTriple($subject, $predicate, array $object)
     {
-        return $this->store->addMultipleTriples(
-            $this->graphUri, array(array($subject, $predicate, $object))
+        return $this->_store->addMultipleTriples(
+            $this->_graphUri, array(array($subject, $predicate, $object))
         );
     } 
     
@@ -52,7 +73,7 @@ class Graph
      */
     public function dropMultipleTriples(array $triples)
     {
-        return $this->store->dropMultipleTriples($this->graphUri, $triples);
+        return $this->_store->dropMultipleTriples($this->_graphUri, $triples);
     }    
     
     /**
@@ -66,10 +87,22 @@ class Graph
      */
     public function dropTriple($subject, $predicate, $object)
     {
-        return $this->store->dropTriple(
-            $this->graphUri, $subject, $predicate, $object
+        return $this->_store->dropTriple(
+            $this->_graphUri, $subject, $predicate, $object
         );
     }    
+    
+    /**
+     * Generates unique resource id.
+     * @param string $resourceUri
+     * @return string Unique resource id + cache prefix
+     */
+    public function generateResourceId($resourceUri)
+    {
+        return "sto". $this->_store->getId() . "--" . 
+               "gph". $this->_graphUriHash   . "_" . 
+               md5($resourceUri);
+    } 
     
     /**
      * Based on the given URI this function load information (?p, ?o) about a certain
@@ -85,9 +118,9 @@ class Graph
         if (true === \Saft\Uri::check($resourceUri)) {
         
             // generate unique ID for the resource uri
-            $query = "SELECT ?p ?o FROM <". $this->graphUri ."> WHERE {<". $resourceUri ."> ?p ?o.}";
-            $queryId = $this->store->getQueryCache()->generateShortId($query);
-            $queryResult = $store->getCache()->get($queryId);
+            $query = "SELECT ?p ?o FROM <". $this->_graphUri ."> WHERE {<". $resourceUri ."> ?p ?o.}";
+            $queryId = $this->_store->getQueryCache()->generateShortId($query);
+            $queryResult = $this->_cache->get($queryId);
             
             // check if resource uri was saved before, only save it once
             if (false === $queryResult) {
@@ -123,7 +156,7 @@ class Graph
                 }
                 
                 // init cache entry
-                $this->store->getQueryCache()->rememberQueryResult(
+                $this->_store->getQueryCache()->rememberQueryResult(
                     $query, $queryResult
                 );
                 
@@ -146,7 +179,7 @@ class Graph
      */
     public function getTripleCount()
     {
-        return $this->store->getTripleCount($this->graphUri);
+        return $this->_store->getTripleCount($this->_graphUri);
     }
     
     /**
@@ -154,7 +187,7 @@ class Graph
      */
     public function getStore()
     {
-        return $this->store;
+        return $this->_store;
     }
     
     /**
@@ -163,43 +196,176 @@ class Graph
      */
     public function getUri()
     {
-        return $this->graphUri;
+        return $this->_graphUri;
     }
     
     /**
-     * Imports data into a graph.
-     * 
-     * @see \Saft\Store->importRdf for more information
+     * Imports data into a graph
+     * @param string $rdf              String with data to import
+     * @param string $format  optional RDF-format of the data. Possible are: 
+     *                                 auto, json, rdfxml, turtle, ntripples, 
+     *                                 sparql-xml, rdfa
+     * @param string $locator optional Set the location of the data. Possible are:
+     *                                 datastring, url, file 
+     * @return
+     * @throw
      */
     public function importRdf($data, $format = "auto", $locator = "datastring")
     {
-        $this->store->importRdf($this->graphUri, $data, $format, $locator);
+        if ("auto" === $format) {
+                
+            // url
+            if ($locator === "url") {
+                
+                // no format guessing neccessary, because EasyRdf will do it
+                // for us
+                
+            // file
+            } elseif ($locator === "file") {
+                
+                // check if file is readable and exists
+                if (false === is_readable($data) || false === file_exists($data)) {
+                    throw new \Exception(
+                        "File to import does not exists or not readable."
+                    );
+                }
+                
+                // no format guessing neccessary, because EasyRdf will do it
+                // for us
+            
+            // data string
+            } elseif ($locator === "datastring") {
+                
+                $format = \EasyRdf_Format::guessFormat($data);
+                
+                if (null === $format) {
+                    throw new \Exception(
+                        "\$format is not guessable from the given \$data."
+                    );
+                }
+                
+            // unsupported locator
+            } else {
+                
+                throw new \Exception(
+                    "Given \$locator is not a valid locator or empty."
+                );
+            }
+            
+        // user defined format
+        } else {
+            
+            // normalize given format; we support synonyms which means, that
+            // rdfxml and xml both leads to rdfxml
+            try {
+                $format = \EasyRdf\Format::getFormat($format);
+            // if format is unsupported
+            } catch (EasyRdf_Exception $e) {
+                throw new \Exception(
+                    "Given \$format is not a valid import/export format or empty."
+                );
+            }
+        }
+        
+        /**
+         * at this point we know, what format and/or data we have to handle
+         */
+        $graph = new \EasyRdf\Graph();
+        
+        // file
+        if ($locator === "file") {
+            if ("auto" === $format) {
+                $graph->parseFile($data);
+            } else {
+                $graph->parseFile($data, $format->getName());
+            }
+        
+        // data string
+        } elseif ($locator === "datastring") {
+            $graph->parse($data, $format->getName());
+        
+        // url
+        } elseif ($locator === "url") {
+            if ("auto" === $format) {
+                $graph->load($data);
+            } else {
+                $graph->load($data, $format->getName());
+            }
+            
+        // unsupported locator
+        } else {
+            throw new \Exception(
+                "Given \$locator is not a valid locator or empty."
+            );
+        }
+        
+        // move data from $graph instance to graph        
+        $data = $graph->toRdfPhp();
+        
+        // go through all subjects
+        foreach ($data as $subject => $predicates) {
+            // predicates associated with the subject
+            foreach ($predicates as $property => $objects) {
+                // object(s)
+                foreach ($objects as $object) {
+                    $this->addTriple($subject, $property, $object);
+                }
+            }
+        }
     }
         
     /**
      * Initialize graph instance.
      * 
-     * @param \Saft\Store $store According store instance.
-     * @param string $graphUri URI of the graph
+     * @param \Enable\Store $store
+     * @param string $graphUri
+     * @param \Enable\Cache $cache
+     * @return
      * @throw \Exception
      */
-    public function init(\Saft\Store $store, $graphUri)
+    public function init(\Saft\Store $store, $graphUri, \Saft\Cache $cache)
     {
         $this->setGraphUri($graphUri);
+        $this->_graphUriHash = md5($graphUri);
         
+        $this->setCache($cache);
         $this->setStore($store);
     }
     
     /**
-     * Set graph URI.
+     * Invalidates cached information about a resource.
      * 
-     * @param string $graphUri URI to set.
-     * @throw \Exception If given $graphUri parameter is not a valid URI or empty.
+     * @param string $resourceUri URI of the resource to invalidate
+     * @return bool
+     */
+    public function invalidateResource($resourceUri)
+    {
+        return $this->_store->getQueryCache()->invalidateByQuery(
+            "SELECT ?p ?o FROM <". $this->_graphUri ."> WHERE {<". $resourceUri ."> ?p ?o.}"
+        );
+    }
+    
+    /**
+     * 
+     * @param
+     * @return
+     * @throw
+     */
+    protected function setCache(\Saft\Cache $cache)
+    {
+        $this->_cache = $cache;
+    }
+    
+    /**
+     * 
+     * @param
+     * @return
+     * @throw
      */
     protected function setGraphUri($graphUri)
     {
         if (true === \Saft\Uri::check($graphUri)) {
-            $this->graphUri = $graphUri;
+            $this->_graphUri = $graphUri;
         } else {
             throw new \Exception(
                 "Given \$graphUri is not a valid URI or empty."
@@ -210,29 +376,30 @@ class Graph
     /**
      * Set new store instance.
      * 
-     * @param \Saft\Store $store Store instance which this graph instance has to use
+     * @param \Enable\Store $store Store instance which this graph instance has to use
+     * @return void
      */
     protected function setStore(\Saft\Store $store)
     {
-        $this->store = $store;
+        $this->_store = $store;
     }
     
     /**
      * Send SPARQL query to the server.
      * 
      * @param string $query Query to execute
-     * @param array $options optional Options to configure the query-execution and the result.
+     * @param array $options optional Options to configure the query-execution and the 
+     *                                result.
      * @return array
      * @throw \Exception
      */
     public function sparql($query, array $options = array())
     {
-        // force FROM clause of the SPARQL to be set to the value of $this->graphUri
-        $queryObj = new \Saft\Sparql\Query();
-        $queryObj->init($query);
-        $queryObj->setFrom(array($this->graphUri));
+        // force FROM clause of the SPARQL to be set to the value of $this->_graphUri
+        $queryObj = new \Saft\Sparql\Query($query);
+        $queryObj->setFrom(array($this->_graphUri));
         
-        return $this->store->sparql((string) $queryObj, $options);
+        return $this->_store->sparql((string) $queryObj, $options);
     }
     
 }
