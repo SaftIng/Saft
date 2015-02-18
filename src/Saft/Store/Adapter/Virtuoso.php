@@ -2,27 +2,42 @@
 
 namespace Saft\Store\Adapter;
 
-class Virtuoso extends AbstractAdapter
+class Virtuoso extends \Saft\Store\Adapter\AbstractAdapter
 {
     /**
      * Adapter option array
      * 
      * @var array
      */
-    protected $config = null;
+    protected $_adapterOptions = null;
 
     /**
      * PDO ODBC
      * @var \PDO
      */
-    protected $connect = null;
+    protected $_connection = null;
 
     /**
      * Constructor.
+     * 
+     * @param array $adapterOptions Array containing database credentials
+     * @return void
+     * @throws \Exception In case the pdo_odbc extension is not available
      */
-    public function __construct()
+    public function __construct(array $adapterOptions)
     {
+        // check for odbc extension
+        if (!extension_loaded("pdo_odbc")) {
+            throw new \Exception(
+                "Virtuoso adapter requires the PDO_ODBC extension to be loaded."
+            );
+            return;
+        }
         
+        $this->_adapterOptions = $adapterOptions;
+        
+        // Open connection
+        $this->openConnection();
     }
 
     /**
@@ -30,7 +45,7 @@ class Virtuoso extends AbstractAdapter
      */
     public function __destruct()
     {
-        $this->disconnect();
+        $this->closeConnection();
     }
     
     /**
@@ -68,7 +83,7 @@ class Virtuoso extends AbstractAdapter
 
                 $this->sparql(
                     "INSERT INTO GRAPH <". $graphUri ."> {" .
-                        \Saft\RDF\Triple::buildTripleString($batch) .
+                        \Saft\Rdf\Triple::buildTripleString($batch) .
                     "}"
                 );
                  
@@ -79,7 +94,7 @@ class Virtuoso extends AbstractAdapter
         
         $result = $this->sparql(
             "INSERT INTO GRAPH <". $graphUri ."> {" .
-                \Saft\RDF\Triple::buildTripleString($batch) .
+                \Saft\Rdf\Triple::buildTripleString($batch) .
             "}"
         );
 
@@ -101,30 +116,16 @@ class Virtuoso extends AbstractAdapter
         return $this->addMultipleTriples(
             $graphUri, array(array($subject, $predicate, $object))
         );
-    }
-    
-    /**
-     * Checks that all requirements for Virtuoso via PDO-ODBC are fullfilled.
-     */
-    public function checkRequirements()
-    {
-        if (!extension_loaded("pdo_odbc")) {
-            throw new \Exception(
-                "Virtuoso adapter requires the PDO_ODBC extension to be loaded."
-            );
-        }
-        
-        return true;
-    }  
+    }    
     
     /**
      * Closes a current connection to the database.
      * 
      * @return void
      */
-    public function disconnect()
+    public function closeConnection()
     {
-        $this->connect = null;
+        $this->_connection = null;
     }
     
     /**
@@ -161,7 +162,7 @@ class Virtuoso extends AbstractAdapter
 
                 $odbcRes = $this->sparql(
                     "DELETE FROM GRAPH <". $graphUri ."> {".
-                        \Saft\RDF\Triple::buildTripleString($batch) .
+                        \Saft\Rdf\Triple::buildTripleString($batch) .
                     "}"
                 );
                  
@@ -172,7 +173,7 @@ class Virtuoso extends AbstractAdapter
         
         $odbcRes = $this->sparql(
             "DELETE FROM GRAPH <". $graphUri ."> {".
-                \Saft\RDF\Triple::buildTripleString($batch) .
+                \Saft\Rdf\Triple::buildTripleString($batch) .
             "}"
         );
 
@@ -245,7 +246,7 @@ class Virtuoso extends AbstractAdapter
         
         // execute query
         try {
-            $query = $this->connect->prepare(
+            $query = $this->_connection->prepare(
                 $queryString, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY)
             );
             
@@ -294,23 +295,6 @@ class Virtuoso extends AbstractAdapter
     }
     
     /**
-     * Init adapter.
-     * 
-     * @param array $config Array containing database credentials
-     * @return
-     * @throw \Exception If requirements are not fullfilled. 
-     */
-    public function init(array $config)
-    {
-        $this->checkRequirements();
-        
-        $this->config = $config;
-        
-        // Open connection
-        $this->connect();
-    }
-    
-    /**
      * Checks if a certain graph is available in the store.
      *
      * @param string $graphUri URI of the graph to check if it is available.
@@ -328,12 +312,12 @@ class Virtuoso extends AbstractAdapter
      * The resource is created lazily if it doesn't exist.
      * @retun resource
      */
-    public function connect()
+    public function openConnection()
     {
         // connection still closed
-        if (!$this->connect) {
+        if (!$this->_connection) {
             
-            $options = $this->config;
+            $options = $this->_adapterOptions;
             
             // check for dsn parameter
             if (!isset($options["dsn"])) {
@@ -366,10 +350,10 @@ class Virtuoso extends AbstractAdapter
              * Setup ODBC connection using PDO
              */
             try {
-                $this->connect = new \PDO("odbc:" . $dsn, $username, $password);
-                $this->connect->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
-                $this->connect->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-                $this->connect->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);                
+                $this->_connection = new \PDO("odbc:" . $dsn, $username, $password);
+                $this->_connection->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
+                $this->_connection->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+                $this->_connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);                
             
             } catch (\PDOException $e) {
                 throw new \Exception($e->getMessage());
@@ -378,7 +362,7 @@ class Virtuoso extends AbstractAdapter
             $this->_user = $username;
         }
 
-        return $this->connect;
+        return $this->_connection;
     }
     
     /**
@@ -386,7 +370,8 @@ class Virtuoso extends AbstractAdapter
      * 
      * @param string $query Query to execute
      * @param array $variables optional Key-value-pairs to create prepared statements
-     * @param array $options optional Options to configure the query-execution and the result.
+     * @param array $options optional Options to configure the query-execution and the 
+     *                                result.
      * @return array
      * @throw \Exception
      */
