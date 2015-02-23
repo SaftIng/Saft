@@ -2,7 +2,7 @@
 
 namespace Saft\Cache\Adapter;
 
-class File implements \Saft\Cache\Adapter\Base
+class File extends \Saft\Cache\Adapter\AbstractAdapter
 {
     /**
      * @var string
