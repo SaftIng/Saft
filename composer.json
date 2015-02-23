@@ -1,0 +1,35 @@
+{
+    "name": "Saft/Saft.store.http",
+    "type": "library",
+    "description": "HTTP adapter for store package from the library Saft.",
+    "keywords": ["Saft", "TripleStore", "Virtuoso"],
+    "homepage": "https://github.com/SaftIng/Saft.store.http",
+    "license": "GPL2",
+    "authors": [
+        {
+            "name": "Nathanel Arndt",
+            "homepage": "http://aksw.org/NatanaelArndt",
+            "role": "Developer"
+        },
+        {
+            "name": "Konrad Abicht",
+            "homepage": "http://www.inspirito.de",
+            "email": "hi@inspirito.de",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "php-curl": "*",
+        
+        "php-curl-class/php-curl-class": "*",
+        
+        "Saft/Saft.core": "*",
+        "Saft/Saft.store": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Saft\\": "src/Saft/"
+        }
+    }
+}
