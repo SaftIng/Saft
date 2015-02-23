@@ -118,8 +118,13 @@ class Graph
         if (true === \Saft\Uri::check($resourceUri)) {
         
             // generate unique ID for the resource uri
-            $query = "SELECT ?p ?o FROM <". $this->_graphUri ."> WHERE {<". $resourceUri ."> ?p ?o.}";
+            $query = "SELECT ?p ?o ".
+                       "FROM <". $this->_graphUri ."> ".
+                      "WHERE {<". $resourceUri ."> ?p ?o.} ".
+                      "ORDER BY ?p";
+                      
             $queryId = $this->_store->getQueryCache()->generateShortId($query);
+            
             $queryResult = $this->_cache->get($queryId);
             
             // check if resource uri was saved before, only save it once
@@ -127,10 +132,7 @@ class Graph
                 
                 $queryResult = null;
                 
-                $result = $this->sparql(
-                    $query, 
-                    array("resultType" => "extended")
-                );
+                $result = $this->sparql($query, array("resultType" => "extended"));
                 $result = $result["results"]["bindings"];
                 
                 // if result contains information, compute them
@@ -139,13 +141,16 @@ class Graph
                     $queryResult = array();
                     
                     foreach ($result as $triple) {
+                        
+                        // TODO add switch for xml:lang (virtuoso) and lang (http)
+                        
                         // add triple
                         $queryResult[] = array(
                             $resourceUri,
                             $triple["p"]["value"],
                             array(
-                                "lang"      => true === isset($triple["o"]["xml:lang"]) 
-                                               ? $triple["o"]["xml:lang"] : null,
+                                "lang"      => true === isset($triple["o"]["lang"]) 
+                                               ? $triple["o"]["lang"] : null,
                                 "datatype"  => true === isset($triple["o"]["datatype"]) 
                                                ? $triple["o"]["datatype"] : null,
                                 "type"      => $triple["o"]["type"],

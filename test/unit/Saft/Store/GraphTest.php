@@ -9,8 +9,20 @@ class GraphTest extends \Saft\TestCase
         parent::setUp();
         
         $store = new \Saft\Store($this->_storeConfig, $this->_cache);
+        $store->addGraph($this->_testGraphUri);
+        
         $this->_fixture = new \Saft\Store\Graph($store, $this->_testGraphUri, $this->_cache);
     }  
+    
+    /**
+     * 
+     */
+    public function tearDown()
+    { 
+        $this->_fixture->getStore()->dropGraph($this->_testGraphUri);
+    
+        parent::tearDown();
+    }
     
     /**
      * function addMultipleTriples
@@ -18,6 +30,9 @@ class GraphTest extends \Saft\TestCase
     
     public function testAddMultipleTriples()
     {
+        $this->_fixture->getStore()->dropGraph($this->_testGraphUri);
+        $this->_fixture->getStore()->addGraph($this->_testGraphUri);
+        
         // graph is empty
         $this->assertEquals(0, $this->_fixture->getTripleCount($this->_testGraphUri));
         
@@ -216,17 +231,17 @@ class GraphTest extends \Saft\TestCase
          * Generate query id and check that there is no according cache entry.
          */
         $resourceUri = "http://s/";
-        
-        $query = "SELECT ?p ?o FROM <". $this->_fixture->getUri() ."> WHERE {<". $resourceUri ."> ?p ?o.}";
+        $query = "SELECT ?p ?o ".
+                   "FROM <". $this->_testGraphUri ."> ".
+                  "WHERE {<". $resourceUri ."> ?p ?o.} ".
+                  "ORDER BY ?p";
         $queryId = $this->_fixture->getStore()->getQueryCache()->generateShortId($query);
         
-        $this->assertEquals(
-            false, 
-            $this->_cache->get($queryId)
-        );
+        // check that cache is empty
+        $this->assertEquals(false, $this->_cache->get($queryId));
         
         /**
-         * add 4 test triples
+         * add test triples
          */
         $multipleTriples = array(
             array(
@@ -241,27 +256,17 @@ class GraphTest extends \Saft\TestCase
             ),
             array(
                 $resourceUri, 
-                "http://p/", 
+                "http://p/1", 
                 array(
-                    "datatype" => null, 
+                    "datatype" => "http://www.w3.org/2001/XMLSchema#string", 
                     "lang" => null, 
-                    "type" => "literal", 
+                    "type" => "typed-literal", 
                     "value" => "test literal"
                 )
             ),
             array(
                 $resourceUri, 
-                "http://p/2/", 
-                array(
-                    "datatype" => null, 
-                    "lang" => null, 
-                    "type" => "uri", 
-                    "value" => "http://test/uri2"
-                )
-            ),
-            array(
-                $resourceUri, 
-                "http://p/2/", 
+                "http://p/2", 
                 array(
                     "datatype" => null, 
                     "lang" => "en", 
@@ -282,8 +287,8 @@ class GraphTest extends \Saft\TestCase
         $this->assertEqualsArrays(
             array(
                 array(
-                    $resourceUri,
-                    "http://p/",
+                    $resourceUri, 
+                    "http://p/", 
                     array(
                         "datatype" => null, 
                         "lang" => null, 
@@ -292,36 +297,26 @@ class GraphTest extends \Saft\TestCase
                     ),
                 ),
                 array(
-                    $resourceUri,
-                    "http://p/",
+                    $resourceUri, 
+                    "http://p/1", 
                     array(
-                        "datatype" => null, 
+                        "datatype" => "http://www.w3.org/2001/XMLSchema#string", 
                         "lang" => null, 
-                        "type" => "literal", 
+                        "type" => "typed-literal", 
                         "value" => "test literal"
                     )
                 ),
                 array(
-                    $resourceUri,
-                    "http://p/2/",
+                    $resourceUri, 
+                    "http://p/2", 
                     array(
                         "datatype" => null, 
                         "lang" => null, 
-                        "type" => "uri", 
-                        "value" => "http://test/uri2"
-                    ),
-                ),
-                array(
-                    $resourceUri,
-                    "http://p/2/",
-                    array(
-                        "datatype" => null, 
-                        "lang" => "en", 
                         "type" => "literal", 
                         "value" => "val EN"
                     )
                 )
-            ),
+            ), 
             $this->_fixture->getResourceInformation($resourceUri)
         );
         
@@ -331,50 +326,39 @@ class GraphTest extends \Saft\TestCase
          */
         $cacheEntry = $this->_cache->get($queryId);
         
-        $this->assertEquals(
+        $this->assertEqualsArrays(
             array(
                 array(
-                    $resourceUri,
-                    "http://p/2/",
-                    array(
-                        "datatype" => null, 
-                        "lang" => null, 
-                        "type" => "uri", 
-                        "value" => "http://test/uri2"
-                    )
-                ),
-                array(
-                    $resourceUri,
-                    "http://p/2/",
-                    array(
-                        "datatype" => null, 
-                        "lang" => "en", 
-                        "type" => "literal", 
-                        "value" => "val EN"
-                    )
-                ),
-                array(
-                    $resourceUri,
-                    "http://p/",
+                    $resourceUri, 
+                    "http://p/", 
                     array(
                         "datatype" => null, 
                         "lang" => null, 
                         "type" => "uri", 
                         "value" => "http://test/uri"
+                    ),
+                ),
+                array(
+                    $resourceUri, 
+                    "http://p/1", 
+                    array(
+                        "datatype" => "http://www.w3.org/2001/XMLSchema#string", 
+                        "lang" => null, 
+                        "type" => "typed-literal", 
+                        "value" => "test literal"
                     )
                 ),
                 array(
-                    $resourceUri,
-                    "http://p/",
+                    $resourceUri, 
+                    "http://p/2", 
                     array(
                         "datatype" => null, 
                         "lang" => null, 
                         "type" => "literal", 
-                        "value" => "test literal"
+                        "value" => "val EN"
                     )
-                ),
-            ),
-            $cacheEntry["result"]
+                )
+            ), $cacheEntry["result"]
         );
     }
     
@@ -417,9 +401,7 @@ class GraphTest extends \Saft\TestCase
         a <http://model.org/model#className1>, <http://model.org/model#className2> ;
         <http://www.w3.org/2000/01/rdf-schema#label> \"label1\", \"label2\"@nl .";
         
-        $this->_fixture->importRdf(
-            $turtleString, "turtle"
-        );
+        $this->_fixture->importRdf($turtleString, "turtle");
         
         // graph has to contain 4 new triples
         $this->assertEquals(4, $this->_fixture->getTripleCount());
