@@ -1,0 +1,16 @@
+{
+    "name": "aksw/saft-rdf",
+    "require": {
+        "php": ">5.3.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.3",
+        "squizlabs/php_codesniffer": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Saft\\Rdf\\": "src/",
+            "Saft\\Rdf\\Tests\\": "tests/"
+        }
+    }
+}
