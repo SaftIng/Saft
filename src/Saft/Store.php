@@ -91,7 +91,18 @@ class Store
         return $this->addMultipleTriples(
             $graphUri, array(array($subject, $predicate, $object))
         );
-    } 
+    }
+    
+    /**
+     * 
+     * @param string $graphUri
+     * @return
+     * @throw \Exception TODO
+     */
+    public function clearGraph($graphUri)
+    {
+        return $this->_adapter->clearGraph($graphUri);
+    }
     
     /**
      * Drops an existing graph.
@@ -357,16 +368,29 @@ class Store
      */
     public function init(array $config, \Saft\Cache $cache)
     {
-        if (true === isset($config["type"]) 
-            && true === in_array($config["type"], array("virtuoso"))) {
+        if (true === isset($config["type"])) {
             
             switch ($config["type"]) {
+                
+                /**
+                 * Http
+                 */
+                case "http": 
+                    $this->_adapter = new \Saft\Store\Adapter\Http($config);
+                    break;
                 
                 /**
                  * Virtuoso
                  */
                 case "virtuoso": 
                     $this->_adapter = new \Saft\Store\Adapter\Virtuoso($config);
+                    break;
+                    
+                /**
+                 * Unknown adapter type.
+                 */
+                default:
+                    throw new \Exception("Unknown adapter type given.");
                     break;
             }
         
@@ -387,8 +411,7 @@ class Store
      * Send SPARQL query to the server.
      * 
      * @param string $query Query to execute
-     * @param array $options optional Options to configure the query-execution and the 
-     *                                result.
+     * @param array $options optional Options to configure the query-execution and the result.
      * @return array
      * @throw \Exception
      */

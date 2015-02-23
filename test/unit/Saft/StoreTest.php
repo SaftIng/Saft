@@ -80,7 +80,7 @@ class StoreTest extends \Saft\TestCase
             "graphUris"         => $graphUris,
             "query"             => $query,
             "queryContainer"    => array(
-                "relatedQueryCacheEntries" => "",
+                "relatedQueryCacheEntries"   => "",
                 "graphIds"                   => $graphIds,
                 "query"                      => $query,
                 "result"                     => $result,
@@ -97,6 +97,20 @@ class StoreTest extends \Saft\TestCase
         parent::setUp();
         
         $this->_fixture = new \Saft\Store($this->_storeConfig, $this->_cache);
+        $this->_fixture->addGraph($this->_testGraphUri);
+        
+        $this->_cache->clean();
+    }
+    
+    /**
+     * 
+     */
+    public function tearDown()
+    { 
+        $this->_fixture->dropGraph($this->_testGraphUri);
+        $this->_fixture->getCache()->clean();
+    
+        parent::tearDown();
     }
     
     /**
@@ -126,8 +140,10 @@ class StoreTest extends \Saft\TestCase
         
         // check cache for added graph
         $this->assertTrue(
-            array_key_exists($this->_testGraphUri, 
-            $this->_cache->get("sto". $this->_fixture->getId() ."_availableGraphUris"))
+            array_key_exists(
+                $this->_testGraphUri, 
+                $this->_cache->get("sto". $this->_fixture->getId() ."_availableGraphUris")
+            )
         );
     }
     
@@ -471,13 +487,6 @@ class StoreTest extends \Saft\TestCase
         );
         
         $this->assertEquals(0, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
-        // execute a query to get the content of the graph
-        $graph = $this->_fixture->getGraph($this->_testGraphUri);
-        $this->assertEquals(
-            array(),
-            $graph->sparql("SELECT ?s ?p ?o WHERE {?s ?p ?o.}")
-        );
     }
     
     public function testDropMultipleStmts_focusOnQueryCache()
@@ -513,10 +522,7 @@ class StoreTest extends \Saft\TestCase
             // usually sparql function cache query + result, but we force it to 
             // bypass QueryCache 
             $graph->sparql(
-                "SELECT ?s ?p ?o 
-                   FROM ". $this->_testGraphUri ." 
-                  WHERE {?s ?p ?o.}",
-                array("useQueryCache" => false)
+                "SELECT ?s ?p ?o WHERE {?s ?p ?o.}", array("useQueryCache" => false)
             )
         );
         
@@ -527,9 +533,7 @@ class StoreTest extends \Saft\TestCase
          
         // graph container
         foreach($testData["graphIds"] as $graphId) {
-            $this->assertFalse(
-                $this->_fixture->getCache()->get($graphId)
-            );
+            $this->assertFalse($this->_fixture->getCache()->get($graphId));
         }
         
         // triple pattern
@@ -565,18 +569,16 @@ class StoreTest extends \Saft\TestCase
         /**
          * check freshly created cache entries
          */
-        $propertyQuery = "SELECT ?p ?o ".
-                           "FROM <". $this->_testGraphUri ."> ".
-                           "WHERE {<". $resourceUri ."> ?p ?o.}";
         $propertyQueryId = $this->_fixture->getQueryCache()->generateShortId(
-            $propertyQuery
+            "SELECT ?p ?o ".
+              "FROM <". $this->_testGraphUri ."> ".
+             "WHERE {<". $resourceUri ."> ?p ?o.} ".
+             "ORDER BY ?p"
         );
         
         $testGraphId = $this->_fixture->getQueryCache()->generateShortId(
             $this->_testGraphUri
         );
-        
-        $subjectUri = "http://foo/bar";
                            
         $this->assertEquals(
             array(
@@ -586,10 +588,13 @@ class StoreTest extends \Saft\TestCase
                         $this->_testGraphUri
                     )
                 ),
-                "query" => "SELECT ?p ?o FROM <". $this->_testGraphUri ."> WHERE {<$subjectUri> ?p ?o.}",
+                "query" => "SELECT ?p ?o ".
+                             "FROM <". $this->_testGraphUri ."> ".
+                            "WHERE {<". $resourceUri ."> ?p ?o.} ".
+                            "ORDER BY ?p",
                 "result" => array(
                     array(
-                        $subjectUri,
+                        $resourceUri,
                         "http://www.w3.org/2000/01/rdf-schema#label",
                         array(
                             "lang" => null,
@@ -860,7 +865,11 @@ class StoreTest extends \Saft\TestCase
         
         $this->assertEquals(
             array(),
-            $this->_fixture->sparql("SELECT ?s ?p ?o WHERE {?s ?p ?o.}")
+            $this->_fixture->sparql(
+                "SELECT ?s ?p ?o 
+                   FROM <" . $this->_testGraphUri . "> 
+                  WHERE {?s ?p ?o.}"
+            )
         );
         
         // add 3 triples to the graph
@@ -894,13 +903,13 @@ class StoreTest extends \Saft\TestCase
     {
         $this->assertEquals(
             array(),
-            $this->_fixture->sparql("SELECT ?s ?p ?o WHERE {?s ?p ?o.}")
+            $this->_fixture->sparql("SELECT ?s ?p ?o FROM <" . $this->_testGraphUri . "> WHERE {?s ?p ?o.}")
         );
         
         $this->assertEquals(
             array(),
             $this->_fixture->sparql(
-                "SELECT ?s ?p ?o WHERE {?s ?p ?o.}", 
+                "SELECT ?s ?p ?o FROM <" . $this->_testGraphUri . "> WHERE {?s ?p ?o.}", 
                 array("resultType" => "array")
             )
         );
@@ -908,9 +917,13 @@ class StoreTest extends \Saft\TestCase
     
     public function testSparql_emptyResult()
     {
+        $this->_fixture->clearGraph($this->_testGraphUri);
+        
         $this->assertEquals(
             array(),
-            $this->_fixture->sparql("SELECT ?s ?p ?o WHERE {?s ?p ?o.}")
+            $this->_fixture->sparql(
+                "SELECT ?s ?p ?o FROM <" . $this->_testGraphUri . "> WHERE {?s ?p ?o.}"
+            )
         );
     }
     
@@ -922,10 +935,7 @@ class StoreTest extends \Saft\TestCase
         // be sure that nothing is in the QueryCache already
         $this->assertFalse($this->_fixture->getCache()->get($queryId));
         
-        $this->assertEquals(
-            array(),
-            $this->_fixture->sparql($query)
-        );
+        $this->assertEquals(array(), $this->_fixture->sparql($query));
         
         
         // notice: 
