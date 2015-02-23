@@ -8,6 +8,8 @@ class DispenseableResourceTest extends \Saft\TestCase
     {   
         parent::setUp();
         
+        $this->_store->addGraph($this->_testGraphUri);
+        
         // init instance of DispenseableResource
         $this->_fixture = new \Saft\Store\DispenseableResource(
             $this->_store->getGraph($this->_testGraphUri)
@@ -209,6 +211,8 @@ class DispenseableResourceTest extends \Saft\TestCase
      
     public function testSaveSimple()
     {        
+        $this->_store->clearGraph($this->_testGraphUri);
+        
         $this->_fixture->init();
         
         $this->_fixture->foo = "bar";
@@ -237,7 +241,9 @@ class DispenseableResourceTest extends \Saft\TestCase
     }
      
     public function testSaveWithNamespaces()
-    {        
+    {
+        $this->_store->clearGraph($this->_testGraphUri);
+        
         $this->_fixture->init();
         
         $this->_fixture->{"rdf:subject"} = "bar";
@@ -266,7 +272,9 @@ class DispenseableResourceTest extends \Saft\TestCase
     }
      
     public function testSaveWithOverriding()
-    {        
+    {
+        $this->_store->clearGraph($this->_testGraphUri);
+        
         $this->_fixture->init();
         
         $this->_fixture->foo = "bar";
