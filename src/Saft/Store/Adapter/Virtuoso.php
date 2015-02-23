@@ -116,7 +116,18 @@ class Virtuoso extends \Saft\Store\Adapter\AbstractAdapter
         return $this->addMultipleTriples(
             $graphUri, array(array($subject, $predicate, $object))
         );
-    }    
+    }
+    
+    /**
+     * Deletes all triples of a graph.
+     * 
+     * @throw TODO Exceptions 
+     */
+    public function clearGraph($graphUri)
+    {
+        $this->dropGraph($graphUri);
+        $this->addGraph($graphUri);
+    }
     
     /**
      * Closes a current connection to the database.

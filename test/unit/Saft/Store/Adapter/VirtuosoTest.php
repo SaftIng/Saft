@@ -18,6 +18,16 @@ class VirtuosoTest extends \Saft\TestCase
     }
     
     /**
+     * 
+     */
+    public function tearDown()
+    { 
+        $this->_fixture->dropGraph($this->_testGraphUri);
+    
+        parent::tearDown();
+    }
+    
+    /**
      * function addMultipleTriples
      */
     
@@ -460,7 +470,7 @@ class VirtuosoTest extends \Saft\TestCase
                 )
             ),
             $this->_fixture->sparql(
-                "SELECT ?s ?p ?o FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o.}", 
+                "SELECT ?s ?p ?o FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o.} ORDER BY ?p", 
                 array("resultType" => "extended")
             )
         );
