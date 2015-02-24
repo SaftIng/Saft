@@ -1,48 +1,69 @@
 <?php
-namespace Saft\Rdf;
+namespace Saft\Rdf\Literal\Boolean;
 
-abstract class Literal implements Node
+/**
+ * Represents a boolean literal whose value can either be true or false.
+ */
+class Boolean extends \Saft\Rdf\Literal
 {
-    /**
-     * @var mixed
-     */
-    protected $value;
-    
     /**
      * @return string
      */
     public function __toString()
     {
         return $this->getLiteralValue();
-    }    
+    }
     
     /**
+     * Constructor. It sets $value but ignores $lang.
+     * 
      * @param mixed $value
      * @param string $lang optional
-     * @param string $datatype optional
      */
-    public function __construct($value, string $lang = null);
+    public function __construct($value, $lang = null)
+    {
+        $this->value = $value;
+    }
     
     /**
-     * @param \Saft\Rdf\Literal $toCompare
+     * @param \Saft\Rdf\Node $toCompare
      * @return boolean
      */
-    abstract public function equals(\Saft\Rdf\Node $toCompare);
+    public function equals(\Saft\Rdf\Node $toCompare)
+    {
+        // Strict comparison: It only compares if given $toCompare is a boolean too,
+        // otherwise it returns false.
+        if(true === $toCompare->isLiteral()
+           && $toCompare instanceOf \Saft\Rdf\Literal\Boolean) {
+            return $this->value === $toCompare->getValue();
+        }
+        
+        return false;
+    }
     
     /**
      * @return string
      */
-    abstract public function getDatatype();
+    public function getDatatype()
+    {
+        return 'http://www.w3.org/2001/XMLSchema#boolean';
+    }
     
     /**
-     * @return string|null
+     * @return null
      */
-    abstract public function getLanguage();
+    public function getLanguage()
+    {
+        return null;
+    }
     
     /**
-     * @return mixed
+     * @return boolean
      */
-    abstract public function getValue();
+    public function getValue()
+    {
+        return $this->value;
+    }
 
     /**
      * @return boolean

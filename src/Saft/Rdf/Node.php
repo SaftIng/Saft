@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Rdf;
 
 interface Node
@@ -9,9 +10,17 @@ interface Node
     public function __toString();
     
     /**
+     * @param mixed $value
+     * @param string $lang optional
+     * @param string $datatype optional
+     */
+    public function __construct($value, string $lang = null);
+    
+    /**
+     * @param \Saft\Rdf\Node $toCompare
      * @return boolean
      */
-    public function equals($tocompare);
+    abstract public function equals(\Saft\Rdf\Node $toCompare);
     
     /**
      * @return boolean
