@@ -36,7 +36,7 @@ interface Node
     /**
      * @return boolean
      */
-    public function isreturniable();
+    public function isReturnable();
 
     /**
      * @return string
