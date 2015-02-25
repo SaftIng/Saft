@@ -17,8 +17,10 @@ interface Node
     public function __construct($value, $lang = null);
     
     /**
+     * Check if a given instance of \Saft\Rdf\Node is equal to this instance.
+     * 
      * @param \Saft\Rdf\Node $toCompare
-     * @return boolean
+     * @return boolean True, if both instances are semantically equal, false otherwise.
      */
     public function equals(\Saft\Rdf\Node $toCompare);
     

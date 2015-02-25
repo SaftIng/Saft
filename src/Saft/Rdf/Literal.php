@@ -33,12 +33,18 @@ class Literal implements Node
     }
     
     /**
-     * @param \Saft\Rdf\Literal $toCompare
-     * @return boolean
+     * @see \Saft\Node
      */
     public function equals(\Saft\Rdf\Node $toCompare)
     {
+        // Only compare, if given instance is a literal
+        if (true == $toCompare->isLiteral()) {
+            return $this->getValue() === $toCompare->getValue();
+        }
         
+        // TODO what about cases like 1 == 1.0 or 1 == "1"?
+        
+        return false;
     }
     
     /**

@@ -23,6 +23,25 @@ class BooleanTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
+     * Tests equals
+     */
+    public function testEquals()
+    {
+        $this->fixture = new \Saft\Rdf\Literal(true);
+        $toCompare = new \Saft\Rdf\Literal(true);
+        
+        $this->assertTrue($this->fixture->equals($toCompare));
+    }
+    
+    public function testEquals_differentType()
+    {
+        $this->fixture = new \Saft\Rdf\Literal(1);
+        $toCompare = new \Saft\Rdf\Literal(1.0);
+        
+        $this->assertFalse($this->fixture->equals($toCompare));
+    }
+    
+    /**
      * Tests getDatatype
      */
     public function testGetDatatype_boolean()
