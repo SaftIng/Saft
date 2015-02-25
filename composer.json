@@ -1,5 +1,5 @@
 {
-    "name": "aksw/saft-rdf",
+    "name": "saft/saft-rdf",
     "require": {
         "php": ">5.3.3"
     },
