@@ -9,8 +9,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Saft\\Rdf\\": "src/",
-            "Saft\\Rdf\\Tests\\": "tests/"
+            "Saft\\": "src/Saft"
         }
     }
 }
