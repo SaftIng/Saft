@@ -12,6 +12,7 @@ class NamedNode implements \Saft\Rdf\Node
     /**
      * @param mixed $value The URI of the node.
      * @param string $lang optional Will be ignore because an NamedNode has no language.
+     * @throw \Exception If parameter $value is not a valid URI.
      */
     public function __construct($value, $lang = null)
     {
