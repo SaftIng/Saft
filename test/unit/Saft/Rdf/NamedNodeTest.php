@@ -48,9 +48,22 @@ class NamedNodeTest extends \PHPUnit_Framework_TestCase
         $this->fixture = new \Saft\Rdf\NamedNode('foo');
     }
     
+    public function testInstanciation_null()
+    {
+        $this->fixture = new \Saft\Rdf\NamedNode(null);
+        $this->assertEquals(null, $this->fixture->getValue());
+    }
+    
     public function testInstanciation_validUri()
     {
         $this->fixture = new \Saft\Rdf\NamedNode($this->testUri);
+        $this->assertEquals($this->testUri, $this->fixture->getValue());
+    }
+    
+    public function testInstanciation_variable()
+    {
+        $this->fixture = new \Saft\Rdf\NamedNode("?s");
+        $this->assertEquals("?s", $this->fixture->getValue());
     }
     
     /**
