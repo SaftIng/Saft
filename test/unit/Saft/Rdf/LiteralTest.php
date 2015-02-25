@@ -23,6 +23,56 @@ class BooleanTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
+     * Tests getDatatype
+     */
+    public function testGetDatatype_boolean()
+    {
+        $this->fixture = new \Saft\Rdf\Literal(true);
+        
+        $this->assertEquals(
+            'http://www.w3.org/2001/XMLSchema#boolean',
+            $this->fixture->getDatatype()
+        );
+    }
+    
+    public function testGetDatatype_langSet()
+    {
+        $this->fixture = new \Saft\Rdf\Literal('foo', 'en');
+        
+        $this->assertNull($this->fixture->getDatatype());
+    }
+    
+    public function testGetDatatype_decimal()
+    {
+        $this->fixture = new \Saft\Rdf\Literal(3.18);
+        
+        $this->assertEquals(
+            'http://www.w3.org/2001/XMLSchema#decimal',
+            $this->fixture->getDatatype()
+        );
+    }
+    
+    public function testGetDatatype_integer()
+    {
+        $this->fixture = new \Saft\Rdf\Literal(3);
+        
+        $this->assertEquals(
+            'http://www.w3.org/2001/XMLSchema#integer',
+            $this->fixture->getDatatype()
+        );
+    }
+    
+    public function testGetDatatype_string()
+    {
+        $this->fixture = new \Saft\Rdf\Literal('foo');
+        
+        $this->assertEquals(
+            'http://www.w3.org/2001/XMLSchema#string',
+            $this->fixture->getDatatype()
+        );
+    }
+    
+    /**
      * Tests isBlank
      */
     public function testIsBlank()
@@ -59,7 +109,7 @@ class BooleanTest extends \PHPUnit_Framework_TestCase
      */
     public function testToNT_langAndValueSet()
     {
-        $this->fixture = new \Saft\Rdf\Literal("foo", "en");
+        $this->fixture = new \Saft\Rdf\Literal('foo', 'en');
         
         $this->assertEquals('"foo"@en', $this->fixture->toNT());
     }
@@ -68,27 +118,39 @@ class BooleanTest extends \PHPUnit_Framework_TestCase
     {
         $this->fixture = new \Saft\Rdf\Literal(true);
         
-        $this->assertEquals('"1"', $this->fixture->toNT());
+        $this->assertEquals(
+            '"1"^^<http://www.w3.org/2001/XMLSchema#boolean>', 
+            $this->fixture->toNT()
+        );
     }
     
     public function testToNT_valueInteger()
     {
         $this->fixture = new \Saft\Rdf\Literal(30);
         
-        $this->assertEquals('"30"', $this->fixture->toNT());
+        $this->assertEquals(
+            '"30"^^<http://www.w3.org/2001/XMLSchema#integer>', 
+            $this->fixture->toNT()
+        );
     }
     
     public function testToNT_valueNull()
     {
+        // TODO: Implement case for getDatatype when value is null.
+        $this->setExpectedException('\Exception');
+        
         $this->fixture = new \Saft\Rdf\Literal(null);
         
-        $this->assertEquals('""', $this->fixture->toNT());
+        $this->fixture->toNT();
     }
     
     public function testToNT_valueString()
     {
-        $this->fixture = new \Saft\Rdf\Literal("foo");
+        $this->fixture = new \Saft\Rdf\Literal('foo');
         
-        $this->assertEquals('"foo"', $this->fixture->toNT());
+        $this->assertEquals(
+            '"foo"^^<http://www.w3.org/2001/XMLSchema#string>', 
+            $this->fixture->toNT()
+        );
     }
 }
