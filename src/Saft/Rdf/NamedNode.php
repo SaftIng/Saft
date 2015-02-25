@@ -16,7 +16,9 @@ class NamedNode implements \Saft\Rdf\Node
      */
     public function __construct($value, $lang = null)
     {
-        if(true === \Saft\Rdf\NamedNode::check($value)) {
+        if (true === \Saft\Rdf\NamedNode::check($value) 
+            || null === $value
+            || true === \Saft\Rdf\NamedNode::isVariable($value)) {
             $this->value = $value;
         } else {
             throw new \Exception('Paramter $value is not a valid URI.');
@@ -105,7 +107,27 @@ class NamedNode implements \Saft\Rdf\Node
     {
         return false;
     }
-
+    
+    /**
+     * Checks if a given string is a variable (?s).
+     * 
+     * @param string $string String to check if its a variable or not.
+     * @return boolean
+     */
+    public static function isVariable($string)
+    {
+        $matches = array();
+        preg_match_all('/\?[a-zA-Z0-9\_]+/', $string, $matches);
+        
+        if (true === isset($matches[0][0])
+            && 1 == count($matches[0][0]) 
+            && strlen($matches[0][0]) == strlen($string)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
     /**
      * @return string
      */

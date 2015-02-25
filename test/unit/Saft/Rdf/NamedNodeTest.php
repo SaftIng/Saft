@@ -84,4 +84,15 @@ class NamedNodeTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue($this->fixture->isNamed());
     }
+    
+    /**
+     * Tests isNamed
+     */
+    public function testIsVariable()
+    {
+        $this->assertTrue($this->fixture->isVariable("?s"));
+        $this->assertTrue($this->fixture->isVariable("?longVariable"));
+        
+        $this->assertFalse($this->fixture->isVariable("not a ?variable"));
+    }
 }
