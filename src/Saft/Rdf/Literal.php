@@ -1,7 +1,8 @@
 <?php
+
 namespace Saft\Rdf;
 
-abstract class Literal implements Node
+class Literal implements Node
 {
     /**
      * @var mixed
@@ -9,40 +10,68 @@ abstract class Literal implements Node
     protected $value;
     
     /**
-     * @return string
+     * @var string
      */
-    public function __toString()
-    {
-        return $this->getLiteralValue();
-    }    
+    protected $lang;
     
     /**
      * @param mixed $value
      * @param string $lang optional
-     * @param string $datatype optional
      */
-    public function __construct($value, string $lang = null);
+    public function __construct($value, $lang = null)
+    {
+        $this->value = $value;
+        $this->lang = $lang;
+    }
+    
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getValue();
+    }
     
     /**
      * @param \Saft\Rdf\Literal $toCompare
      * @return boolean
      */
-    abstract public function equals(\Saft\Rdf\Node $toCompare);
+    public function equals(\Saft\Rdf\Node $toCompare)
+    {
+        
+    }
     
     /**
      * @return string
      */
-    abstract public function getDatatype();
+    public function getDatatype()
+    {
+        
+    }
     
     /**
      * @return string|null
      */
-    abstract public function getLanguage();
+    public function getLanguage()
+    {
+        return $this->lang;
+    }
     
     /**
      * @return mixed
      */
-    abstract public function getValue();
+    public function getValue()
+    {
+        return $this->value;
+    }
+    
+    /**
+     * @return boolean
+     */
+    public function isBlank()
+    {
+        return false;
+    }
 
     /**
      * @return boolean
@@ -71,14 +100,6 @@ abstract class Literal implements Node
     /**
      * @return boolean
      */
-    public function isBlank()
-    {
-        return false;
-    }
-
-    /**
-     * @return boolean
-     */
     public function isReturnable()
     {
         return false;
@@ -89,10 +110,11 @@ abstract class Literal implements Node
      */
     public function toNT()
     {
-        $string = '"' . $this->geLiteralValue() . '"';
+        $string = '"' . $this->getValue() . '"';
+        
         if ($this->getLanguage() !== null) {
             $string .= '@' . $this->getLanguage();
-        } else if ($this->getDatatype() !== null) {
+        } elseif ($this->getDatatype() !== null) {
             $string .= '^^<' . $this->getDatatype() . '>';
         }
 

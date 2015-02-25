@@ -14,13 +14,13 @@ interface Node
      * @param string $lang optional
      * @param string $datatype optional
      */
-    public function __construct($value, string $lang = null);
+    public function __construct($value, $lang = null);
     
     /**
      * @param \Saft\Rdf\Node $toCompare
      * @return boolean
      */
-    abstract public function equals(\Saft\Rdf\Node $toCompare);
+    public function equals(\Saft\Rdf\Node $toCompare);
     
     /**
      * @return boolean
