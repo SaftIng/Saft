@@ -16,7 +16,7 @@ class DispenseableResourceTest extends \Saft\TestCase
         );
         
         // remove test namespace from global namespace registry of EasyRdf_Namespace
-        \EasyRdf\RdfNamespace::delete("enable");
+        \EasyRdf_Namespace::delete("enable");
     }  
     
     /**
@@ -73,7 +73,7 @@ class DispenseableResourceTest extends \Saft\TestCase
         
         $this->assertEquals(
             "http://enable/",
-            \EasyRdf\RdfNamespace::get("enable")
+            \EasyRdf_Namespace::get("enable")
         );
     }
     
@@ -87,13 +87,13 @@ class DispenseableResourceTest extends \Saft\TestCase
         
         $this->assertEquals(
             "http://enable/",
-            \EasyRdf\RdfNamespace::get("enable")
+            \EasyRdf_Namespace::get("enable")
         );
         
         $this->_fixture->deleteNamespace("enable");
         
         $this->assertNull(
-            \EasyRdf\RdfNamespace::get("enable")
+            \EasyRdf_Namespace::get("enable")
         );
     }
     

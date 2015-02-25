@@ -263,9 +263,9 @@ class Graph
             // normalize given format; we support synonyms which means, that
             // rdfxml and xml both leads to rdfxml
             try {
-                $format = \EasyRdf\Format::getFormat($format);
+                $format = \EasyRdf_Format::getFormat($format);
             // if format is unsupported
-            } catch (EasyRdf_Exception $e) {
+            } catch (\EasyRdf_Exception $e) {
                 throw new \Exception(
                     "Given \$format is not a valid import/export format or empty."
                 );
@@ -275,7 +275,7 @@ class Graph
         /**
          * at this point we know, what format and/or data we have to handle
          */
-        $graph = new \EasyRdf\Graph();
+        $graph = new \EasyRdf_Graph();
         
         // file
         if ($locator === "file") {

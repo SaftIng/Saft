@@ -87,7 +87,7 @@ class DispenseableResource
      */
     public function addNamespace($prefix, $uri)
     {
-        \EasyRdf\RdfNamespace::set($prefix, $uri);
+        \EasyRdf_Namespace::set($prefix, $uri);
     }    
     
     /**
@@ -98,7 +98,7 @@ class DispenseableResource
      */
     public function deleteNamespace($prefix)
     {
-        \EasyRdf\RdfNamespace::delete($prefix);
+        \EasyRdf_Namespace::delete($prefix);
     }    
     
     /**
@@ -128,7 +128,7 @@ class DispenseableResource
             
             // if the property is a prefixed URI
             if (false !== strpos($property, ":")) {
-                $predicate = \EasyRdf\RdfNamespace::expand($property);
+                $predicate = \EasyRdf_Namespace::expand($property);
                 
                 if ($predicate == $property) {
                     throw new \Exception(
@@ -207,7 +207,7 @@ class DispenseableResource
             
             // if the property is a prefixed URI
             if (false !== strpos($entry[1], ":")) {
-                $property = \EasyRdf\RdfNamespace::shorten($entry[1]);
+                $property = \EasyRdf_Namespace::shorten($entry[1]);
             
                 // if the shortening was not possible, but the property URI contains
                 // the URI of this resource than remove this URI part and let only 
