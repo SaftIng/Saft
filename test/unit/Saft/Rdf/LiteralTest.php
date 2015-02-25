@@ -1,8 +1,8 @@
 <?php
 
-namespace Saft\Rdf\Literal;
+namespace Saft\Rdf;
 
-class BooleanTest extends \PHPUnit_Framework_TestCase
+class LiteralTest extends \PHPUnit_Framework_TestCase
 {   
     /**
      * 
