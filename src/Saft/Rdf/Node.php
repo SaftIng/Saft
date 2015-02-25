@@ -12,7 +12,6 @@ interface Node
     /**
      * @param mixed $value
      * @param string $lang optional
-     * @param string $datatype optional
      */
     public function __construct($value, $lang = null);
     
