@@ -227,7 +227,7 @@ class Virtuoso extends \Saft\Store\Adapter\AbstractAdapter
          */
         if ("sparql" == $type) {
                         
-            if (true === \Saft\Uri::check($graphUri)) {
+            if (true === \Saft\Rdf\NamedNode::check($graphUri)) {
                 // enquote
                 $graphUri = "'" . $graphUri . "'";
                 $graphSpec = "define input:default-graph-uri <" . $graphUri . "> ";
