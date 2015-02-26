@@ -262,14 +262,20 @@ class Http extends AbstractAdapter
             // TODO check result type automatically
             $responseArray = json_decode($responseString, true);
             
-            foreach($responseArray["results"]["bindings"] as $entry) {
-                $returnEntry = array();
-                
-                foreach($responseArray["head"]["vars"] as $var) {
-                    $returnEntry[$var] = $entry[$var]["value"];
+            // in case $responseArray is null, something went wrong.
+            if (null == $responseArray) {
+                throw new \Exception('SPARQL error: '. $responseString);
+            } else {
+
+                foreach($responseArray["results"]["bindings"] as $entry) {
+                    $returnEntry = array();
+
+                    foreach($responseArray["head"]["vars"] as $var) {
+                        $returnEntry[$var] = $entry[$var]["value"];
+                    }
+
+                    $return[] = $returnEntry;
                 }
-                
-                $return[] = $returnEntry;
             }
         
         // SPARQL UPDATE query 
