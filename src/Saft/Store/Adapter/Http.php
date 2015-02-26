@@ -341,7 +341,7 @@ class Http extends AbstractAdapter
      */
     public function getTripleCount($graphUri)
     {
-        if (true === \Saft\Uri::check($graphUri)) {
+        if (true === \Saft\Rdf\NamedNode::check($graphUri)) {
             // TODO simplify that mess!
         
             $client = new \Saft\Sparql\Client();
