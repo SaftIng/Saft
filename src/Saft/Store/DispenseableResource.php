@@ -148,7 +148,7 @@ class DispenseableResource
                 $predicate, 
                 // object
                 array(
-                    "type" => false == \Saft\Uri::check($value) ? "literal" : "uri",
+                    "type" => false == \Saft\Rdf\NamedNode::check($value) ? "literal" : "uri",
                     "value" => $value
                 )
             );

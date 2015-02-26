@@ -48,7 +48,7 @@ class Store
      */
     public function addGraph($graphUri)
     {
-        if (true === \Saft\Uri::check($graphUri)) {
+        if (true === \Saft\Rdf\NamedNode::check($graphUri)) {
             
             $this->_adapter->addGraph($graphUri);
             
@@ -113,7 +113,7 @@ class Store
      */
     public function dropGraph($graphUri)
     {
-        if (true === \Saft\Uri::check($graphUri)) {
+        if (true === \Saft\Rdf\NamedNode::check($graphUri)) {
             $this->_adapter->dropGraph($graphUri);
             
             /**
@@ -249,7 +249,7 @@ class Store
      */
     public function getTripleCount($graphUri = "")
     {
-        if (true === \Saft\Uri::check($graphUri)) {
+        if (true === \Saft\Rdf\NamedNode::check($graphUri)) {
             return $this->_adapter->getTripleCount($graphUri);
         } else {
             $graphUris = $this->getAvailableGraphUris();

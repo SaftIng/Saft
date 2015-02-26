@@ -115,7 +115,7 @@ class Graph
      */
     public function getResourceInformation($resourceUri, $lang = "")
     {
-        if (true === \Saft\Uri::check($resourceUri)) {
+        if (true === \Saft\Rdf\NamedNode::check($resourceUri)) {
         
             // generate unique ID for the resource uri
             $query = "SELECT ?p ?o ".
@@ -369,7 +369,7 @@ class Graph
      */
     protected function setGraphUri($graphUri)
     {
-        if (true === \Saft\Uri::check($graphUri)) {
+        if (true === \Saft\Rdf\NamedNode::check($graphUri)) {
             $this->_graphUri = $graphUri;
         } else {
             throw new \Exception(
