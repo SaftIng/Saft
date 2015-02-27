@@ -2,15 +2,17 @@
 
 namespace Saft\Rdf;
 
+use \Saft\Rdf\Node;
+use \Saft\Rdf\NamedNode;
+
 class Triple extends \Saft\Rdf\AbstractStatement
 {
     /**
-     * @param \Saft\Rdf\Node $subject
-     * @param \Saft\Rdf\NamedNode $predicate
-     * @param \Saft\Rdf\Node $object
+     * @param Node $subject
+     * @param NamedNode $predicate
+     * @param Node $object
      */
-    public function __construct(\Saft\Rdf\Node $subject, \Saft\Rdf\Node $predicate, 
-        \Saft\Rdf\Node $object)
+    public function __construct(Node $subject, NamedNode $predicate, Node $object)
     {
         $this->subject = $subject;
         $this->predicate = $predicate;

@@ -16,7 +16,7 @@ class NamedNode implements \Saft\Rdf\Node
      */
     public function __construct($value, $lang = null)
     {
-        if (true === \Saft\Rdf\NamedNode::check($value) 
+        if (true === \Saft\Rdf\NamedNode::check($value)
             || null === $value
             || true === \Saft\Rdf\NamedNode::isVariable($value)) {
             $this->value = $value;
@@ -34,8 +34,8 @@ class NamedNode implements \Saft\Rdf\Node
     }
     
     /**
-     * Checks the general syntax of a given URI. Protocol-specific syntaxes are 
-     * not checked. Instead, only characters disallowed an all URIs lead to a 
+     * Checks the general syntax of a given URI. Protocol-specific syntaxes are
+     * not checked. Instead, only characters disallowed an all URIs lead to a
      * rejection of the check.
      *
      * @param string $string String to check if its a URI or not.
@@ -43,7 +43,7 @@ class NamedNode implements \Saft\Rdf\Node
      */
     public static function check($string)
     {
-        $regEx = '/^([a-zA-Z][a-zA-Z0-9+.-]+):([^\x00-\x0f\x20\x7f<>{}|\[\]`"^\\\\])+$/';        
+        $regEx = '/^([a-zA-Z][a-zA-Z0-9+.-]+):([^\x00-\x0f\x20\x7f<>{}|\[\]`"^\\\\])+$/';
         return (1 === preg_match($regEx, (string)$string));
     }
     
@@ -110,7 +110,7 @@ class NamedNode implements \Saft\Rdf\Node
     
     /**
      * Checks if a given string is a variable (?s).
-     * 
+     *
      * @param string $string String to check if its a variable or not.
      * @return boolean
      */
@@ -120,7 +120,7 @@ class NamedNode implements \Saft\Rdf\Node
         preg_match_all('/\?[a-zA-Z0-9\_]+/', $string, $matches);
         
         if (true === isset($matches[0][0])
-            && 1 == count($matches[0][0]) 
+            && 1 == count($matches[0][0])
             && strlen($matches[0][0]) == strlen($string)) {
             return true;
         }

@@ -17,7 +17,7 @@ interface Node
     
     /**
      * Check if a given instance of \Saft\Rdf\Node is equal to this instance.
-     * 
+     *
      * @param \Saft\Rdf\Node $toCompare
      * @return boolean True, if both instances are semantically equal, false otherwise.
      */

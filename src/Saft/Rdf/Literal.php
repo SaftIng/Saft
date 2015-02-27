@@ -34,7 +34,7 @@ class Literal implements Node
     
     /**
      * Forked from Erfurt_Utils.php of the Erfurt project.
-     * 
+     *
      * Build a Turtle-compatible literal string out of an RDF/PHP array object.
      * This string is used as the canonical representation for object values in Erfurt.
      *
@@ -56,7 +56,7 @@ class Literal implements Node
                 // it seems that either Virtuoso or ODBC convert a xmls:boolean
                 // value to an integer later on. So we will cast it internally
                 // to an string, to keep the value, but, unfortunately, we lost
-                // the datatype too. 
+                // the datatype too.
                 $search  = array("0", "1");
                 $replace = array("false", "true");
                 $value   = str_replace($search, $replace, $value);
@@ -64,18 +64,29 @@ class Literal implements Node
                 $datatype = "http://www.w3.org/2001/XMLSchema#string";
                 break;
                 
-            /* no normalization needed for these types */    
-            case "http://www.w3.org/2001/XMLSchema#decimal":    break;
-            case "http://www.w3.org/2001/XMLSchema#integer":    break;
-            case "http://www.w3.org/2001/XMLSchema#int":        break;
-            case "http://www.w3.org/2001/XMLSchema#float":      break;
-            case "http://www.w3.org/2001/XMLSchema#double":     break;
-            case "http://www.w3.org/2001/XMLSchema#duration":   break;
-            case "http://www.w3.org/2001/XMLSchema#dateTime":   break;
-            case "http://www.w3.org/2001/XMLSchema#date":       break;
-            case "http://www.w3.org/2001/XMLSchema#gMonthDay":  break;
-            case "http://www.w3.org/2001/XMLSchema#anyURI":     break;
-            case "http://www.w3.org/2001/XMLSchema#time":       break;
+            /* no normalization needed for these types */
+            case "http://www.w3.org/2001/XMLSchema#decimal":
+                break;
+            case "http://www.w3.org/2001/XMLSchema#integer":
+                break;
+            case "http://www.w3.org/2001/XMLSchema#int":
+                break;
+            case "http://www.w3.org/2001/XMLSchema#float":
+                break;
+            case "http://www.w3.org/2001/XMLSchema#double":
+                break;
+            case "http://www.w3.org/2001/XMLSchema#duration":
+                break;
+            case "http://www.w3.org/2001/XMLSchema#dateTime":
+                break;
+            case "http://www.w3.org/2001/XMLSchema#date":
+                break;
+            case "http://www.w3.org/2001/XMLSchema#gMonthDay":
+                break;
+            case "http://www.w3.org/2001/XMLSchema#anyURI":
+                break;
+            case "http://www.w3.org/2001/XMLSchema#time":
+                break;
             /* no normalization needed for these types */
             case "":    /* fallthrough */
             case null:  /* fallthrough */
@@ -84,7 +95,7 @@ class Literal implements Node
             default:
                 $value = addcslashes($value, $quoteChar);
                 
-                /** 
+                /**
                  * TODO Check for characters not allowed in a short literal
                  * {@link http://www.w3.org/TR/rdf-sparql-query/#rECHAR}
                  */
@@ -93,22 +104,22 @@ class Literal implements Node
                 }
                 break;
         }
-        
+
         // add short, long literal quotes respectively
         $value = $quoteChar . ($longString ? ($quoteChar . $quoteChar) : '')
-               . $value 
+               . $value
                . $quoteChar . ($longString ? ($quoteChar . $quoteChar) : '');
-        
+
         // add datatype URI/lang tag
         if (!empty($datatype)) {
             $value .= '^^<' . (string)$datatype . '>';
         } else if (!empty($lang)) {
             $value .= '@' . (string)$lang;
         }
-        
+
         return $value;
     }
-    
+
     /**
      * @see \Saft\Node
      */
@@ -150,18 +161,18 @@ class Literal implements Node
             /**
              * Note that according to [1] the lexical representation of a boolean
              * is defined as:
-             * 
-             * > An instance of a datatype that is defined as boolean can have 
+             *
+             * > An instance of a datatype that is defined as boolean can have
              * > the following legal literals {true, false, 1, 0}.
-             * 
+             *
              * But because of PHP's dynamic type system and the fact, that an user
              * can change values of a variable when he wants, we only determine the
              * values true and false as boolean.
-             * 
+             *
              * [1] - http://www.w3.org/TR/xmlschema-2/#boolean
              */
             return $xsd . 'boolean';
-        
+
         // xsd:string
         } elseif (true === is_string($this->value)) {
             return $xsd . 'string';
@@ -242,7 +253,7 @@ class Literal implements Node
     public function toNT()
     {
         $string = '"' . $this->getValue() . '"';
-        
+
         if ($this->getLanguage() !== null) {
             $string .= '@' . $this->getLanguage();
         } elseif ($this->getDatatype() !== null) {
