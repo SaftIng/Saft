@@ -12,7 +12,7 @@ class Http extends AbstractAdapter
     protected $_adapterOptions = null;
 
     /**
-     * @var \Saft\Sparql\Client
+     * @var \Saft\Net\Client
      */
     protected $client = null;
 
@@ -26,7 +26,7 @@ class Http extends AbstractAdapter
         $this->_adapterOptions = $adapterOptions;
         
         // TODO move that config to init function
-        $this->client = new \Saft\Sparql\Client();
+        $this->client = new \Saft\Net\Client();
         
         // Open connection
         $this->connect();
@@ -63,7 +63,7 @@ class Http extends AbstractAdapter
     {
         // TODO simplify that mess!
         
-        $client = new \Saft\Sparql\Client();
+        $client = new \Saft\Net\Client();
         $client->setUrl($this->_adapterOptions["authUrl"]);
         $response = $client->sendDigestAuthentication(
             $this->_adapterOptions["username"], $this->_adapterOptions["password"]
@@ -172,7 +172,7 @@ class Http extends AbstractAdapter
     {      
         // TODO simplify that mess!
         
-        $client = new \Saft\Sparql\Client();
+        $client = new \Saft\Net\Client();
         $client->setUrl($this->_adapterOptions["authUrl"]);
         $response = $client->sendDigestAuthentication(
             $this->_adapterOptions["username"], $this->_adapterOptions["password"]
@@ -344,7 +344,7 @@ class Http extends AbstractAdapter
         if (true === \Saft\Rdf\NamedNode::check($graphUri)) {
             // TODO simplify that mess!
         
-            $client = new \Saft\Sparql\Client();
+            $client = new \Saft\Net\Client();
             $client->setUrl($this->_adapterOptions["authUrl"]);
             $response = $client->sendDigestAuthentication(
                 $this->_adapterOptions["username"], $this->_adapterOptions["password"]
