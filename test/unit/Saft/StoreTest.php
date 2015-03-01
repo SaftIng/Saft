@@ -11,8 +11,8 @@ class StoreTest extends \Saft\TestCase
     public function generateTestCacheEntries()
     {
         $query = "SELECT ?s ?p ?o
-                    FROM <". $this->_testGraphUri .">
-                    FROM <". $this->_testGraphUri ."2>
+                    FROM <" . $this->testGraphUri . ">
+                    FROM <" . $this->testGraphUri . "2>
                    WHERE {
                      <http://rdfs.org/sioc/ns#foo> ?p ?o.
                      ?s <http://www.w3.org/2000/01/rdf-schema#label> \"foo\".
@@ -20,61 +20,63 @@ class StoreTest extends \Saft\TestCase
                    }";
         $result = array("foo" => 1337);
 
-        $queryId = $this->_fixture->getQueryCache()->generateShortId($query);
-        $this->assertFalse($this->_fixture->getCache()->get($queryId));
-        
+        $queryId = $this->fixture->getQueryCache()->generateShortId($query);
+        $this->assertFalse($this->fixture->getCache()->get($queryId));
+
         /**
          * graph container
          */
         $graphUris = array(
-            $this->_testGraphUri, $this->_testGraphUri . "2"
+            $this->testGraphUri, $this->testGraphUri . "2"
         );
         $graphIds = array();
-        
-        foreach($graphUris as $graphUri) {
-            $graphIds[] = $this->_fixture->getQueryCache()->generateShortId($graphUri);
+
+        foreach ($graphUris as $graphUri) {
+            $graphIds[] = $this->fixture->getQueryCache()->generateShortId($graphUri);
         }
-        
-        foreach($graphIds as $graphId) {
-            $this->assertFalse($this->_fixture->getCache()->get($graphId));
+
+        foreach ($graphIds as $graphId) {
+            $this->assertFalse($this->fixture->getCache()->get($graphId));
         }
-        
+
         /**
-         * Generate triple pattern array. 
-          
+         * Generate triple pattern array.
+
            # Example:
-           
+
             "qryCah--f7bc2ce104" => array (
                 0 => "qryCah--f7bc2ce104_*_*_*"
                 1 => "qryCah--f7bc2ce104_*_2e393a3c3c_*"
             )
-        
-        
+
+
             # Behind the scenes (what does each entry mean):
-            
+
             "$graphId (hashed graph URI)" => array (
                 0 => "$keyPrefix$graphId (hashed graph URI)_Placeholder_Placeholder_Placeholder"
                 1 => "$keyPrefix$graphId (hashed graph URI)_Placeholder_2e393a3c3c_Placeholder"
             )
          *
          */
-        $sPO = "_". $this->_fixture->getQueryCache()->generateShortId("http://rdfs.org/sioc/ns#foo", false) 
+        $sPO = "_". $this->fixture->getQueryCache()->generateShortId("http://rdfs.org/sioc/ns#foo", false)
                . "_*_*";
-               
-        $sLabelFoo = "_*_" . $this->_fixture->getQueryCache()->generateShortId(
-                        "http://www.w3.org/2000/01/rdf-schema#label", false
-                     ) . "_*";
-        
-        foreach($graphIds as $graphId) {
+
+        $sLabelFoo = "_*_" .
+            $this->fixture->getQueryCache()->generateShortId(
+                "http://www.w3.org/2000/01/rdf-schema#label",
+                false
+            ) . "_*";
+
+        foreach ($graphIds as $graphId) {
             $triplePattern[$graphId] = array(
-                $graphId . $sPO, 
+                $graphId . $sPO,
                 $graphId . $sLabelFoo
             );
-            
-            $this->assertFalse($this->_fixture->getCache()->get($graphId . $sPO));
-            $this->assertFalse($this->_fixture->getCache()->get($graphId . $sLabelFoo));
+
+            $this->assertFalse($this->fixture->getCache()->get($graphId . $sPO));
+            $this->assertFalse($this->fixture->getCache()->get($graphId . $sLabelFoo));
         }
-        
+
         return array(
             "graphIds"          => $graphIds,       // have cache entries
             "graphUris"         => $graphUris,
@@ -84,100 +86,100 @@ class StoreTest extends \Saft\TestCase
                 "graphIds"                   => $graphIds,
                 "query"                      => $query,
                 "result"                     => $result,
-                "triplePattern"              => $triplePattern 
+                "triplePattern"              => $triplePattern
             ),
-            "queryId"           => $queryId,        // has cache entry 
+            "queryId"           => $queryId,        // has cache entry
             "result"            => $result,
             "triplePattern"     => $triplePattern   // have cache entries
         );
     }
-    
+
     public function setUp()
-    {   
+    {
         parent::setUp();
-        
-        $this->_fixture = new \Saft\Store($this->_storeConfig, $this->_cache);
-        $this->_fixture->addGraph($this->_testGraphUri);
-        
-        $this->_cache->clean();
+
+        $this->fixture = new \Saft\Store($this->storeConfig, $this->cache);
+        $this->fixture->addGraph($this->testGraphUri);
+
+        $this->cache->clean();
     }
-    
+
     /**
-     * 
+     *
      */
     public function tearDown()
-    { 
-        $this->_fixture->dropGraph($this->_testGraphUri);
-        $this->_fixture->getCache()->clean();
-    
+    {
+        $this->fixture->dropGraph($this->testGraphUri);
+        $this->fixture->getCache()->clean();
+
         parent::tearDown();
     }
-    
+
     /**
      * function addGraph
      */
     public function testAddGraph()
     {
-        $this->_fixture->dropGraph($this->_testGraphUri);
-        
+        $this->fixture->dropGraph($this->testGraphUri);
+
         $this->assertFalse(
-            $this->_fixture->isGraphAvailable($this->_testGraphUri)
+            $this->fixture->isGraphAvailable($this->testGraphUri)
         );
-        
+
         // clear cache
-        $this->_cache->clean();
-        
+        $this->cache->clean();
+
         $this->assertFalse(
-            $this->_cache->get("enable_store_availableGraphs")
+            $this->cache->get("enable_store_availableGraphs")
         );
-        
+
         // add graph
-        $this->_fixture->addGraph($this->_testGraphUri);
-        
+        $this->fixture->addGraph($this->testGraphUri);
+
         $this->assertTrue(
-            $this->_fixture->isGraphAvailable($this->_testGraphUri)
+            $this->fixture->isGraphAvailable($this->testGraphUri)
         );
-        
+
         // check cache for added graph
         $this->assertTrue(
             array_key_exists(
-                $this->_testGraphUri, 
-                $this->_cache->get("sto". $this->_fixture->getId() ."_availableGraphUris")
+                $this->testGraphUri,
+                $this->cache->get("sto". $this->fixture->getId() ."_availableGraphUris")
             )
         );
     }
-    
+
     /**
      * function addMultipleTriples
      */
-    
+
     public function testAddMultipleStmts()
     {
         // graph is empty
-        $this->assertEquals(0, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+
         // 2 triples
         $multipleTriples = array(
             array(
-                "http://s/", 
-                "http://p/", 
+                "http://s/",
+                "http://p/",
                 array("type" => "uri", "value" => "http://test/uri")
             ),
             array(
-                "http://s/", 
-                "http://p/", 
+                "http://s/",
+                "http://p/",
                 array("type" => "literal", "value" => "test literal")
             )
         );
-        
+
         // add triples
-        $this->_fixture->addMultipleTriples($this->_testGraphUri, $multipleTriples);
-        
+        $this->fixture->addMultipleTriples($this->testGraphUri, $multipleTriples);
+
         // graph contains two entries
-        $this->assertEquals(2, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
+        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraphUri));
+
         // execute a query to get the content of the graph
-        $graph = $this->_fixture->getGraph($this->_testGraphUri);
+        $graph = $this->fixture->getGraph($this->testGraphUri);
         $this->assertEquals(
             array(
                 array(
@@ -190,54 +192,57 @@ class StoreTest extends \Saft\TestCase
             $graph->sparql("SELECT ?s ?p ?o WHERE {?s ?p ?o.}")
         );
     }
-    
-    public function testAddMultipleStmts_focusOnQueryCache()
+
+    public function testAddMultipleStmtsFocusOnQueryCache()
     {
         $testData = $this->generateTestCacheEntries();
-        
+
         // put test data into the QueryCache
-        $this->_fixture->getQueryCache()->rememberQueryResult(
-            $testData["query"], $testData["result"]
+        $this->fixture->getQueryCache()->rememberQueryResult(
+            $testData["query"],
+            $testData["result"]
         );
-        
+
         /**
          * check if everything was created successfully
          */
-                
+
         // graph container
-        foreach($testData["graphIds"] as $graphId) {
+        foreach ($testData["graphIds"] as $graphId) {
             $this->assertEquals(
                 array($testData["queryId"] => $testData["queryId"]),
-                $this->_fixture->getCache()->get($graphId)
+                $this->fixture->getCache()->get($graphId)
             );
         }
-        
+
         // triple pattern
         foreach ($testData["triplePattern"] as $graphId => $triplePattern) {
             foreach ($triplePattern as $pattern) {
                 $this->assertEquals(
-                    $testData["queryId"], $this->_fixture->getCache()->get($pattern)
+                    $testData["queryId"],
+                    $this->fixture->getCache()->get($pattern)
                 );
             }
         }
-        
+
         // query container
         $this->assertEquals(
-            $testData["queryContainer"], $this->_fixture->getCache()->get($testData["queryId"])
+            $testData["queryContainer"],
+            $this->fixture->getCache()->get($testData["queryId"])
         );
-        
+
         /**
          * add triples which have to lead to an invalidation of the previously
          * created cache entries!
          */
-        $this->_fixture->addMultipleTriples(
-            $this->_testGraphUri, 
+        $this->fixture->addMultipleTriples(
+            $this->testGraphUri,
             array(
                 array(
-                    "http://rdfs.org/sioc/ns#foo", 
-                    "http://predicate/", 
+                    "http://rdfs.org/sioc/ns#foo",
+                    "http://predicate/",
                     array("type" => "uri", "value" => "http://object")
-                ), 
+                ),
                 array(
                     "http://whatever",
                     "http://www.w3.org/2000/01/rdf-schema#label",
@@ -245,271 +250,282 @@ class StoreTest extends \Saft\TestCase
                 )
             )
         );
-        
+
         /**
          * check everything again
          */
-        
+
         // graph container
-        foreach($testData["graphIds"] as $graphId) {
+        foreach ($testData["graphIds"] as $graphId) {
             $this->assertFalse(
-                $this->_fixture->getCache()->get($graphId)
+                $this->fixture->getCache()->get($graphId)
             );
         }
-        
+
         // triple pattern
         foreach ($testData["triplePattern"] as $graphId => $triplePattern) {
             foreach ($triplePattern as $pattern) {
-                $this->assertFalse($this->_fixture->getCache()->get($pattern));
+                $this->assertFalse($this->fixture->getCache()->get($pattern));
             }
         }
-        
+
         // query container
-        $this->assertFalse($this->_fixture->getCache()->get($testData["queryId"]));
+        $this->assertFalse($this->fixture->getCache()->get($testData["queryId"]));
     }
-    
+
     /**
      * function addTriple
      */
-    
+
     public function testAddStmt()
     {
         // graph is empty
-        $this->assertEquals(0, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+
         // add triple
-        $this->_fixture->addTriple(
-            $this->_testGraphUri, 
-            "http://s/", "http://p/", array("type" => "uri", "value" => "http://test/uri")
+        $this->fixture->addTriple(
+            $this->testGraphUri,
+            "http://s/",
+            "http://p/",
+            array("type" => "uri", "value" => "http://test/uri")
         );
-        
+
         // graph is empty
-        $this->assertEquals(1, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
+        $this->assertEquals(1, $this->fixture->getTripleCount($this->testGraphUri));
+
         // execute a query to get the content of the graph
-        $graph = $this->_fixture->getGraph($this->_testGraphUri);
+        $graph = $this->fixture->getGraph($this->testGraphUri);
         $this->assertEquals(
             array(
                 array(
-                    "s" => "http://s/", "p" => "http://p/", "o" => "http://test/uri"
+                    "s" => "http://s/",
+                    "p" => "http://p/",
+                    "o" => "http://test/uri"
                 )
             ),
             $graph->sparql("SELECT ?s ?p ?o WHERE {?s ?p ?o.}")
         );
     }
-    
-    public function testAddStmt_focusOnQueryCache()
+
+    public function testAddStmtFocusOnQueryCache()
     {
         $testData = $this->generateTestCacheEntries();
-        
+
         // put test data into the QueryCache
-        $this->_fixture->getQueryCache()->rememberQueryResult(
-            $testData["query"], $testData["result"]
+        $this->fixture->getQueryCache()->rememberQueryResult(
+            $testData["query"],
+            $testData["result"]
         );
-        
+
         /**
          * check if everything was created successfully
          */
-                
+
         // graph container
-        foreach($testData["graphIds"] as $graphId) {
+        foreach ($testData["graphIds"] as $graphId) {
             $this->assertEquals(
                 array($testData["queryId"] => $testData["queryId"]),
-                $this->_fixture->getCache()->get($graphId)
+                $this->fixture->getCache()->get($graphId)
             );
         }
-        
+
         // triple pattern
         foreach ($testData["triplePattern"] as $graphId => $triplePattern) {
             foreach ($triplePattern as $pattern) {
                 $this->assertEquals(
-                    $testData["queryId"], $this->_fixture->getCache()->get($pattern)
+                    $testData["queryId"],
+                    $this->fixture->getCache()->get($pattern)
                 );
             }
         }
-        
+
         // query container
         $this->assertEquals(
-            $testData["queryContainer"], $this->_fixture->getCache()->get($testData["queryId"])
+            $testData["queryContainer"],
+            $this->fixture->getCache()->get($testData["queryId"])
         );
-        
+
         /**
          * add a triple which has to lead to an invalidation of the previously
          * created cache data!
          */
-        $this->_fixture->addTriple(
-            $this->_testGraphUri, 
-            "http://rdfs.org/sioc/ns#foo", 
+        $this->fixture->addTriple(
+            $this->testGraphUri,
+            "http://rdfs.org/sioc/ns#foo",
             "http://predicate/",
             array("type" => "uri", "value" => "http://object")
         );
-        
-        
+
+
         /**
          * check everything again
          */
-        
+
         // graph container
-        foreach($testData["graphIds"] as $graphId) {
+        foreach ($testData["graphIds"] as $graphId) {
             $this->assertFalse(
-                $this->_fixture->getCache()->get($graphId)
+                $this->fixture->getCache()->get($graphId)
             );
         }
-        
+
         // triple pattern
         foreach ($testData["triplePattern"] as $graphId => $triplePattern) {
             foreach ($triplePattern as $pattern) {
-                $this->assertFalse($this->_fixture->getCache()->get($pattern));
+                $this->assertFalse($this->fixture->getCache()->get($pattern));
             }
         }
-        
+
         // query container
-        $this->assertFalse($this->_fixture->getCache()->get($testData["queryId"]));
+        $this->assertFalse($this->fixture->getCache()->get($testData["queryId"]));
     }
-    
+
     /**
      * function dropGraph
      */
-    
+
     public function testDropGraph()
     {
-        $this->_fixture->dropGraph($this->_testGraphUri);
-        
+        $this->fixture->dropGraph($this->testGraphUri);
+
         $this->assertFalse(
-            $this->_fixture->isGraphAvailable($this->_testGraphUri)
+            $this->fixture->isGraphAvailable($this->testGraphUri)
         );
-        
-        $this->_fixture->addGraph($this->_testGraphUri);
-        
+
+        $this->fixture->addGraph($this->testGraphUri);
+
         $this->assertTrue(
-            $this->_fixture->isGraphAvailable($this->_testGraphUri)
+            $this->fixture->isGraphAvailable($this->testGraphUri)
         );
-        
-        $this->_fixture->dropGraph($this->_testGraphUri);
-        
+
+        $this->fixture->dropGraph($this->testGraphUri);
+
         $this->assertFalse(
-            $this->_fixture->isGraphAvailable($this->_testGraphUri)
+            $this->fixture->isGraphAvailable($this->testGraphUri)
         );
     }
-    
-    public function testDropGraph_focusOnQueryCache()
+
+    public function testDropGraphFocusOnQueryCache()
     {
         $testData = $this->generateTestCacheEntries();
-        
+
         // put test data into the QueryCache
-        $this->_fixture->getQueryCache()->rememberQueryResult(
-            $testData["query"], $testData["result"]
+        $this->fixture->getQueryCache()->rememberQueryResult(
+            $testData["query"],
+            $testData["result"]
         );
-        
+
         /**
          * check if everything was created successfully
          */
-                
+
         // graph container
-        foreach($testData["graphIds"] as $graphId) {
+        foreach ($testData["graphIds"] as $graphId) {
             $this->assertEquals(
                 array($testData["queryId"] => $testData["queryId"]),
-                $this->_fixture->getCache()->get($graphId)
+                $this->fixture->getCache()->get($graphId)
             );
         }
-        
+
         // triple pattern
         foreach ($testData["triplePattern"] as $graphId => $triplePattern) {
             foreach ($triplePattern as $pattern) {
                 $this->assertEquals(
-                    $testData["queryId"], $this->_fixture->getCache()->get($pattern)
+                    $testData["queryId"],
+                    $this->fixture->getCache()->get($pattern)
                 );
             }
         }
-        
+
         // query container
         $this->assertEquals(
-            $testData["queryContainer"], $this->_fixture->getCache()->get($testData["queryId"])
+            $testData["queryContainer"],
+            $this->fixture->getCache()->get($testData["queryId"])
         );
-        
-        
+
+
         /**
          * add a triple which has to lead to an invalidation of the previously
          * created cache data!
          */
-        $this->_fixture->dropGraph($this->_testGraphUri);
-        
-        
+        $this->fixture->dropGraph($this->testGraphUri);
+
+
         /**
          * check everything again
          */
-        
+
         // graph container
-        foreach($testData["graphIds"] as $graphId) {
-            if ($graphId === 
-                $this->_fixture->getQueryCache()->generateShortId($this->_testGraphUri)) {
+        foreach ($testData["graphIds"] as $graphId) {
+            if ($graphId ===
+                $this->fixture->getQueryCache()->generateShortId($this->testGraphUri)) {
                 $this->assertFalse(
-                    $this->_fixture->getCache()->get($graphId)
+                    $this->fixture->getCache()->get($graphId)
                 );
             }
         }
-        
+
         // triple pattern
         foreach ($testData["triplePattern"] as $graphId => $triplePattern) {
             foreach ($triplePattern as $pattern) {
-                $this->assertFalse($this->_fixture->getCache()->get($pattern));
+                $this->assertFalse($this->fixture->getCache()->get($pattern));
             }
         }
-        
+
         // query container
-        $this->assertFalse($this->_fixture->getCache()->get($testData["queryId"]));
+        $this->assertFalse($this->fixture->getCache()->get($testData["queryId"]));
     }
-    
+
     /**
      * function dropMultipleTriples
      */
-    
+
     public function testDropMultipleStmts()
     {
         /**
          * Create some test data
          */
-        $this->assertEquals(0, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+
         // 2 triples
         $multipleTriples = array(
             array("http://s/", "http://p/", array("type" => "uri", "value" => "http://test/uri")),
             array("http://s/", "http://p/", array("type" => "literal", "value" => "test literal"))
         );
-        $this->_fixture->addMultipleTriples($this->_testGraphUri, $multipleTriples);
-        $this->assertEquals(2, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
+        $this->fixture->addMultipleTriples($this->testGraphUri, $multipleTriples);
+        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraphUri));
+
         /**
          * drop multiple triples
          */
-        $this->_fixture->dropMultipleTriples(
-            $this->_testGraphUri, $multipleTriples
+        $this->fixture->dropMultipleTriples(
+            $this->testGraphUri,
+            $multipleTriples
         );
-        
-        $this->assertEquals(0, $this->_fixture->getTripleCount($this->_testGraphUri));
+
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
     }
-    
-    public function testDropMultipleStmts_focusOnQueryCache()
+
+    public function testDropMultipleStmtsFocusOnQueryCache()
     {
-        $graph = $this->_fixture->getGraph($this->_testGraphUri);
-        $this->assertEquals(0, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
-        
+        $graph = $this->fixture->getGraph($this->testGraphUri);
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+
+
         /**
          * Create some test data, especially for the QueryCache
          */
         $testData = $this->generateTestCacheEntries();
-        
+
         $resourceUri = "http://foo/bar";
-        
+
         // test triples
         $multipleTriples = array(array(
-            $resourceUri, 
+            $resourceUri,
             "http://www.w3.org/2000/01/rdf-schema#label",
             array("type" => "literal", "value" => "foo's label")
         ));
-        $this->_fixture->addMultipleTriples($this->_testGraphUri, $multipleTriples);      
-        
+        $this->fixture->addMultipleTriples($this->testGraphUri, $multipleTriples);
+
         // verify the everything was created as requested, bypass query cache
         $this->assertEquals(
             array(
@@ -519,33 +535,34 @@ class StoreTest extends \Saft\TestCase
                     "o" => "foo's label"
                 )
             ),
-            // usually sparql function cache query + result, but we force it to 
-            // bypass QueryCache 
+            // usually sparql function cache query + result, but we force it to
+            // bypass QueryCache
             $graph->sparql(
-                "SELECT ?s ?p ?o WHERE {?s ?p ?o.}", array("useQueryCache" => false)
+                "SELECT ?s ?p ?o WHERE {?s ?p ?o.}",
+                array("useQueryCache" => false)
             )
         );
-        
+
         /**
          * check cache entries; the adding of multiple triples has to lead to
          * an invalidation of a couple of cache entries
          */
-         
+
         // graph container
-        foreach($testData["graphIds"] as $graphId) {
-            $this->assertFalse($this->_fixture->getCache()->get($graphId));
+        foreach ($testData["graphIds"] as $graphId) {
+            $this->assertFalse($this->fixture->getCache()->get($graphId));
         }
-        
+
         // triple pattern
         foreach ($testData["triplePattern"] as $graphId => $triplePattern) {
             foreach ($triplePattern as $pattern) {
-                $this->assertFalse($this->_fixture->getCache()->get($pattern));
+                $this->assertFalse($this->fixture->getCache()->get($pattern));
             }
         }
-        
+
         // query container
-        $this->assertFalse($this->_fixture->getCache()->get($testData["queryId"]));  
-        
+        $this->assertFalse($this->fixture->getCache()->get($testData["queryId"]));
+
         /**
          * get information about the main resource to let the query cache save the
          * according cache information
@@ -556,40 +573,40 @@ class StoreTest extends \Saft\TestCase
                     $resourceUri,
                     "http://www.w3.org/2000/01/rdf-schema#label",
                     array(
-                        "datatype" => null, 
-                        "lang" => null, 
-                        "type" => "literal", 
+                        "datatype" => null,
+                        "lang" => null,
+                        "type" => "literal",
                         "value" => "foo's label"
                     )
                 )
             ),
             $graph->getResourceInformation($resourceUri)
         );
-        
+
         /**
          * check freshly created cache entries
          */
-        $propertyQueryId = $this->_fixture->getQueryCache()->generateShortId(
+        $propertyQueryId = $this->fixture->getQueryCache()->generateShortId(
             "SELECT ?p ?o ".
-              "FROM <". $this->_testGraphUri ."> ".
-             "WHERE {<". $resourceUri ."> ?p ?o.} ".
-             "ORDER BY ?p"
+            "FROM <". $this->testGraphUri ."> ".
+            "WHERE {<". $resourceUri ."> ?p ?o.} ".
+            "ORDER BY ?p"
         );
-        
-        $testGraphId = $this->_fixture->getQueryCache()->generateShortId(
-            $this->_testGraphUri
+
+        $testGraphId = $this->fixture->getQueryCache()->generateShortId(
+            $this->testGraphUri
         );
-                           
+
         $this->assertEquals(
             array(
                 "relatedQueryCacheEntries" => "",
                 "graphIds" => array(
-                    $this->_fixture->getQueryCache()->generateShortId(
-                        $this->_testGraphUri
+                    $this->fixture->getQueryCache()->generateShortId(
+                        $this->testGraphUri
                     )
                 ),
                 "query" => "SELECT ?p ?o ".
-                             "FROM <". $this->_testGraphUri ."> ".
+                             "FROM <". $this->testGraphUri ."> ".
                             "WHERE {<". $resourceUri ."> ?p ?o.} ".
                             "ORDER BY ?p",
                 "result" => array(
@@ -608,67 +625,68 @@ class StoreTest extends \Saft\TestCase
                     $testGraphId => array(
                         $testGraphId
                         . "_"
-                        . $this->_fixture->getQueryCache()->generateShortId($resourceUri, false)
+                        . $this->fixture->getQueryCache()->generateShortId($resourceUri, false)
                         . "_*_*"
                     )
                 )
             ),
-            $this->_fixture->getCache()->get($propertyQueryId)
-        ); 
-        
+            $this->fixture->getCache()->get($propertyQueryId)
+        );
+
         // ---------------------------------------------------------------------
-        $this->assertEquals(1, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
+        $this->assertEquals(1, $this->fixture->getTripleCount($this->testGraphUri));
+
         /**
          * drop multiple triples
          */
-        $this->_fixture->dropMultipleTriples(
-            $this->_testGraphUri, $multipleTriples
+        $this->fixture->dropMultipleTriples(
+            $this->testGraphUri,
+            $multipleTriples
         );
         // ---------------------------------------------------------------------
-        
-        $this->assertEquals(0, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
+
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+
         /**
          * check cache entries again
          */
-        
-        $this->assertFalse($this->_fixture->getCache()->get($propertyQueryId)); 
+
+        $this->assertFalse($this->fixture->getCache()->get($propertyQueryId));
     }
-    
+
     /**
      * function dropTriple
      */
-    
+
     public function testDropStmt()
     {
         /**
          * Create some test data
          */
-        $this->assertEquals(0, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+
         // 2 triples
         $multipleTriples = array(
             array("http://s/", "http://p/", array("type" => "uri", "value" => "http://test/uri")),
             array("http://s/", "http://p/", array("type" => "literal", "value" => "test literal"))
         );
-        $this->_fixture->addMultipleTriples($this->_testGraphUri, $multipleTriples);
-        $this->assertEquals(2, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
+        $this->fixture->addMultipleTriples($this->testGraphUri, $multipleTriples);
+        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraphUri));
+
         /**
          * drop one triple
          */
-        $this->_fixture->dropTriple(
-            $this->_testGraphUri, 
-            "http://s/", 
-            "http://p/", 
+        $this->fixture->dropTriple(
+            $this->testGraphUri,
+            "http://s/",
+            "http://p/",
             array("type" => "literal", "value" => "test literal")
         );
-        
-        $this->assertEquals(1, $this->_fixture->getTripleCount($this->_testGraphUri));        
-        
+
+        $this->assertEquals(1, $this->fixture->getTripleCount($this->testGraphUri));
+
         // execute a query to get the content of the graph
-        $graph = $this->_fixture->getGraph($this->_testGraphUri);
+        $graph = $this->fixture->getGraph($this->testGraphUri);
         $this->assertEquals(
             array(
                 array(
@@ -680,209 +698,214 @@ class StoreTest extends \Saft\TestCase
             $graph->sparql("SELECT ?s ?p ?o WHERE {?s ?p ?o.}")
         );
     }
-    
-    public function testDropStmt_focusOnQueryCache()
+
+    public function testDropStmtFocusOnQueryCache()
     {
         $testData = $this->generateTestCacheEntries();
-        
+
         // put test data into the QueryCache
-        $this->_fixture->getQueryCache()->rememberQueryResult(
-            $testData["query"], $testData["result"]
+        $this->fixture->getQueryCache()->rememberQueryResult(
+            $testData["query"],
+            $testData["result"]
         );
-        
+
         /**
          * check if everything was created successfully
          */
-                
+
         // graph container
-        foreach($testData["graphIds"] as $graphId) {
+        foreach ($testData["graphIds"] as $graphId) {
             $this->assertEquals(
                 array($testData["queryId"] => $testData["queryId"]),
-                $this->_fixture->getCache()->get($graphId)
+                $this->fixture->getCache()->get($graphId)
             );
         }
-        
+
         // triple pattern
         foreach ($testData["triplePattern"] as $graphId => $triplePattern) {
             foreach ($triplePattern as $pattern) {
                 $this->assertEquals(
-                    $testData["queryId"], $this->_fixture->getCache()->get($pattern)
+                    $testData["queryId"],
+                    $this->fixture->getCache()->get($pattern)
                 );
             }
         }
-        
+
         // query container
         $this->assertEquals(
-            $testData["queryContainer"], $this->_fixture->getCache()->get($testData["queryId"])
+            $testData["queryContainer"],
+            $this->fixture->getCache()->get($testData["queryId"])
         );
-        
+
         /**
          * add a triple which has to lead to an invalidation of the previously
          * created cache data!
          */
-        $this->_fixture->dropTriple(
-            $this->_testGraphUri, 
-            "http://rdfs.org/sioc/ns#foo", 
+        $this->fixture->dropTriple(
+            $this->testGraphUri,
+            "http://rdfs.org/sioc/ns#foo",
             "http://predicate/",
             array("type" => "uri", "value" => "http://object")
         );
-        
-        
+
+
         /**
          * check everything again
          */
-        
+
         // graph container
-        foreach($testData["graphIds"] as $graphId) {
+        foreach ($testData["graphIds"] as $graphId) {
             $this->assertFalse(
-                $this->_fixture->getCache()->get($graphId)
+                $this->fixture->getCache()->get($graphId)
             );
         }
-        
+
         // triple pattern
         foreach ($testData["triplePattern"] as $graphId => $triplePattern) {
             foreach ($triplePattern as $pattern) {
-                $this->assertFalse($this->_fixture->getCache()->get($pattern));
+                $this->assertFalse($this->fixture->getCache()->get($pattern));
             }
         }
-        
+
         // query container
-        $this->assertFalse($this->_fixture->getCache()->get($testData["queryId"]));
+        $this->assertFalse($this->fixture->getCache()->get($testData["queryId"]));
     }
-    
+
     /**
-     * 
+     *
      * @param
      * @return
      * @throw
      */
     public function testGetAvailableGraphs()
     {
-        $this->_cache->clean();
-        
+        $this->cache->clean();
+
         $this->assertFalse(
-            $this->_cache->get("sto". $this->_fixture->getId() ."_availableGraphUris")
+            $this->cache->get("sto". $this->fixture->getId() ."_availableGraphUris")
         );
-        
-        $graphUris = $this->_fixture->getAvailableGraphUris();
-        
+
+        $graphUris = $this->fixture->getAvailableGraphUris();
+
         $this->assertTrue(0 < count($graphUris));
-        
+
         $this->assertEquals(
             $graphUris,
-            $this->_cache->get("sto". $this->_fixture->getId() ."_availableGraphUris")
+            $this->cache->get("sto". $this->fixture->getId() ."_availableGraphUris")
         );
     }
-    
+
     /**
      * function getTripleCount
      */
-    
+
     public function testGetTripleCount()
     {
         // graph is empty
-        $this->assertEquals(0, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+
         // add 3 triples to the graph
-        $this->_fixture->addMultipleTriples($this->_testGraphUri, array(
+        $this->fixture->addMultipleTriples($this->testGraphUri, array(
             array("http://s/", "http://p/", array("type" => "uri", "value" => "http://o/")),
             array("http://s/", "http://p/", array("type" => "uri", "value" => "http://o/1")),
             array("http://s/", "http://p/", array("type" => "uri", "value" => "http://o/2"))
         ));
-        
+
         // graph has to contain 3 triples
-        $this->assertEquals(3, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
-        $this->assertTrue(0 < $this->_fixture->getTripleCount());
+        $this->assertEquals(3, $this->fixture->getTripleCount($this->testGraphUri));
+
+        $this->assertTrue(0 < $this->fixture->getTripleCount());
     }
-    
+
     /**
      * function importRdf
      */
-     
-    public function testImportRdf_usingGraphInstance()
+
+    public function testImportRdfUsingGraphInstance()
     {
-        $turtleString = "<http://model.org/model#localName> 
+        $turtleString = "<http://model.org/model#localName>
         a <http://model.org/model#className1>, <http://model.org/model#className2> ;
         <http://www.w3.org/2000/01/rdf-schema#label> 'label1', 'label2'@nl .";
-        
-        $this->_fixture->getGraph($this->_testGraphUri)->importRdf(
-            $turtleString, "turtle"
+
+        $this->fixture->getGraph($this->testGraphUri)->importRdf(
+            $turtleString,
+            "turtle"
         );
-        
+
         // graph has to contain 4 new triples
         $this->assertEquals(
-            4, 
-            $this->_fixture->getGraph($this->_testGraphUri)->getTripleCount()
+            4,
+            $this->fixture->getGraph($this->testGraphUri)->getTripleCount()
         );
-    }    
-     
-    public function testImportRdf_newStoreAndGraphInstance()
+    }
+
+    public function testImportRdfNewStoreAndGraphInstance()
     {
-        $this->_cache->clean();
-        
+        $this->cache->clean();
+
         // TODO find a way to drop that too
         $graphUri = "http://localhost/Enable/importRdfExample/";
-        $store = new \Saft\Store($this->_storeConfig, $this->_cache);
+        $store = new \Saft\Store($this->storeConfig, $this->cache);
         $store->addGraph($graphUri);
-        
-        $turtleString = "<http://model.org/model#localName> 
+
+        $turtleString = "<http://model.org/model#localName>
         a <http://model.org/model#className1>, <http://model.org/model#className2> ;
         <http://www.w3.org/2000/01/rdf-schema#label> 'label1', 'label2'@nl .";
-        
-        $this->_cache->clean();
-        
+
+        $this->cache->clean();
+
         $store->getGraph($graphUri)->importRdf(
-            $turtleString, "turtle"
+            $turtleString,
+            "turtle"
         );
-        
+
         // graph has to contain 4 new triples
         $this->assertEquals(4, $store->getGraph($graphUri)->getTripleCount());
-        
-        $this->_fixture->dropGraph($graphUri);
-    }    
-    
+
+        $this->fixture->dropGraph($graphUri);
+    }
+
     /**
-     * 
+     *
      * @param
      * @return
      * @throw
      */
     public function testIsGraphAvailable()
     {
-        $this->assertFalse($this->_fixture->isGraphAvailable("not existing graph"));
-        
-        $this->assertTrue($this->_fixture->isGraphAvailable($this->_testGraphUri));
-    }    
-    
+        $this->assertFalse($this->fixture->isGraphAvailable("not existing graph"));
+
+        $this->assertTrue($this->fixture->isGraphAvailable($this->testGraphUri));
+    }
+
     /**
      * function sparql
      */
-    
+
     public function testSparql()
     {
-        $this->assertEquals(0, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+
         $this->assertEquals(
             array(),
-            $this->_fixture->sparql(
-                "SELECT ?s ?p ?o 
-                   FROM <" . $this->_testGraphUri . "> 
+            $this->fixture->sparql(
+                "SELECT ?s ?p ?o
+                   FROM <" . $this->testGraphUri . ">
                   WHERE {?s ?p ?o.}"
             )
         );
-        
+
         // add 3 triples to the graph
         $multipleTriples = array(
             array("http://s/", "http://p/", array("type" => "uri", "value" => "http://o/")),
             array("http://s/", "http://p/", array("type" => "uri", "value" => "http://o/1")),
             array("http://s/", "http://p/", array("type" => "uri", "value" => "http://o/2"))
         );
-        
-        $this->_fixture->addMultipleTriples($this->_testGraphUri, $multipleTriples);
-        
-        $this->assertEquals(3, $this->_fixture->getTripleCount($this->_testGraphUri));
-        
+
+        $this->fixture->addMultipleTriples($this->testGraphUri, $multipleTriples);
+
+        $this->assertEquals(3, $this->fixture->getTripleCount($this->testGraphUri));
+
         $this->assertEquals(
             array(array(
                 "s" => "http://s/", "p" => "http://p/", "o" => "http://o/"
@@ -891,59 +914,59 @@ class StoreTest extends \Saft\TestCase
             ), array(
                 "s" => "http://s/", "p" => "http://p/", "o" => "http://o/2"
             )),
-            $this->_fixture->sparql(
-                "SELECT ?s ?p ?o 
-                   FROM <" . $this->_testGraphUri . "> 
+            $this->fixture->sparql(
+                "SELECT ?s ?p ?o
+                   FROM <" . $this->testGraphUri . ">
                   WHERE {?s ?p ?o.}"
             )
         );
     }
-    
-    public function testSparql_differentResultTypes()
+
+    public function testSparqlDifferentResultTypes()
     {
         $this->assertEquals(
             array(),
-            $this->_fixture->sparql("SELECT ?s ?p ?o FROM <" . $this->_testGraphUri . "> WHERE {?s ?p ?o.}")
+            $this->fixture->sparql("SELECT ?s ?p ?o FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.}")
         );
-        
+
         $this->assertEquals(
             array(),
-            $this->_fixture->sparql(
-                "SELECT ?s ?p ?o FROM <" . $this->_testGraphUri . "> WHERE {?s ?p ?o.}", 
+            $this->fixture->sparql(
+                "SELECT ?s ?p ?o FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.}",
                 array("resultType" => "array")
             )
         );
     }
-    
-    public function testSparql_emptyResult()
+
+    public function testSparqlEmptyResult()
     {
-        $this->_fixture->clearGraph($this->_testGraphUri);
-        
+        $this->fixture->clearGraph($this->testGraphUri);
+
         $this->assertEquals(
             array(),
-            $this->_fixture->sparql(
-                "SELECT ?s ?p ?o FROM <" . $this->_testGraphUri . "> WHERE {?s ?p ?o.}"
+            $this->fixture->sparql(
+                "SELECT ?s ?p ?o FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.}"
             )
         );
     }
-    
-    public function testSparql_focusOnQueryCache()
+
+    public function testSparqlFocusOnQueryCache()
     {
-        $query = "SELECT ?s ?p ?o FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o.}";
-        $queryId = $this->_fixture->getQueryCache()->generateShortId($query);
-        
+        $query = "SELECT ?s ?p ?o FROM <". $this->testGraphUri ."> WHERE {?s ?p ?o.}";
+        $queryId = $this->fixture->getQueryCache()->generateShortId($query);
+
         // be sure that nothing is in the QueryCache already
-        $this->assertFalse($this->_fixture->getCache()->get($queryId));
-        
-        $this->assertEquals(array(), $this->_fixture->sparql($query));
-        
-        
-        // notice: 
+        $this->assertFalse($this->fixture->getCache()->get($queryId));
+
+        $this->assertEquals(array(), $this->fixture->sparql($query));
+
+
+        // notice:
         // at this point, the QueryCache has new entries because of the sparql
         // function call
-        
-        $testGraphId = $this->_fixture->getQueryCache()->generateShortId($this->_testGraphUri);
-        
+
+        $testGraphId = $this->fixture->getQueryCache()->generateShortId($this->testGraphUri);
+
         $this->assertEquals(
             array(
                 "relatedQueryCacheEntries" => "",
@@ -958,16 +981,16 @@ class StoreTest extends \Saft\TestCase
                     )
                 )
             ),
-            $this->_fixture->getCache()->get($queryId)
+            $this->fixture->getCache()->get($queryId)
         );
-        
+
     }
-    
-    public function testSparql_invalidResultType()
+
+    public function testSparqlInvalidResultType()
     {
         $this->setExpectedException("\Exception");
-        
-        $this->_fixture->sparql(
+
+        $this->fixture->sparql(
             "SELECT ?s ?p ?o WHERE {?s ?p ?o.}",
             array("resultType" => "invalid")
         );
