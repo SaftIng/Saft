@@ -8,12 +8,12 @@ class Client
      * @var \Curl\Curl
      */
     protected $client;
-    
+
     /**
      * @var string
      */
     protected $url;
-    
+
     /**
      * Constructor
      */
@@ -21,9 +21,9 @@ class Client
     {
         $this->client = new \Curl\Curl();
     }
-    
+
     /**
-     * 
+     *
      * @param
      * @return
      * @throw
@@ -32,9 +32,9 @@ class Client
     {
         return $this->client;
     }
-    
+
     /**
-     * 
+     *
      * @param
      * @return
      * @throw
@@ -45,15 +45,15 @@ class Client
          * Change that, after the following pull request was merged:
          * https://github.com/php-curl-class/php-curl-class/pull/142
          */
-        
+
         curl_setopt($this->client->curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
         curl_setopt($this->client->curl, CURLOPT_USERPWD, $username . ":" . $password);
         curl_setopt($this->client->curl, CURLOPT_RETURNTRANSFER, true);
         return $this->client->get($this->url);
     }
-    
+
     /**
-     * 
+     *
      * @param string $query
      * @return
      * @throw
@@ -63,12 +63,12 @@ class Client
         // TODO extend Accept headers to further formats
         $this->client->setHeader("Accept", "application/sparql-results+json");
         $this->client->setHeader("Content-Type", "application/x-www-form-urlencoded");
-        
+
         return $this->client->post($this->url, array("query" => $query));
     }
-    
+
     /**
-     * 
+     *
      * @param string $query
      * @return
      * @throw
@@ -80,9 +80,9 @@ class Client
         $this->client->setHeader("Content-Type", "application/sparql-update");
         return $this->client->get($this->url, array("query" => $query));
     }
-    
+
     /**
-     * 
+     *
      * @param
      * @return
      * @throw
