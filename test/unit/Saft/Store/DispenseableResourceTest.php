@@ -220,7 +220,7 @@ class DispenseableResourceTest extends \Saft\TestCase
         $this->_fixture->save();
         
         $result = $this->_store->getGraph($this->_testGraphUri)->sparql(
-            "SELECT ?s ?p ?o WHERE {?s ?p ?o};"
+            "SELECT ?s ?p ?o WHERE {?s ?p ?o.};"
         );
         
         $this->assertEqualsArrays(
@@ -251,7 +251,7 @@ class DispenseableResourceTest extends \Saft\TestCase
         $this->_fixture->save();
         
         $result = $this->_store->getGraph($this->_testGraphUri)->sparql(
-            "SELECT ?s ?p ?o WHERE {?s ?p ?o};"
+            "SELECT ?s ?p ?o WHERE {?s ?p ?o.};"
         );
         
         $this->assertEqualsArrays(
@@ -286,7 +286,7 @@ class DispenseableResourceTest extends \Saft\TestCase
          */
         
         $result = $this->_store->getGraph($this->_testGraphUri)->sparql(
-            "SELECT ?s ?p ?o WHERE {?s ?p ?o};"
+            "SELECT ?s ?p ?o WHERE {?s ?p ?o.};"
         );
         
         $this->assertEqualsArrays(
@@ -313,7 +313,7 @@ class DispenseableResourceTest extends \Saft\TestCase
          * SPARQL for the second change
          */
         $result2 = $this->_store->getGraph($this->_testGraphUri)->sparql(
-            "SELECT ?s ?p ?o WHERE {?s ?p ?o};"
+            "SELECT ?s ?p ?o WHERE {?s ?p ?o.};"
         );
         
         $this->assertEqualsArrays(
