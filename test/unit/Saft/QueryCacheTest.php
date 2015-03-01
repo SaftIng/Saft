@@ -196,7 +196,7 @@ class QueryCacheTest extends \Saft\TestCase
         $testGraphId = $this->_fixture->generateShortId($this->_testGraphUri);
         
         // data for 2. transaction
-        $testQuery2 = "SELECT ?s FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o};";
+        $testQuery2 = "SELECT ?s FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o.};";
         $testResult2 = "2";
         
         $testGraphUriId = $this->_fixture->generateShortId($this->_testGraphUri);
@@ -204,7 +204,7 @@ class QueryCacheTest extends \Saft\TestCase
         /**
             Transaction structure is
             
-            1. transaction            
+            1. transaction
             2. transaction
             
             both at the same level and do not depend on each other
@@ -355,13 +355,6 @@ class QueryCacheTest extends \Saft\TestCase
             $this->_fixture->getCache()->get($testData["queryId"])
         );
     }
-     
-    public function testRememberQueryResult_invalidQuery()
-    {
-        $this->setExpectedException("\Exception");
-        
-        $this->_fixture->rememberQueryResult("invalid query", array());
-    }
     
     /**
      * function startTransaction
@@ -406,15 +399,15 @@ class QueryCacheTest extends \Saft\TestCase
         $testGraphId = $this->_fixture->generateShortId($this->_testGraphUri);
         
         // data for 2. transaction
-        $testQuery2 = "SELECT ?s FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o};";
+        $testQuery2 = "SELECT ?s FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o.};";
         $testResult2 = "2";
         
         // data for 3. transaction
-        $testQuery3 = "SELECT ?p FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o};";
+        $testQuery3 = "SELECT ?p FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o.};";
         $testResult3 = "3";
         
         // data for 4. transaction
-        $testQuery4 = "SELECT ?o FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o};";
+        $testQuery4 = "SELECT ?o FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o.};";
         $testResult4 = "4";
         
         /**
@@ -635,15 +628,15 @@ class QueryCacheTest extends \Saft\TestCase
         $testGraphId = $this->_fixture->generateShortId($this->_testGraphUri);
         
         // data for 2. transaction
-        $testQuery2 = "SELECT ?s FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o};";
+        $testQuery2 = "SELECT ?s FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o.};";
         $testResult2 = "2";
         
         // data for 3. transaction
-        $testQuery3 = "SELECT ?p FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o};";
+        $testQuery3 = "SELECT ?p FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o.};";
         $testResult3 = "3";
         
         // data for 4. transaction
-        $testQuery4 = "SELECT ?o FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o};";
+        $testQuery4 = "SELECT ?o FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o.};";
         $testResult4 = "4";
         
         /**
@@ -742,15 +735,15 @@ class QueryCacheTest extends \Saft\TestCase
         $testGraphId = $this->_fixture->generateShortId($this->_testGraphUri);
         
         // data for 2. transaction
-        $testQuery2 = "SELECT ?s FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o};";
+        $testQuery2 = "SELECT ?s FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o.};";
         $testResult2 = "2";
         
         // data for 3. transaction
-        $testQuery3 = "SELECT ?p FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o};";
+        $testQuery3 = "SELECT ?p FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o.};";
         $testResult3 = "3";
         
         // data for 4. transaction
-        $testQuery4 = "SELECT ?o FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o};";
+        $testQuery4 = "SELECT ?o FROM <". $this->_testGraphUri ."> WHERE {?s ?p ?o.};";
         $testResult4 = "4";
         
         /**
