@@ -1,0 +1,111 @@
+<?php
+
+namespace Saft\Store;
+
+/**
+ * Declaration of methods that any Store implementation must have, whether its
+ * for a Triple- or Quad store.
+ */
+interface StoreInterface
+{
+    /**
+     * Returns array with graphUri's which are available.
+     *
+     * @return array Array which contains graph URI's as values and keys.
+     */
+    public function getAvailableGraphs();
+
+    /**
+     * Adds multiple Statements to (default-) graph.
+     *
+     * @param StatementList $statements StatementList instance must contain Statement
+     *                                  instances which are 'concret-' and not 'pattern'-
+     *                                  statements.
+     * @param string $graphUri optional Overrides target graph. If set, all statements
+     *                                  will be add to that graph, if available.
+     * @param array $options optional It contains key-value pairs and should provide additional
+     *                                introductions for the store and/or its adapter(s).
+     * @return boolean Returns true, if function performed without errors. In case
+     *                 an error occur, an exception will be thrown.
+     */
+    public function addStatements(
+        \Saft\Sparql\StatementList $statements,
+        $graphUri = null,
+        array $options = array()
+    );
+
+    /**
+     * Removes all statements from a (default-) graph which match with given statement.
+     *
+     * @param \Saft\Sparql\Statement $statement It can be either a concrete or pattern-statement.
+     * @param string $graphUri optional Overrides target graph. If set, all statements
+     *                                  will be delete in that graph.
+     * @param array $options optional It contains key-value pairs and should provide additional
+     *                                introductions for the store and/or its adapter(s).
+     * @return boolean Returns true, if function performed without errors. In case
+     *                 an error occur, an exception will be thrown.
+     */
+    public function deleteMatchingStatements(
+        \Saft\Sparql\Statement $statement,
+        $graphUri = null,
+        array $options = array()
+    );
+
+    /**
+     * It gets all statements of a given graph which match the following conditions:
+     * - statement's subject is either equal to the subject of the same statement of the graph or it is null.
+     * - statement's predicate is either equal to the predicate of the same statement of the graph or it is null.
+     * - statement's object is either equal to the object of a statement of the graph or it is null.
+     *
+     * @param \Saft\Sparql\Statement $statement It can be either a concrete or pattern-statement.
+     * @param string $graphUri optional Overrides target graph. If set, you will get all
+     *                                  matching statements of that graph.
+     * @param array $options optional It contains key-value pairs and should provide additional
+     *                                introductions for the store and/or its adapter(s).
+     * @return \Saft\Sparql\StatementList It contains \Saft\Sparql\Statement instances
+     *                                    of all matching statements of the given graph.
+     */
+    public function getMatchingStatements(
+        \Saft\Sparql\Statement $Statement,
+        $graphUri = null,
+        array $options = array()
+    );
+
+    /**
+     * Returns true or false depending on whether or not the statements pattern
+     * has any matches in the given graph.
+     *
+     * @param \Saft\Sparql\Statement $statement It can be either a concrete or pattern-statement.
+     * @param string $graphUri optional Overrides target graph.
+     * @param array $options optional It contains key-value pairs and should provide additional
+     *                                introductions for the store and/or its adapter(s).
+     * @return boolean Returns true if at least one match was found, false otherwise.
+     */
+    public function hasMatchingStatement(
+        \Saft\Sparql\Statement $Statement,
+        $graphUri = null,
+        array $options = array()
+    );
+
+    /**
+     * Get information about the store and its features.
+     *
+     * @return array Array which contains information about the store and its features.
+     */
+    public function getStoreDescription();
+
+    /**
+     * This method sends a SPARQL query to the store.
+     *
+     * @param string $query The SPARQL query to send to the store.
+     * @param array $options optional It contains key-value pairs and should provide additional
+     *                                introductions for the store and/or its adapter(s).
+     * @return \Saft\Sparql\NTupleList Returns result of the query. Depending on the query
+     *                                 type, it returns either an instance of \Saft\Sparql\NTupleList,
+     *                                 which contains n-tuples or \Saft\Sparql\TripleList,
+     *                                 which contains triples.
+     * @throws \Exception If query is no string.
+     *                    If query is malformed.
+     */
+    public function query($query, array $options = array());
+}
