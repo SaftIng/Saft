@@ -1,5 +1,5 @@
 {
-    "name": "Saft/Saft.store",
+    "name": "saft/saft-store",
     "type": "library",
     "description": "Store package from the library Saft.",
     "keywords": ["Saft", "Linked Data", "Semantic Web", "Store", "TripleStore"],
