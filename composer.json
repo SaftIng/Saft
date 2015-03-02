@@ -1,5 +1,5 @@
 {
-    "name": "Saft/Saft-store-http",
+    "name": "saft/saft-store-http",
     "type": "library",
     "description": "HTTP adapter for store package from the library Saft.",
     "keywords": ["Saft", "TripleStore", "Virtuoso"],
@@ -23,7 +23,7 @@
         "php": ">=5.3.0",
         "php-curl-class/php-curl-class": "*",
 
-        "Saft/Saft.store": "*"
+        "saft/saft-store": "*"
     },
     "autoload": {
         "psr-4": {
