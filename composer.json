@@ -1,5 +1,5 @@
 {
-    "name": "Saft/Saft.querycache",
+    "name": "saft/saft-querycache",
     "type": "library",
     "description": "QueryCache package from the library Saft.",
     "keywords": ["Saft", "Linked Data", "Semantic Web", "SPARQL", "Cache", "Query"],
@@ -7,8 +7,9 @@
     "license": "GPL2",
     "authors": [
         {
-            "name": "Nathanel Arndt",
+            "name": "Natanael Arndt",
             "homepage": "http://aksw.org/NatanaelArndt",
+            "email": "arndtn@gmail.com",
             "role": "Developer"
         },
         {
