@@ -23,7 +23,7 @@
         "php": ">=5.3.0",
         "ext-odbc": "*",
 
-        "saft/saft.store": "*"
+        "saft/saft-store": "*"
     },
     "autoload": {
         "psr-4": {
