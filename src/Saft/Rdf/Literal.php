@@ -113,7 +113,7 @@ class Literal implements Node
         // add datatype URI/lang tag
         if (!empty($datatype)) {
             $value .= '^^<' . (string)$datatype . '>';
-        } else if (!empty($lang)) {
+        } elseif (!empty($lang)) {
             $value .= '@' . (string)$lang;
         }
 
