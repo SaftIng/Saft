@@ -3,9 +3,10 @@
 namespace Saft\Rdf;
 
 class QuadTest extends \PHPUnit_Framework_TestCase
-{   
+{
+
     /**
-     * 
+     *
      */
     public function setUp()
     {
@@ -20,7 +21,7 @@ class QuadTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * 
+     *
      */
     public function tearDown()
     {

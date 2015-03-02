@@ -3,9 +3,10 @@
 namespace Saft\Rdf;
 
 class TripleTest extends \PHPUnit_Framework_TestCase
-{   
+{
+
     /**
-     * 
+     *
      */
     public function setUp()
     {
@@ -19,7 +20,7 @@ class TripleTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * 
+     *
      */
     public function tearDown()
     {
