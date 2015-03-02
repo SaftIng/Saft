@@ -7,8 +7,9 @@
     "license": "GPL2",
     "authors": [
         {
-            "name": "Nathanel Arndt",
+            "name": "Natanel Arndt",
             "homepage": "http://aksw.org/NatanaelArndt",
+            "email": "arndtn@gmail.com",
             "role": "Developer"
         },
         {
@@ -21,8 +22,7 @@
     "require": {
         "php": ">=5.3.0",
         "php-odbc": "*",
-        
-        "Saft/Saft.core": "*",
+
         "Saft/Saft.store": "*"
     },
     "autoload": {
