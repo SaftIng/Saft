@@ -1,5 +1,5 @@
 {
-    "name": "Saft/Saft.store.virtuoso",
+    "name": "saft/saft-store-virtuoso",
     "type": "library",
     "description": "Virtuoso adapter for store package from the library Saft.",
     "keywords": ["Saft", "TripleStore", "Virtuoso"],
@@ -7,7 +7,7 @@
     "license": "GPL2",
     "authors": [
         {
-            "name": "Natanel Arndt",
+            "name": "Natanael Arndt",
             "homepage": "http://aksw.org/NatanaelArndt",
             "email": "arndtn@gmail.com",
             "role": "Developer"
@@ -21,7 +21,7 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "php-odbc": "*",
+        "ext-odbc": "*",
 
         "Saft/Saft.store": "*"
     },
