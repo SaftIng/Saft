@@ -1,5 +1,5 @@
 {
-    "name": "Saft/Saft.store.http",
+    "name": "Saft/Saft-store-http",
     "type": "library",
     "description": "HTTP adapter for store package from the library Saft.",
     "keywords": ["Saft", "TripleStore", "Virtuoso"],
@@ -21,7 +21,6 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "php-curl": "*",
         "php-curl-class/php-curl-class": "*",
 
         "Saft/Saft.store": "*"
