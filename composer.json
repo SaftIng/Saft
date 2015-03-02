@@ -21,9 +21,7 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "ext-memcached": "*",
-        
-        "Saft/Saft.core": "*"
+        "ext-memcached": "*"
     },
     "autoload": {
         "psr-4": {
