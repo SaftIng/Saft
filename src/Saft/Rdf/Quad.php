@@ -2,29 +2,41 @@
 
 namespace Saft\Rdf;
 
-use \Saft\Rdf\Node;
-use \Saft\Rdf\NamedNode;
-
-class Quad extends \Saft\Rdf\AbstractStatement
+class Quad implements Statement
 {
     /**
-     * @var string
+     * @var NamedNode|BlankNode
      */
-    protected $graphUri;
+    protected $subject;
+
+    /**
+     * @var NamedNode
+     */
+    protected $predicate;
+
+    /**
+     * @var Node
+     */
+    protected $object;
+
+    /**
+     * @var NamedNode
+     */
+    protected $graph;
     
     /**
-     * @param Node $subject
+     * @param NamedNode|BlankNode $subject
      * @param NamedNode $predicate
      * @param Node $object
-     * @param string $graphUri
+     * @param NamedNode $graph
      */
-    public function __construct(Node $subject, NamedNode $predicate, Node $object, $graphUri)
+    public function __construct($subject, NamedNode $predicate, Node $object, NamedNode $graph)
     {
         $this->subject = $subject;
         $this->predicate = $predicate;
         $this->object = $object;
 
-        $this->grahpUri = $graphUri;
+        $this->grahp = $graph;
     }
     
     /**
@@ -41,5 +53,37 @@ class Quad extends \Saft\Rdf\AbstractStatement
     public function isTriple()
     {
         return false;
+    }
+
+    /**
+     * @return NamedNode|BlankNode
+     */
+    public function getSubject()
+    {
+        return $this->subject;
+    }
+
+    /**
+     * @return NamedNode
+     */
+    public function getPredicate()
+    {
+        return $this->predicate;
+    }
+
+    /**
+     * @return Node
+     */
+    public function getObject()
+    {
+        return $this->object;
+    }
+
+    /**
+     * @return NamedNode
+     */
+    public function getGraph()
+    {
+        return $this->graph;
     }
 }

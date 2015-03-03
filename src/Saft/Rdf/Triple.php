@@ -2,11 +2,23 @@
 
 namespace Saft\Rdf;
 
-use \Saft\Rdf\Node;
-use \Saft\Rdf\NamedNode;
-
-class Triple extends \Saft\Rdf\AbstractStatement
+class Triple implements Statement
 {
+    /**
+     * @var NamedNode|BlankNode
+     */
+    protected $subject;
+
+    /**
+     * @var NamedNode
+     */
+    protected $predicate;
+
+    /**
+     * @var Node
+     */
+    protected $object;
+
     /**
      * @param Node $subject
      * @param NamedNode $predicate
@@ -63,5 +75,37 @@ class Triple extends \Saft\Rdf\AbstractStatement
     public function isTriple()
     {
         return true;
+    }
+
+    /**
+     * @return NamedNode|BlankNode
+     */
+    public function getSubject()
+    {
+        return $this->subject;
+    }
+
+    /**
+     * @return NamedNode
+     */
+    public function getPredicate()
+    {
+        return $this->predicate;
+    }
+
+    /**
+     * @return Node
+     */
+    public function getObject()
+    {
+        return $this->object;
+    }
+
+    /**
+     * @return null
+     */
+    public function getGraph()
+    {
+        return null;
     }
 }

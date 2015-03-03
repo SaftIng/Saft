@@ -137,6 +137,7 @@ class Literal implements Node
     
     /**
      * @return string
+     * @throws \Exception
      */
     public function getDatatype()
     {

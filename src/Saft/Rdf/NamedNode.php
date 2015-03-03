@@ -2,7 +2,7 @@
 
 namespace Saft\Rdf;
 
-class NamedNode implements \Saft\Rdf\Node
+class NamedNode implements Node
 {
     /**
      * @var string
@@ -12,16 +12,16 @@ class NamedNode implements \Saft\Rdf\Node
     /**
      * @param mixed $value The URI of the node.
      * @param string $lang optional Will be ignore because an NamedNode has no language.
-     * @throw \Exception If parameter $value is not a valid URI.
+     * @throws \Exception If parameter $value is not a valid URI.
      */
     public function __construct($value, $lang = null)
     {
-        if (true === \Saft\Rdf\NamedNode::check($value)
+        if (true === NamedNode::check($value)
             || null === $value
-            || true === \Saft\Rdf\NamedNode::isVariable($value)) {
+            || true === NamedNode::isVariable($value)) {
             $this->value = $value;
         } else {
-            throw new \Exception('Paramter $value is not a valid URI.');
+            throw new \Exception('Parameter $value is not a valid URI.');
         }
     }
     
@@ -50,7 +50,7 @@ class NamedNode implements \Saft\Rdf\Node
     /**
      * @see \Saft\Rdf\Node
      */
-    public function equals(\Saft\Rdf\Node $toCompare)
+    public function equals(Node $toCompare)
     {
         // It only compares URIs, everything will be quit with false.
         if (true === $toCompare->isNamed()) {
