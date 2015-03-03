@@ -6,7 +6,7 @@ interface StatementIterator extends \Iterator
     /**
      * @return Statement
      */
-    public function current() ;
+    public function current();
 
     /**
      * @return scalar May not be meaningful, but must be distinct.
