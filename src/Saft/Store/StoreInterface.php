@@ -37,7 +37,7 @@ interface StoreInterface
     /**
      * Removes all statements from a (default-) graph which match with given statement.
      *
-     * @param \Saft\Sparql\Statement $statement It can be either a concrete or pattern-statement.
+     * @param \Saft\Rdf\Statement$statement It can be either a concrete or pattern-statement.
      * @param string $graphUri optional Overrides target graph. If set, all statements
      *                                  will be delete in that graph.
      * @param array $options optional It contains key-value pairs and should provide additional
@@ -46,7 +46,7 @@ interface StoreInterface
      *                 an error occur, an exception will be thrown.
      */
     public function deleteMatchingStatements(
-        \Saft\Sparql\Statement $statement,
+        \Saft\Rdf\Statement $statement,
         $graphUri = null,
         array $options = array()
     );
@@ -57,16 +57,16 @@ interface StoreInterface
      * - statement's predicate is either equal to the predicate of the same statement of the graph or it is null.
      * - statement's object is either equal to the object of a statement of the graph or it is null.
      *
-     * @param \Saft\Sparql\Statement $statement It can be either a concrete or pattern-statement.
+     * @param \Saft\Rdf\Statement$statement It can be either a concrete or pattern-statement.
      * @param string $graphUri optional Overrides target graph. If set, you will get all
      *                                  matching statements of that graph.
      * @param array $options optional It contains key-value pairs and should provide additional
      *                                introductions for the store and/or its adapter(s).
-     * @return \Saft\Sparql\StatementList It contains \Saft\Sparql\Statement instances
+     * @return \Saft\Sparql\StatementList It contains \Saft\Rdf\Statementinstances
      *                                    of all matching statements of the given graph.
      */
     public function getMatchingStatements(
-        \Saft\Sparql\Statement $Statement,
+        \Saft\Rdf\Statement $Statement,
         $graphUri = null,
         array $options = array()
     );
@@ -75,14 +75,14 @@ interface StoreInterface
      * Returns true or false depending on whether or not the statements pattern
      * has any matches in the given graph.
      *
-     * @param \Saft\Sparql\Statement $statement It can be either a concrete or pattern-statement.
+     * @param \Saft\Rdf\Statement$statement It can be either a concrete or pattern-statement.
      * @param string $graphUri optional Overrides target graph.
      * @param array $options optional It contains key-value pairs and should provide additional
      *                                introductions for the store and/or its adapter(s).
      * @return boolean Returns true if at least one match was found, false otherwise.
      */
     public function hasMatchingStatement(
-        \Saft\Sparql\Statement $Statement,
+        \Saft\Rdf\Statement $Statement,
         $graphUri = null,
         array $options = array()
     );
