@@ -1,7 +1,7 @@
 <?php
-
 namespace Saft\Sparql;
 
-class NTupleList
+class ResultValue
 {
+
 }

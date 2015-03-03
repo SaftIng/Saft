@@ -2,7 +2,7 @@
 
 namespace Saft;
 
-class StoreTest extends \Saft\TestCase
+class StoreTest extends TestCase
 {
     /**
      * Generates a bunch of test data, but it also makes sure that there is nothing
@@ -98,7 +98,7 @@ class StoreTest extends \Saft\TestCase
     {
         parent::setUp();
 
-        $this->fixture = new \Saft\Store($this->storeConfig, $this->cache);
+        $this->fixture = new Store($this->storeConfig, $this->cache);
         $this->fixture->addGraph($this->testGraphUri);
 
         $this->cache->clean();

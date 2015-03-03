@@ -2,6 +2,9 @@
 
 namespace Saft\Store;
 
+use \Saft\Rdf;
+use Saft\Sparql\ResultIterator;
+
 /**
  * Declaration of methods that any Store implementation must have, whether its
  * for a Triple- or Quad store.
@@ -18,7 +21,7 @@ interface StoreInterface
     /**
      * Adds multiple Statements to (default-) graph.
      *
-     * @param StatementList $statements StatementList instance must contain Statement
+     * @param StatementIterator $statements StatementList instance must contain Statement
      *                                  instances which are 'concret-' and not 'pattern'-
      *                                  statements.
      * @param string $graphUri optional Overrides target graph. If set, all statements
@@ -29,7 +32,7 @@ interface StoreInterface
      *                 an error occur, an exception will be thrown.
      */
     public function addStatements(
-        \Saft\Sparql\StatementList $statements,
+        StatementIterator $statements,
         $graphUri = null,
         array $options = array()
     );
@@ -37,7 +40,7 @@ interface StoreInterface
     /**
      * Removes all statements from a (default-) graph which match with given statement.
      *
-     * @param \Saft\Rdf\Statement$statement It can be either a concrete or pattern-statement.
+     * @param Statement $statement It can be either a concrete or pattern-statement.
      * @param string $graphUri optional Overrides target graph. If set, all statements
      *                                  will be delete in that graph.
      * @param array $options optional It contains key-value pairs and should provide additional
@@ -46,7 +49,7 @@ interface StoreInterface
      *                 an error occur, an exception will be thrown.
      */
     public function deleteMatchingStatements(
-        \Saft\Rdf\Statement $statement,
+        Statement $statement,
         $graphUri = null,
         array $options = array()
     );
@@ -57,16 +60,16 @@ interface StoreInterface
      * - statement's predicate is either equal to the predicate of the same statement of the graph or it is null.
      * - statement's object is either equal to the object of a statement of the graph or it is null.
      *
-     * @param \Saft\Rdf\Statement$statement It can be either a concrete or pattern-statement.
+     * @param Statement $statement It can be either a concrete or pattern-statement.
      * @param string $graphUri optional Overrides target graph. If set, you will get all
      *                                  matching statements of that graph.
      * @param array $options optional It contains key-value pairs and should provide additional
      *                                introductions for the store and/or its adapter(s).
-     * @return \Saft\Sparql\StatementList It contains \Saft\Rdf\Statementinstances
-     *                                    of all matching statements of the given graph.
+     * @return StatementIterator It contains Statement instances
+     *                           of all matching statements of the given graph.
      */
     public function getMatchingStatements(
-        \Saft\Rdf\Statement $Statement,
+        Statement $Statement,
         $graphUri = null,
         array $options = array()
     );
@@ -75,14 +78,14 @@ interface StoreInterface
      * Returns true or false depending on whether or not the statements pattern
      * has any matches in the given graph.
      *
-     * @param \Saft\Rdf\Statement$statement It can be either a concrete or pattern-statement.
+     * @param Statement $statement It can be either a concrete or pattern-statement.
      * @param string $graphUri optional Overrides target graph.
      * @param array $options optional It contains key-value pairs and should provide additional
      *                                introductions for the store and/or its adapter(s).
      * @return boolean Returns true if at least one match was found, false otherwise.
      */
     public function hasMatchingStatement(
-        \Saft\Rdf\Statement $Statement,
+        Statement $Statement,
         $graphUri = null,
         array $options = array()
     );
@@ -100,10 +103,8 @@ interface StoreInterface
      * @param string $query The SPARQL query to send to the store.
      * @param array $options optional It contains key-value pairs and should provide additional
      *                                introductions for the store and/or its adapter(s).
-     * @return \Saft\Sparql\NTupleList Returns result of the query. Depending on the query
-     *                                 type, it returns either an instance of \Saft\Sparql\NTupleList,
-     *                                 which contains n-tuples or \Saft\Sparql\TripleList,
-     *                                 which contains triples.
+     * @return Result Returns result of the query. Depending on the query
+     *                type, it returns either an instance of ResultIterator, StatementIterator, or ResultValue
      * @throws \Exception If query is no string.
      *                    If query is malformed.
      */
