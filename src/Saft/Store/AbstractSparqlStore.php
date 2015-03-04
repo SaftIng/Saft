@@ -57,7 +57,7 @@ abstract class AbstractSparqlStore implements StoreInterface
             return $query;
         }
     }
-    
+
     public function hasMatchingStatement(\Saft\Rdf\Statement $Statement, $graphUri = null, array $options = array())
     {
         $query = "ASK\n"
@@ -90,7 +90,7 @@ abstract class AbstractSparqlStore implements StoreInterface
                 } elseif (!is_null($graphUri)) {
                     $con = "Graph <" . $graph . "> {" . $con . "}";
                 }
-      
+
                 $query = $query . $con ."\n";
             }
         }
