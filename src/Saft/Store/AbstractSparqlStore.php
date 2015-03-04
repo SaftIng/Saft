@@ -11,7 +11,7 @@ abstract class AbstractSparqlStore implements StoreInterface
 {
     public function addStatements(\Saft\Rdf\StatementIterator $statements, $graphUri = null, array $options = array())
     {
-        foreach ($statements as &$st) {
+        foreach ($statements as $st) {
             if ($st instanceof Statement) {
                 if (!$st->isConcrete()) {
                     throw new \Exception("at least one Statement is not concrete");
@@ -22,7 +22,7 @@ abstract class AbstractSparqlStore implements StoreInterface
             . "{\n";
 
         //TODO eliminate redundancy
-        $query = $query . $this->sparqlFormat($Statements, $graphUri) . "}";
+        $query = $query . $this->sparqlFormat($statements, $graphUri) . "}";
         if (is_callable($this, 'query')) {
             return $this->query($query);
         } else {
@@ -35,7 +35,7 @@ abstract class AbstractSparqlStore implements StoreInterface
         $query = "Delete DATA\n"
             . "{\n";
 
-        $query = $query . $this->sparqlFormat(array($Statement), $graphUri) . "}";
+        $query = $query . $this->sparqlFormat($statements, $graphUri) . "}";
         if (is_callable($this, 'query')) {
             return $this->query($query);
         } else {
@@ -50,7 +50,7 @@ abstract class AbstractSparqlStore implements StoreInterface
             ."WHERE\n"
             . "{\n";
 
-        $query = $query . $this->sparqlFormat(array($Statement), $graphUri) . "}";
+        $query = $query . $this->sparqlFormat($statements, $graphUri) . "}";
         if (is_callable($this, 'query')) {
             return $this->query($query);
         } else {
@@ -63,7 +63,7 @@ abstract class AbstractSparqlStore implements StoreInterface
         $query = "ASK\n"
             . "{\n";
 
-        $query = $query . $this->sparqlFormat(array($Statement), $graphUri) . "}";
+        $query = $query . $this->sparqlFormat($statements, $graphUri) . "}";
         if (is_callable($this, 'query')) {
             return $this->query($query);
         } else {
@@ -77,10 +77,10 @@ abstract class AbstractSparqlStore implements StoreInterface
      * @param string                     $graphUri,  use if Statement is a triple and to using another graph when the default.
      * @return string, part of query
      */
-    private function sparqlFormat(\Saft\RDF\StatementList $Statements, $graphUri = null)
+    private function sparqlFormat(\Saft\Rdf\StatementIterator $Statements, $graphUri = null)
     {
         $query = '';
-        foreach ($Statements as &$st) {
+        foreach ($Statements as $st) {
             if ($st instanceof Statement) {
                 $con = $st->toSparqlFormat();
 
