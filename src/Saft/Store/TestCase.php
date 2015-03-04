@@ -3,7 +3,7 @@ namespace Saft\Store;
 
 use Symfony\Component\Yaml\Parser;
 
-class TestCase extends \Saft\TestCase
+class TestCase extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Saft\Cache
@@ -14,6 +14,34 @@ class TestCase extends \Saft\TestCase
      * @var array
      */
     protected $config;
+    
+    /**
+     * Contains an instance of the class to test.
+     *
+     * @var mixed
+     */
+    protected $fixture;
+
+    /**
+     * @var string
+     */
+    protected $testGraphUri = "http://localhost/Saft/TestGraph/";
+
+    /**
+     * http://stackoverflow.com/a/12496979
+     * Fixes assertEquals in case of check array equality.
+     *
+     * @param array  $expected
+     * @param array  $actual
+     * @param string $message  optional
+     */
+    protected function assertEqualsArrays($expected, $actual, $message = "")
+    {
+        sort($expected);
+        sort($actual);
+
+        $this->assertEquals($expected, $actual, $message);
+    }
 
     /**
      *
@@ -35,9 +63,5 @@ class TestCase extends \Saft\TestCase
         // parse YAML file
         $yaml = new Parser();
         $this->config = $yaml->parse(file_get_contents($configFilepath));
-
-        // setup cache
-        $this->cache = new \Saft\Cache($this->config['configuration']['standardCache']);
-        $this->cache->clean();
     }
 }
