@@ -550,6 +550,16 @@ class Query
 
         return $result;
     }
+    
+    /**
+     * Returns raw query, if available.
+     * 
+     * @return string
+     */
+    public function getQuery()
+    {
+        return $this->query;
+    }
 
     /**
      * Parsing the given queryand extract its parts.
@@ -671,6 +681,36 @@ class Query
         if (isset($parts['offset'][1][0])) {
             $this->setOffset($parts['offset'][1][0]);
         }
+    }
+    
+    /**
+     * Checks if query is a DELETE query.
+     * 
+     * @return boolean
+     */
+    public function isDeleteQuery()
+    {
+        return false !== strpos($this->getProloguePart(), 'DELETE');
+    }
+    
+    /**
+     * Checks if query is an INSERT query.
+     * 
+     * @return boolean
+     */
+    public function isInsertQuery()
+    {
+        return false !== strpos($this->getProloguePart(), 'INSERT');
+    }
+    
+    /**
+     * Checks if query is SPARQL UPDATE by checking if its either an insert- or delete query.
+     * 
+     * @return boolean
+     */
+    public function isUpdateQuery()
+    {
+        return $this->isInsertQuery() || $this->isDeleteQuery();
     }
 
     public function getProloguePart()
