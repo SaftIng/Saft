@@ -25,10 +25,10 @@
         }
     ],
     "repositories": [
-      {
-      "type": "vcs",
-      "url": "https://github.com/SaftIng/Saft.rdf.git"
-      }
+        {
+            "type": "vcs",
+            "url": "https://github.com/SaftIng/Saft.rdf.git"
+        }
     ],
     "require": {
         "php": ">=5.3.0",
