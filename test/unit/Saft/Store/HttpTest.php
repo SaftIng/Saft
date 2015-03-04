@@ -1,8 +1,7 @@
 <?php
+namespace Saft\Store;
 
-namespace Store\Store\Adapter;
-
-class HttpTest extends \Saft\TestCase
+class HttpTest extends TestCase
 {
     /**
      *
@@ -11,11 +10,20 @@ class HttpTest extends \Saft\TestCase
     {
         parent::setUp();
 
-        if ("http" ===$this->envStoreBackend) {
-            $this->fixture = new \Saft\Store\Adapter\Http($this->storeConfig);
+        // if httpConfig array is set
+        if (true === isset($this->config['httpConfig'])) {
+            $this->fixture = new \Saft\Store\Virtuoso($this->config['httpConfig']);
+
+        // if standard store is set to http
+        } elseif ('http' === $this->config['configuration']['standardStore']['type']) {
+            $this->fixture = new \Saft\Store\Virtuoso(
+                $this->config['configuration']['standardStore']
+            );
+
+        // no configuration is available, dont execute tests
         } else {
             $this->markTestSkipped(
-                "ENABLE_ENV_STOREBACKEND was not set to http"
+                "Array virtuosoConfig is not set in the config.yml."
             );
         }
     }
