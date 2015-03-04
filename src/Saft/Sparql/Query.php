@@ -553,7 +553,7 @@ class Query
     
     /**
      * Returns raw query, if available.
-     * 
+     *
      * @return string
      */
     public function getQuery()
@@ -685,7 +685,7 @@ class Query
     
     /**
      * Checks if query is a DELETE query.
-     * 
+     *
      * @return boolean
      */
     public function isDeleteQuery()
@@ -695,7 +695,7 @@ class Query
     
     /**
      * Checks if query is an INSERT query.
-     * 
+     *
      * @return boolean
      */
     public function isInsertQuery()
@@ -705,7 +705,7 @@ class Query
     
     /**
      * Checks if query is SPARQL UPDATE by checking if its either an insert- or delete query.
-     * 
+     *
      * @return boolean
      */
     public function isUpdateQuery()

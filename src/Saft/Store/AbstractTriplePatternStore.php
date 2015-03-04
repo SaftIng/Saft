@@ -13,9 +13,9 @@ abstract class AbstractTriplePatternStore implements StoreInterface
         //@TODO
         if (stristr($a, 'select') || stristr($a, 'construct')) {
             $this->get($a);
-        } else if (stristr($a, 'deslete')) {
+        } elseif (stristr($a, 'deslete')) {
             $this->delete($a);
-        } else if (stristr($a, 'insert')) {
+        } elseif (stristr($a, 'insert')) {
             $this->delete($a);
         }
     }

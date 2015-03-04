@@ -7,7 +7,7 @@ use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
 
 /**
- * Predefined sparql Store. All Triple methods reroute to the query-method. In the specific sparql-Store those 
+ * Predefined sparql Store. All Triple methods reroute to the query-method. In the specific sparql-Store those
  * no longer have to be implemented, but only the Query method / SPARQL interpreter itself.
  */
 abstract class AbstractSparqlStore implements StoreInterface
@@ -30,7 +30,7 @@ abstract class AbstractSparqlStore implements StoreInterface
             if ($st instanceof Statement && true === $st->isConcrete()) {
                 // everything is fine
             
-            // non-Statement instances not allowed    
+            // non-Statement instances not allowed
             } elseif (false === $st instanceof Statement) {
                 throw new \Exception('addStatements does not accept non-Statement instances.');
             
@@ -58,7 +58,7 @@ abstract class AbstractSparqlStore implements StoreInterface
      *                                       that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
-     * @return boolean Returns true, if function performed without errors. In case an error occur, an exception 
+     * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
      *                 will be thrown.
      */
     public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
@@ -143,9 +143,9 @@ abstract class AbstractSparqlStore implements StoreInterface
 
     /**
      * Returns the Statement-Data in sparql-Format.
-     * 
+     *
      * @param StatementIterator $statements
-     * @param string            $graphUri     Use if each statement is a triple and to use another graph as 
+     * @param string            $graphUri     Use if each statement is a triple and to use another graph as
      *                                        the default.
      * @return string, part of query
      */
