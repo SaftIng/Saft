@@ -1,8 +1,8 @@
 {
     "name": "saft/saft-store-http",
     "type": "library",
-    "description": "HTTP adapter for store package from the library Saft.",
-    "keywords": ["Saft", "TripleStore", "Virtuoso"],
+    "description": "HTTP/REST store implementation.",
+    "keywords": ["Saft", "REST", "HTTP", "Store"],
     "homepage": "https://github.com/SaftIng/Saft.store.http",
     "license": "GPL2",
     "authors": [
@@ -21,13 +21,23 @@
     ],
     "require": {
         "php": ">=5.3.0",
+        "ext-curl": "*",
         "php-curl-class/php-curl-class": "*",
 
-        "saft/saft-store": "*"
+        "saft/saft-store": "dev-master"
     },
     "autoload": {
         "psr-4": {
             "Saft\\": "src/Saft/"
         }
-    }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Saft\\": [
+                "test/integration/Saft",
+                "test/unit/Saft"
+            ]
+        }
+    },
+    "minimum-stability": "dev"
 }
