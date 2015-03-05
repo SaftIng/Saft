@@ -15,14 +15,15 @@ use Saft\Sparql\Query;
 class Virtuoso extends AbstractSparqlStore
 {
     /**
-     * Adapter option array
+     * Adapter option array which contains at least connection dsn, username and password.
      *
      * @var array
      */
-    protected $adapterOptions = null;
+    protected $configuration = null;
 
     /**
      * PDO ODBC
+     *
      * @var \PDO
      */
     protected $connection = null;
@@ -30,21 +31,14 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * Constructor.
      *
-     * @param  array $adapterOptions Array containing database credentials
-     * @throws \Exception In case the pdo_odbc extension is not available
-     * @todo Move init process and checks into its own functions
+     * @param  array $configuration Array containing database credentials
+     * @throws \Exception In case the PHP's odbc or pdo_odbc extension is not available
      */
-    public function __construct(array $adapterOptions)
+    public function __construct(array $configuration)
     {
-        // check for odbc extension
-        if (!extension_loaded("pdo_odbc")) {
-            throw new \Exception(
-                "Virtuoso adapter requires the PDO_ODBC extension to be loaded."
-            );
-            return;
-        }
+        $this->checkRequirements();
 
-        $this->adapterOptions = $adapterOptions;
+        $this->configuration = $configuration;
 
         // Open connection
         $this->openConnection();
@@ -59,15 +53,31 @@ class Virtuoso extends AbstractSparqlStore
     }
 
     /**
-     * Add a new empty and named graph.
+     * Adds a new empty and named graph.
      *
      * @param  string $graphUri URI of the graph to create
-     * @return void
      * @throws \Exception
      */
     public function addGraph($graphUri)
     {
         $this->query('CREATE SILENT GRAPH <'. $graphUri .'>');
+    }
+
+    /**
+     * Checks
+     */
+    public function checkRequirements()
+    {
+        // check for odbc extension
+        if (false === extension_loaded('odbc')) {
+            throw new \Exception('Virtuoso adapter requires the PHP ODBC extension to be loaded.');
+            
+        // check for pdo_odbc extension
+        } elseif (false === extension_loaded('pdo_odbc')) {
+            throw new \Exception('Virtuoso adapter requires the PHP PDO_ODBC extension to be loaded.');
+        }
+        
+        return true;
     }
 
     /**
@@ -83,10 +93,8 @@ class Virtuoso extends AbstractSparqlStore
 
     /**
      * Closes a current connection to the database.
-     *
-     * @return void
      */
-    public function closeConnection()
+    protected function closeConnection()
     {
         $this->connection = null;
     }
@@ -214,42 +222,39 @@ class Virtuoso extends AbstractSparqlStore
     }
 
     /**
-     * Returns the current connection resource.
-     * The resource is created lazily if it doesn't exist.
-     * @retun resource
+     * Returns the current connection resource. The resource is created lazily if it doesn't exist.
+     *
+     * @return \PDO Open PDO-ODBC connection.
      */
-    public function openConnection()
+    protected function openConnection()
     {
         // connection still closed
-        if (!$this->connection) {
-            $options = $this->adapterOptions;
-
-            // check for dsn parameter
-            if (!isset($options['dsn'])) {
+        if (null === $this->connection) {
+            // check for dsn parameter. it is usually the ODBC identifier, e.g. VOS.
+            // for more information have a look into /etc/odbc.ini
+            if (false === isset($this->configuration['dsn'])) {
                 throw new \Exception('Parameter dsn is not set.');
-            } else {
-                $dsn = (string) $options['dsn'];
             }
 
             // check for username parameter
-            if (!isset($options['username'])) {
+            if (false === isset($this->configuration['username'])) {
                 throw new \Exception('Parameter username is not set.');
-            } else {
-                $username = (string) $options['username'];
             }
 
             // check for password parameter
-            if (!isset($options['password'])) {
+            if (false === isset($this->configuration['password'])) {
                 throw new \Exception('Parameter password is not set.');
-            } else {
-                $password = (string) $options['password'];
             }
 
             /**
-             * Setup ODBC connection using PDO
+             * Setup ODBC connection using PDO-ODBC
              */
             try {
-                $this->connection = new \PDO('odbc:' . $dsn, $username, $password);
+                $this->connection = new \PDO(
+                    'odbc:' . (string)$this->configuration['dsn'],
+                    (string)$this->configuration['username'],
+                    (string)$this->configuration['password']
+                );
                 $this->connection->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
                 $this->connection->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
                 $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
@@ -257,8 +262,6 @@ class Virtuoso extends AbstractSparqlStore
             } catch (\PDOException $e) {
                 throw new \Exception($e->getMessage());
             }
-
-            $this->_user = $username;
         }
 
         return $this->connection;
@@ -287,8 +290,7 @@ class Virtuoso extends AbstractSparqlStore
         /**
          * extended result type
          */
-        } elseif ('array' != $options['resultType'] && 'extended' != $options['resultType']
-        ) {
+        } elseif ('array' != $options['resultType'] && 'extended' != $options['resultType']) {
             throw new \Exception('Given resultType is invalid, allowed are array and extended.');
         }
 
