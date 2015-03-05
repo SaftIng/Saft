@@ -83,6 +83,19 @@ class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $actual, $message);
     }
+    
+    /**
+     * Tests addGraph
+     */
+
+    public function testAddGraph()
+    {
+        $this->assertFalse($this->fixture->isGraphAvailable($this->testGraphUri));
+         
+        $this->fixture->addGraph($this->testGraphUri);
+        
+        $this->assertTrue($this->fixture->isGraphAvailable($this->testGraphUri));
+    }
 
     /**
      * function dropGraph
