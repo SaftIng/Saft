@@ -126,7 +126,7 @@ abstract class AbstractSparqlStore implements StoreInterface
      *                                       introductions for the store and/or its adapter(s).
      * @return boolean Returns true if at least one match was found, false otherwise.
      */
-    public function hasMatchingStatement(Statement $Statement, $graphUri = null, array $options = array())
+    public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
     {
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $query = 'ASK {'. $this->sparqlFormat($statementIterator, $graphUri) .'}';
