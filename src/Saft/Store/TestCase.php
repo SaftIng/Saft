@@ -3,7 +3,7 @@ namespace Saft\Store;
 
 use Symfony\Component\Yaml\Parser;
 
-class TestCase extends \PHPUnit_Framework_TestCase
+abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Saft\Cache

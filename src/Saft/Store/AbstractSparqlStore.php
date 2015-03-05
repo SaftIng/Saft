@@ -130,6 +130,7 @@ abstract class AbstractSparqlStore implements StoreInterface
     {
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $query = 'ASK {'. $this->sparqlFormat($statementIterator, $graphUri) .'}';
+
         return $this->query($query, $options);
     }
 
