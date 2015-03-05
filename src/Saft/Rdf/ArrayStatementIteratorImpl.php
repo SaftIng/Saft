@@ -18,6 +18,14 @@ class ArrayStatementIteratorImpl extends AbstractStatementIterator
     }
 
     /**
+     * @param Statement $statement
+     */
+    public function append(Statement $statement)
+    {
+        $this->arrayIterator->append($statement);
+    }
+
+    /**
      * @return Statement
      */
     public function current()
