@@ -5,13 +5,47 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\Literal;
 use Saft\Rdf\StatementImpl;
-use Saft\Store\TestCase;
+use Symfony\Component\Yaml\Parser;
 
-class VirtuosoUnitTest extends TestCase
+class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Saft\Cache
+     */
+    protected $cache;
+
+    /**
+     * @var array
+     */
+    protected $config;
+    
+    /**
+     * Contains an instance of the class to test.
+     *
+     * @var mixed
+     */
+    protected $fixture;
+
+    /**
+     * @var string
+     */
+    protected $testGraphUri = 'http://localhost/Saft/TestGraph/';
+    
     public function setUp()
     {
-        parent::setUp();
+        // set path to root dir, usually where to saft-skeleton
+        // TODO move config.yml stuff to Saft.store package
+        $saftRootDir = dirname(__FILE__) . '/../../../../';
+        $configFilepath = $saftRootDir . 'config.yml';
+
+        // check for config file
+        if (false === file_exists($configFilepath)) {
+            throw new \Exception('config.yml missing in test/config.yml');
+        }
+
+        // parse YAML file
+        $yaml = new Parser();
+        $this->config = $yaml->parse(file_get_contents($configFilepath));
 
         if (true === isset($this->config['virtuosoConfig'])) {
             $this->fixture = new \Saft\Store\SparqlStore\Virtuoso($this->config['virtuosoConfig']);
@@ -20,9 +54,7 @@ class VirtuosoUnitTest extends TestCase
                 $this->config['configuration']['standardStore']
             );
         } else {
-            $this->markTestSkipped(
-                'Array virtuosoConfig is not set in the config.yml.'
-            );
+            $this->markTestSkipped('Array virtuosoConfig is not set in the config.yml.');
         }
     }
 
@@ -34,6 +66,22 @@ class VirtuosoUnitTest extends TestCase
         $this->fixture->dropGraph($this->testGraphUri);
 
         parent::tearDown();
+    }
+    
+    /**
+     * http://stackoverflow.com/a/12496979
+     * Fixes assertEquals in case of check array equality.
+     *
+     * @param array  $expected
+     * @param array  $actual
+     * @param string $message  optional
+     */
+    protected function assertEqualsArrays($expected, $actual, $message = "")
+    {
+        sort($expected);
+        sort($actual);
+
+        $this->assertEquals($expected, $actual, $message);
     }
 
     /**
