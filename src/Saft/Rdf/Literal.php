@@ -8,12 +8,12 @@ class Literal implements Node
      * @var mixed
      */
     protected $value;
-    
+
     /**
      * @var string
      */
     protected $lang;
-    
+
     /**
      * @param mixed $value
      * @param string $lang optional
@@ -23,7 +23,7 @@ class Literal implements Node
         $this->value = $value;
         $this->lang = $lang;
     }
-    
+
     /**
      * @return string
      */
@@ -31,7 +31,7 @@ class Literal implements Node
     {
         return $this->getValue();
     }
-    
+
     /**
      * Forked from Erfurt_Utils.php of the Erfurt project.
      *
@@ -49,7 +49,7 @@ class Literal implements Node
         $longString = false;
         $quoteChar  = (strpos($value, '"') !== false) ? "'" : '"';
         $value      = (string)$value;
-        
+
         // datatype-specific treatment
         switch ($datatype) {
             case "http://www.w3.org/2001/XMLSchema#boolean":
@@ -60,10 +60,10 @@ class Literal implements Node
                 $search  = array("0", "1");
                 $replace = array("false", "true");
                 $value   = str_replace($search, $replace, $value);
-                
+
                 $datatype = "http://www.w3.org/2001/XMLSchema#string";
                 break;
-                
+
             /* no normalization needed for these types */
             case "http://www.w3.org/2001/XMLSchema#decimal":
                 break;
@@ -94,7 +94,7 @@ class Literal implements Node
             case "http://www.w3.org/2001/XMLSchema#string":
             default:
                 $value = addcslashes($value, $quoteChar);
-                
+
                 /**
                  * TODO Check for characters not allowed in a short literal
                  * {@link http://www.w3.org/TR/rdf-sparql-query/#rECHAR}
@@ -123,18 +123,18 @@ class Literal implements Node
     /**
      * @see \Saft\Node
      */
-    public function equals(\Saft\Rdf\Node $toCompare)
+    public function equals(Node $toCompare)
     {
         // Only compare, if given instance is a literal
         if (true == $toCompare->isLiteral()) {
             return $this->getValue() === $toCompare->getValue();
         }
-        
+
         // TODO what about cases like 1 == 1.0 or 1 == "1"?
-        
+
         return false;
     }
-    
+
     /**
      * @return string
      * @throws \Exception
@@ -142,21 +142,21 @@ class Literal implements Node
     public function getDatatype()
     {
         $xsd = 'http://www.w3.org/2001/XMLSchema#';
-        
+
         // If a language was set, than datatype is not possible.
         if (2 <= strlen($this->lang)) {
             return null;
         }
-        
+
         /**
          * An overview about all XML Schema datatypes:
          * http://www.w3.org/TR/xmlschema-2/#built-in-datatypes
          */
-        
+
         // xsd:???
         if (null === $this->value) {
             throw new \Exception('TODO: Implement case for getDatatype when value is null.');
-        
+
         // xsd:boolean
         } elseif (true === is_bool($this->value)) {
             /**
@@ -177,21 +177,21 @@ class Literal implements Node
         // xsd:string
         } elseif (true === is_string($this->value)) {
             return $xsd . 'string';
-        
+
         // xsd:integer
         } elseif (true === is_int($this->value)) {
             return $xsd . 'integer';
-        
+
         // xsd:decimal
         } elseif (true === is_float($this->value)) {
             return $xsd . 'decimal';
-        
+
         // In case it can't determine the type of the value.
         } else {
             throw new \Exception('Value has no valid XML schema datatype.');
         }
     }
-    
+
     /**
      * @return string|null
      */
@@ -199,7 +199,7 @@ class Literal implements Node
     {
         return $this->lang;
     }
-    
+
     /**
      * @return mixed
      */
@@ -207,7 +207,7 @@ class Literal implements Node
     {
         return $this->value;
     }
-    
+
     /**
      * @return boolean
      */
@@ -221,7 +221,7 @@ class Literal implements Node
      */
     public function isConcrete()
     {
-        return true;
+        return null !== $this->value;
     }
 
     /**
@@ -253,7 +253,16 @@ class Literal implements Node
      */
     public function toNT()
     {
-        $string = '"' . $this->getValue() . '"';
+        // TODO how to handle boolean values when to transformed as n-tuple?
+        if ('http://www.w3.org/2001/XMLSchema#boolean' == $this->getDatatype()) {
+            if (true === $this->getValue()) {
+                $string = '"true"';
+            } else {
+                $string = '"false"';
+            }
+        } else {
+            $string = '"' . $this->getValue() . '"';
+        }
 
         if ($this->getLanguage() !== null) {
             $string .= '@' . $this->getLanguage();

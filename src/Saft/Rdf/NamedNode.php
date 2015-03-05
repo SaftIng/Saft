@@ -8,7 +8,7 @@ class NamedNode implements Node
      * @var string
      */
     protected $value;
-    
+
     /**
      * @param mixed $value The URI of the node.
      * @param string $lang optional Will be ignore because an NamedNode has no language.
@@ -24,7 +24,7 @@ class NamedNode implements Node
             throw new \Exception('Parameter $value is not a valid URI.');
         }
     }
-    
+
     /**
      * @return string
      */
@@ -32,7 +32,7 @@ class NamedNode implements Node
     {
         return $this->getValue();
     }
-    
+
     /**
      * Checks the general syntax of a given URI. Protocol-specific syntaxes are
      * not checked. Instead, only characters disallowed an all URIs lead to a
@@ -46,7 +46,7 @@ class NamedNode implements Node
         $regEx = '/^([a-zA-Z][a-zA-Z0-9+.-]+):([^\x00-\x0f\x20\x7f<>{}|\[\]`"^\\\\])+$/';
         return (1 === preg_match($regEx, (string)$string));
     }
-    
+
     /**
      * @see \Saft\Rdf\Node
      */
@@ -56,10 +56,10 @@ class NamedNode implements Node
         if (true === $toCompare->isNamed()) {
             return $this->getValue() == $toCompare->getValue();
         }
-        
+
         return false;
     }
-    
+
     /**
      * @return string URI of the node.
      */
@@ -67,13 +67,13 @@ class NamedNode implements Node
     {
         return $this->value;
     }
-    
+
     /**
      * @return boolean
      */
     public function isConcrete()
     {
-        return false;
+        return null !== $this->value;
     }
 
     /**
@@ -107,7 +107,7 @@ class NamedNode implements Node
     {
         return false;
     }
-    
+
     /**
      * Checks if a given string is a variable (?s).
      *
@@ -118,21 +118,27 @@ class NamedNode implements Node
     {
         $matches = array();
         preg_match_all('/\?[a-zA-Z0-9\_]+/', $string, $matches);
-        
+
         if (true === isset($matches[0][0])
             && 1 == count($matches[0][0])
             && strlen($matches[0][0]) == strlen($string)) {
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * @return string
      */
     public function toNT()
     {
-        return '<' . $this->uri . '>';
+        // check, if this named node represents a variable. if so, generate a unique variable name.
+        if (null === $this->getValue()) {
+            $variable = hash('sha1', microtime(true) . rand(0, time()));
+            return '?'. substr($variable, 0, 4);
+        } else {
+            return '<' . $this->value . '>';
+        }
     }
 }
