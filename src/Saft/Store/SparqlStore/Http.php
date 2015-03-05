@@ -105,7 +105,7 @@ class Http extends AbstractSparqlStore
     public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
         /**
-         * To be compatible with Virtuoso 6.1.8+, adapt DELETE DATA query. Virtuoso does not understand 
+         * To be compatible with Virtuoso 6.1.8+, adapt DELETE DATA query. Virtuoso does not understand
          * DELETE DATA calls containing variables such as:
          *
          *      DELETE DATA {

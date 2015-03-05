@@ -5,7 +5,6 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\Literal;
 use Saft\Rdf\StatementImpl;
-use Saft\Store\TestCase;
 use Symfony\Component\Yaml\Parser;
 
 class HttpIntegrationTest extends \PHPUnit_Framework_TestCase
@@ -237,7 +236,7 @@ class HttpIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             array(),
             $this->fixture->query(
-                'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}', 
+                'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}',
                 array('resultType' => 'array')
             )
         );
