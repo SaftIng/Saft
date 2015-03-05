@@ -13,6 +13,7 @@ use Saft\Rdf\StatementIterator;
 abstract class AbstractSparqlStore implements StoreInterface
 {
     /**
+     * redirects to the query method.
      * Adds multiple Statements to (default-) graph.
      *
      * @param  StatementIterator $statements          StatementList instance must contain Statement instances
@@ -45,12 +46,17 @@ abstract class AbstractSparqlStore implements StoreInterface
         
         // TODO implement batching
 
-        $this->query('INSERT DATA {'. $this->sparqlFormat($statements, $graphUri) . '}', $options);
+        $query = 'INSERT DATA {'. $this->sparqlFormat($statements, $graphUri) . '}';
         
-        return true;
+        if (is_callable($this, 'query')) {
+            return $this->query($query, $options);
+        } else {
+            return $query;
+        }
     }
 
     /**
+     * redirects to the query method.
      * Removes all statements from a (default-) graph which match with given statement.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
@@ -65,12 +71,17 @@ abstract class AbstractSparqlStore implements StoreInterface
     {
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         
-        $this->query('DELETE DATA {'. $this->sparqlFormat($statementIterator, $graphUri) .'}', $options);
+        $query = 'DELETE DATA {'. $this->sparqlFormat($statementIterator, $graphUri) .'}';
         
-        return true;
+        if (is_callable($this, 'query')) {
+            return $this->query($query, $options);
+        } else {
+            return $query;
+        }
     }
     
     /**
+     * redirects to the query method.
      * Returns array with graphUri's which are available.
      *
      * @return array Array which contains graph URI's as values and keys.
@@ -89,6 +100,7 @@ abstract class AbstractSparqlStore implements StoreInterface
     }
 
     /**
+     * redirects to the query method.
      * It gets all statements of a given graph which match the following conditions:
      * - statement's subject is either equal to the subject of the same statement of the graph or it is null.
      * - statement's predicate is either equal to the predicate of the same statement of the graph or it is null.
@@ -109,22 +121,17 @@ abstract class AbstractSparqlStore implements StoreInterface
 
         $query = $query . $this->sparqlFormat($statement, $graphUri) . "}";
         
-        $result = $this->query($query, $options);
+        if (is_callable($this, 'query')) {
+            return $this->query($query, $options);
+        } else {
+            return $query;
+        }
         
-        throw new \Exception('getMatchingStatements Handle result');
-    }
-    
-    /**
-     * Get information about the store and its features.
-     *
-     * @return array Array which contains information about the store and its features.
-     */
-    public function getStoreDescription()
-    {
-        return array();
+        //throw new \Exception('getMatchingStatements Handle result');
     }
 
     /**
+     * redirects to the query method.
      * Returns true or false depending on whether or not the statements pattern
      * has any matches in the given graph.
      *
@@ -136,9 +143,13 @@ abstract class AbstractSparqlStore implements StoreInterface
      */
     public function hasMatchingStatement(\Saft\Rdf\Statement $Statement, $graphUri = null, array $options = array())
     {
-        $this->query('ASK {'. $this->sparqlFormat($statements, $graphUri) .'}', $options);
-        
-        return true;
+        $query = 'ASK {'. $this->sparqlFormat($statements, $graphUri) .'}';
+
+        if (is_callable($this, 'query')) {
+            return $this->query($query, $options);
+        } else {
+            return $query;
+        }
     }
 
     /**
@@ -164,6 +175,8 @@ abstract class AbstractSparqlStore implements StoreInterface
                 }
 
                 $query .= $con .' ';
+            } else {
+                throw new \Exception('Not a Statement instance');
             }
         }
         return $query;
