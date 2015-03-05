@@ -70,11 +70,11 @@ class Virtuoso extends AbstractSparqlStore
     {
         // check for odbc extension
         if (false === extension_loaded('odbc')) {
-            throw new \Exception('Virtuoso adapter requires the PHP ODBC extension to be loaded.');
+            throw new \Exception('Virtuoso store requires the PHP ODBC extension to be loaded.');
             
         // check for pdo_odbc extension
         } elseif (false === extension_loaded('pdo_odbc')) {
-            throw new \Exception('Virtuoso adapter requires the PHP PDO_ODBC extension to be loaded.');
+            throw new \Exception('Virtuoso store requires the PHP PDO_ODBC extension to be loaded.');
         }
         
         return true;
@@ -151,28 +151,6 @@ class Virtuoso extends AbstractSparqlStore
     public function dropGraph($graphUri)
     {
         $this->query('DROP SILENT GRAPH <'. $graphUri .'>');
-    }
-
-    /**
-     * Executes a SQL query on the database.
-     *
-     * @param  string $queryString SPARQL- or SQL query to execute
-     * @return \PDOStatement
-     * @throws \Exception If $queryString is invalid
-     */
-    public function sqlQuery($queryString)
-    {
-        try {
-            // execute query
-            $query = $this->connection->prepare($queryString, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
-
-            $query->execute();
-
-            return $query;
-
-        } catch (\PDOException $e) {
-            throw new \Exception($e->getMessage());
-        }
     }
 
     /**
@@ -356,6 +334,28 @@ class Virtuoso extends AbstractSparqlStore
             }
 
             return $result;
+        }
+    }
+    
+    /**
+     * Executes a SQL query on the database.
+     *
+     * @param  string $queryString SPARQL- or SQL query to execute
+     * @return \PDOStatement
+     * @throws \Exception If $queryString is invalid
+     */
+    public function sqlQuery($queryString)
+    {
+        try {
+            // execute query
+            $query = $this->connection->prepare($queryString, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
+
+            $query->execute();
+
+            return $query;
+
+        } catch (\PDOException $e) {
+            throw new \Exception($e->getMessage());
         }
     }
 }
