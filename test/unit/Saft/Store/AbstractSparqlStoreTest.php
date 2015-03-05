@@ -5,11 +5,12 @@ namespace Saft\Store;
 use Saft\Rdf\Statement;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 
-class AbstractSparqlStoreTest extends \PHPUnit_Framework_TestCase
+class AbstractSparqlStoreTest extends TestCase
 {
 
-    protected function setUp()
+    public function setUp()
     {
+        parent::setUp();
         $this->store = $this->getMockForAbstractClass(
             '\Saft\Store\AbstractSparqlStore'
         );
@@ -137,5 +138,6 @@ class AbstractSparqlStoreTest extends \PHPUnit_Framework_TestCase
     public function tearDown()
     {
         unset($this->store);
+        parent::tearDown();
     }
 }

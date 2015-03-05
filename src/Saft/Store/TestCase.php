@@ -52,7 +52,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
         // set path to root dir, usually where to saft-skeleton
         // TODO move config.yml stuff to Saft.store package
-        $saftRootDir = dirname(__FILE__) . '/../../../../../../';
+        $saftRootDir = dirname(__FILE__) . '/../../../';
         $configFilepath = $saftRootDir . 'test/config.yml';
 
         // check for config file
