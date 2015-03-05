@@ -21,7 +21,7 @@ class VirtuosoUnitTest extends TestCase
             );
         } else {
             $this->markTestSkipped(
-                "Array virtuosoConfig is not set in the config.yml."
+                'Array virtuosoConfig is not set in the config.yml.'
             );
         }
     }
@@ -80,14 +80,13 @@ class VirtuosoUnitTest extends TestCase
 
         // alternative way to get the list
         $query = $this->fixture->sqlQuery(
-            "SELECT ID_TO_IRI(REC_GRAPH_IID) as graph
-               FROM DB.DBA.RDF_EXPLICITLY_CREATED_GRAPH",
-            "sql"
+            'SELECT ID_TO_IRI(REC_GRAPH_IID) as graph
+               FROM DB.DBA.RDF_EXPLICITLY_CREATED_GRAPH'
         );
 
         $graphsToCheck = array();
         foreach ($query->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-            $graphsToCheck[$row["graph"]] = $row["graph"];
+            $graphsToCheck[$row['graph']] = $row['graph'];
         }
 
         $this->assertEqualsArrays($graphUris, $graphsToCheck);
