@@ -48,7 +48,7 @@ abstract class AbstractSparqlStore implements StoreInterface
 
         $query = 'INSERT DATA {'. $this->sparqlFormat($statements, $graphUri) . '}';
         
-        if (is_callable($this, 'query')) {
+        if (is_callable(__CLASS__, 'query')) {
             return $this->query($query, $options);
         } else {
             return $query;
