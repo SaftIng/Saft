@@ -1,8 +1,11 @@
 <?php
 
-namespace Saft\Store\Adapter;
+namespace Saft\Store\SparqlStore;
 
-class Http extends AbstractAdapter
+/**
+ * SparqlStore implementation of a client which handles store operations via HTTP.
+ */
+class Http extends AbstractSparqlStore
 {
     /**
      * Adapter option array
