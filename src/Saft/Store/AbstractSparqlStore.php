@@ -45,14 +45,8 @@ abstract class AbstractSparqlStore implements StoreInterface
         }
         
         // TODO implement batching
-
         $query = 'INSERT DATA {'. $this->sparqlFormat($statements, $graphUri) . '}';
-        
-        if (is_callable(__CLASS__, 'query')) {
-            return $this->query($query, $options);
-        } else {
-            return $query;
-        }
+        return $this->query($query, $options);
     }
 
     /**
@@ -72,12 +66,7 @@ abstract class AbstractSparqlStore implements StoreInterface
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         
         $query = 'DELETE DATA {'. $this->sparqlFormat($statementIterator, $graphUri) .'}';
-        
-        if (is_callable($this, 'query')) {
-            return $this->query($query, $options);
-        } else {
-            return $query;
-        }
+        return $this->query($query, $options);
     }
     
     /**
@@ -121,12 +110,7 @@ abstract class AbstractSparqlStore implements StoreInterface
         $query = 'SELECT * WHERE {';
 
         $query = $query . $this->sparqlFormat($statementIterator, $graphUri) . "}";
-        
-        if (is_callable($this, 'query')) {
-            return $this->query($query, $options);
-        } else {
-            return $query;
-        }
+        return $this->query($query, $options);
         
         //throw new \Exception('getMatchingStatements Handle result');
     }
@@ -146,12 +130,7 @@ abstract class AbstractSparqlStore implements StoreInterface
     {
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $query = 'ASK {'. $this->sparqlFormat($statementIterator, $graphUri) .'}';
-
-        if (is_callable($this, 'query')) {
-            return $this->query($query, $options);
-        } else {
-            return $query;
-        }
+        return $this->query($query, $options);
     }
 
     /**
@@ -171,7 +150,7 @@ abstract class AbstractSparqlStore implements StoreInterface
 
                 $graph = $st->getGraph();
                 if (null !== $graph) {
-                    $con = 'Graph <'. $graph .'> {'. $con .'}';
+                    $con = 'Graph <'. $graph->__toString() .'> {'. $con .'}';
                 } elseif (null !== $graphUri) {
                     $con = 'Graph <'. $graphUri .'> {'. $con .'}';
                 }
