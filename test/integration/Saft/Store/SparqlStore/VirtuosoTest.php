@@ -21,7 +21,7 @@ class VirtuosoIntegrationTest extends TestCase
             );
         } else {
             $this->markTestSkipped(
-                "Array virtuosoConfig is not set in the config.yml."
+                'Array virtuosoConfig is not set in the config.yml.'
             );
         }
     }
