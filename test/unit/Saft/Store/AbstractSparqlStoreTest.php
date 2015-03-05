@@ -11,6 +11,9 @@ class AbstractSparqlStoreTest extends \PHPUnit_Framework_TestCase
         $this->store = $this->getMockForAbstractClass(
             '\Saft\Store\AbstractSparqlStore'
         );
+        //override query methode
+        $this->store->method('query')
+             ->will($this->returnArgument(0));
     }
 
     public function testCreateStatements()
@@ -36,9 +39,13 @@ class AbstractSparqlStoreTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateStatement()
     {
-        /*$statement = new \Saft\Rdf\TripleNEW('a1', 'b1', 'c1');
+        $subject1 = new \Saft\Rdf\NamedNode('http://saft/test/s1');
+        $predicate1 = new \Saft\Rdf\NamedNode('http://saft/test/p1');
+        $object1 = new \Saft\Rdf\NamedNode('http://saft/test/o1');
+        $graph1 = new \Saft\Rdf\NamedNode(null);
+        $triple1 = new \Saft\Rdf\StatementImpl($subject1, $predicate1, $object1, $graph1);
 
-        return $statement;*/
+        return $triple1;
     }
 
     /**
@@ -63,14 +70,11 @@ class AbstractSparqlStoreTest extends \PHPUnit_Framework_TestCase
     public function testAddStatements(\Saft\Rdf\ArrayStatementIteratorImpl $statements)
     {
         $query = $this->store->addStatements($statements);
-        //echo $query;
+
         $this->assertEquals(
             $query,
-            "Insert DATA\n"
-            . "{\n"
-            . "<s1> <p1> <o1>.\n"
-            ."Graph <d2> {<a2> <b2> <c2>.}\n"
-            ."}"
+            "INSERT DATA {Graph <> {<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.}"
+            . " Graph <http://saft/test/g2> {<http://saft/test/s2> <http://saft/test/p2> <http://saft/test/o2>.} }"
         );
     }
 
