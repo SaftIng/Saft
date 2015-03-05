@@ -29,9 +29,8 @@
         "saft/saft-rdf": "dev-master"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.3",
+        "phpunit/phpunit": "4.5.*",
         "squizlabs/php_codesniffer": "dev-master",
-        "symfony/yaml": "*"
     },
     "autoload": {
         "psr-4": {
