@@ -193,6 +193,15 @@ class Virtuoso extends AbstractSparqlStore
         }
         return $graphs;
     }
+    
+    /**
+     * @return array Empty array
+     * @todo implement getStoreDescription
+     */
+    public function getStoreDescription()
+    {
+        return array();
+    }
 
     /**
      * Counts the number of triples in a graph.
@@ -277,6 +286,7 @@ class Virtuoso extends AbstractSparqlStore
      *                type, it returns either an instance of ResultIterator, StatementIterator, or ResultValue
      * @throws \Exception If query is no string.
      *                    If query is malformed.
+     *                    If $options[resultType] = is neither extended nor array
      */
     public function query($query, array $options = array())
     {
