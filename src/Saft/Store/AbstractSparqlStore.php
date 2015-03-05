@@ -117,9 +117,10 @@ abstract class AbstractSparqlStore implements StoreInterface
     public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
         //TODO Filter Select
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $query = 'SELECT * WHERE {';
 
-        $query = $query . $this->sparqlFormat($statement, $graphUri) . "}";
+        $query = $query . $this->sparqlFormat($statementIterator, $graphUri) . "}";
         
         if (is_callable($this, 'query')) {
             return $this->query($query, $options);
@@ -141,9 +142,10 @@ abstract class AbstractSparqlStore implements StoreInterface
      *                                       introductions for the store and/or its adapter(s).
      * @return boolean Returns true if at least one match was found, false otherwise.
      */
-    public function hasMatchingStatement(\Saft\Rdf\Statement $Statement, $graphUri = null, array $options = array())
+    public function hasMatchingStatement(Statement $Statement, $graphUri = null, array $options = array())
     {
-        $query = 'ASK {'. $this->sparqlFormat($statements, $graphUri) .'}';
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $query = 'ASK {'. $this->sparqlFormat($statementIterator, $graphUri) .'}';
 
         if (is_callable($this, 'query')) {
             return $this->query($query, $options);
