@@ -2,6 +2,12 @@
 
 namespace Saft\Store\SparqlStore;
 
+use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\Statement;
+use Saft\Rdf\StatementImpl;
+use Saft\Sparql\Query;
+use Saft\Store\AbstractSparqlStore;
+
 /**
  * SparqlStore implementation of a client which handles store operations via HTTP.
  */
@@ -27,12 +33,11 @@ class Http extends AbstractSparqlStore
     public function __construct(array $adapterOptions)
     {
         $this->adapterOptions = $adapterOptions;
-
-        // TODO move that config to init function
-        $this->client = new \Saft\Net\Client();
+        
+        $this->checkRequirements();
 
         // Open connection
-        $this->connect();
+        $this->openConnection();
     }
 
     /**
@@ -40,7 +45,7 @@ class Http extends AbstractSparqlStore
      */
     public function __destruct()
     {
-        $this->disconnect();
+        $this->closeConnection();
     }
 
     /**
@@ -51,108 +56,84 @@ class Http extends AbstractSparqlStore
      */
     public function addGraph($graphUri)
     {
-        $this->client->sendSparqlUpdateQuery("CREATE SILENT GRAPH <". $graphUri .">");
+        $this->client->sendSparqlUpdateQuery('CREATE SILENT GRAPH <'. $graphUri .'>');
     }
 
     /**
-     * Adds multiple triples to the graph.
-     *
-     * @param  string $graphUri URI of the graph to add the triples
-     * @param  array  $triples  Array of triples to add.
-     * @return \PDOStatement
-     * @throw  \Exception
-     */
-    public function addMultipleTriples($graphUri, array $triples)
-    {
-        // TODO simplify that mess!
-
-        $client = new \Saft\Net\Client();
-        $client->setUrl($this->adapterOptions["authUrl"]);
-        $response = $client->sendDigestAuthentication(
-            $this->adapterOptions["username"],
-            $this->adapterOptions["password"]
-        );
-
-        // validate CURL status
-        if (curl_errno($client->getClient()->curl)) {
-            throw new \Exception(curl_error($client->getClient()->error), 500);
-        }
-
-        // validate HTTP status code (user/password credential issues)
-        $status_code = curl_getinfo($client->getClient()->curl, CURLINFO_HTTP_CODE);
-        if (200 != $status_code) {
-            throw new \Exception("Response with Status Code [" . $status_code . "].", 500);
-        }
-
-        $client->setUrl($this->adapterOptions["queryUrl"]);
-
-
-
-
-        $tripleNumber = count($triples);
-
-        /**
-         * create batches
-         */
-        $batch = array();
-        $batchSize = 50;
-
-        for ($i = 0; $i < $tripleNumber; ++$i) {
-            if (0 == $i % $batchSize && 0 < count($batch)) {
-                $result = $client->sendSparqlUpdateQuery(
-                    "INSERT INTO GRAPH <". $graphUri ."> {" .
-                    \Saft\Rdf\Triple::buildTripleString($batch) .
-                    "}"
-                );
-
-                $batch = array();
-            }
-            $batch[] = $triples[$i];
-        }
-
-        $result = $client->sendSparqlUpdateQuery(
-            "INSERT INTO GRAPH <". $graphUri ."> {" .
-            \Saft\Rdf\Triple::buildTripleString($batch) .
-            "}"
-        );
-
-        return $result;
-    }
-
-    /**
-     * Add a triple.
-     *
-     * @param  string $graphUri  URI of the graph to add triple
-     * @param  string $subject   URI of the subject to add
-     * @param  string $predicate URI of the predicate to add
-     * @param  array  $object    Array with data of the object to add
-     * @return ODBC resource
-     * @throw  \Exception
-     */
-    public function addTriple($graphUri, $subject, $predicate, array $object)
-    {
-        return $this->addMultipleTriples(
-            $graphUri,
-            array(array($subject, $predicate, $object))
-        );
-    }
-
-    /**
-     * Checks that all requirements for Virtuoso via PDO-ODBC are fullfilled.
+     * Checks that all requirements for queries via HTTP are fullfilled.
      */
     public function checkRequirements()
     {
-        // TODO
+        // check for odbc extension
+        if (false === extension_loaded('curl')) {
+            throw new \Exception('Http store requires the PHP ODBC extension to be loaded.');
+        }
 
         return true;
+    }
+    
+    /**
+     * Deletes all triples of a graph.
+     *
+     * @param string $graphUri URI of the graph to clear.
+     * @throw TODO Exceptions
+     */
+    public function clearGraph($graphUri)
+    {
+        $this->query('CLEAR GRAPH <' . $graphUri . '>');
     }
 
     /**
      * Closes a current connection.
      */
-    public function disconnect()
+    public function closeConnection()
     {
         $this->client->getClient()->close();
+    }
+    
+    /**
+     * Removes all statements from a (default-) graph which match with given statement.
+     *
+     * @param  Statement $statement          It can be either a concrete or pattern-statement.
+     * @param  string    $graphUri  optional Overrides target graph. If set, all statements will be delete in
+     *                                       that graph.
+     * @param  array     $options   optional It contains key-value pairs and should provide additional
+     *                                       introductions for the store and/or its adapter(s).
+     * @return boolean Returns true, if function performed without errors. In case
+     *                 an error occur, an exception will be thrown.
+     */
+    public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
+    {
+        /**
+         * To be compatible with Virtuoso 6.1.8+, adapt DELETE DATA query. Virtuoso does not understand 
+         * DELETE DATA calls containing variables such as:
+         *
+         *      DELETE DATA {
+         *          Graph <http://localhost/Saft/TestGraph/> {<http://s/> <http://p/> ?o.}
+         *      }
+         *
+         * So we have to override this method to make it look like:
+         *
+         *      WITH <http://localhost/Saft/TestGraph/>
+         *      DELETE { <http://s/> <http://p/> ?o. }
+         *      WHERE { <http://s/> <http://p/> ?o. }
+         */
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+
+        if (null === $graphUri) {
+            $graphUri = $statement->getGraph();
+        }
+
+        // if given graphUri and $statements graph are both null, throw exception
+        if (null === $graphUri) {
+            throw new \Exception('Neither $graphUri nor $statement graph were set.');
+        }
+
+        $condition = $this->sparqlFormat($statementIterator);
+        $query = 'WITH <'. $graphUri .'> DELETE {'. $condition .'} WHERE {'. $condition .'}';
+        $this->query($query, $options);
+
+        return true;
     }
 
     /**
@@ -163,171 +144,25 @@ class Http extends AbstractSparqlStore
      */
     public function dropGraph($graphUri)
     {
-        $this->client->sendSparqlUpdateQuery("DROP SILENT GRAPH <". $graphUri .">");
+        $this->client->sendSparqlUpdateQuery('DROP SILENT GRAPH <'. $graphUri .'>');
     }
 
     /**
-     * Drops multiple triples.
+     * Returns array with graphUri's which are available.
      *
-     * @param  string $graphUri URI of the graph to drop triples
-     * @param  array  $triples  Array of triples to drop
-     * @return ODBC resource Last used ODBC resource
-     * @throws \Exception
+     * @return array Array which contains graph URI's as values and keys.
      */
-    public function dropMultipleTriples($graphUri, array $triples)
+    public function getAvailableGraphs()
     {
-        // TODO simplify that mess!
+        $result = $this->query('SELECT DISTINCT ?g WHERE { GRAPH ?g {?s ?p ?o.} }');
+        
+        $graphs = array();
 
-        $client = new \Saft\Net\Client();
-        $client->setUrl($this->adapterOptions["authUrl"]);
-        $response = $client->sendDigestAuthentication(
-            $this->adapterOptions["username"],
-            $this->adapterOptions["password"]
-        );
-
-        // validate CURL status
-        if (curl_errno($client->getClient()->curl)) {
-            throw new \Exception(curl_error($client->getClient()->error), 500);
-        }
-
-        // validate HTTP status code (user/password credential issues)
-        $status_code = curl_getinfo($client->getClient()->curl, CURLINFO_HTTP_CODE);
-        if ($status_code != 200) {
-            throw new \Exception("Response with Status Code [" . $status_code . "].", 500);
-        }
-
-        $client->setUrl($this->adapterOptions["queryUrl"]);
-
-
-
-        $tripleNumber = count($triples);
-
-        /**
-         * create batches
-         */
-        $batch = array();
-        $batchSize = 250;
-
-        for ($i = 0; $i < $tripleNumber; ++$i) {
-            if (0 == $i % $batchSize) {
-                $client->sendSparqlUpdateQuery(
-                    "DELETE FROM GRAPH <". $graphUri ."> {".
-                    \Saft\Rdf\Triple::buildTripleString($batch) .
-                    "}"
-                );
-
-                $batch = array();
-            }
-            $batch[] = $triples[$i];
-        }
-
-        $odbcRes = $client->sendSparqlUpdateQuery(
-            "DELETE FROM GRAPH <". $graphUri ."> {".
-            \Saft\Rdf\Triple::buildTripleString($batch) .
-            "}"
-        );
-
-        return $odbcRes;
-    }
-
-    /**
-     * Drops a triple.
-     *
-     * @param  string $graphUri  URI of the graph to drop triple
-     * @param  string $subject   URI of the subject to drop
-     * @param  string $predicate URI of the predicate to drop
-     * @param  array  $object    Array with data of the object to drop
-     * @return ODBC resource
-     * @throw  \Exception
-     */
-    public function dropTriple($graphUri, $subject, $predicate, array $object)
-    {
-        return $this->dropMultipleTriples(
-            $graphUri,
-            array(array($subject, $predicate, $object))
-        );
-    }
-
-    /**
-     * Executes an SPARQL SELECT or SPARQL UPDATE query over HTTP.
-     *
-     * @param  string $query SPARQL query to execute
-     * @param  string $type  optional Set type of statement: sparql (standard) or sparqlUpdate
-     * @return array
-     * @throw  \Exception If $query is invalid
-     *                   If $type = "sql", because it is not supported by SPARQL endpoints
-     * @todo   merge \PDOStatement and EasyRdf return approachs
-     * @todo   replace $type = "sparql" with "sparqlSelect"
-     */
-    public function executeQuery($query, $type = "sparql")
-    {
-        // SPARQL SELECT query
-        // TODO change $type == "sparql" to "sparqlSelect" (in virtuoso adapter too!)
-        if ("sparql" == $type) {
-            $responseString = $this->client->sendSparqlSelectQuery($query);
-
-            $return = array();
-
-            // TODO check result type automatically
-            $responseArray = json_decode($responseString, true);
-
-            // in case $responseArray is null, something went wrong.
-            if (null == $responseArray) {
-                throw new \Exception('SPARQL error: '. $responseString);
-            } else {
-                foreach ($responseArray["results"]["bindings"] as $entry) {
-                    $returnEntry = array();
-
-                    foreach ($responseArray["head"]["vars"] as $var) {
-                        $returnEntry[$var] = $entry[$var]["value"];
-                    }
-
-                    $return[] = $returnEntry;
-                }
-            }
-
-            // SPARQL UPDATE query
-        } elseif ("sparqlUpdate" == $type) {
-            $sparqlResult = $this->client->sendSparqlUpdateQuery($query);
-
-            // TODO check HTTP status code
-
-
-            // validate CURL status
-            //if (curl_errno($curl))
-            //    throw new Exception(curl_error($curl), 500);
-
-            // validate HTTP status code (user/password credential issues)
-            //$status_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            //if ($status_code != 200)
-            //    throw new Exception("Response with Status Code [" . $status_code . "].", 500);
-
-            $return = array();
-
-            // SQL queries are not supported by SPARQL endpoints, mostly.
-        } elseif ("sql" == $type) {
-            throw new \Exception("SQL is not supported.");
-
-            // Unknown type
-        } else {
-            throw new \Exception("Given \$type $type is not supported.");
-        }
-
-        return $return;
-    }
-
-    /**
-     *
-     */
-    public function getAvailableGraphUris()
-    {
-        $result = $this->executeQuery("SELECT DISTINCT ?graph {GRAPH ?graph { ?s ?p ?o.}}");
-
-        $graphUris = array();
         foreach ($result as $entry) {
-            $graphUris[$entry["graph"]] = $entry["graph"];
+            $graphs[$entry['g']] = $entry['g'];
         }
-        return $graphUris;
+        
+        return $graphs;
     }
 
     /**
@@ -339,7 +174,16 @@ class Http extends AbstractSparqlStore
     {
         return $this->client->getUri();
     }
-
+    
+    /**
+     * @return array Empty
+     * @todo implement getStoreDescription
+     */
+    public function getStoreDescription()
+    {
+        return array();
+    }
+    
     /**
      * Counts the number of triples in a graph.
      *
@@ -350,56 +194,13 @@ class Http extends AbstractSparqlStore
     public function getTripleCount($graphUri)
     {
         if (true === \Saft\Rdf\NamedNode::check($graphUri)) {
-            // TODO simplify that mess!
-
-            $client = new \Saft\Net\Client();
-            $client->setUrl($this->adapterOptions["authUrl"]);
-            $response = $client->sendDigestAuthentication(
-                $this->adapterOptions["username"],
-                $this->adapterOptions["password"]
-            );
-
-            // validate CURL status
-            if (curl_errno($client->getClient()->curl)) {
-                throw new \Exception(curl_error($client->getClient()->error), 500);
-            }
-
-            // validate HTTP status code (user/password credential issues)
-            $status_code = curl_getinfo($client->getClient()->curl, CURLINFO_HTTP_CODE);
-            if ($status_code != 200) {
-                throw new \Exception("Response with Status Code [" . $status_code . "].", 500);
-            }
-
-            $client->setUrl($this->adapterOptions["queryUrl"]);
-
-
-            $result = $client->sendSparqlSelectQuery(
-                "SELECT (COUNT(*) AS ?count) FROM <" . $graphUri . "> WHERE {?s ?p ?o.}"
-            );
-
-            $result = json_decode($result, true);
-            return $result["results"]["bindings"][0]["count"]["value"];
+            $result = $this->query('SELECT (COUNT(*) AS ?count) FROM <' . $graphUri . '> WHERE {?s ?p ?o.}');
+            
+            return $result[0]['count'];
 
         } else {
-            throw new \Exception("Parameter \$graphUri is not valid or empty.");
+            throw new \Exception('Parameter $graphUri is not valid or empty.');
         }
-    }
-
-    /**
-     * Init adapter.
-     *
-     * @param  array $config Array containing database credentials
-     * @return
-     * @throw  \Exception If requirements are not fullfilled.
-     */
-    public function init(array $config)
-    {
-        $this->checkRequirements();
-
-        $this->config = $config;
-
-        // Open connection
-        $this->connect();
     }
 
     /**
@@ -411,87 +212,113 @@ class Http extends AbstractSparqlStore
      */
     public function isGraphAvailable($graphUri)
     {
-        return true === in_array($graphUri, $this->getAvailableGraphUris());
+        return true === in_array($graphUri, $this->getAvailableGraphs());
     }
-
+    
     /**
-     * Deletes all triples of a graph.
+     * Establish a connection to the endpoint and authenticate.
      *
-     * @param string $graphUri URI of the graph to clear.
-     * @throw TODO Exceptions
+     * @return \Saft\Net\Client Setup HTTP client.
      */
-    public function clearGraph($graphUri)
+    public function openConnection()
     {
-        $this->executeQuery("CLEAR GRAPH <" . $graphUri . ">", "sparqlUpdate");
-    }
-
-    /**
-     * Returns the current connection resource.
-     * @return null
-     */
-    public function connect()
-    {
-        $this->client->setUrl($this->adapterOptions["authUrl"]);
+        $this->client = new \Saft\Net\Client();
+        
+        $this->client->setUrl($this->adapterOptions['authUrl']);
         $this->client->sendDigestAuthentication(
-            $this->adapterOptions["username"],
-            $this->adapterOptions["password"]
+            $this->adapterOptions['username'],
+            $this->adapterOptions['password']
         );
 
-        // TODO check if auth was successfully
+        // validate CURL status
+        if (curl_errno($this->client->getClient()->curl)) {
+            throw new \Exception(curl_error($this->client->getClient()->error), 500);
+        }
+        // validate HTTP status code (user/password credential issues)
+        $status_code = curl_getinfo($this->client->getClient()->curl, CURLINFO_HTTP_CODE);
+        if ($status_code != 200) {
+            throw new \Exception('Response with Status Code [' . $status_code . '].', 500);
+        }
 
-        $this->client->setUrl($this->adapterOptions["queryUrl"]);
+        $this->client->setUrl($this->adapterOptions['queryUrl']);
 
-        return null;
+        return $this->client;
     }
-
+    
     /**
-     * Shortcut for sparqlSelect as long as function was not renamed.
+     * This method sends a SPARQL query to the store.
      *
-     * @todo change all sparql-calls to sparqlSelect or sparqlUpdate!
+     * @param  string $query            The SPARQL query to send to the store.
+     * @param  array  $options optional It contains key-value pairs and should provide additional
+     *                                  introductions for the store and/or its adapter(s).
+     * @return Result Returns result of the query. Depending on the query
+     *                type, it returns either an instance of ResultIterator, StatementIterator, or ResultValue
+     * @throws \Exception If query is no string.
+     *                    If query is malformed.
+     *                    If $options[resultType] = is neither extended nor array
      */
-    public function sparql($query, array $options = array())
-    {
-        return $this->sparqlSelect($query, $options);
-    }
-
-    /**
-     * Send SPARQL query to the server.
-     *
-     * @param  string $query     Query to execute
-     * @param  array  $variables optional Key-value-pairs to create prepared statements
-     * @param  array  $options   optional Options to configure the query-execution and the result.
-     * @return array
-     * @throw  \Exception If $options["resultType"] is invalid
-     */
-    public function sparqlSelect($query, array $options = array())
+    public function query($query, array $options = array())
     {
         /**
          * result type not set, use array instead
          */
-        if (false === isset($options["resultType"])) {
-            // if nothing was set, array is default result type
-            // possible are: array, extended
-            $options["resultType"] = "array";
+        if (false === isset($options['resultType'])) {
+            // if nothing was set, array is default result type. Possible are: array, extended
+            $options['resultType'] = 'array';
 
-            // invalid resultType given
-        } elseif ("extended" != $options["resultType"] && "array" != $options["resultType"]) {
-            throw new \Exception(
-                "Given resultType is invalid, allowed are array and extended."
-            );
+        /**
+         * extended result type
+         */
+        } elseif ('array' != $options['resultType'] && 'extended' != $options['resultType']) {
+            throw new \Exception('Given resultType is invalid, allowed are array and extended.');
         }
 
-        // if result type is set tot extended, use SPARQL client directly because
-        // server returns extended result set
-        if ("extended" == $options["resultType"]) {
-            $result = $this->client->sendSparqlSelectQuery($query);
-            // TODO check result type automatically
-            $result = json_decode($result, true);
+        $queryObject = new Query($query);
 
-            // array == $option["resultType"]
+        /**
+         * SPARQL query (usually to fetch data)
+         */
+        if (false === $queryObject->isUpdateQuery()) {
+            $this->client->sendSparqlSelectQuery($query);
+            
+            if ('extended' == $options['resultType']) {
+                $result = $this->client->sendSparqlSelectQuery($query);
+                // TODO check result type automatically
+                $return = json_decode($result, true);
+
+            // array == $option['resultType']
+            } else {
+                $responseString = $this->client->sendSparqlSelectQuery($query);
+
+                $return = array();
+
+                // TODO check result type automatically
+                $responseArray = json_decode($responseString, true);
+
+                // in case $responseArray is null, something went wrong.
+                if (null == $responseArray) {
+                    throw new \Exception('SPARQL error: '. $responseString);
+                } else {
+                    foreach ($responseArray['results']['bindings'] as $entry) {
+                        $returnEntry = array();
+
+                        foreach ($responseArray['head']['vars'] as $var) {
+                            $returnEntry[$var] = $entry[$var]['value'];
+                        }
+
+                        $return[] = $returnEntry;
+                    }
+                }
+            }
+
+        /**
+         * SPARPQL Update query
+         */
         } else {
-            $result = $this->executeQuery($query);
+            $this->client->sendSparqlUpdateQuery($query);
+            $return = null;
         }
 
-        return $result;
+        return $return;
     }
 }

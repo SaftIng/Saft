@@ -1,0 +1,9 @@
+# Feel free to copy it to config.yml and adapt. You can reuse existing configurations or you can use your own.
+
+# SparqlStore related configuration
+httpConfig: &httpConfig
+  type: "http"
+  authUrl: "http://localhost:8890/sparql-auth"
+  queryUrl: "http://localhost:8890/sparql"
+  username: "saftuser"
+  password: "saft"
