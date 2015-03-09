@@ -7,7 +7,7 @@ use Symfony\Component\Yaml\Parser;
 /**
  * That abstract class provides tests for the QueryCache component. But it will not be executed directly but
  * over subclasses with cache backend as suffix, such as QueryCacheFileCacheTest.php.
- * 
+ *
  * This way we can run all the tests for different configuration with minimum overhead.
  */
 abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
