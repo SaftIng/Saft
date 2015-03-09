@@ -52,7 +52,7 @@ class Query
     
     /**
      * List of widely used namespaces.
-     * 
+     *
      * @var
      */
     protected $namespaces = array(
