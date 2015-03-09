@@ -33,8 +33,7 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
     
     public function setUp()
     {
-        // set path to root dir, usually where to saft-skeleton
-        // TODO move config.yml stuff to Saft.store package
+        // set path to test dir
         $saftRootDir = dirname(__FILE__) . '/../../../../';
         $configFilepath = $saftRootDir . 'config.yml';
 
