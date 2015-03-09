@@ -2,8 +2,38 @@
 
 namespace Saft;
 
-class QueryCacheTest extends \Saft\TestCase
+use Symfony\Component\Yaml\Parser;
+
+/**
+ * That abstract class provides tests for the QueryCache component. But it will not be executed directly but
+ * over subclasses with cache backend as suffix, such as QueryCacheFileCacheTest.php.
+ * 
+ * This way we can run all the tests for different configuration with minimum overhead.
+ */
+abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Saft\Cache
+     */
+    protected $cache;
+
+    /**
+     * @var array
+     */
+    protected $config;
+    
+    /**
+     * Contains an instance of the class to test.
+     *
+     * @var mixed
+     */
+    protected $fixture;
+
+    /**
+     * @var string
+     */
+    protected $testGraphUri = 'http://localhost/Saft/TestGraph/';
+    
     /**
      * Generates a bunch of test data, but it also makes sure that there is nothing
      * already in the cache.
@@ -96,9 +126,35 @@ class QueryCacheTest extends \Saft\TestCase
     public function setUp()
     {
         parent::setUp();
+        
+        // set path to test dir
+        $saftRootDir = dirname(__FILE__) . '/../../';
+        $configFilepath = $saftRootDir . 'config.yml';
 
-        $this->fixture = new \Saft\QueryCache($this->cache);
-        $this->fixture->getCache()->clean();
+        // check for config file
+        if (false === file_exists($configFilepath)) {
+            throw new \Exception('config.yml missing in test/config.yml');
+        }
+
+        // parse YAML file
+        $yaml = new Parser();
+        $this->config = $yaml->parse(file_get_contents($configFilepath));
+    }
+    
+    /**
+     * http://stackoverflow.com/a/12496979
+     * Fixes assertEquals in case of check array equality.
+     *
+     * @param array  $expected
+     * @param array  $actual
+     * @param string $message  optional
+     */
+    protected function assertEqualsArrays($expected, $actual, $message = "")
+    {
+        sort($expected);
+        sort($actual);
+
+        $this->assertEquals($expected, $actual, $message);
     }
 
     /**

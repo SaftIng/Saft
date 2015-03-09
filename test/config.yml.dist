@@ -1,0 +1,13 @@
+# Feel free to copy it to config.yml and adapt. You can reuse existing configurations or you can use your own.
+
+# Cache related configurations.
+fileCacheConfig: &fileCacheConfig
+    type: "file"
+
+memcachedCacheConfig: &memcachedCacheConfig
+    type: "memcached"
+    host: "127.0.0.1"
+    port: "11211"
+
+phparrayCacheConfig: &phparrayCacheConfig
+    type: "phparray"
