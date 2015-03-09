@@ -72,6 +72,14 @@ class BlankNode implements Node
     {
         // TODO: Implement isReturnable() method.
     }
+    
+    /**
+     * @return boolean
+     */
+    public function isVariable()
+    {
+        return false;
+    }
 
     /**
      * @return string

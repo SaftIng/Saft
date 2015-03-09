@@ -105,6 +105,10 @@ class LiteralTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsConcrete()
     {
+        $this->fixture = new \Saft\Rdf\Literal(null, null);
+        $this->assertTrue($this->fixture->isConcrete());
+        
+        $this->fixture = new \Saft\Rdf\Literal('hallo', 'de');
         $this->assertTrue($this->fixture->isConcrete());
     }
 
@@ -139,7 +143,7 @@ class LiteralTest extends \PHPUnit_Framework_TestCase
         $this->fixture = new \Saft\Rdf\Literal(true);
 
         $this->assertEquals(
-            '"1"^^<http://www.w3.org/2001/XMLSchema#boolean>',
+            '"true"^^<http://www.w3.org/2001/XMLSchema#boolean>',
             $this->fixture->toNT()
         );
     }

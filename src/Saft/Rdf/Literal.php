@@ -221,7 +221,7 @@ class Literal implements Node
      */
     public function isConcrete()
     {
-        return null !== $this->value;
+        return true;
     }
 
     /**
@@ -244,6 +244,14 @@ class Literal implements Node
      * @return boolean
      */
     public function isReturnable()
+    {
+        return false;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isVariable()
     {
         return false;
     }

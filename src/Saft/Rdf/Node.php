@@ -49,6 +49,11 @@ interface Node
     public function isReturnable();
 
     /**
+     * @return boolean
+     */
+    public function isVariable();
+
+    /**
      * @return string
      */
     public function toNT();

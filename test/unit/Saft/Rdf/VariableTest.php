@@ -2,7 +2,7 @@
 
 namespace Saft\Rdf;
 
-class NamedNodeTest extends \PHPUnit_Framework_TestCase
+class VariableTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $testUri = 'http://saft/test/';
@@ -14,7 +14,7 @@ class NamedNodeTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->fixture = new \Saft\Rdf\NamedNode($this->testUri);
+        $this->fixture = new \Saft\Rdf\Variable('?s');
     }
 
     /**
@@ -30,35 +30,41 @@ class NamedNodeTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheck()
     {
-        $this->assertFalse($this->fixture->check(''));
-        $this->assertFalse($this->fixture->check('http//foobar/'));
+        $this->assertTrue($this->fixture->check('?s'));
+        $this->assertTrue($this->fixture->check('?longVariable'));
 
-        $this->assertTrue($this->fixture->check('http:foobar/'));
-        $this->assertTrue($this->fixture->check('http://foobar/'));
-        $this->assertTrue($this->fixture->check('http://foobar:42/'));
-        $this->assertTrue($this->fixture->check('http://foo:bar@foobar/'));
+        $this->assertFalse($this->fixture->check('not a ?variable'));
+    }
+
+    /**
+     * Tests getValue
+     */
+    public function testGetValue()
+    {
+        $this->fixture = new \Saft\Rdf\Variable('?s');
+        
+        $this->assertEquals('?s', $this->fixture->getValue());
     }
 
     /**
      * Tests instanciation
      */
-    public function testInstanciationInvalidUri()
+    public function testInstanciation()
+    {
+        $this->fixture = new \Saft\Rdf\Variable('?foo');
+    }
+    
+    public function testInstanciationInvalidValue()
     {
         $this->setExpectedException('\Exception');
-
-        $this->fixture = new \Saft\Rdf\NamedNode('foo');
+        
+        $this->fixture = new \Saft\Rdf\Variable(2);
     }
 
     public function testInstanciationNull()
     {
         $this->fixture = new \Saft\Rdf\NamedNode(null);
         $this->assertEquals(null, $this->fixture->getValue());
-    }
-
-    public function testInstanciationValidUri()
-    {
-        $this->fixture = new \Saft\Rdf\NamedNode($this->testUri);
-        $this->assertEquals($this->testUri, $this->fixture->getValue());
     }
 
     /**
@@ -74,8 +80,7 @@ class NamedNodeTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsConcrete()
     {
-        $this->fixture = new \Saft\Rdf\NamedNode($this->testUri);
-        $this->assertTrue($this->fixture->isConcrete());
+        $this->assertFalse($this->fixture->isConcrete());
     }
 
     /**
@@ -91,14 +96,15 @@ class NamedNodeTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsNamed()
     {
-        $this->assertTrue($this->fixture->isNamed());
+        $this->assertFalse($this->fixture->isNamed());
     }
 
     /**
      * Tests isVariable
+     * 
      */
     public function testIsVariable()
     {
-        $this->assertFalse($this->fixture->isVariable());
+        $this->assertTrue($this->fixture->isVariable());
     }
 }

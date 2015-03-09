@@ -2,7 +2,7 @@
 
 namespace Saft\Rdf;
 
-class NamedNode implements Node
+class Variable implements Node
 {
     /**
      * @var string
@@ -10,18 +10,22 @@ class NamedNode implements Node
     protected $value;
 
     /**
-     * @param mixed $value The URI of the node.
-     * @param string $lang optional Will be ignore because a NamedNode has no language.
+     * @param mixed $value optional The Name of the variable. If not given, a random hash will be used later on.
+     * @param string $lang optional Will be ignore because a Variable has no language.
      * @throws \Exception If parameter $value is not a valid URI.
      */
-    public function __construct($value, $lang = null)
+    public function __construct($value = null, $lang = null)
     {
-        if (true === NamedNode::check($value)
-            || null === $value
-            || true === NamedNode::isVariable($value)) {
+        // $value is a variable, like ?s
+        if (null !== $value && true === is_string($value) && '?' == substr($value, 0, 1)) {
             $this->value = $value;
+            
+        // $value is null, means we have to generate a random variable name
+        } elseif (null === $value) {
+            $variable = hash('sha1', microtime(true) . rand(0, time()));
+            $this->value = '?'. substr($variable, 0, 4);
         } else {
-            throw new \Exception('Parameter $value is not a valid URI.');
+            throw new \Exception('Parameter $value is not a string or not null.');
         }
     }
 
@@ -34,17 +38,23 @@ class NamedNode implements Node
     }
 
     /**
-     * Checks the general syntax of a given URI. Protocol-specific syntaxes are
-     * not checked. Instead, only characters disallowed an all URIs lead to a
-     * rejection of the check.
+     * Checks if a given string is a variable (?s).
      *
-     * @param string $string String to check if its a URI or not.
-     * @return boolean True if given string is a valid URI, false otherwise.
+     * @param string $string String to check if its a variable or not.
+     * @return boolean
      */
     public static function check($string)
     {
-        $regEx = '/^([a-zA-Z][a-zA-Z0-9+.-]+):([^\x00-\x0f\x20\x7f<>{}|\[\]`"^\\\\])+$/';
-        return (1 === preg_match($regEx, (string)$string));
+        $matches = array();
+        preg_match_all('/\?[a-zA-Z0-9\_]+/', $string, $matches);
+
+        if (true === isset($matches[0][0])
+            && 1 == count($matches[0][0])
+            && strlen($matches[0][0]) == strlen($string)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -73,7 +83,7 @@ class NamedNode implements Node
      */
     public function isConcrete()
     {
-        return true;
+        return false;
     }
 
     /**
@@ -89,7 +99,7 @@ class NamedNode implements Node
      */
     public function isNamed()
     {
-        return true;
+        return false;
     }
 
     /**
@@ -107,13 +117,13 @@ class NamedNode implements Node
     {
         return false;
     }
-    
+
     /**
      * @return boolean
      */
     public function isVariable()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -121,6 +131,8 @@ class NamedNode implements Node
      */
     public function toNT()
     {
-        return '<' . $this->value . '>';
+        // check, if this named node represents a variable. if so, generate a unique variable name.
+        $variable = hash('sha1', microtime(true) . rand(0, time()));
+        return '?'. substr($variable, 0, 4);
     }
 }
