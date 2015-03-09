@@ -2,7 +2,7 @@
     "name": "saft/saft-cache",
     "type": "library",
     "description": "Store package from the library Saft.",
-    "keywords": ["Saft", "Linked Data", "Semantic Web", "Store", "TripleStore"],
+    "keywords": ["Saft", "Cache"],
     "homepage": "https://github.com/SaftIng/Saft.store",
     "license": "GPL2",
     "require": {
@@ -10,9 +10,23 @@
         
         "saft/saft-cache-phparray": "*"
     },
+    "require-dev": {
+        "phpunit/phpunit": "4.5.*",
+        "saft/saft-cache-file": "*",
+        "saft/saft-cache-memcached": "*"
+    },
     "autoload": {
         "psr-4": {
             "Saft\\": "src/Saft/"
         }
-    }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Saft\\": [
+                "test/integration/Saft",
+                "test/unit/Saft"
+            ]
+        }
+    },
+    "minimum-stability":"dev"
 }
