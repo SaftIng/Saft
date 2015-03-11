@@ -24,10 +24,31 @@ class RestApi extends \Saft\Rest\RestAbstract
      */
     protected function store()
     {
-        //TODO eliminate redundancy
         if ($this->verb == "statements") {
+            if (!isset($_POST['statementsarray'])) {
+                throw new \Exception('no statements passed.');
+            }
+            $statementsPost = $_POST['statementsarray'];
+            foreach ($statementsPost as $st) {
+                if (is_array($st)) {
+                    if (sizeof($st) == 3) {
+                        $st[3] = null;
+                    } elseif (sizeof($st) != 4) {
+                        throw new \Exception('wrong statements-format. not a triple an not a quad');
+                    }
+                } else {
+                    if (sizeof($statementsPost) == 3) {
+                        $statementsPost[3] = null;
+                    } elseif (sizeof($statementsPost) != 4) {
+                        throw new \Exception('wrong statements-format. not a triple an not a quad');
+                    }
+                }
+            }
+
+            //TODO eliminate redundancy
+            
+            //AddStatements
             if ($this->method == 'POST') {
-                $statementsPost = $_POST['statements'];
                 $statements = array();
                 $i = 0;
                 foreach ($statementsPost as $st) {
@@ -37,26 +58,35 @@ class RestApi extends \Saft\Rest\RestAbstract
                 }
                 $statements = new ArrayStatementIteratorImpl($statements);
                 return $this->store->addStatements($statements);
-            } elseif ($this->method == 'DELETE') {
-                $sub = $_POST['subject'];
-                $pred = $_POST['predicate'];
-                $obj = $_POST['object'];
-                $gr = $_POST['graph'];
 
-                $statement = $this->createStatement($sub, $pred, $obj, $gr);
+            //deleteMatchingStatements
+            } elseif ($this->method == 'DELETE') {
+                if (is_array($statementsPost[0])) {
+                    throw new \Exception('expect just one statement');
+                }
+                $statement = $this->createStatement(
+                    $statementsPost[0],
+                    $statementsPost[1],
+                    $statementsPost[2],
+                    $statementsPost[3]
+                );
                 return $this->store->deleteMatchingStatements($statement);
 
+            //getMatchingStatements
             } elseif ($this->method == 'GET') {
-                $sub = $_POST['subject'];
-                $pred = $_POST['predicate'];
-                $obj = $_POST['object'];
-                $gr = $_POST['graph'];
-
-                $statement = $this->createStatement($sub, $pred, $obj, $gr);
+                if (is_array($statementsPost[0])) {
+                    throw new \Exception('expect just one statement');
+                }
+                $statement = $this->createStatement(
+                    $statementsPost[0],
+                    $statementsPost[1],
+                    $statementsPost[2],
+                    $statementsPost[3]
+                );
                 return $this->store->getMatchingStatements($statement);
 
             } else {
-                return "Only accepts POST/get/delete requests";
+                return "Only accepts POST/GET/DELETE requests";
             }
         } if ($this->verb == "store") {
             if ($this->method == 'GET') {
@@ -67,7 +97,7 @@ class RestApi extends \Saft\Rest\RestAbstract
         }
     }
 
-    private function createStatement($sub, $pred, $obj, $gr)
+    private function createStatement($sub, $pred, $obj, $gr = null)
     {
         $subject = $this->createNode($sub);
         $predicate = $this->createNode($pred);
@@ -85,9 +115,9 @@ class RestApi extends \Saft\Rest\RestAbstract
 
     private function createNode($value)
     {
+        //TODO triple-pattern
         if (true === NamedNode::check($value)
-            || null === $value
-            || true === NamedNode::isVariable($value)) {
+            || null === $value) {
             return new NamedNode($value);
         } else {
             throw new \Exception('atleast one Parameter is not a valid URI.');
