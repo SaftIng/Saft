@@ -13,7 +13,8 @@
     "require-dev": {
         "phpunit/phpunit": "4.5.*",
         "saft/saft-cache-file": "*",
-        "saft/saft-cache-memcached": "*"
+        "saft/saft-cache-memcached": "*",
+        "symfony/yaml": "*"
     },
     "autoload": {
         "psr-4": {

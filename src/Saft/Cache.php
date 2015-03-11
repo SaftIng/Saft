@@ -8,7 +8,7 @@ namespace Saft;
 class Cache
 {
     /**
-     * @var instance which implements \Enable\Cache\Adapter\Base
+     * @var
      */
     protected $cache;
 
@@ -70,7 +70,7 @@ class Cache
      */
     public function getType()
     {
-        return $this->_config["type"];
+        return $this->_config['type'];
     }
 
     /**
@@ -81,12 +81,12 @@ class Cache
      */
     public function init(array $config)
     {
-        if (true === isset($config["type"])) {
-            switch ($config["type"]) {
+        if (true === isset($config['type'])) {
+            switch ($config['type']) {
                 /**
                  * File
                  */
-                case "file":
+                case 'file':
                     $this->cache = new \Saft\Cache\Adapter\File();
                     $this->cache->setup($config);
                     break;
@@ -94,7 +94,7 @@ class Cache
                 /**
                  * MemcacheD
                  */
-                case "memcached":
+                case 'memcached':
                     $this->cache = new \Saft\Cache\Adapter\MemcacheD();
                     $this->cache->setup($config);
                     break;
@@ -102,18 +102,18 @@ class Cache
                 /**
                  * PHPArray
                  */
-                case "phparray":
+                case 'phparray':
                     $this->cache = new \Saft\Cache\Adapter\PHPArray();
                     $this->cache->setup($config);
                     break;
 
                 default:
-                    throw new \Exception("Unknown cache backend.");
+                    throw new \Exception('Unknown cache backend.');
                     break;
             }
 
         } else {
-            throw new \Exception("Unknown cache backend.");
+            throw new \Exception('Unknown cache backend.');
         }
 
         $this->_config = $config;
