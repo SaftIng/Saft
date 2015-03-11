@@ -2,11 +2,9 @@
 namespace Saft\Rest;
 
 use Saft\Store\StoreInterface;
-use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Rdf\Statement;
-use Saft\Rdf\StatementIterator;
 
 /**
+ * @todo
  * http://coreymaynard.com/blog/creating-a-restful-api-with-php/
  */
 abstract class RestAbstract

@@ -3,13 +3,15 @@ namespace Saft\Rest;
 
 use Saft\Store\StoreInterface;
 use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Rdf\Statement;
 use Saft\Rdf\NamedNode;
-use Saft\Rdf\StatementIterator;
+use Saft\Rdf\Literal;
 use Saft\Rdf\StatementImpl;
 
 /**
- * http://coreymaynard.com/blog/creating-a-restful-api-with-php/
+ * @todo  add documentation
+ * @todo  eliminate redundancy
+ * @todo  statement-pattern missing
+ * @todo  hasMatchingStatement missing
  */
 class RestApi extends \Saft\Rest\RestAbstract
 {
@@ -30,18 +32,20 @@ class RestApi extends \Saft\Rest\RestAbstract
             }
             $statementsPost = $_POST['statementsarray'];
             foreach ($statementsPost as $st) {
-                if (is_array($st)) {
-                    if (sizeof($st) == 3) {
-                        $st[3] = null;
-                    } elseif (sizeof($st) != 4) {
-                        throw new \Exception('wrong statements-format. not a triple an not a quad');
-                    }
-                } else {
+                if (!is_array($st)) {
                     if (sizeof($statementsPost) == 3) {
                         $statementsPost[3] = null;
                     } elseif (sizeof($statementsPost) != 4) {
                         throw new \Exception('wrong statements-format. not a triple an not a quad');
                     }
+                }
+            }
+            $graphUri = null;
+            if (isset($_POST['graphUri'])) {
+                if (true === NamedNode::check($_POST['graphUri'])) {
+                    $graphUri = new NamedNode($_POST['graphUri']);
+                } else {
+                    throw new \Exception('graphUri not a valid URI.');
                 }
             }
 
@@ -52,12 +56,18 @@ class RestApi extends \Saft\Rest\RestAbstract
                 $statements = array();
                 $i = 0;
                 foreach ($statementsPost as $st) {
-                    $statement = $this->createStatement($st[0], $st[1], $st[2], $st[3]);
+                    if (sizeof($st) == 3) {
+                        $statement = $this->createStatement($st[0], $st[1], $st[2]);
+                    } elseif (sizeof($st) == 4) {
+                        $statement = $this->createStatement($st[0], $st[1], $st[2], $st[3]);
+                    } else {
+                        throw new \Exception('wrong statements-format. not a triple an not a quad');
+                    }
                     $statements[$i] = $statement;
                     $i++;
                 }
                 $statements = new ArrayStatementIteratorImpl($statements);
-                return $this->store->addStatements($statements);
+                return $this->store->addStatements($statements, $graphUri);
 
             //deleteMatchingStatements
             } elseif ($this->method == 'DELETE') {
@@ -70,7 +80,7 @@ class RestApi extends \Saft\Rest\RestAbstract
                     $statementsPost[2],
                     $statementsPost[3]
                 );
-                return $this->store->deleteMatchingStatements($statement);
+                return $this->store->deleteMatchingStatements($statement, $graphUri);
 
             //getMatchingStatements
             } elseif ($this->method == 'GET') {
@@ -83,7 +93,7 @@ class RestApi extends \Saft\Rest\RestAbstract
                     $statementsPost[2],
                     $statementsPost[3]
                 );
-                return $this->store->getMatchingStatements($statement);
+                return $this->store->getMatchingStatements($statement, $graphUri);
 
             } else {
                 return "Only accepts POST/GET/DELETE requests";
@@ -108,11 +118,6 @@ class RestApi extends \Saft\Rest\RestAbstract
         return $statement;
     }
 
-    private function validLiteral()
-    {
-
-    }
-
     private function createNode($value)
     {
         //TODO triple-pattern
@@ -120,7 +125,7 @@ class RestApi extends \Saft\Rest\RestAbstract
             || null === $value) {
             return new NamedNode($value);
         } else {
-            throw new \Exception('atleast one Parameter is not a valid URI.');
+            return new Literal($value);
         }
     }
 }
