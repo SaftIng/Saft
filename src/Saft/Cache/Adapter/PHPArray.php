@@ -48,7 +48,7 @@ class PHPArray implements CacheInterface
         if (true === $this->isCached($key)) {
             return json_decode($this->cache[$key], true);
         } else {
-            return false;
+            return null;
         }
     }
 
