@@ -22,9 +22,7 @@ class Cache
     }
 
     /**
-     * Removes all cached entries.
-     *
-     * @return void
+     * Removes all entries of the cache instance.
      */
     public function clean()
     {
@@ -32,10 +30,9 @@ class Cache
     }
 
     /**
-     * Deletes a certain entry.
+     * Deletes a certain cache entry by key.
      *
-     * @param  string $key ID of the entry to delete.
-     * @return void
+     * @param string $key Key of the cache entry to delete.
      */
     public function delete($key)
     {
@@ -43,14 +40,23 @@ class Cache
     }
 
     /**
-     * Returns the value of an entry, if it exists in the cache.
+     * Returns the value to a given key, if it exists in the cache.
      *
-     * @param  string $key ID of the entry.
+     * @param string $key ID of the entry to return the value from.
      * @return mixed Value of the entry.
      */
     public function get($key)
     {
-        return $this->cache->get($key);
+        $entry = $this->cache->get($key);
+        
+        // increase access count by 1 and save entry
+        if (false !== $entry) {
+            ++$entry['access_count'];
+            $this->cache->set($key, $entry);
+            return $entry['value'];
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -62,11 +68,23 @@ class Cache
     {
         return $this->cache;
     }
+    
+    /**
+     * Returns the complete cache entry to a given key, if it exists in the cache. It does not change the
+     * cache entry itself, such as the access_count.
+     *
+     * @param string $key ID of the cache entry to return.
+     * @return array|null Cache entry array
+     */
+    public function getCompleteEntry($key)
+    {
+        return $this->cache->get($key);
+    }
 
     /**
      * Returns the type of the cache adapter.
      *
-     * @return string Type of the cache.
+     * @return string Type of the cache adapter.
      */
     public function getType()
     {
@@ -77,7 +95,7 @@ class Cache
      * Initialize the cache.
      *
      * @param array $config Array to configure this instance.
-     * @throw \Exception In case of an unknown cache backend
+     * @throw \Exception If an unknown cache backend was used.
      */
     public function init(array $config)
     {
@@ -122,12 +140,16 @@ class Cache
     /**
      * Stores a new entry in the cache or overrides an existing one.
      *
-     * @param  string $key   Identifier of the value to store.
-     * @param  mixed  $value Value to store in the cache.
-     * @return void
+     * @param string $key Identifier of the value to store.
+     * @param mixed $value Value to store in the cache.
      */
     public function set($key, $value)
     {
-        $this->cache->set($key, $value);
+        $entry = array(
+            'access_count' => 0,
+            'value' => $value
+        );
+        
+        $this->cache->set($key, $entry);
     }
 }

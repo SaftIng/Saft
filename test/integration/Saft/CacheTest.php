@@ -104,6 +104,31 @@ abstract class CacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $this->fixture->get('foo'));
     }
 
+    public function testGetCompleteEntry()
+    {
+        $this->fixture->set('foo', 'bar');
+        
+        $this->assertEquals(
+            array('access_count' => 0, 'value' => 'bar'),
+            $this->fixture->getCompleteEntry('foo')
+        );
+    }
+
+    public function testGetCompleteEntryMultipleAccessesBefore()
+    {
+        $this->fixture->set('foo', 'bar');
+        
+        // accessed 3 times
+        $this->fixture->get('foo');
+        $this->fixture->get('foo');
+        $this->fixture->get('foo');
+        
+        $this->assertEquals(
+            array('access_count' => 3, 'value' => 'bar'),
+            $this->fixture->getCompleteEntry('foo')
+        );
+    }
+
     public function testGetInvalidKey()
     {
         $this->assertFalse($this->fixture->get(time().'invalid key'));
