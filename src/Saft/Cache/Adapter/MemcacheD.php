@@ -121,8 +121,8 @@ class MemcacheD implements CacheInterface
             $config['host'] = true == isset($config['host']) ? $config['host'] : '127.0.0.1';
             $config['port'] = 0 < (int)$config['port'] ? (int)$config['port'] : 11211;
 
-            // check if the host-port-combination is already in the server list,
-            // to avoid adding the same configuration multiple times
+            // check if the host-port-combination is already in the server list, to avoid adding the same 
+            // configuration multiple times
             if (true === empty($servers)) {
                 $this->cache->setOption(\Memcached::OPT_RECV_TIMEOUT, 1000);
                 $this->cache->setOption(\Memcached::OPT_SEND_TIMEOUT, 3000);
