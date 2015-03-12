@@ -31,12 +31,11 @@ class MemcacheD implements CacheInterface
     {
         if (false === extension_loaded('memcached')) {
             throw new \Exception('Memcached extension is not available.');
-        }
-        if (false === class_exists('\Memcached')) {
+        } elseif (false === class_exists('\Memcached')) {
             throw new \Exception('Class \Memcached does not exist.');
+        } else {
+            return true;
         }
-        
-        return true;
     }
 
     /**
@@ -65,7 +64,13 @@ class MemcacheD implements CacheInterface
      */
     public function get($key)
     {
-        return $this->cache->get($this->keyPrefix . $key);
+        $value = $this->cache->get($this->keyPrefix . $key);
+        
+        if (false !== $value) {
+            return $value;
+        } else {
+            return null;
+        }
     }
 
     /**
