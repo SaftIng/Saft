@@ -2,6 +2,21 @@
 
 namespace Saft;
 
+/**
+ * This class implements a SPARQL query cache, which was described in the following paper:
+ * 
+ * Martin Michael, Jörg Unbehauen, and Sören Auer. 
+ * "Improving the performance of semantic web applications with SPARQL query caching." 
+ * The Semantic Web: Research and Applications. 
+ * Springer Berlin Heidelberg, 2010. 
+ * 304-318.
+ * 
+ * Link: http://www.informatik.uni-leipzig.de/~auer/publication/caching.pdf
+ * 
+ * ----------------------------------------------------------------------------------------
+ * 
+ * The implementation here uses a key-value-pair based cache mechanism. 
+ */
 class QueryCache
 {
     /**
@@ -62,7 +77,7 @@ class QueryCache
     /**
      * Constructor
      *
-     * @param  \Enable\Cache $cache Initialized cache instance.
+     * @param \Saft\Cache $cache Initialized cache instance.
      * @return void
      */
     public function __construct(\Saft\Cache $cache)
@@ -91,7 +106,7 @@ class QueryCache
      *
      * @param  array $operation Array containing information of a function to execute
      * @return void
-     * @throw  \Enable\Exception
+     * @throw \Exception
      */
     public function executeOperation($operation)
     {
@@ -122,7 +137,7 @@ class QueryCache
                 break;
 
             default:
-                throw new \Enable\Exception(
+                throw new \Exception(
                     'Key "function" is not set or invalid: '. $operation['function']
                 );
                 break;
@@ -155,9 +170,9 @@ class QueryCache
     }
 
     /**
-     * Returns in stance of \Enable\Cache instance in use.
+     * Returns in stance of \Cache instance in use.
      *
-     * @return \Enable\Cache Instance of the \Enable\Cache in use
+     * @return \Cache Instance of the \Cache in use
      */
     public function getCache()
     {
@@ -206,7 +221,7 @@ class QueryCache
     /**
      * Initialize the QueryCache instance.
      *
-     * @param  \Enable\Cache $cache Instance of the \Enable\Cache in use
+     * @param  \Cache $cache Instance of the \Cache in use
      * @return void
      */
     public function init(\Saft\Cache $cache)
@@ -233,14 +248,12 @@ class QueryCache
     }
 
     /**
-     * Invalidate according cache entries to the given $graphUri. That means, that
-     * all queries, which are according to this graph will be invalidated.
+     * Invalidate according cache entries to the given $graphUri. That means, that all queries, which are 
+     * according to this graph will be invalidated.
      *
-     * @param  string  $graphUri
-     * @param  boolean $checkTransaction optionally True, if you wanna check for active
-     *                                             transactions. False if you just want
-     *                                             to execute regardless of active transactions.
-     * @return void
+     * @param string  $graphUri
+     * @param boolean $checkTransaction optional True, if you wanna check for active transactions. False if 
+     *                                           you just want to execute regardless of active transactions.
      */
     public function invalidateByGraphUri($graphUri, $checkTransaction = true)
     {
@@ -326,7 +339,7 @@ class QueryCache
      *                                                              are related QueryCache entries and
      *                                                              if so, invalidate them.
      * @return void
-     * @throw  \Enable\Exception
+     * @throw  \Exception
      */
     public function invalidateByQuery(
         $query,
@@ -587,9 +600,8 @@ class QueryCache
      * no nested transactions, which means, that all of its placed operations
      * will be immediately executed.
      *
-     * @return void
-     * @throw  \Enable\Exception Various reasons possible
-     * @todo   implement rollback support, in case something went wrong
+     * @throw \Exception Various reasons possible
+     * @todo Implement rollback support, in case something went wrong
      */
     public function stopTransaction()
     {
