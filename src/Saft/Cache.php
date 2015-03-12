@@ -50,12 +50,12 @@ class Cache
         $entry = $this->cache->get($key);
         
         // increase access count by 1 and save entry
-        if (false !== $entry) {
+        if (null !== $entry) {
             ++$entry['access_count'];
             $this->cache->set($key, $entry);
             return $entry['value'];
         } else {
-            return false;
+            return null;
         }
     }
 

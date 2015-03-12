@@ -58,13 +58,13 @@ abstract class CacheTest extends \PHPUnit_Framework_TestCase
 
     public function testClean()
     {
-        $this->assertFalse($this->fixture->get('foo'));
+        $this->assertNull($this->fixture->get('foo'));
         $this->fixture->set('foo', 'bar');
         $this->assertEquals('bar', $this->fixture->get('foo'));
 
         $this->fixture->clean();
 
-        $this->assertFalse($this->fixture->get('foo'));
+        $this->assertNull($this->fixture->get('foo'));
     }
 
     /**
@@ -73,22 +73,15 @@ abstract class CacheTest extends \PHPUnit_Framework_TestCase
 
     public function testDelete()
     {
-        $this->assertFalse(
-            $this->fixture->get('foo')
-        );
+        $this->assertNull($this->fixture->get('foo'));
 
         $this->fixture->set('foo', 'bar');
 
-        $this->assertEquals(
-            'bar',
-            $this->fixture->get('foo')
-        );
+        $this->assertEquals('bar',$this->fixture->get('foo'));
 
         $this->fixture->delete('foo');
 
-        $this->assertFalse(
-            $this->fixture->get('foo')
-        );
+        $this->assertNull($this->fixture->get('foo'));
     }
 
     /**
@@ -97,7 +90,7 @@ abstract class CacheTest extends \PHPUnit_Framework_TestCase
 
     public function testGet()
     {
-        $this->assertFalse($this->fixture->get('foo'));
+        $this->assertNull($this->fixture->get('foo'));
 
         $this->fixture->set('foo', 'bar');
 
@@ -112,6 +105,11 @@ abstract class CacheTest extends \PHPUnit_Framework_TestCase
             array('access_count' => 0, 'value' => 'bar'),
             $this->fixture->getCompleteEntry('foo')
         );
+    }
+
+    public function testGetCompleteEntryNoEntry()
+    {
+        $this->assertNull($this->fixture->getCompleteEntry('foo'));
     }
 
     public function testGetCompleteEntryMultipleAccessesBefore()
@@ -131,7 +129,7 @@ abstract class CacheTest extends \PHPUnit_Framework_TestCase
 
     public function testGetInvalidKey()
     {
-        $this->assertFalse($this->fixture->get(time().'invalid key'));
+        $this->assertNull($this->fixture->get(time().'invalid key'));
     }
 
     /**
