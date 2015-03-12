@@ -2,8 +2,9 @@
 namespace Saft\Store\SparqlStore;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Rdf\NamedNode;
 use Saft\Rdf\Literal;
+use Saft\Rdf\NamedNode;
+use Saft\Rdf\Variable;
 use Saft\Rdf\StatementImpl;
 use Symfony\Component\Yaml\Parser;
 
@@ -173,7 +174,7 @@ class HttpIntegrationTest extends \PHPUnit_Framework_TestCase
          * drop all triples
          */
         $this->fixture->deleteMatchingStatements(
-            new StatementImpl(new NamedNode('http://s/'), new NamedNode('http://p/'), new NamedNode(null)),
+            new StatementImpl(new NamedNode('http://s/'), new NamedNode('http://p/'), new Variable()),
             $this->testGraphUri
         );
 
