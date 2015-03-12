@@ -11,10 +11,19 @@ class Cache
      * @var
      */
     protected $cache;
+    
+    /**
+     * Standard key prefix for cache entry keys. You can set it to separate your entries from others to avoid
+     * naming conflicts.
+     * 
+     * @var string
+     */
+    protected $keyPrefix = '';
 
     /**
+     * Constructor, which calls init function.
+     * 
      * @param array $config Array to configure the Cache instance.
-     * @return void
      */
     public function __construct(array $config)
     {
@@ -62,7 +71,7 @@ class Cache
     /**
      * Returns the current active cache instance.
      *
-     * @return mixed Instance which implements \Enable\Cache\Adapter\Base inteface
+     * @return mixed Instance which implements \Saft\Cache\CacheInterface
      */
     public function getCacheObj()
     {
@@ -74,7 +83,7 @@ class Cache
      * cache entry itself, such as the access_count.
      *
      * @param string $key ID of the cache entry to return.
-     * @return array|null Cache entry array
+     * @return array|null Cache entry array or null, if not available.
      */
     public function getCompleteEntry($key)
     {
@@ -134,6 +143,10 @@ class Cache
             throw new \Exception('Unknown cache backend.');
         }
 
+        if (true === isset($config['keyPrefix']) && false === empty($config['keyPrefix'])) {
+            $this->keyPrefix = $config['keyPrefix'];
+        }
+    
         $this->_config = $config;
     }
 

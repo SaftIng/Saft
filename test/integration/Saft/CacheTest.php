@@ -77,7 +77,7 @@ abstract class CacheTest extends \PHPUnit_Framework_TestCase
 
         $this->fixture->set('foo', 'bar');
 
-        $this->assertEquals('bar',$this->fixture->get('foo'));
+        $this->assertEquals('bar', $this->fixture->get('foo'));
 
         $this->fixture->delete('foo');
 
