@@ -4,18 +4,18 @@ namespace Saft;
 
 /**
  * This class implements a SPARQL query cache, which was described in the following paper:
- * 
- * Martin Michael, Jörg Unbehauen, and Sören Auer. 
- * "Improving the performance of semantic web applications with SPARQL query caching." 
- * The Semantic Web: Research and Applications. 
- * Springer Berlin Heidelberg, 2010. 
+ *
+ * Martin Michael, Jörg Unbehauen, and Sören Auer.
+ * "Improving the performance of semantic web applications with SPARQL query caching."
+ * The Semantic Web: Research and Applications.
+ * Springer Berlin Heidelberg, 2010.
  * 304-318.
- * 
+ *
  * Link: http://www.informatik.uni-leipzig.de/~auer/publication/caching.pdf
- * 
+ *
  * ----------------------------------------------------------------------------------------
- * 
- * The implementation here uses a key-value-pair based cache mechanism. 
+ *
+ * The implementation here uses a key-value-pair based cache mechanism.
  */
 class QueryCache
 {
@@ -248,11 +248,11 @@ class QueryCache
     }
 
     /**
-     * Invalidate according cache entries to the given $graphUri. That means, that all queries, which are 
+     * Invalidate according cache entries to the given $graphUri. That means, that all queries, which are
      * according to this graph will be invalidated.
      *
      * @param string  $graphUri
-     * @param boolean $checkTransaction optional True, if you wanna check for active transactions. False if 
+     * @param boolean $checkTransaction optional True, if you wanna check for active transactions. False if
      *                                           you just want to execute regardless of active transactions.
      */
     public function invalidateByGraphUri($graphUri, $checkTransaction = true)
