@@ -15,14 +15,14 @@ class Cache
     /**
      * Standard key prefix for cache entry keys. You can set it to separate your entries from others to avoid
      * naming conflicts.
-     * 
+     *
      * @var string
      */
     protected $keyPrefix = '';
 
     /**
      * Constructor, which calls init function.
-     * 
+     *
      * @param array $config Array to configure the Cache instance.
      */
     public function __construct(array $config)
