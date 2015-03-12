@@ -1,5 +1,7 @@
 # Feel free to copy it to config.yml and adapt. You can reuse existing configurations or you can use your own.
 
-phparrayCacheConfig: &phparrayCacheConfig
-    key_prefix: "phparray-"
-    type: "phparray"
+memcachedCacheConfig: &memcachedCacheConfig
+    host: "127.0.0.1"
+    key_prefix: "memcached-"
+    port: "11211"
+    type: "memcached"
