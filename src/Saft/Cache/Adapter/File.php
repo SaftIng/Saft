@@ -92,7 +92,7 @@ class File implements CacheInterface
 
     /**
      * Checks if an entry is cached.
-     * 
+     *
      * @param string $key ID of the entry to check.
      * @return boolean True, if entry behind given $key exists, false otherwise.
      */
@@ -118,7 +118,7 @@ class File implements CacheInterface
     }
 
     /**
-     * Setup cache adapter. All operations to establish a connection to the cache have to be done. It should 
+     * Setup cache adapter. All operations to establish a connection to the cache have to be done. It should
      * call checkRequirements to be sure all requirements are fullfilled, before init anything.
      *
      * @param array $config Array containing necessary parameter to setup a cache adapter.
