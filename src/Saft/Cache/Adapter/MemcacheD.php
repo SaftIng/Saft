@@ -85,7 +85,7 @@ class MemcacheD implements CacheInterface
     
     /**
      * Checks if an entry is cached.
-     * 
+     *
      * @param string $key ID of the entry to check.
      * @return boolean True, if entry behind given $key exists, false otherwise.
      */
