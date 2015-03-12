@@ -64,7 +64,7 @@ class File implements CacheInterface
      * Returns the value to a given key, if it exists in the cache.
      *
      * @param string $key ID of the entry to return the value from.
-     * @return mixed Value of the entry.
+     * @return mixed Value of the entry. Returns null if there is no cache entry.
      */
     public function get($key)
     {
@@ -76,7 +76,7 @@ class File implements CacheInterface
                 true
             );
         } else {
-            return false;
+            return null;
         }
     }
 
