@@ -46,10 +46,10 @@ abstract class RestAbstract
     public function __construct($request, StoreInterface $store)
     {
         // allow requests from any origin to be processed by this page
-        header("Access-Control-Allow-Orgin: *");
+        header('Access-Control-Allow-Orgin: *');
         // allow for any HTTP method to be accepted.
-        header("Access-Control-Allow-Methods: *");
-        header("Content-Type: application/json");
+        header('Access-Control-Allow-Methods: *');
+        header('Content-Type: application/json');
 
         $this->store = $store;
 
@@ -62,24 +62,24 @@ abstract class RestAbstract
         
         $this->method = $_SERVER['REQUEST_METHOD'];
         //DELETE and PUT requests are hidden inside a POST request
-        if ($this->method == 'POST' && array_key_exists('HTTP_X_HTTP_METHOD', $_SERVER)) {
+        if ($this->method == 'POST' && true === isset($_SERVER['HTTP_X_HTTP_METHOD'])) {
             if ($_SERVER['HTTP_X_HTTP_METHOD'] == 'DELETE') {
                 $this->method = 'DELETE';
             } else {
-                throw new \Exception("Unexpected Header");
+                throw new \Exception('Unexpected Header');
             }
         }
 
         switch($this->method) {
             case 'DELETE':
             case 'POST':
-                $this->request = $this->_cleanInputs($_POST);
+                $this->request = $this->cleanInputs($_POST);
                 break;
             case 'GET':
-                $this->request = $this->_cleanInputs($_GET);
+                $this->request = $this->cleanInputs($_GET);
                 break;
             default:
-                $this->_response('Invalid Method', 405);
+                $this->response('Invalid Method', 405);
                 break;
         }
     }
@@ -87,9 +87,9 @@ abstract class RestAbstract
     public function processAPI()
     {
         if ((int)method_exists($this, $this->endpoint) > 0) {
-            return $this->_response($this->{$this->endpoint}($this->args));
+            return $this->response($this->{$this->endpoint}($this->args));
         }
-        return $this->_response("No Endpoint: $this->endpoint", 404);
+        return $this->response('No Endpoint: '. $this->endpoint, 404);
     }
 
     /**
@@ -98,9 +98,9 @@ abstract class RestAbstract
      * @param  integer $status HTTP-Status
      * @return Returns the JSON representation of $data.
      */
-    private function _response($data, $status = 200)
+    protected function response($data, $status = 200)
     {
-        header("HTTP/1.1 " . $status . " " . $this->_requestStatus($status));
+        header('HTTP/1.1 '. $status .' '. $this->requestStatus($status));
         //TODO the JSON representation of $data.
         return $data;
     }
@@ -110,12 +110,12 @@ abstract class RestAbstract
      * @param  [type] $data [description]
      * @return string request-method
      */
-    private function _cleanInputs($data)
+    protected function cleanInputs($data)
     {
         $clean_input = array();
         if (is_array($data)) {
             foreach ($data as $k => $v) {
-                $clean_input[$k] = $this->_cleanInputs($v);
+                $clean_input[$k] = $this->cleanInputs($v);
             }
         } else {
             $clean_input = trim(strip_tags($data));
@@ -128,7 +128,7 @@ abstract class RestAbstract
      * @param  integer $code HTTP-Status
      * @return string http-status
      */
-    private function _requestStatus($code)
+    protected function requestStatus($code)
     {
         $status = array(
             200 => 'OK',
