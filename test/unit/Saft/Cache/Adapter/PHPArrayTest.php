@@ -38,7 +38,8 @@ class PHPArrayTest extends \PHPUnit_Framework_TestCase
         $yaml = new Parser();
         $this->config = $yaml->parse(file_get_contents($configFilepath));
         
-        $this->fixture = new PHPArray($this->config['phparrayCacheConfig']);
+        $this->fixture = new PHPArray();
+        $this->fixture->setup($this->config['phparrayCacheConfig']);
     }
     
     /**
