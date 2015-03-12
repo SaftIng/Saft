@@ -40,15 +40,15 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
      */
     public function generateTestCacheEntries()
     {
-        $query = "SELECT ?s ?p ?o
-                    FROM <" . $this->testGraphUri . ">
-                    FROM <" . $this->testGraphUri ."2>
+        $query = 'SELECT ?s ?p ?o
+                    FROM <' . $this->testGraphUri . '>
+                    FROM <' . $this->testGraphUri .'2>
                    WHERE {
                      <http://rdfs.org/sioc/ns#foo> ?p ?o.
-                     ?s <http://www.w3.org/2000/01/rdf-schema#label> \"foo\".
+                     ?s <http://www.w3.org/2000/01/rdf-schema#label> "foo".
                      FILTER (?o < 40)
-                   }";
-        $result = array("foo" => 1337);
+                   }';
+        $result = array('foo' => 1337);
 
         $queryId = $this->fixture->generateShortId($query);
         $this->assertFalse($this->fixture->getCache()->get($queryId));
@@ -57,7 +57,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
          * graph container
          */
         $graphUris = array(
-            $this->testGraphUri, $this->testGraphUri."2"
+            $this->testGraphUri, $this->testGraphUri.'2'
         );
         $graphIds = array();
 
@@ -74,7 +74,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
            # Example:
 
-            "qryCah--f7bc2ce104" => array (
+            'qryCah--f7bc2ce104' => array (
                 0 => 'qryCah--f7bc2ce104_*_*_*'
                 1 => 'qryCah--f7bc2ce104_*_2e393a3c3c_*'
             )
@@ -82,16 +82,16 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
             # Behind the scenes (what does each entry mean):
 
-            "$graphId (hashed graph URI)" => array (
+            '$graphId (hashed graph URI)' => array (
                 0 => '$keyPrefix$graphId (hashed graph URI)_Placeholder_Placeholder_Placeholder'
                 1 => '$keyPrefix$graphId (hashed graph URI)_Placeholder_2e393a3c3c_Placeholder'
             )
          *
          */
-        $sPO = "_". $this->fixture->generateShortId("http://rdfs.org/sioc/ns#foo", false) ."_*_*";
-        $sLabelFoo = "_*"
-                     . "_" . $this->fixture->generateShortId("http://www.w3.org/2000/01/rdf-schema#label", false)
-                     . "_*";
+        $sPO = '_'. $this->fixture->generateShortId('http://rdfs.org/sioc/ns#foo', false) .'_*_*';
+        $sLabelFoo = '_*'
+                     . '_' . $this->fixture->generateShortId('http://www.w3.org/2000/01/rdf-schema#label', false)
+                     . '_*';
 
         foreach ($graphIds as $graphId) {
             $triplePattern[$graphId] = array(
@@ -104,19 +104,19 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         }
 
         return array(
-            "graphIds"          => $graphIds,       // have cache entries
-            "graphUris"         => $graphUris,
-            "query"             => $query,
-            "queryContainer"    => array(
-                "relatedQueryCacheEntries" => "",
-                "graphIds"                   => $graphIds,
-                "query"                      => $query,
-                "result"                     => $result,
-                "triplePattern"              => $triplePattern
+            'graphIds'          => $graphIds,       // have cache entries
+            'graphUris'         => $graphUris,
+            'query'             => $query,
+            'queryContainer'    => array(
+                'relatedQueryCacheEntries' => '',
+                'graphIds'                   => $graphIds,
+                'query'                      => $query,
+                'result'                     => $result,
+                'triplePattern'              => $triplePattern
             ),
-            "queryId"           => $queryId,        // has cache entry
-            "result"            => $result,
-            "triplePattern"     => $triplePattern   // have cache entries
+            'queryId'           => $queryId,        // has cache entry
+            'result'            => $result,
+            'triplePattern'     => $triplePattern   // have cache entries
         );
     }
 
@@ -149,7 +149,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
      * @param array  $actual
      * @param string $message  optional
      */
-    protected function assertEqualsArrays($expected, $actual, $message = "")
+    protected function assertEqualsArrays($expected, $actual, $message = '')
     {
         sort($expected);
         sort($actual);
@@ -163,7 +163,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testExistence()
     {
-        $this->assertTrue(class_exists("\Saft\QueryCache"));
+        $this->assertTrue(class_exists('\Saft\QueryCache'));
     }
 
     /**
@@ -172,10 +172,10 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateShortId()
     {
-        $str = "foo";
+        $str = 'foo';
 
         $this->assertEquals(
-            $this->fixture->getKeyPrefix(). substr(hash("sha512", $str), 0, 10),
+            $this->fixture->getKeyPrefix(). substr(hash('sha512', $str), 0, 10),
             $this->fixture->generateShortId($str)
         );
     }
@@ -199,11 +199,11 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
         // put test data into the QueryCache
         $this->fixture->rememberQueryResult(
-            $testData["query"],
-            $testData["result"]
+            $testData['query'],
+            $testData['result']
         );
 
-        $queryId = $testData["queryId"];
+        $queryId = $testData['queryId'];
         $this->assertTrue(
             false !== $this->fixture->getCache()->get($queryId)
         );
@@ -211,7 +211,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         /**
          * invalidate test data in QueryCache
          */
-        foreach ($testData["graphUris"] as $graphUri) {
+        foreach ($testData['graphUris'] as $graphUri) {
             /**
              * Function to test
                ---------------------------------------------------------------- **/
@@ -220,7 +220,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         }
 
         // test, if each graphId cache entry is set to false (means unset)
-        foreach ($testData["graphIds"] as $graphId) {
+        foreach ($testData['graphIds'] as $graphId) {
             $this->assertFalse(
                 $this->fixture->getCache()->get($graphId)
             );
@@ -228,11 +228,11 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
         // test, if the according query cache entry is set to false (means unset)
         $this->assertFalse(
-            $this->fixture->getCache()->get($testData["queryId"])
+            $this->fixture->getCache()->get($testData['queryId'])
         );
 
         // test, if each triple pattern cache entry is set to false (means unset)
-        foreach ($testData["triplePattern"] as $triplePattern) {
+        foreach ($testData['triplePattern'] as $triplePattern) {
             foreach ($triplePattern as $patternId) {
                 $this->assertFalse(
                     $this->fixture->getCache()->get($patternId)
@@ -252,8 +252,8 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $testGraphId = $this->fixture->generateShortId($this->testGraphUri);
 
         // data for 2. transaction
-        $testQuery2 = "SELECT ?s FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult2 = "2";
+        $testQuery2 = 'SELECT ?s FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult2 = '2';
 
         $testGraphUriId = $this->fixture->generateShortId($this->testGraphUri);
 
@@ -271,8 +271,8 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
          */
         $this->fixture->startTransaction();
         $this->fixture->rememberQueryResult(
-            $testCacheEntries["query"],
-            $testCacheEntries["result"]
+            $testCacheEntries['query'],
+            $testCacheEntries['result']
         );
         $this->fixture->stopTransaction();
 
@@ -289,12 +289,12 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
          * Test, that the invalidation of the following query does not lead to
          * the invalidation of the other query result.
          */
-        $this->fixture->invalidateByQuery($testCacheEntries["query"]);
+        $this->fixture->invalidateByQuery($testCacheEntries['query']);
 
 
         $this->assertFalse(
             $this->fixture->getCache()->get(
-                $this->fixture->generateShortId($testCacheEntries["query"])
+                $this->fixture->generateShortId($testCacheEntries['query'])
             )
         );
 
@@ -304,15 +304,15 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             array(
-                "relatedQueryCacheEntries" => $testQueryCacheEntity2["relatedQueryCacheEntries"],
-                "graphIds" => array (
+                'relatedQueryCacheEntries' => $testQueryCacheEntity2['relatedQueryCacheEntries'],
+                'graphIds' => array (
                     $testGraphUriId
                 ),
-                "result" => $testResult2,
-                "query" => $testQuery2,
-                "triplePattern" => array(
+                'result' => $testResult2,
+                'query' => $testQuery2,
+                'triplePattern' => array(
                     $testGraphUriId => array(
-                        $testGraphUriId . "_*_*_*"
+                        $testGraphUriId . '_*_*_*'
                     )
                 )
             ),
@@ -330,18 +330,18 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
         // put test data into the QueryCache
         $this->fixture->rememberQueryResult(
-            $testData["query"],
-            $testData["result"]
+            $testData['query'],
+            $testData['result']
         );
 
         /**
          * Function to test
            ---------------------------------------------------------------- **/
-        $this->fixture->invalidateByQuery($testData["query"]);
+        $this->fixture->invalidateByQuery($testData['query']);
         /* ---------------------------------------------------------------- **/
 
         // test, if each graphId cache entry is set to false (means unset)
-        foreach ($testData["graphIds"] as $graphId) {
+        foreach ($testData['graphIds'] as $graphId) {
             $this->assertFalse(
                 $this->fixture->getCache()->get($graphId)
             );
@@ -349,11 +349,11 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
         // test, if the according query cache entry is set to false (means unset)
         $this->assertFalse(
-            $this->fixture->getCache()->get($testData["queryId"])
+            $this->fixture->getCache()->get($testData['queryId'])
         );
 
         // test, if each triple pattern cache entry is set to false (means unset)
-        foreach ($testData["triplePattern"] as $triplePattern) {
+        foreach ($testData['triplePattern'] as $triplePattern) {
             foreach ($triplePattern as $patternId) {
                 $this->assertFalse(
                     $this->fixture->getCache()->get($patternId)
@@ -375,8 +375,8 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
          * Function to test
            ---------------------------------------------------------------- **/
         $this->fixture->rememberQueryResult(
-            $testData["query"],
-            $testData["result"]
+            $testData['query'],
+            $testData['result']
         );
         /* ---------------------------------------------------------------- **/
 
@@ -384,9 +384,9 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         /**
          * graph container
          */
-        foreach ($testData["graphIds"] as $graphId) {
+        foreach ($testData['graphIds'] as $graphId) {
             $this->assertEquals(
-                array($testData["queryId"] => $testData["queryId"]),
+                array($testData['queryId'] => $testData['queryId']),
                 $this->fixture->getCache()->get($graphId)
             );
         }
@@ -394,10 +394,10 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         /**
          * triple pattern
          */
-        foreach ($testData["triplePattern"] as $graphId => $triplePattern) {
+        foreach ($testData['triplePattern'] as $graphId => $triplePattern) {
             foreach ($triplePattern as $pattern) {
                 $this->assertEquals(
-                    $testData["queryId"],
+                    $testData['queryId'],
                     $this->fixture->getCache()->get($pattern)
                 );
             }
@@ -407,8 +407,8 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
          * query container
          */
         $this->assertEquals(
-            $testData["queryContainer"],
-            $this->fixture->getCache()->get($testData["queryId"])
+            $testData['queryContainer'],
+            $this->fixture->getCache()->get($testData['queryId'])
         );
     }
 
@@ -422,7 +422,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
         // get running transactions
         $this->assertEquals(
-            array(0 => "active"),
+            array(0 => 'active'),
             $this->fixture->getRunningTransactions()
         );
 
@@ -455,16 +455,16 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $testGraphId = $this->fixture->generateShortId($this->testGraphUri);
 
         // data for 2. transaction
-        $testQuery2 = "SELECT ?s FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult2 = "2";
+        $testQuery2 = 'SELECT ?s FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult2 = '2';
 
         // data for 3. transaction
-        $testQuery3 = "SELECT ?p FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult3 = "3";
+        $testQuery3 = 'SELECT ?p FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult3 = '3';
 
         // data for 4. transaction
-        $testQuery4 = "SELECT ?o FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult4 = "4";
+        $testQuery4 = 'SELECT ?o FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult4 = '4';
 
         /**
             Transaction structure is
@@ -489,14 +489,14 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
         // do something ...
         $this->assertFalse($this->fixture->getCache()->get(
-            $testCacheEntries["queryId"]
+            $testCacheEntries['queryId']
         ));
         $this->fixture->rememberQueryResult(
-            $testCacheEntries["query"],
-            $testCacheEntries["result"]
+            $testCacheEntries['query'],
+            $testCacheEntries['result']
         );
         $this->assertFalse($this->fixture->getCache()->get(
-            $testCacheEntries["queryId"]
+            $testCacheEntries['queryId']
         ));
 
         /**
@@ -530,15 +530,15 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         // check that the placed operation of the 3. transaction took place
         $this->assertEquals(
             array(
-                "relatedQueryCacheEntries" => $this->fixture->getRelatedQueryCacheEntryList(),
-                "graphIds" => array(
+                'relatedQueryCacheEntries' => $this->fixture->getRelatedQueryCacheEntryList(),
+                'graphIds' => array(
                     $testGraphId
                 ),
-                "query" => $testQuery3,
-                "result" => $testResult3,
-                "triplePattern" => array(
+                'query' => $testQuery3,
+                'result' => $testResult3,
+                'triplePattern' => array(
                     $testGraphId => array(
-                        $testGraphId . "_*_*_*"
+                        $testGraphId . '_*_*_*'
                     )
                 )
             ),
@@ -562,15 +562,15 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         // check that the placed operation of the 2. transaction took place
         $this->assertEquals(
             array(
-                "relatedQueryCacheEntries" => $this->fixture->getRelatedQueryCacheEntryList(),
-                "graphIds" => array(
+                'relatedQueryCacheEntries' => $this->fixture->getRelatedQueryCacheEntryList(),
+                'graphIds' => array(
                     $testGraphId
                 ),
-                "query" => $testQuery2,
-                "result" => $testResult2,
-                "triplePattern" => array(
+                'query' => $testQuery2,
+                'result' => $testResult2,
+                'triplePattern' => array(
                     $testGraphId => array(
-                        $testGraphId . "_*_*_*"
+                        $testGraphId . '_*_*_*'
                     )
                 )
             ),
@@ -600,15 +600,15 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         // check that the placed operation of the 4. transaction took place
         $this->assertEquals(
             array(
-                "relatedQueryCacheEntries" => $this->fixture->getRelatedQueryCacheEntryList(),
-                "graphIds" => array(
+                'relatedQueryCacheEntries' => $this->fixture->getRelatedQueryCacheEntryList(),
+                'graphIds' => array(
                     $testGraphId
                 ),
-                "query" => $testQuery4,
-                "result" => $testResult4,
-                "triplePattern" => array(
+                'query' => $testQuery4,
+                'result' => $testResult4,
+                'triplePattern' => array(
                     $testGraphId => array(
-                        $testGraphId . "_*_*_*"
+                        $testGraphId . '_*_*_*'
                     )
                 )
             ),
@@ -626,12 +626,12 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         // check that the placed operation of the 1. transaction took place
         $this->assertEqualsArrays(
             array_merge(
-                $testCacheEntries["queryContainer"],
+                $testCacheEntries['queryContainer'],
                 array(
-                    "relatedQueryCacheEntries" => $this->fixture->getRelatedQueryCacheEntryList()
+                    'relatedQueryCacheEntries' => $this->fixture->getRelatedQueryCacheEntryList()
                 )
             ),
-            $this->fixture->getCache()->get($testCacheEntries["queryId"])
+            $this->fixture->getCache()->get($testCacheEntries['queryId'])
         );
 
 
@@ -642,11 +642,11 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         // QueryCache entry of 2. transaction
         $this->assertEqualsArrays(
             array(
-                "relatedQueryCacheEntries" => $this->fixture->getRelatedQueryCacheEntryList(),
-                "graphIds" => array($testGraphId),
-                "query" => $testQuery2,
-                "result" => $testResult2,
-                "triplePattern" => array($testGraphId => array($testGraphId . "_*_*_*"))
+                'relatedQueryCacheEntries' => $this->fixture->getRelatedQueryCacheEntryList(),
+                'graphIds' => array($testGraphId),
+                'query' => $testQuery2,
+                'result' => $testResult2,
+                'triplePattern' => array($testGraphId => array($testGraphId . '_*_*_*'))
             ),
             $this->fixture->getCache()->get($this->fixture->generateShortId($testQuery2))
         );
@@ -654,11 +654,11 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         // QueryCache entry of 3. transaction
         $this->assertEqualsArrays(
             array(
-                "relatedQueryCacheEntries" => $this->fixture->getRelatedQueryCacheEntryList(),
-                "graphIds" => array($testGraphId),
-                "query" => $testQuery3,
-                "result" => $testResult3,
-                "triplePattern" => array($testGraphId => array($testGraphId . "_*_*_*"))
+                'relatedQueryCacheEntries' => $this->fixture->getRelatedQueryCacheEntryList(),
+                'graphIds' => array($testGraphId),
+                'query' => $testQuery3,
+                'result' => $testResult3,
+                'triplePattern' => array($testGraphId => array($testGraphId . '_*_*_*'))
             ),
             $this->fixture->getCache()->get($this->fixture->generateShortId($testQuery3))
         );
@@ -666,11 +666,11 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         // QueryCache entry of 4. transaction
         $this->assertEqualsArrays(
             array(
-                "relatedQueryCacheEntries" => $this->fixture->getRelatedQueryCacheEntryList(),
-                "graphIds" => array($testGraphId),
-                "query" => $testQuery4,
-                "result" => $testResult4,
-                "triplePattern" => array($testGraphId => array($testGraphId . "_*_*_*"))
+                'relatedQueryCacheEntries' => $this->fixture->getRelatedQueryCacheEntryList(),
+                'graphIds' => array($testGraphId),
+                'query' => $testQuery4,
+                'result' => $testResult4,
+                'triplePattern' => array($testGraphId => array($testGraphId . '_*_*_*'))
             ),
             $this->fixture->getCache()->get($this->fixture->generateShortId($testQuery4))
         );
@@ -683,16 +683,16 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $testGraphId = $this->fixture->generateShortId($this->testGraphUri);
 
         // data for 2. transaction
-        $testQuery2 = "SELECT ?s FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult2 = "2";
+        $testQuery2 = 'SELECT ?s FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult2 = '2';
 
         // data for 3. transaction
-        $testQuery3 = "SELECT ?p FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult3 = "3";
+        $testQuery3 = 'SELECT ?p FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult3 = '3';
 
         // data for 4. transaction
-        $testQuery4 = "SELECT ?o FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult4 = "4";
+        $testQuery4 = 'SELECT ?o FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult4 = '4';
 
         /**
             Transaction structure is
@@ -713,7 +713,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
          * 1. transaction
          */
         $this->fixture->startTransaction();
-        $this->fixture->rememberQueryResult($testCacheEntries["query"], $testCacheEntries["result"]);
+        $this->fixture->rememberQueryResult($testCacheEntries['query'], $testCacheEntries['result']);
 
         /**
          * 2. transaction (first level)
@@ -750,18 +750,18 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
 
         /**
-         * indirect invalidation by "override" an existing QueryCache entry
+         * indirect invalidation by 'override' an existing QueryCache entry
          */
-        $this->fixture->rememberQueryResult($testQuery2, "new2");
+        $this->fixture->rememberQueryResult($testQuery2, 'new2');
 
         // test 2: check new data
         $this->assertEquals(
             array(
-                "relatedQueryCacheEntries" => "",
-                "graphIds" => array($testGraphId),
-                "query" => $testQuery2,
-                "result" => "new2",
-                "triplePattern" => array($testGraphId => array($testGraphId . "_*_*_*"))
+                'relatedQueryCacheEntries' => '',
+                'graphIds' => array($testGraphId),
+                'query' => $testQuery2,
+                'result' => 'new2',
+                'triplePattern' => array($testGraphId => array($testGraphId . '_*_*_*'))
             ),
             $this->fixture->getCache()->get(
                 $this->fixture->generateShortId($testQuery2)
@@ -790,16 +790,16 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $testGraphId = $this->fixture->generateShortId($this->testGraphUri);
 
         // data for 2. transaction
-        $testQuery2 = "SELECT ?s FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult2 = "2";
+        $testQuery2 = 'SELECT ?s FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult2 = '2';
 
         // data for 3. transaction
-        $testQuery3 = "SELECT ?p FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult3 = "3";
+        $testQuery3 = 'SELECT ?p FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult3 = '3';
 
         // data for 4. transaction
-        $testQuery4 = "SELECT ?o FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult4 = "4";
+        $testQuery4 = 'SELECT ?o FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult4 = '4';
 
         /**
             Transaction structure is
@@ -820,7 +820,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
          * 1. transaction
          */
         $this->fixture->startTransaction();
-        $this->fixture->rememberQueryResult($testCacheEntries["query"], $testCacheEntries["result"]);
+        $this->fixture->rememberQueryResult($testCacheEntries['query'], $testCacheEntries['result']);
 
         /**
          * 2. transaction (first level)
@@ -891,16 +891,16 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $testGraphId = $this->fixture->generateShortId($this->testGraphUri);
 
         // data for 2. transaction
-        $testQuery2 = "SELECT ?s FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult2 = "2";
+        $testQuery2 = 'SELECT ?s FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult2 = '2';
 
         // data for 3. transaction
-        $testQuery3 = "SELECT ?p FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult3 = "3";
+        $testQuery3 = 'SELECT ?p FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult3 = '3';
 
         // data for 4. transaction
-        $testQuery4 = "SELECT ?o FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult4 = "4";
+        $testQuery4 = 'SELECT ?o FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult4 = '4';
 
         /**
             Transaction structure is
@@ -921,7 +921,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
          * 1. transaction
          */
         $this->fixture->startTransaction();
-        $this->fixture->rememberQueryResult($testCacheEntries["query"], $testCacheEntries["result"]);
+        $this->fixture->rememberQueryResult($testCacheEntries['query'], $testCacheEntries['result']);
 
         /**
          * 2. transaction (first level)
@@ -995,16 +995,16 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $testGraphId = $this->fixture->generateShortId($this->testGraphUri);
 
         // data for 2. transaction
-        $testQuery2 = "SELECT ?s FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult2 = "2";
+        $testQuery2 = 'SELECT ?s FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult2 = '2';
 
         // data for 3. transaction
-        $testQuery3 = "SELECT ?p FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult3 = "3";
+        $testQuery3 = 'SELECT ?p FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult3 = '3';
 
         // data for 4. transaction
-        $testQuery4 = "SELECT ?o FROM <" . $this->testGraphUri . "> WHERE {?s ?p ?o.};";
-        $testResult4 = "4";
+        $testQuery4 = 'SELECT ?o FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.};';
+        $testResult4 = '4';
 
         /**
             Transaction structure is
@@ -1025,7 +1025,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
          * 1. transaction
          */
         $this->fixture->startTransaction();
-        $this->fixture->rememberQueryResult($testCacheEntries["query"], $testCacheEntries["result"]);
+        $this->fixture->rememberQueryResult($testCacheEntries['query'], $testCacheEntries['result']);
 
         /**
          * 2. transaction (first level)
@@ -1100,14 +1100,14 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
         // put test data into the query cache
         $this->fixture->rememberQueryResult(
-            $testCacheEntries["query"],
-            $testCacheEntries["result"]
+            $testCacheEntries['query'],
+            $testCacheEntries['result']
         );
 
         // check, that there are entries in the query cache
         $this->assertEquals(
-            $testCacheEntries["queryContainer"],
-            $this->fixture->getCache()->get($testCacheEntries["queryId"])
+            $testCacheEntries['queryContainer'],
+            $this->fixture->getCache()->get($testCacheEntries['queryId'])
         );
 
         // this test function checks that the invalidateByGraphUri function works
@@ -1115,12 +1115,12 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->fixture->startTransaction();
 
-        $this->fixture->invalidateByGraphUri($testCacheEntries["graphUris"][0]);
+        $this->fixture->invalidateByGraphUri($testCacheEntries['graphUris'][0]);
 
         // check, that there are STILL the same entries in the query cache
         $this->assertEquals(
-            $testCacheEntries["queryContainer"],
-            $this->fixture->getCache()->get($testCacheEntries["queryId"])
+            $testCacheEntries['queryContainer'],
+            $this->fixture->getCache()->get($testCacheEntries['queryId'])
         );
 
         $this->fixture->stopTransaction();
@@ -1128,7 +1128,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         // check, that after the transaction was stopped, there is no cache entry
         // according to the given query ID anymore
         $this->assertFalse(
-            $this->fixture->getCache()->get($testCacheEntries["queryId"])
+            $this->fixture->getCache()->get($testCacheEntries['queryId'])
         );
     }
 
@@ -1142,9 +1142,9 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         /**
          * the following data will be used to remember
          */
-        $query = "SELECT ?s FROM <" . $this->testGraphUri . "> WHERE { ?s ?p ?o. }";
+        $query = 'SELECT ?s FROM <' . $this->testGraphUri . '> WHERE { ?s ?p ?o. }';
         $queryId = $this->fixture->generateShortId($query);
-        $result = array("s" => "foo");
+        $result = array('s' => 'foo');
 
         /**
          * the following data will be used for invalidation
@@ -1152,8 +1152,8 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $testCacheEntries = $this->generateTestCacheEntries();
 
         $this->fixture->rememberQueryResult(
-            $testCacheEntries["query"],
-            $testCacheEntries["result"]
+            $testCacheEntries['query'],
+            $testCacheEntries['result']
         );
 
 
@@ -1162,13 +1162,13 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
         // check invalidateByGraphUri
         $this->assertEquals(
-            $testCacheEntries["queryContainer"],
-            $this->fixture->getCache()->get($testCacheEntries["queryId"])
+            $testCacheEntries['queryContainer'],
+            $this->fixture->getCache()->get($testCacheEntries['queryId'])
         );
-        $this->fixture->invalidateByGraphUri($testCacheEntries["graphUris"][0]);
+        $this->fixture->invalidateByGraphUri($testCacheEntries['graphUris'][0]);
         $this->assertEquals(
-            $testCacheEntries["queryContainer"],
-            $this->fixture->getCache()->get($testCacheEntries["queryId"])
+            $testCacheEntries['queryContainer'],
+            $this->fixture->getCache()->get($testCacheEntries['queryId'])
         );
 
         // check rememberQueryResult
@@ -1182,14 +1182,14 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
         // test data have to be invalidated by invalidateByGraphUri
         $this->assertFalse(
-            $this->fixture->getCache()->get($testCacheEntries["queryId"])
+            $this->fixture->getCache()->get($testCacheEntries['queryId'])
         );
 
         // query related data from the cache has to be available
         $cacheEntry = $this->fixture->getCache()->get($queryId);
         $this->assertEquals(
             $result,
-            $cacheEntry["result"]
+            $cacheEntry['result']
         );
     }
 
@@ -1203,14 +1203,14 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
         // put test data into the query cache
         $this->fixture->rememberQueryResult(
-            $testCacheEntries["query"],
-            $testCacheEntries["result"]
+            $testCacheEntries['query'],
+            $testCacheEntries['result']
         );
 
         // check, that there are entries in the query cache
         $this->assertEquals(
-            $testCacheEntries["queryContainer"],
-            $this->fixture->getCache()->get($testCacheEntries["queryId"])
+            $testCacheEntries['queryContainer'],
+            $this->fixture->getCache()->get($testCacheEntries['queryId'])
         );
 
         // this test function checks that the invalidateByGraphUri function works
@@ -1218,12 +1218,12 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->fixture->startTransaction();
 
-        $this->fixture->invalidateByQuery($testCacheEntries["query"]);
+        $this->fixture->invalidateByQuery($testCacheEntries['query']);
 
         // check, that there are STILL the same entries in the query cache
         $this->assertEquals(
-            $testCacheEntries["queryContainer"],
-            $this->fixture->getCache()->get($testCacheEntries["queryId"])
+            $testCacheEntries['queryContainer'],
+            $this->fixture->getCache()->get($testCacheEntries['queryId'])
         );
 
         $this->fixture->stopTransaction();
@@ -1231,7 +1231,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         // check, that after the transaction was stopped, there is no cache entry
         // according to the given query ID anymore
         $this->assertFalse(
-            $this->fixture->getCache()->get($testCacheEntries["queryId"])
+            $this->fixture->getCache()->get($testCacheEntries['queryId'])
         );
     }
 
@@ -1247,15 +1247,15 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
         // simple check, that there is no cache entry for the given query
 
-        $this->assertFalse($this->fixture->getCache()->get($testCacheEntries["queryId"]));
+        $this->assertFalse($this->fixture->getCache()->get($testCacheEntries['queryId']));
 
-        $this->fixture->rememberQueryResult($testCacheEntries["query"], $testCacheEntries["result"]);
+        $this->fixture->rememberQueryResult($testCacheEntries['query'], $testCacheEntries['result']);
 
         // after calling the function rememberQueryResult we have to check that
         // the query cache is STILL clean, means it has no entry according to the
         // given $query
 
-        $this->assertFalse($this->fixture->getCache()->get($testCacheEntries["queryId"]));
+        $this->assertFalse($this->fixture->getCache()->get($testCacheEntries['queryId']));
 
         $this->fixture->stopTransaction();
 
@@ -1263,11 +1263,11 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         // which includes rememberQueryResult, so at this point there are data in
         // the cache for the query
 
-        $cacheEntry = $this->fixture->getCache()->get($testCacheEntries["queryId"]);
+        $cacheEntry = $this->fixture->getCache()->get($testCacheEntries['queryId']);
 
         $this->assertEquals(
-            $testCacheEntries["result"],
-            $cacheEntry["result"]
+            $testCacheEntries['result'],
+            $cacheEntry['result']
         );
     }
 }
