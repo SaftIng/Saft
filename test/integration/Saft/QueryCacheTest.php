@@ -109,10 +109,10 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
             'query'             => $query,
             'queryContainer'    => array(
                 'relatedQueryCacheEntries' => '',
-                'graphIds'                   => $graphIds,
-                'query'                      => $query,
-                'result'                     => $result,
-                'triplePattern'              => $triplePattern
+                'graphIds'                 => $graphIds,
+                'query'                    => $query,
+                'result'                   => $result,
+                'triplePattern'            => $triplePattern
             ),
             'queryId'           => $queryId,        // has cache entry
             'result'            => $result,
@@ -185,7 +185,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $str = 'foo';
 
         $this->assertEquals(
-            $this->fixture->getKeyPrefix(). substr(hash('sha512', $str), 0, 10),
+            'saft-qC-' . substr(hash('sha256', $str), 0, 30),
             $this->fixture->generateShortId($str)
         );
     }
@@ -196,7 +196,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testInstanciation()
     {
-        $queryCache = new \Saft\QueryCache($this->cache);
+        $queryCache = new QueryCache($this->cache);
     }
 
     /**
