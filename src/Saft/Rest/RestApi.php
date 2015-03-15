@@ -9,8 +9,6 @@ use Saft\Rdf\Variable;
 use Saft\Rdf\StatementImpl;
 
 /**
- * @todo  add documentation
- * @todo  eliminate redundancy
  * @todo  hasMatchingStatement missing
  */
 class RestApi extends \Saft\Rest\RestAbstract
@@ -42,7 +40,7 @@ class RestApi extends \Saft\Rest\RestAbstract
             }
             $graphUri = null;
             if (isset($_POST['graphUri'])) {
-                if (NamedNode::check($_POST['graphUri']) 
+                if (NamedNode::check($_POST['graphUri'])
                     || '?' == substr($_POST['graphUri'], 0, 1)
                 ) {
                     $graphUri = $_POST['graphUri'];
@@ -98,9 +96,12 @@ class RestApi extends \Saft\Rest\RestAbstract
                 }
             }
 
-        } elseif ($this->verb == "store") {
+        } elseif ($this->verb == "graph") {
+            print('foo');
             if ($this->method == 'GET') {
-                //get Graphs
+                return $this->store->getAvailableGraphs();
+            } else {
+                return "Only accepts POST/GET/DELETE requests";
             }
         } else {
             return "Wrong input";

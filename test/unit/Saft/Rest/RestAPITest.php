@@ -55,7 +55,7 @@ class RestAPITest extends \Saft\Store\TestCase
     {
         $_POST['statementsarray'] = $statement;
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
-        $this->calRestApi(
+        $this->callRestApi(
             'DELETE DATA {Graph <http://saft/test/g1> {'.
             '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
             '} }'
@@ -70,7 +70,7 @@ class RestAPITest extends \Saft\Store\TestCase
     {
         $_POST['statementsarray'] = $statement;
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $this->calRestApi(
+        $this->callRestApi(
             'SELECT * WHERE {Graph <http://saft/test/g1> {'.
             '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
             '} }'
@@ -85,7 +85,7 @@ class RestAPITest extends \Saft\Store\TestCase
     {
         $_POST['statementsarray'] = $statements;
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $this->calRestApi(
+        $this->callRestApi(
             'INSERT DATA {Graph <http://saft/test/g1> {'.
             '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
             '}'.
@@ -113,7 +113,7 @@ class RestAPITest extends \Saft\Store\TestCase
         
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $this->calRestApi(
+        $this->callRestApi(
             'INSERT DATA {Graph <> {'.
             '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer>.'.
             '} Graph <> {'.
@@ -134,7 +134,7 @@ class RestAPITest extends \Saft\Store\TestCase
         $_POST['statementsarray'] = array($statement);
         $_POST['graphUri'] = 'http://saft/test/g2';
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $this->calRestApi(
+        $this->callRestApi(
             'INSERT DATA {Graph <http://saft/test/g2> {'.
             '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
             '} }'
@@ -144,7 +144,7 @@ class RestAPITest extends \Saft\Store\TestCase
          * use graphPattern
          */
         $_POST['graphUri'] = '?graph';
-        $this->calRestApi(
+        $this->callRestApi(
             'INSERT DATA {Graph ?graph {'.
             '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
             '} }'
@@ -179,14 +179,25 @@ class RestAPITest extends \Saft\Store\TestCase
 
         $_POST['statementsarray'] = $statement;
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $this->calRestApi(
+        $this->callRestApi(
             'SELECT * WHERE {Graph <> {'.
             '<http://saft/test/s1> <http://saft/test/p1> ?ob.'.
             '} }'
         );
     }
 
-    private function calRestApi($value)
+    /**
+     * @runInSeparateProcess
+     */
+    public function testGetGraphs()
+    {
+        $_POST['request'] = 'store/graph';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        //@TODO
+        //$this->callRestApi('');
+    }
+
+    private function callRestApi($value)
     {
         try {
             $API = new RestApi(
