@@ -55,9 +55,11 @@ class RestAPITest extends \Saft\Store\TestCase
     {
         $_POST['statementsarray'] = $statement;
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
-        $this->calRestApi('DELETE DATA {Graph <http://saft/test/g1> {'.
-                '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
-                '} }');
+        $this->calRestApi(
+            'DELETE DATA {Graph <http://saft/test/g1> {'.
+            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
+            '} }'
+        );
     }
 
     /**
@@ -68,9 +70,11 @@ class RestAPITest extends \Saft\Store\TestCase
     {
         $_POST['statementsarray'] = $statement;
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $this->calRestApi('SELECT * WHERE {Graph <http://saft/test/g1> {'.
-                '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
-                '} }');
+        $this->calRestApi(
+            'SELECT * WHERE {Graph <http://saft/test/g1> {'.
+            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
+            '} }'
+        );
     }
 
     /**
@@ -81,10 +85,12 @@ class RestAPITest extends \Saft\Store\TestCase
     {
         $_POST['statementsarray'] = $statements;
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $this->calRestApi('INSERT DATA {Graph <http://saft/test/g1> {'.
-                '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
-                '}'.
-                ' Graph <http://saft/test/g2> {<http://saft/test/s2> <http://saft/test/p2> <http://saft/test/o2>.} }');
+        $this->calRestApi(
+            'INSERT DATA {Graph <http://saft/test/g1> {'.
+            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
+            '}'.
+            ' Graph <http://saft/test/g2> {<http://saft/test/s2> <http://saft/test/p2> <http://saft/test/o2>.} }'
+        );
     }
 
     /**
@@ -107,11 +113,13 @@ class RestAPITest extends \Saft\Store\TestCase
         
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $this->calRestApi('INSERT DATA {Graph <> {'.
-                '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer>.'.
-                '} Graph <> {'.
-                '<http://saft/test/s2> <http://saft/test/p2> ""John""^^<http://www.w3.org/2001/XMLSchema#string>.'.
-                '} }');
+        $this->calRestApi(
+            'INSERT DATA {Graph <> {'.
+            '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer>.'.
+            '} Graph <> {'.
+            '<http://saft/test/s2> <http://saft/test/p2> ""John""^^<http://www.w3.org/2001/XMLSchema#string>.'.
+            '} }'
+        );
     }
 
     /**
@@ -126,17 +134,21 @@ class RestAPITest extends \Saft\Store\TestCase
         $_POST['statementsarray'] = array($statement);
         $_POST['graphUri'] = 'http://saft/test/g2';
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $this->calRestApi('INSERT DATA {Graph <http://saft/test/g2> {'.
-                '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
-                '} }');
+        $this->calRestApi(
+            'INSERT DATA {Graph <http://saft/test/g2> {'.
+            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
+            '} }'
+        );
 
         /**
          * use graphPattern
          */
         $_POST['graphUri'] = '?graph';
-        $this->calRestApi('INSERT DATA {Graph ?graph {'.
-                '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
-                '} }');
+        $this->calRestApi(
+            'INSERT DATA {Graph ?graph {'.
+            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
+            '} }'
+        );
 
         /**
          * use bad graphUri
@@ -167,9 +179,11 @@ class RestAPITest extends \Saft\Store\TestCase
 
         $_POST['statementsarray'] = $statement;
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $this->calRestApi('SELECT * WHERE {Graph <> {'.
-                '<http://saft/test/s1> <http://saft/test/p1> ?ob.'.
-                '} }');
+        $this->calRestApi(
+            'SELECT * WHERE {Graph <> {'.
+            '<http://saft/test/s1> <http://saft/test/p1> ?ob.'.
+            '} }'
+        );
     }
 
     private function calRestApi($value)

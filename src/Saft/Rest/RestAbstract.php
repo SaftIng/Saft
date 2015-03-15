@@ -71,16 +71,16 @@ abstract class RestAbstract
         }
 
         switch($this->method) {
-            case 'DELETE':
-            case 'POST':
-                $this->request = $this->cleanInputs($_POST);
-                break;
-            case 'GET':
-                $this->request = $this->cleanInputs($_GET);
-                break;
-            default:
-                $this->response('Invalid Method', 405);
-                break;
+        case 'DELETE':
+        case 'POST':
+            $this->request = $this->cleanInputs($_POST);
+            break;
+        case 'GET':
+            $this->request = $this->cleanInputs($_GET);
+            break;
+        default:
+            $this->response('Invalid Method', 405);
+            break;
         }
     }
 

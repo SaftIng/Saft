@@ -42,8 +42,9 @@ class RestApi extends \Saft\Rest\RestAbstract
             }
             $graphUri = null;
             if (isset($_POST['graphUri'])) {
-                if (NamedNode::check($_POST['graphUri']) ||
-                    '?' == substr($_POST['graphUri'], 0, 1)) {
+                if (NamedNode::check($_POST['graphUri']) 
+                    || '?' == substr($_POST['graphUri'], 0, 1)
+                ) {
                     $graphUri = $_POST['graphUri'];
                 } else {
                     throw new \Exception('graphUri not a valid URI.');
@@ -82,7 +83,7 @@ class RestApi extends \Saft\Rest\RestAbstract
                     );
                     return $this->store->deleteMatchingStatements($statement, $graphUri);
 
-                //getMatchingStatements
+                    //getMatchingStatements
                 } elseif ($this->method == 'GET') {
                     $statement = $this->createStatement(
                         $statementsPost[0],
@@ -133,7 +134,8 @@ class RestApi extends \Saft\Rest\RestAbstract
     private function createNode($value)
     {
         if (true === NamedNode::check($value)
-            || null === $value) {
+            || null === $value
+        ) {
             return new NamedNode($value);
         } elseif ('?' == substr($value, 0, 1)) {
             return new Variable($value);
