@@ -8,13 +8,7 @@ interface Node
      * @return string
      */
     public function __toString();
-    
-    /**
-     * @param mixed $value
-     * @param string $lang optional
-     */
-    public function __construct($value, $lang = null);
-    
+
     /**
      * Check if a given instance of \Saft\Rdf\Node is equal to this instance.
      *
@@ -44,6 +38,7 @@ interface Node
     public function isBlank();
 
     /**
+     * TODO: what for is this?
      * @return boolean
      */
     public function isReturnable();
@@ -56,5 +51,5 @@ interface Node
     /**
      * @return string
      */
-    public function toNT();
+    public function toNQuads();
 }
