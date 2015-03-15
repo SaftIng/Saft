@@ -165,9 +165,9 @@ class RestAPITest extends \Saft\Store\TestCase
             '?ob',
         );
 
-        $_POST['statementsarray'] = array($statement);
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-        $this->calRestApi('INSERT DATA {Graph <> {'.
+        $_POST['statementsarray'] = $statement;
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $this->calRestApi('SELECT * WHERE {Graph <> {'.
                 '<http://saft/test/s1> <http://saft/test/p1> ?ob.'.
                 '} }');
     }

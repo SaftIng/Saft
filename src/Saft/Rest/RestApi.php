@@ -5,12 +5,12 @@ use Saft\Store\StoreInterface;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\Literal;
+use Saft\Rdf\Variable;
 use Saft\Rdf\StatementImpl;
 
 /**
  * @todo  add documentation
  * @todo  eliminate redundancy
- * @todo  statement-pattern missing
  * @todo  hasMatchingStatement missing
  */
 class RestApi extends \Saft\Rest\RestAbstract
@@ -22,7 +22,7 @@ class RestApi extends \Saft\Rest\RestAbstract
 
     /**
      * Rest-Endpoint
-     * @return [type] [description]
+     * @return mixed
      */
     protected function store()
     {
@@ -42,14 +42,13 @@ class RestApi extends \Saft\Rest\RestAbstract
             }
             $graphUri = null;
             if (isset($_POST['graphUri'])) {
-                if (true === NamedNode::check($_POST['graphUri'])) {
-                    $graphUri = new NamedNode($_POST['graphUri']);
+                if (NamedNode::check($_POST['graphUri']) ||
+                    '?' == substr($_POST['graphUri'], 0, 1)) {
+                    $graphUri = $_POST['graphUri'];
                 } else {
                     throw new \Exception('graphUri not a valid URI.');
                 }
             }
-
-            //TODO eliminate redundancy
             
             //AddStatements
             if ($this->method == 'POST') {
@@ -69,36 +68,36 @@ class RestApi extends \Saft\Rest\RestAbstract
                 $statements = new ArrayStatementIteratorImpl($statements);
                 return $this->store->addStatements($statements, $graphUri);
 
-            //deleteMatchingStatements
-            } elseif ($this->method == 'DELETE') {
-                if (is_array($statementsPost[0])) {
-                    throw new \Exception('expect just one statement');
-                }
-                $statement = $this->createStatement(
-                    $statementsPost[0],
-                    $statementsPost[1],
-                    $statementsPost[2],
-                    $statementsPost[3]
-                );
-                return $this->store->deleteMatchingStatements($statement, $graphUri);
-
-            //getMatchingStatements
-            } elseif ($this->method == 'GET') {
-                if (is_array($statementsPost[0])) {
-                    throw new \Exception('expect just one statement');
-                }
-                $statement = $this->createStatement(
-                    $statementsPost[0],
-                    $statementsPost[1],
-                    $statementsPost[2],
-                    $statementsPost[3]
-                );
-                return $this->store->getMatchingStatements($statement, $graphUri);
-
             } else {
-                return "Only accepts POST/GET/DELETE requests";
+                if (is_array($statementsPost[0])) {
+                    throw new \Exception('expect just one statement');
+                }
+                //deleteMatchingStatements
+                if ($this->method == 'DELETE') {
+                    $statement = $this->createStatement(
+                        $statementsPost[0],
+                        $statementsPost[1],
+                        $statementsPost[2],
+                        $statementsPost[3]
+                    );
+                    return $this->store->deleteMatchingStatements($statement, $graphUri);
+
+                //getMatchingStatements
+                } elseif ($this->method == 'GET') {
+                    $statement = $this->createStatement(
+                        $statementsPost[0],
+                        $statementsPost[1],
+                        $statementsPost[2],
+                        $statementsPost[3]
+                    );
+                    return $this->store->getMatchingStatements($statement, $graphUri);
+
+                } else {
+                    return "Only accepts POST/GET/DELETE requests";
+                }
             }
-        } if ($this->verb == "store") {
+
+        } elseif ($this->verb == "store") {
             if ($this->method == 'GET') {
                 //get Graphs
             }
@@ -107,6 +106,14 @@ class RestApi extends \Saft\Rest\RestAbstract
         }
     }
 
+    /**
+     * Create a Statement.
+     * @param  string $sub
+     * @param  string $pred
+     * @param  string $obj
+     * @param  string $gr
+     * @return Statement
+     */
     private function createStatement($sub, $pred, $obj, $gr = null)
     {
         $subject = $this->createNode($sub);
@@ -118,12 +125,18 @@ class RestApi extends \Saft\Rest\RestAbstract
         return $statement;
     }
 
+    /**
+     * Create a Node from string.
+     * @param  string $value value of Node
+     * @return Node        return NamedNode, Variable oder Literal
+     */
     private function createNode($value)
     {
-        //TODO triple-pattern
         if (true === NamedNode::check($value)
             || null === $value) {
             return new NamedNode($value);
+        } elseif ('?' == substr($value, 0, 1)) {
+            return new Variable($value);
         } else {
             return new Literal($value);
         }
