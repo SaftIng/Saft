@@ -33,13 +33,11 @@ class RestAPITest extends \Saft\Store\TestCase
         return $statement;
     }
 
-    public function testCreateStatements()
+    /**
+     * @depends testCreateStatement
+     */
+    public function testCreateStatements(array $statement1)
     {
-        $statement1 = array('http://saft/test/s1',
-            'http://saft/test/p1',
-            'http://saft/test/o1',
-            'http://saft/test/g1'
-        );
         $statement2 = array('http://saft/test/s2',
             'http://saft/test/p2',
             'http://saft/test/o2',
@@ -57,22 +55,9 @@ class RestAPITest extends \Saft\Store\TestCase
     {
         $_POST['statementsarray'] = $statement;
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
-        try {
-            $API = new RestApi(
-                $_POST['request'],
-                $_SERVER['HTTP_ORIGIN'],
-                $this->fixture
-            );
-            $query = $API->processAPI();
-            $this->assertEquals(
-                $query,
-                'DELETE DATA {Graph <http://saft/test/g1> {'.
+        $this->calRestApi('DELETE DATA {Graph <http://saft/test/g1> {'.
                 '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
-                '} }'
-            );
-        } catch (Exception $e) {
-            echo json_encode(array('error' => $e->getMessage()));
-        }
+                '} }');
     }
 
     /**
@@ -83,22 +68,9 @@ class RestAPITest extends \Saft\Store\TestCase
     {
         $_POST['statementsarray'] = $statement;
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        try {
-            $API = new RestApi(
-                $_POST['request'],
-                $_SERVER['HTTP_ORIGIN'],
-                $this->fixture
-            );
-            $query = $API->processAPI();
-            $this->assertEquals(
-                $query,
-                'SELECT * WHERE {Graph <http://saft/test/g1> {'.
+        $this->calRestApi('SELECT * WHERE {Graph <http://saft/test/g1> {'.
                 '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
-                '} }'
-            );
-        } catch (Exception $e) {
-            echo json_encode(array('error' => $e->getMessage()));
-        }
+                '} }');
     }
 
     /**
@@ -109,23 +81,10 @@ class RestAPITest extends \Saft\Store\TestCase
     {
         $_POST['statementsarray'] = $statements;
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        try {
-            $API = new RestApi(
-                $_POST['request'],
-                $_SERVER['HTTP_ORIGIN'],
-                $this->fixture
-            );
-            $query = $API->processAPI();
-            $this->assertEquals(
-                $query,
-                'INSERT DATA {Graph <http://saft/test/g1> {'.
+        $this->calRestApi('INSERT DATA {Graph <http://saft/test/g1> {'.
                 '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
                 '}'.
-                ' Graph <http://saft/test/g2> {<http://saft/test/s2> <http://saft/test/p2> <http://saft/test/o2>.} }'
-            );
-        } catch (Exception $e) {
-            echo json_encode(array('error' => $e->getMessage()));
-        }
+                ' Graph <http://saft/test/g2> {<http://saft/test/s2> <http://saft/test/p2> <http://saft/test/o2>.} }');
     }
 
     /**
@@ -148,20 +107,11 @@ class RestAPITest extends \Saft\Store\TestCase
         
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        try {
-            $API = new RestApi($_POST['request'], $_SERVER['HTTP_ORIGIN'], $this->fixture);
-            $query = $API->processAPI();
-            $this->assertEquals(
-                $query,
-                'INSERT DATA {Graph <> {'.
+        $this->calRestApi('INSERT DATA {Graph <> {'.
                 '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer>.'.
                 '} Graph <> {'.
                 '<http://saft/test/s2> <http://saft/test/p2> ""John""^^<http://www.w3.org/2001/XMLSchema#string>.'.
-                '} }'
-            );
-        } catch (Exception $e) {
-            echo json_encode(array('error' => $e->getMessage()));
-        }
+                '} }');
     }
 
     /**
@@ -170,9 +120,60 @@ class RestAPITest extends \Saft\Store\TestCase
      */
     public function testPassGraphUri(array $statement)
     {
+        /**
+         * use given graphUri
+         */
         $_POST['statementsarray'] = array($statement);
         $_POST['graphUri'] = 'http://saft/test/g2';
         $_SERVER['REQUEST_METHOD'] = 'POST';
+        $this->calRestApi('INSERT DATA {Graph <http://saft/test/g2> {'.
+                '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
+                '} }');
+
+        /**
+         * use graphPattern
+         */
+        $_POST['graphUri'] = '?graph';
+        $this->calRestApi('INSERT DATA {Graph ?graph {'.
+                '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
+                '} }');
+
+        /**
+         * use bad graphUri
+         */
+        $_POST['graphUri'] = 'foo';
+        try {
+            $API = new RestApi(
+                $_POST['request'],
+                $_SERVER['HTTP_ORIGIN'],
+                $this->fixture
+            );
+            $this->setExpectedException('\Exception');
+            $query = $API->processAPI();
+        } catch (Exception $e) {
+            echo json_encode(array('error' => $e->getMessage()));
+        }
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testStatementPattern()
+    {
+        $statement = array('http://saft/test/s1',
+            'http://saft/test/p1',
+            '?ob',
+        );
+
+        $_POST['statementsarray'] = array($statement);
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $this->calRestApi('INSERT DATA {Graph <> {'.
+                '<http://saft/test/s1> <http://saft/test/p1> ?ob.'.
+                '} }');
+    }
+
+    private function calRestApi($value)
+    {
         try {
             $API = new RestApi(
                 $_POST['request'],
@@ -182,17 +183,10 @@ class RestAPITest extends \Saft\Store\TestCase
             $query = $API->processAPI();
             $this->assertEquals(
                 $query,
-                'INSERT DATA {Graph <http://saft/test/g2> {'.
-                '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
-                '} }'
+                $value
             );
         } catch (Exception $e) {
             echo json_encode(array('error' => $e->getMessage()));
         }
-    }
-
-    public function testStatementPattern()
-    {
-        //@TODO
     }
 }
