@@ -151,12 +151,15 @@ abstract class AbstractSparqlStore implements StoreInterface
                 $con = $st->toSparqlFormat();
 
                 $graph = $st->getGraph();
-                //TODO if graphUri is a valide Uri
                 if (null !== $graphUri) {
-                    if (NamedNode::check($graphUri)) {
-                        $con = 'Graph <'. $graphUri .'> {'. $con .'}';
-                    } else {
-                        throw new \Exception('bad graphUri');
+                    if (true === is_string($graphUri)) {
+                        if (NamedNode::check($graphUri)) {
+                            $con = 'Graph <'. $graphUri .'> {'. $con .'}';
+                        } elseif ('?' == substr($graphUri, 0, 1)) {
+                            $con = 'Graph '. $graphUri .' {'. $con .'}';
+                        } else {
+                            throw new \Exception('bad graphUri');
+                        }
                     }
                 } elseif (null !== $graph) {
                     $con = 'Graph <'. $graph->__toString() .'> {'. $con .'}';
