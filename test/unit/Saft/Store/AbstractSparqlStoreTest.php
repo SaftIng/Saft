@@ -3,6 +3,10 @@
 namespace Saft\Store;
 
 use Saft\Rdf\Statement;
+use Saft\Rdf\NamedNode;
+use Saft\Rdf\Literal;
+use Saft\Rdf\Variable;
+use Saft\Rdf\StatementImpl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 
 class AbstractSparqlStoreTest extends TestCase
@@ -24,11 +28,11 @@ class AbstractSparqlStoreTest extends TestCase
 
     public function testCreateStatement()
     {
-        $subject1 = new \Saft\Rdf\NamedNode('http://saft/test/s1');
-        $predicate1 = new \Saft\Rdf\NamedNode('http://saft/test/p1');
-        $object1 = new \Saft\Rdf\NamedNode('http://saft/test/o1');
-        $graph1 = new \Saft\Rdf\NamedNode(null);
-        $triple1 = new \Saft\Rdf\StatementImpl($subject1, $predicate1, $object1, $graph1);
+        $subject1 = new NamedNode('http://saft/test/s1');
+        $predicate1 = new NamedNode('http://saft/test/p1');
+        $object1 = new NamedNode('http://saft/test/o1');
+        $graph1 = new NamedNode(null);
+        $triple1 = new StatementImpl($subject1, $predicate1, $object1, $graph1);
 
         return $triple1;
     }
@@ -38,11 +42,11 @@ class AbstractSparqlStoreTest extends TestCase
      */
     public function testCreateStatements(Statement $statement1)
     {
-        $subject2 = new \Saft\Rdf\NamedNode('http://saft/test/s2');
-        $predicate2 = new \Saft\Rdf\NamedNode('http://saft/test/p2');
-        $object2 = new \Saft\Rdf\NamedNode('http://saft/test/o2');
-        $graph2 = new \Saft\Rdf\NamedNode('http://saft/test/g2');
-        $quad1 = new \Saft\Rdf\StatementImpl($subject2, $predicate2, $object2, $graph2);
+        $subject2 = new NamedNode('http://saft/test/s2');
+        $predicate2 = new NamedNode('http://saft/test/p2');
+        $object2 = new NamedNode('http://saft/test/o2');
+        $graph2 = new NamedNode('http://saft/test/g2');
+        $quad1 = new StatementImpl($subject2, $predicate2, $object2, $graph2);
 
         $statements = new \Saft\Rdf\ArrayStatementIteratorImpl(
             array($statement1, $quad1)
@@ -103,22 +107,22 @@ class AbstractSparqlStoreTest extends TestCase
         );
     }
 
-    public function testMultipleVariatonOfStatements()
+    public function testLiteralInStatements()
     {
         /**
          * object is a number
          */
-        $subject1 = new \Saft\Rdf\NamedNode('http://saft/test/s1');
-        $predicate1 = new \Saft\Rdf\NamedNode('http://saft/test/p1');
-        $object1 = new \Saft\Rdf\Literal(42);
-        $graph1 = new \Saft\Rdf\NamedNode(null);
-        $triple1 = new \Saft\Rdf\StatementImpl($subject1, $predicate1, $object1, $graph1);
+        $subject1 = new NamedNode('http://saft/test/s1');
+        $predicate1 = new NamedNode('http://saft/test/p1');
+        $object1 = new Literal(42);
+        $graph1 = new NamedNode(null);
+        $triple1 = new StatementImpl($subject1, $predicate1, $object1, $graph1);
 
         /**
          * object is a literal
          */
-        $object2 = new \Saft\Rdf\Literal('"John"');
-        $triple2 = new \Saft\Rdf\StatementImpl($subject1, $predicate1, $object2, $graph1);
+        $object2 = new Literal('"John"');
+        $triple2 = new StatementImpl($subject1, $predicate1, $object2, $graph1);
         
         // Setup array statement iterator
         $statements = new \Saft\Rdf\ArrayStatementIteratorImpl(array($triple1, $triple2));
@@ -133,19 +137,57 @@ class AbstractSparqlStoreTest extends TestCase
             '<http://saft/test/s1> <http://saft/test/p1> ""John""^^<http://www.w3.org/2001/XMLSchema#string>.'.
             '} }'
         );
+    }
 
-        /**
+    /**
+     * @depends testCreateStatement
+     */
+    public function testGivenGraphUri(Statement $statement)
+    {
+         /**
          * use the given graphUri
          */
-        $statements = new \Saft\Rdf\ArrayStatementIteratorImpl(array($triple1));
+        $statements = new \Saft\Rdf\ArrayStatementIteratorImpl(array($statement));
         
         $query = $this->fixture->addStatements($statements, 'http://saft/test/graph');
         
         $this->assertEquals(
             $query,
             'INSERT DATA {Graph <http://saft/test/graph> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer>.'.
+            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
             '} }'
+        );
+
+        /**
+         * use graphPattern
+         */
+        $query = $this->fixture->addStatements($statements, '?graph');
+        $this->assertEquals(
+            $query,
+            'INSERT DATA {Graph ?graph {'.
+            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
+            '} }'
+        );
+
+        /**
+         * use bad graphUri
+         */
+         $this->setExpectedException('\Exception');
+          $query = $this->fixture->addStatements($statements, 'foo');
+    }
+
+    public function testpatternInStatements()
+    {
+        $subject1 = new NamedNode('http://saft/test/s1');
+        $predicate1 = new NamedNode('http://saft/test/p1');
+        $object1 = new Variable('?otest');
+        $graph1 = new NamedNode(null);
+        $triple1 = new StatementImpl($subject1, $predicate1, $object1, $graph1);
+
+        $query = $this->fixture->hasMatchingStatement($triple1);
+        $this->assertEquals(
+            $query,
+            'ASK {Graph <> {<http://saft/test/s1> <http://saft/test/p1> ?otest.} }'
         );
     }
 }
