@@ -1,20 +1,20 @@
 <?php
 namespace Saft\Rdf;
 
-class AbstractStatement implements Statement
+abstract class AbstractStatement implements Statement
 {
     /**
      * @return boolean
      */
     public function isConcrete()
     {
-        if ($this->isQuad() && !$this->graph->isConcrete()) {
+        if ($this->isQuad() && !$this->getGraph()->isConcrete()) {
                 return false;
         }
 
-        return $this->subject->isConcrete()
-               && $this->predicate->isConcrete()
-               && $this->object->isConcrete();
+        return $this->getSubject()->isConcrete()
+               && $this->getPredicate()->isConcrete()
+               && $this->getObject()->isConcrete();
     }
 
     /**
@@ -30,10 +30,11 @@ class AbstractStatement implements Statement
      */
     public function toNQuads()
     {
-        return $this->getSubject()->toNT() . ' ' .
-               $this->getPredicate()->toNT() . ' ' .
-               $this->getObject()->toNT() . ' ' .
-               $this->getGraph()->toNT() . '.';
+        if ($this->isConcrete()) {
+            return $this->toSparqlFormat();
+        } else {
+            throw new \Exception("A statement has to be concrete in N-Quads.");
+        }
     }
 
     /**
@@ -41,8 +42,15 @@ class AbstractStatement implements Statement
      */
     public function toSparqlFormat()
     {
-        return $this->getSubject()->toNT() .' '.
-               $this->getPredicate()->toNT() .' '.
-               $this->getObject()->toNT() .'.';
+        if ($this->isQuad()) {
+            return $this->getSubject()->toNQuads() . ' ' .
+                   $this->getPredicate()->toNQuads() . ' ' .
+                   $this->getObject()->toNQuads() . ' ' .
+                   $this->getGraph()->toNQuads() . '.';
+        } else {
+            return $this->getSubject()->toNQuads() . ' ' .
+                   $this->getPredicate()->toNQuads() . ' ' .
+                   $this->getObject()->toNQuads() . '.';
+        }
     }
 }

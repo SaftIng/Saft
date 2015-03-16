@@ -78,6 +78,6 @@ abstract class AbstractNamedNode implements NamedNode
      */
     public function toNQuads()
     {
-        return '<' . $this->value . '>';
+        return '<' . $this->getValue() . '>';
     }
 }
