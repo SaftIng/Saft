@@ -23,7 +23,7 @@ class Variable implements Node
         // $value is null, means we have to generate a random variable name
         } elseif (null === $value) {
             $variable = hash('sha1', microtime(true) . rand(0, time()));
-            $this->value = '?'. substr($variable, 0, 4);
+            $this->value = '?'. substr($variable, 0, 10);
         } else {
             throw new \Exception('Parameter $value is not a string or not null.');
         }
@@ -131,8 +131,6 @@ class Variable implements Node
      */
     public function toNT()
     {
-        // check, if this named node represents a variable. if so, generate a unique variable name.
-        $variable = hash('sha1', microtime(true) . rand(0, time()));
-        return '?'. substr($variable, 0, 4);
+        return $this->value;
     }
 }

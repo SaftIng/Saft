@@ -25,13 +25,13 @@ class StatementImpl implements Statement
 
     /**
      *
-     * @param NamedNode|BlankNode $subject
-     * @param NamedNode $predicate
-     * @param Node $object
+     * @param NamedNode|BlankNode|Variable $subject
+     * @param NamedNode                    $predicate
+     * @param Node                         $object
      * @return
      * @throw
      */
-    public function __construct($subject, NamedNode $predicate, Node $object, NamedNode $graph = null)
+    public function __construct(Node $subject, Node $predicate, Node $object, NamedNode $graph = null)
     {
         $this->subject = $subject;
         $this->predicate = $predicate;
