@@ -1,7 +1,7 @@
 <?php
 namespace Saft\Backend\Redland\Rdf;
 
-use \Saft\Rdf\StatementInterator as SaftStatementIterator;
+use \Saft\Rdf\StatementIterator as SaftStatementIterator;
 
 class StatementIterator implements SaftStatementIterator
 {

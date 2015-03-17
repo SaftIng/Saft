@@ -13,11 +13,6 @@ class Parser implements ParserInterface
     protected $world;
 
     /**
-     * @var StatementIterator an instance of redland statement iterator
-     */
-    protected $iterator;
-
-    /**
      * The prefixes seen so far while parsing the input
      * @var array keys are prefixes, values are the uris
      */
@@ -48,6 +43,12 @@ class Parser implements ParserInterface
         }
     }
 
+    /**
+     * @param $inputStream
+     * @param $baseUri
+     * @return StatementIterator
+     * @throws Exception
+     */
     public function parseStreamToIterator ($inputStream, $baseUri)
     {
         $rdfUri = librdf_new_uri($this->world, $baseUri);
@@ -66,7 +67,7 @@ class Parser implements ParserInterface
             );
         }
 
-        $this->iterator = new StatementIterator($redlandStream);
+        return new StatementIterator($redlandStream);
     }
 
     public function getCurrentPrefixlist ()
