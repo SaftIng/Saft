@@ -52,7 +52,7 @@ interface Statement
     /**
      * @return boolean
      */
-    public function toNT();
+    public function toNQuads();
 
     /**
      * @return boolean
