@@ -29,7 +29,12 @@ class Literal extends AbstractLiteral
      */
     public function getDatatype()
     {
-        return librdf_uri_to_string(librdf_node_get_literal_value_datatype_uri($this->redlandNode));
+        $datatype = librdf_node_get_literal_value_datatype_uri($this->redlandNode);
+        if ($datatype !== null) {
+            return librdf_uri_to_string($datatype);
+        } else {
+            return null;
+        }
     }
 
     /**
