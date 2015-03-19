@@ -6,6 +6,7 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\Node;
 
 /**
  * Predefined sparql Store. All Triple methods reroute to the query-method. In the specific sparql-Store those
@@ -148,9 +149,10 @@ abstract class AbstractSparqlStore implements StoreInterface
         $query = '';
         foreach ($statements as $st) {
             if ($st instanceof Statement) {
-                $con = $st->toSparqlFormat();
+                $con = $this->getNodeInSparqlF($st->getSubject()) . ' ' .
+                    $this->getNodeInSparqlF($st->getPredicate()) . ' ' .
+                    $this->getNodeInSparqlF($st->getObject()) . '.';
 
-                $graph = $st->getGraph();
                 if (null !== $graphUri) {
                     if (true === is_string($graphUri)) {
                         if (NamedNodeImpl::check($graphUri)) {
@@ -161,15 +163,34 @@ abstract class AbstractSparqlStore implements StoreInterface
                             throw new \Exception('bad graphUri');
                         }
                     }
-                } elseif (null !== $graph) {
-                    $con = 'Graph <'. $graph->__toString() .'> {'. $con .'}';
+                } else {
+                    $graph = $st->getGraph();
+                    if (null !== $graph->__toString()) {
+                        $con = 'Graph '.
+                        $this->getNodeInSparqlF($graph) .
+                        ' {'. $con .'}';
+                    }
                 }
 
-                $query .= $con .' ';
+                $query .= $con;
             } else {
                 throw new \Exception('Not a Statement instance');
             }
         }
         return $query;
+    }
+
+    /**
+     * Retrun Node in SparqlFormat
+     * @param  Node   $node
+     * @return string
+     */
+    private function getNodeInSparqlF(Node $node)
+    {
+        if ($node->isConcrete()) {
+            return $node->toNQuads();
+        } else {
+            return $node->__toString();
+        }
     }
 }

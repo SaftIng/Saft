@@ -63,7 +63,7 @@ class AbstractSparqlStoreTest extends TestCase
         $query = $this->fixture->getMatchingStatements($statement);
         $this->assertEquals(
             $query,
-            'SELECT * WHERE {Graph <> {<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.} }'
+            'SELECT * WHERE {<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.}'
         );
     }
 
@@ -76,8 +76,8 @@ class AbstractSparqlStoreTest extends TestCase
 
         $this->assertEquals(
             $query,
-            'INSERT DATA {Graph <> {<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.}'.
-            ' Graph <http://saft/test/g2> {<http://saft/test/s2> <http://saft/test/p2> <http://saft/test/o2>.} }'
+            'INSERT DATA {<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
+            'Graph <http://saft/test/g2> {<http://saft/test/s2> <http://saft/test/p2> <http://saft/test/o2>.}}'
         );
     }
 
@@ -90,7 +90,7 @@ class AbstractSparqlStoreTest extends TestCase
         //echo $query;
         $this->assertEquals(
             $query,
-            'DELETE DATA {Graph <> {<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.} }'
+            'DELETE DATA {<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.}'
         );
     }
 
@@ -103,7 +103,7 @@ class AbstractSparqlStoreTest extends TestCase
         //echo $query;
         $this->assertEquals(
             $query,
-            'ASK {Graph <> {<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.} }'
+            'ASK {<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.}'
         );
     }
 
@@ -131,11 +131,10 @@ class AbstractSparqlStoreTest extends TestCase
         $query = $this->fixture->addStatements($statements);
         $this->assertEquals(
             $query,
-            'INSERT DATA {Graph <> {'.
+            'INSERT DATA {'.
             '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer>.'.
-            '} Graph <> {'.
             '<http://saft/test/s1> <http://saft/test/p1> ""John""^^<http://www.w3.org/2001/XMLSchema#string>.'.
-            '} }'
+            '}'
         );
     }
 
@@ -155,7 +154,7 @@ class AbstractSparqlStoreTest extends TestCase
             $query,
             'INSERT DATA {Graph <http://saft/test/graph> {'.
             '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
-            '} }'
+            '}}'
         );
 
         /**
@@ -166,7 +165,7 @@ class AbstractSparqlStoreTest extends TestCase
             $query,
             'INSERT DATA {Graph ?graph {'.
             '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.'.
-            '} }'
+            '}}'
         );
 
         /**
@@ -187,7 +186,7 @@ class AbstractSparqlStoreTest extends TestCase
         $query = $this->fixture->hasMatchingStatement($triple1);
         $this->assertEquals(
             $query,
-            'ASK {Graph <> {<http://saft/test/s1> <http://saft/test/p1> ?otest.} }'
+            'ASK {<http://saft/test/s1> <http://saft/test/p1> ?otest.}'
         );
     }
 }
