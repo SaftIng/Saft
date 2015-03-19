@@ -1,7 +1,6 @@
 <?php
-namespace Saft\Store;
 
-use Symfony\Component\Yaml\Parser;
+namespace Saft;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
@@ -25,7 +24,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    protected $testGraphUri = "http://localhost/Saft/TestGraph/";
+    protected $testGraphUri = 'http://localhost/Saft/TestGraph/';
 
     /**
      * http://stackoverflow.com/a/12496979

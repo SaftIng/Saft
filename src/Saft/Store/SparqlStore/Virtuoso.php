@@ -1,13 +1,16 @@
 <?php
+
 namespace Saft\Store\SparqlStore;
 
-use Saft\Rdf\NamedNode as NamedNode;
 use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\Statement;
+use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\Triple;
-use Saft\Store\AbstractSparqlStore;
 use Saft\Sparql\Query;
+use Saft\Store\AbstractSparqlStore;
+use Saft\Store\StoreInterface;
 
 /**
  * SparqlStore implementation of OpenLink Virtuoso. It supports version 6.1.8+
@@ -55,16 +58,109 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * Adds a new empty and named graph.
      *
-     * @param  string $graphUri URI of the graph to create
+     * @param  string $graphUri URI of the graph to create.
      * @throws \Exception
      */
-    public function addGraph($graphUri)
+    public function addGraph($graphUri, array $options = array())
     {
         $this->query('CREATE SILENT GRAPH <'. $graphUri .'>');
     }
+    
+    /**
+     * Adds multiple Statements to (default-) graph.
+     *
+     * @param  StatementIterator $statements          StatementList instance must contain Statement instances
+     *                                                which are 'concret-' and not 'pattern'-statements.
+     * @param  string            $graphUri   optional Overrides target graph. If set, all statements will
+     *                                                be add to that graph, if available.
+     * @param  array             $options    optional It contains key-value pairs and should provide additional
+     *                                                introductions for the store and/or its adapter(s).
+     * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
+     *                 will be thrown.
+     * @todo implement usage of graph inside the statement(s). create groups for each graph
+     */
+    public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
+    {
+        foreach ($statements as $st) {
+            if ($st instanceof Statement && true === $st->isConcrete()) {
+                // everything is fine
+            
+            // non-Statement instances not allowed
+            } elseif (false === $st instanceof Statement) {
+                throw new \Exception('addStatements does not accept non-Statement instances.');
+            
+            // non-concrete Statement instances not allowed
+            } elseif ($st instanceof Statement && false === $st->isConcrete()) {
+                throw new \Exception('At least one Statement is not concrete');
+            
+            } else {
+                throw new \Exception('Unknown error.');
+            }
+        }
+        
+        /**
+         * Create batches out of given statements to improve statement throughput.
+         */
+        $counter = 0;
+        $batchSize = 100;
+        $batchStatements = array();
+        
+        foreach($statements as $statement) {
+            
+            // given $graphUri forces usage of it and not the graph from the statement instance
+            if (null !== $graphUri) {
+                $graphUriToUse = $graphUri;
+             
+            // use graphUri from statement
+            } else {
+                $graphUriToUse = $statement->getGraph()->getValue();
+            }
+            
+            if (false === isset($batchStatements[$graphUriToUse])) {
+                $batchStatements[$graphUriToUse] = new ArrayStatementIteratorImpl(array());
+            }
+            
+            /**
+             * Notice: add a triple to the batch, even a quad was given, because we dont want the quad
+             *         sparqlFormat call, because Virtuoso wont accepts queries like:
+             *              
+             *          INSERT DATA {Graph <> {...}}
+             *
+             *         so we have to change it to:
+             *          
+             *          INSERT INTO GRAPH <> {<...> <...> <...>. ...}
+             */
+            $batchStatements[$graphUriToUse]->append(new StatementImpl(
+                $statement->getSubject(), $statement->getPredicate(), $statement->getObject()
+            ));
+            
+            // after batch is full, execute collected statements all at once
+            if (0 === $counter % $batchSize) {
+                
+                /**
+                 * $batchStatements is an array with graphUri('s) as key(s) and ArrayStatementIteratorImpl
+                 * instances as value. Each entry is related to a certain graph and contains a bunch of 
+                 * statement instances.
+                 */
+                foreach ($batchStatements as $graphUriToUse => $statementBatch) {
+                    $this->query(
+                        'INSERT INTO GRAPH <'. $graphUriToUse .'> {'. $this->sparqlFormat($statementBatch) .'}', 
+                        $options
+                    );
+                }
+                
+                // re-init variables
+                $batchStatements = array();
+            }
+        }
+    }
 
     /**
-     * Checks
+     * Checks that all requirements for queries via HTTP are fullfilled.
+     * 
+     * @return boolean True, if all requirements are fullfilled.
+     * @throws \Exception If PHP ODBC extension was not loaded.
+     * @throws \Exception If PHP PDO-ODBC extension was not loaded.
      */
     public function checkRequirements()
     {
@@ -144,11 +240,14 @@ class Virtuoso extends AbstractSparqlStore
     }
 
     /**
-     * Drops a graph.
-     *
-     * @param string $graphUri URI of the graph to remove.
+     * Drops an existing graph.
+     * 
+     * @param string $graphUri          URI of the graph to drop.
+     * @param array  $options  optional It contains key-value pairs and should provide additional introductions 
+     *                                  for the store and/or its adapter(s).
+     * @throw \Exception
      */
-    public function dropGraph($graphUri)
+    public function dropGraph($graphUri, array $options = array())
     {
         $this->query('DROP SILENT GRAPH <'. $graphUri .'>');
     }
@@ -173,6 +272,39 @@ class Virtuoso extends AbstractSparqlStore
     }
     
     /**
+     * It gets all statements of a given graph which match the following conditions:
+     * - statement's subject is either equal to the subject of the same statement of the graph or it is null.
+     * - statement's predicate is either equal to the predicate of the same statement of the graph or it is null.
+     * - statement's object is either equal to the object of a statement of the graph or it is null.
+     *
+     * @param  Statement $statement          It can be either a concrete or pattern-statement.
+     * @param  string    $graphUri  optional Overrides target graph. If set, you will get all
+     *                                       matching statements of that graph.
+     * @param  array     $options   optional It contains key-value pairs and should provide additional
+     *                                       introductions for the store and/or its adapter(s).
+     * @return StatementIterator It contains Statement instances  of all matching
+     *                           statements of the given graph.
+     * @todo FILTER select
+     * @todo check if graph URI is valid
+     */
+    public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
+    {
+        // Remove, maybe available, graph from given statement and put it into an iterator
+        // reason for the removal of the graph is to avoid quads in the query. Virtuoso wants the graph in the
+        // FROM part.
+        $statementIterator = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(
+                $statement->getSubject(), $statement->getPredicate(), $statement->getObject()
+            )
+        ));
+        
+        return $this->query(
+            'SELECT * FROM <'. $graphUri .'> WHERE {'. $this->sparqlFormat($statementIterator) .'}',
+            $options
+        );
+    }
+    
+    /**
      * @return array Empty array
      * @todo implement getStoreDescription
      */
@@ -184,7 +316,7 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * Counts the number of triples in a graph.
      *
-     * @param  string $graphUri URI of the graph you wanna count triples
+     * @param  string  $graphUri URI of the graph you wanna count triples
      * @return integer Number of found triples
      * @throws \Exception
      */
@@ -193,7 +325,7 @@ class Virtuoso extends AbstractSparqlStore
         $result = $this->query('SELECT COUNT(?s) as ?count FROM <'. $graphUri .'> WHERE {?s ?p ?o.}');
 
         return $result[0]['count'];
-    }
+    }    
 
     /**
      * Checks if a certain graph is available in the store.
@@ -211,14 +343,14 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * Returns the current connection resource. The resource is created lazily if it doesn't exist.
      *
-     * @return \PDO Open PDO-ODBC connection.
+     * @return \PDO Instance of \PDO representing an open PDO-ODBC connection.
      */
     protected function openConnection()
     {
         // connection still closed
         if (null === $this->connection) {
             // check for dsn parameter. it is usually the ODBC identifier, e.g. VOS.
-            // for more information have a look into /etc/odbc.ini
+            // for more information have a look into /etc/odbc.ini (*NIX systems)
             if (false === isset($this->configuration['dsn'])) {
                 throw new \Exception('Parameter dsn is not set.');
             }
@@ -326,9 +458,14 @@ class Virtuoso extends AbstractSparqlStore
         // transform result to array in case we fired a non-UPDATE query
         if (false !== $pdoQuery) {
             $result = $pdoQuery->fetchAll(\PDO::FETCH_ASSOC);
-
+            
+            // if it was an ASK query, return true or false.
+            if (true === $queryObject->isAskQuery()) {
+                // TODO fix that ASK queries return true even the graph is empty
+                return '1' === $result[0]['__ask_retval'];
+                
             // encode as JSON string
-            if ('extended' === $options['resultType']) {
+            } elseif ('extended' === $options['resultType']) {
                 $result = current(current($result));
                 $result = json_decode($result, true);
             }

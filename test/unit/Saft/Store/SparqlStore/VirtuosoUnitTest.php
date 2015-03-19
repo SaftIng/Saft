@@ -2,12 +2,12 @@
 namespace Saft\Store\SparqlStore;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Rdf\Literal;
-use Saft\Rdf\NamedNode;
+use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\StatementImpl;
 use Symfony\Component\Yaml\Parser;
 
-class HttpTest extends \PHPUnit_Framework_TestCase
+class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Saft\Cache
@@ -31,9 +31,6 @@ class HttpTest extends \PHPUnit_Framework_TestCase
      */
     protected $testGraphUri = 'http://localhost/Saft/TestGraph/';
     
-    /**
-     *
-     */
     public function setUp()
     {
         // set path to test dir
@@ -49,19 +46,14 @@ class HttpTest extends \PHPUnit_Framework_TestCase
         $yaml = new Parser();
         $this->config = $yaml->parse(file_get_contents($configFilepath));
 
-        // if httpConfig array is set
-        if (true === isset($this->config['httpConfig'])) {
-            $this->fixture = new \Saft\Store\SparqlStore\Http($this->config['httpConfig']);
-
-        // if standard store is set to http
-        } elseif ('http' === $this->config['configuration']['standardStore']['type']) {
-            $this->fixture = new \Saft\Store\SparqlStore\Http(
+        if (true === isset($this->config['virtuosoConfig'])) {
+            $this->fixture = new \Saft\Store\SparqlStore\Virtuoso($this->config['virtuosoConfig']);
+        } elseif ('virtuoso' === $this->config['configuration']['standardStore']['type']) {
+            $this->fixture = new \Saft\Store\SparqlStore\Virtuoso(
                 $this->config['configuration']['standardStore']
             );
-
-        // no configuration is available, dont execute tests
         } else {
-            $this->markTestSkipped('Array httpConfig is not set in the config.yml.');
+            $this->markTestSkipped('Array virtuosoConfig is not set in the config.yml.');
         }
     }
 
@@ -105,7 +97,7 @@ class HttpTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests dropGraph
+     * function dropGraph
      */
 
     public function testDropGraph()
@@ -130,22 +122,34 @@ class HttpTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests existence (simple)
+     * Tests existence of Virtuoso class
      */
     public function testExistence()
     {
-        $this->assertTrue(class_exists('\Saft\Store\SparqlStore\Http'));
+        $this->assertTrue(class_exists('\Saft\Store\SparqlStore\Virtuoso'));
     }
 
     /**
-     * Tests getAvailableGraphUris
+     * function getAvailableGraphs
      */
 
-    public function testGetAvailableGraphUris()
+    public function testGetAvailableGraphs()
     {
-        // assumption here is that the SPARQL endpoint contains at least one graph.
+        // get graph list
+        $graphUris = $this->fixture->getAvailableGraphs();
 
-        $this->assertTrue(0 <$this->fixture->getAvailableGraphs());
+        // alternative way to get the list
+        $query = $this->fixture->sqlQuery(
+            'SELECT ID_TO_IRI(REC_GRAPH_IID) as graph
+               FROM DB.DBA.RDF_EXPLICITLY_CREATED_GRAPH'
+        );
+
+        $graphsToCheck = array();
+        foreach ($query->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            $graphsToCheck[$row['graph']] = $row['graph'];
+        }
+
+        $this->assertEqualsArrays($graphUris, $graphsToCheck);
     }
 
     /**
@@ -157,23 +161,33 @@ class HttpTest extends \PHPUnit_Framework_TestCase
         // graph is empty
         $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
 
+        // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/'),
-                new NamedNode('http://o/')
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
             ),
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/'),
-                new Literal('test literal')
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
             ),
         ));
 
         // add triples
         $this->fixture->addStatements($statements, $this->testGraphUri);
 
-        // graph has to contain 3 triples
+        // graph has to contain 2 triples
         $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraphUri));
+    }
+
+    /**
+     * Tests getServiceDescription
+     */
+
+    public function testGetStoreDescription()
+    {
+        $this->assertEquals(array(), $this->fixture->getStoreDescription());
     }
 }

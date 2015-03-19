@@ -146,9 +146,11 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
      */
     public function tearDown()
     {
-        parent::tearDown();
+        if (null !== $this->cache) {
+            $this->cache->clean();
+        }
         
-        $this->cache->clean();
+        parent::tearDown();
     }
 
     /**
@@ -168,12 +170,33 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * existence
+     * Tests dropGraph
      */
 
-    public function testExistence()
+    public function testDropGraph()
     {
-        $this->assertTrue(class_exists('\Saft\QueryCache'));
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        // creates a subclass of the mock and adds a dummy dropGraph function
+        if (false == class_exists('successorMock')) {
+            eval(
+                'class successorMock extends '. get_class($storeInterfaceMock) .' {
+                    public function dropGraph($graphUri) {
+                        return null;
+                    }
+                }'
+            );
+        }
+        
+        $this->fixture->setChainSuccessor(new \successorMock());
+        
+        $this->fixture->dropGraph($this->testGraphUri);
+    }
+
+    public function testDropGraphNoSuccessor()
+    {
+        $this->setExpectedException('\Exception');
+        
+        $this->fixture->dropGraph($this->testGraphUri);
     }
 
     /**

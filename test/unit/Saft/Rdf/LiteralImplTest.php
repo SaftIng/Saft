@@ -2,7 +2,7 @@
 
 namespace Saft\Rdf;
 
-class LiteralTest extends \PHPUnit_Framework_TestCase
+class LiteralImplTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -12,7 +12,7 @@ class LiteralTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->fixture = new \Saft\Rdf\Literal(null, null);
+        $this->fixture = new LiteralImpl(null, null);
     }
 
     /**
@@ -28,16 +28,16 @@ class LiteralTest extends \PHPUnit_Framework_TestCase
      */
     public function testEquals()
     {
-        $this->fixture = new \Saft\Rdf\Literal(true);
-        $toCompare = new \Saft\Rdf\Literal(true);
+        $this->fixture = new LiteralImpl(true);
+        $toCompare = new LiteralImpl(true);
 
         $this->assertTrue($this->fixture->equals($toCompare));
     }
 
     public function testEqualsDifferentType()
     {
-        $this->fixture = new \Saft\Rdf\Literal(1);
-        $toCompare = new \Saft\Rdf\Literal(1.0);
+        $this->fixture = new LiteralImpl(1);
+        $toCompare = new LiteralImpl(1.0);
 
         $this->assertFalse($this->fixture->equals($toCompare));
     }
@@ -47,7 +47,7 @@ class LiteralTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetDatatypeBoolean()
     {
-        $this->fixture = new \Saft\Rdf\Literal(true);
+        $this->fixture = new LiteralImpl(true);
 
         $this->assertEquals(
             'http://www.w3.org/2001/XMLSchema#boolean',
@@ -57,14 +57,14 @@ class LiteralTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDatatypeLangSet()
     {
-        $this->fixture = new \Saft\Rdf\Literal('foo', 'en');
+        $this->fixture = new LiteralImpl('foo', 'en');
 
         $this->assertNull($this->fixture->getDatatype());
     }
 
     public function testGetDatatypeDecimal()
     {
-        $this->fixture = new \Saft\Rdf\Literal(3.18);
+        $this->fixture = new LiteralImpl(3.18);
 
         $this->assertEquals(
             'http://www.w3.org/2001/XMLSchema#decimal',
@@ -74,7 +74,7 @@ class LiteralTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDatatypeInteger()
     {
-        $this->fixture = new \Saft\Rdf\Literal(3);
+        $this->fixture = new LiteralImpl(3);
 
         $this->assertEquals(
             'http://www.w3.org/2001/XMLSchema#integer',
@@ -84,7 +84,7 @@ class LiteralTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDatatypeString()
     {
-        $this->fixture = new \Saft\Rdf\Literal('foo');
+        $this->fixture = new LiteralImpl('foo');
 
         $this->assertEquals(
             'http://www.w3.org/2001/XMLSchema#string',
@@ -105,17 +105,17 @@ class LiteralTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsConcrete()
     {
-        $this->fixture = new \Saft\Rdf\Literal(null, null);
+        $this->fixture = new LiteralImpl(null, null);
         $this->assertTrue($this->fixture->isConcrete());
         
-        $this->fixture = new \Saft\Rdf\Literal('hallo', 'de');
+        $this->fixture = new LiteralImpl('hallo', 'de');
         $this->assertTrue($this->fixture->isConcrete());
     }
 
     /**
      * Tests isLiteral
      */
-    public function testIsLiteral()
+    public function testIsLiteralImpl()
     {
         $this->assertTrue($this->fixture->isLiteral());
     }
@@ -133,28 +133,28 @@ class LiteralTest extends \PHPUnit_Framework_TestCase
      */
     public function testToNTLangAndValueSet()
     {
-        $this->fixture = new \Saft\Rdf\Literal('foo', 'en');
+        $this->fixture = new LiteralImpl('foo', 'en');
 
-        $this->assertEquals('"foo"@en', $this->fixture->toNT());
+        $this->assertEquals('"foo"@en', $this->fixture->toNQuads());
     }
 
     public function testToNTValueBoolean()
     {
-        $this->fixture = new \Saft\Rdf\Literal(true);
+        $this->fixture = new LiteralImpl(true);
 
         $this->assertEquals(
             '"true"^^<http://www.w3.org/2001/XMLSchema#boolean>',
-            $this->fixture->toNT()
+            $this->fixture->toNQuads()
         );
     }
 
     public function testToNTValueInteger()
     {
-        $this->fixture = new \Saft\Rdf\Literal(30);
+        $this->fixture = new LiteralImpl(30);
 
         $this->assertEquals(
             '"30"^^<http://www.w3.org/2001/XMLSchema#integer>',
-            $this->fixture->toNT()
+            $this->fixture->toNQuads()
         );
     }
 
@@ -163,18 +163,18 @@ class LiteralTest extends \PHPUnit_Framework_TestCase
         // TODO: Implement case for getDatatype when value is null.
         $this->setExpectedException('\Exception');
 
-        $this->fixture = new \Saft\Rdf\Literal(null);
+        $this->fixture = new LiteralImpl(null);
 
-        $this->fixture->toNT();
+        $this->fixture->toNQuads();
     }
 
     public function testToNTValueString()
     {
-        $this->fixture = new \Saft\Rdf\Literal('foo');
+        $this->fixture = new LiteralImpl('foo');
 
         $this->assertEquals(
             '"foo"^^<http://www.w3.org/2001/XMLSchema#string>',
-            $this->fixture->toNT()
+            $this->fixture->toNQuads()
         );
     }
 }

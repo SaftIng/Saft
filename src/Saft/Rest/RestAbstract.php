@@ -11,25 +11,36 @@ abstract class RestAbstract
 {
     /**
      * concrete implementation of StoreInterface.
+     * 
      * @var \Saft\StoreInterface\StoreInterface
      */
     protected $store;
+    
     /**
      * Property: method
      * The HTTP method this request was made in, either GET, POST or DELETE
+     *
+     * @var string
      */
     protected $method = '';
+    
     /**
      * Property: endpoint
      * The Model requested in the URI. eg: /files
+     *
+     * @var string
      */
     protected $endpoint = '';
+    
     /**
      * Property: verb
      * An optional additional descriptor about the endpoint, used for things that can
      * not be handled by the basic methods. eg: /files/process
+     *
+     * @var string
      */
     protected $verb = '';
+    
     /**
      * Property: args
      * Any additional URI components after the endpoint and verb have been removed, in our
@@ -71,16 +82,16 @@ abstract class RestAbstract
         }
 
         switch($this->method) {
-        case 'DELETE':
-        case 'POST':
-            $this->request = $this->cleanInputs($_POST);
-            break;
-        case 'GET':
-            $this->request = $this->cleanInputs($_GET);
-            break;
-        default:
-            $this->response('Invalid Method', 405);
-            break;
+            case 'DELETE':
+            case 'POST':
+                $this->request = $this->cleanInputs($_POST);
+                break;
+            case 'GET':
+                $this->request = $this->cleanInputs($_GET);
+                break;
+            default:
+                $this->response('Invalid Method', 405);
+                break;
         }
     }
 

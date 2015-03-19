@@ -2,9 +2,9 @@
 namespace Saft\Store\SparqlStore;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Rdf\Literal;
-use Saft\Rdf\NamedNode;
-use Saft\Rdf\Variable;
+use Saft\Rdf\LiteralImpl;
+use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\VariableImpl;
 use Saft\Rdf\StatementImpl;
 use Symfony\Component\Yaml\Parser;
 
@@ -63,7 +63,9 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
      */
     public function tearDown()
     {
-        $this->fixture->dropGraph($this->testGraphUri);
+        if (null !== $this->fixture) {
+            $this->fixture->dropGraph($this->testGraphUri);
+        }
 
         parent::tearDown();
     }
@@ -96,14 +98,14 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/'),
-                new Literal('test literal', 'en')
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal', 'en')
             ),
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/'),
-                new Literal('test literal', 'de')
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal', 'de')
             ),
         ));
 
@@ -122,14 +124,14 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/'),
-                new NamedNode('http://o/')
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
             ),
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/'),
-                new Literal('test literal')
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
             ),
         ));
 
@@ -154,14 +156,14 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/'),
-                new NamedNode('http://o/')
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
             ),
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/'),
-                new Literal('test literal')
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
             ),
         ));
 
@@ -174,7 +176,7 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
          * drop all triples
          */
         $this->fixture->deleteMatchingStatements(
-            new StatementImpl(new NamedNode('http://s/'), new NamedNode('http://p/'), new Variable()),
+            new StatementImpl(new NamedNodeImpl('http://s/'), new NamedNodeImpl('http://p/'), new VariableImpl()),
             $this->testGraphUri
         );
 
@@ -193,19 +195,19 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/'),
-                new NamedNode('http://o/')
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
             ),
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/'),
-                new NamedNode('http://o/1')
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/1')
             ),
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/'),
-                new NamedNode('http://o/2')
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/2')
             ),
         ));
 
@@ -256,29 +258,29 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
         // triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/1'),
-                new Literal('val EN', 'en')
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/1'),
+                new LiteralImpl('val EN', 'en')
             ),
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/2'),
-                new Literal('val DE', 'de')
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/2'),
+                new LiteralImpl('val DE', 'de')
             ),
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/3'),
-                new Literal(1337)
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/3'),
+                new LiteralImpl(1337)
             ),
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/4'),
-                new Literal(0)
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/4'),
+                new LiteralImpl(0)
             ),
             new StatementImpl(
-                new NamedNode('http://s/'),
-                new NamedNode('http://p/5'),
-                new Literal(false)
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/5'),
+                new LiteralImpl(false)
             ),
         ));
 

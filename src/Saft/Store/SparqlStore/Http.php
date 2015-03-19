@@ -3,13 +3,17 @@
 namespace Saft\Store\SparqlStore;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
+use Saft\Rdf\StatementIterator;
 use Saft\Sparql\Query;
+use Saft\Store\StoreInterface;
 use Saft\Store\AbstractSparqlStore;
 
 /**
- * SparqlStore implementation of a client which handles store operations via HTTP.
+ * SparqlStore implementation of a client which handles store operations via HTTP. It is able to determine some
+ * server types by checking response header.
  */
 class Http extends AbstractSparqlStore
 {
@@ -24,6 +28,13 @@ class Http extends AbstractSparqlStore
      * @var \Saft\Net\Client
      */
     protected $client = null;
+    
+    /**
+     * Name of the store, which runs on the server, e.g. virtuoso.
+     * 
+     * @var string
+     */
+    protected $storeName = '';
 
     /**
      * Constructor.
@@ -60,7 +71,107 @@ class Http extends AbstractSparqlStore
     }
 
     /**
+     * Adds multiple Statements to (default-) graph.
+     *
+     * @param  StatementIterator $statements          StatementList instance must contain Statement instances
+     *                                                which are 'concret-' and not 'pattern'-statements.
+     * @param  string            $graphUri   optional Overrides target graph. If set, all statements will
+     *                                                be add to that graph, if available.
+     * @param  array             $options    optional It contains key-value pairs and should provide additional
+     *                                                introductions for the store and/or its adapter(s).
+     * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
+     *                 will be thrown.
+     * @todo implement usage of graph inside the statement(s). create groups for each graph
+     */
+    public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
+    {
+        if ('virtuoso' == $this->storeName) {
+            /* 
+             * Bcause Virtuoso wont accepts queries like:
+             *              
+             *          INSERT DATA {Graph <...> {<...> <...> <...>}}
+             *
+             * so we have to change it to:
+             *          
+             *          INSERT INTO GRAPH <...> {<...> <...> <...>.}
+             */
+            foreach ($statements as $st) {
+                if ($st instanceof Statement && true === $st->isConcrete()) {
+                    // everything is fine
+                
+                // non-Statement instances not allowed
+                } elseif (false === $st instanceof Statement) {
+                    throw new \Exception('addStatements does not accept non-Statement instances.');
+                
+                // non-concrete Statement instances not allowed
+                } elseif ($st instanceof Statement && false === $st->isConcrete()) {
+                    throw new \Exception('At least one Statement is not concrete');
+                
+                } else {
+                    throw new \Exception('Unknown error.');
+                }
+            }
+
+            /**
+             * Create batches out of given statements to improve statement throughput.
+             */
+            $counter = 0;
+            $batchSize = 100;
+            $batchStatements = array();
+
+            foreach($statements as $statement) {
+                
+                // given $graphUri forces usage of it and not the graph from the statement instance
+                if (null !== $graphUri) {
+                    $graphUriToUse = $graphUri;
+                 
+                // use graphUri from statement
+                } else {
+                    $graphUriToUse = $statement->getGraph()->getValue();
+                }
+                
+                if (false === isset($batchStatements[$graphUriToUse])) {
+                    $batchStatements[$graphUriToUse] = new ArrayStatementIteratorImpl(array());
+                }
+                
+                /**
+                 * Notice: add a triple to the batch, even a quad was given, because we dont want the quad
+                 *         sparqlFormat call.
+                 */
+                $batchStatements[$graphUriToUse]->append(new StatementImpl(
+                    $statement->getSubject(), $statement->getPredicate(), $statement->getObject()
+                ));
+                
+                // after batch is full, execute collected statements all at once
+                if (0 === $counter % $batchSize) {
+                    
+                    /**
+                     * $batchStatements is an array with graphUri('s) as key(s) and ArrayStatementIteratorImpl
+                     * instances as value. Each entry is related to a certain graph and contains a bunch of 
+                     * statement instances.
+                     */
+                    foreach ($batchStatements as $graphUriToUse => $statementBatch) {
+                        $this->query(
+                            'INSERT INTO GRAPH <'. $graphUriToUse .'> {'. $this->sparqlFormat($statementBatch) .'}', 
+                            $options
+                        );
+                    }
+                    
+                    // re-init variables
+                    $batchStatements = array();
+                }
+            }
+            
+        } else {
+            return parent::addStatements($statements, $graphUri, $options);
+        }
+    }
+
+    /**
      * Checks that all requirements for queries via HTTP are fullfilled.
+     * 
+     * @return boolean True, if all requirements are fullfilled.
+     * @throws \Exception If PHP CURL extension was not loaded.
      */
     public function checkRequirements()
     {
@@ -137,6 +248,25 @@ class Http extends AbstractSparqlStore
     }
 
     /**
+     * Determines store on the server.
+     * 
+     * @return string Name of the store on the server. If not possible, returns null.
+     */
+    public function determineStoreOnServer($responseHeaders)
+    {
+        $store = null;
+        
+        // Virtuoso usually set Server key in the response array with value such as: 
+        //
+        //      Virtuoso/06.01.3127 (Linux) i686-pc-linux-gnu
+        if ('Virtuoso' === substr($responseHeaders['Server'], 0, 8)) {
+            $store = 'virtuoso';
+        }
+        
+        return $store;
+    }
+
+    /**
      * Drops a graph.
      *
      * @param  string $graphUri URI of the graph to remove
@@ -193,7 +323,7 @@ class Http extends AbstractSparqlStore
      */
     public function getTripleCount($graphUri)
     {
-        if (true === \Saft\Rdf\NamedNode::check($graphUri)) {
+        if (true === NamedNodeImpl::check($graphUri)) {
             $result = $this->query('SELECT (COUNT(*) AS ?count) FROM <' . $graphUri . '> WHERE {?s ?p ?o.}');
             
             return $result[0]['count'];
@@ -234,15 +364,21 @@ class Http extends AbstractSparqlStore
         if (curl_errno($this->client->getClient()->curl)) {
             throw new \Exception(curl_error($this->client->getClient()->error), 500);
         }
+        
+        $curlInfo = curl_getinfo($this->client->getClient()->curl);
+    
+        // If status code is 200, means everything is OK
+        if (200 === $curlInfo['http_code']) {
+            // save name of the store which provides SPARQL endpoint
+            $this->storeName = $this->determineStoreOnServer($this->client->getClient()->response_headers);
+            
+            $this->client->setUrl($this->adapterOptions['queryUrl']);
+            return $this->client;
+        
         // validate HTTP status code (user/password credential issues)
-        $status_code = curl_getinfo($this->client->getClient()->curl, CURLINFO_HTTP_CODE);
-        if ($status_code != 200) {
+        } else {
             throw new \Exception('Response with Status Code [' . $status_code . '].', 500);
         }
-
-        $this->client->setUrl($this->adapterOptions['queryUrl']);
-
-        return $this->client;
     }
     
     /**
@@ -320,5 +456,19 @@ class Http extends AbstractSparqlStore
         }
 
         return $return;
+    }
+    
+    /**
+     * Set successor instance. This method is useful, if you wanna build chain of instances which implement
+     * StoreInterface. It sets another instance which will be later called, if a statement- or query-related
+     * function gets called. 
+     * E.g. you chain a query cache and a virtuoso instance. In this example all queries will be handled by
+     * the query cache first, but if no cache entry was found, the virtuoso instance gets called.
+     *
+     * @return array Array which contains information about the store and its features.
+     */
+    public function setChainSuccessor(StoreInterface $successor)
+    {
+        
     }
 }

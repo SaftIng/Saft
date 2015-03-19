@@ -375,9 +375,9 @@ class Query
             /**
              * determine type of subject, predicate and object
              */
-            $sType = true === \Saft\Rdf\NamedNode::check($s) ? 'uri' : 'var';
-            $pType = true === \Saft\Rdf\NamedNode::check($p) ? 'uri' : 'var';
-            if (true === \Saft\Rdf\NamedNode::check($o)) {
+            $sType = true === \Saft\Rdf\NamedNodeImpl::check($s) ? 'uri' : 'var';
+            $pType = true === \Saft\Rdf\NamedNodeImpl::check($p) ? 'uri' : 'var';
+            if (true === \Saft\Rdf\NamedNodeImpl::check($o)) {
                 $oType = 'uri';
             } elseif (false !== $arrowPos) {
                 $oType = 'typed-literal';
@@ -732,6 +732,16 @@ class Query
         if (isset($parts['offset'][1][0])) {
             $this->setOffset($parts['offset'][1][0]);
         }
+    }
+    
+    /**
+     * Checks if query is an ASK query.
+     *
+     * @return boolean
+     */
+    public function isAskQuery()
+    {
+        return false !== strpos($this->getProloguePart(), 'ASK');
     }
     
     /**
