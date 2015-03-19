@@ -129,7 +129,7 @@ class Variable implements Node
     /**
      * @return string
      */
-    public function toNT()
+    public function toNQuads()
     {
         return $this->value;
     }

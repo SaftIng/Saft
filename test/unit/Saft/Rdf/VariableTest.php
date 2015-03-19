@@ -63,7 +63,7 @@ class VariableTest extends \PHPUnit_Framework_TestCase
 
     public function testInstanciationNull()
     {
-        $this->fixture = new \Saft\Rdf\NamedNode(null);
+        $this->fixture = new \Saft\Rdf\NamedNodeImpl(null);
         $this->assertEquals(null, $this->fixture->getValue());
     }
 
@@ -101,7 +101,7 @@ class VariableTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Tests isVariable
-     * 
+     *
      */
     public function testIsVariable()
     {
