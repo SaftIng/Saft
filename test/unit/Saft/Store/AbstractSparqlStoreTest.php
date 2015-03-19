@@ -3,8 +3,8 @@
 namespace Saft\Store;
 
 use Saft\Rdf\Statement;
-use Saft\Rdf\NamedNode;
-use Saft\Rdf\Literal;
+use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\Variable;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
@@ -28,10 +28,10 @@ class AbstractSparqlStoreTest extends TestCase
 
     public function testCreateStatement()
     {
-        $subject1 = new NamedNode('http://saft/test/s1');
-        $predicate1 = new NamedNode('http://saft/test/p1');
-        $object1 = new NamedNode('http://saft/test/o1');
-        $graph1 = new NamedNode(null);
+        $subject1 = new NamedNodeImpl('http://saft/test/s1');
+        $predicate1 = new NamedNodeImpl('http://saft/test/p1');
+        $object1 = new NamedNodeImpl('http://saft/test/o1');
+        $graph1 = new NamedNodeImpl(null);
         $triple1 = new StatementImpl($subject1, $predicate1, $object1, $graph1);
 
         return $triple1;
@@ -42,10 +42,10 @@ class AbstractSparqlStoreTest extends TestCase
      */
     public function testCreateStatements(Statement $statement1)
     {
-        $subject2 = new NamedNode('http://saft/test/s2');
-        $predicate2 = new NamedNode('http://saft/test/p2');
-        $object2 = new NamedNode('http://saft/test/o2');
-        $graph2 = new NamedNode('http://saft/test/g2');
+        $subject2 = new NamedNodeImpl('http://saft/test/s2');
+        $predicate2 = new NamedNodeImpl('http://saft/test/p2');
+        $object2 = new NamedNodeImpl('http://saft/test/o2');
+        $graph2 = new NamedNodeImpl('http://saft/test/g2');
         $quad1 = new StatementImpl($subject2, $predicate2, $object2, $graph2);
 
         $statements = new \Saft\Rdf\ArrayStatementIteratorImpl(
@@ -107,21 +107,21 @@ class AbstractSparqlStoreTest extends TestCase
         );
     }
 
-    public function testLiteralInStatements()
+    public function testLiteralImplInStatements()
     {
         /**
          * object is a number
          */
-        $subject1 = new NamedNode('http://saft/test/s1');
-        $predicate1 = new NamedNode('http://saft/test/p1');
-        $object1 = new Literal(42);
-        $graph1 = new NamedNode(null);
+        $subject1 = new NamedNodeImpl('http://saft/test/s1');
+        $predicate1 = new NamedNodeImpl('http://saft/test/p1');
+        $object1 = new LiteralImpl(42);
+        $graph1 = new NamedNodeImpl(null);
         $triple1 = new StatementImpl($subject1, $predicate1, $object1, $graph1);
 
         /**
-         * object is a literal
+         * object is a Literal
          */
-        $object2 = new Literal('"John"');
+        $object2 = new LiteralImpl('"John"');
         $triple2 = new StatementImpl($subject1, $predicate1, $object2, $graph1);
         
         // Setup array statement iterator
@@ -178,10 +178,10 @@ class AbstractSparqlStoreTest extends TestCase
 
     public function testpatternInStatements()
     {
-        $subject1 = new NamedNode('http://saft/test/s1');
-        $predicate1 = new NamedNode('http://saft/test/p1');
+        $subject1 = new NamedNodeImpl('http://saft/test/s1');
+        $predicate1 = new NamedNodeImpl('http://saft/test/p1');
         $object1 = new Variable('?otest');
-        $graph1 = new NamedNode(null);
+        $graph1 = new NamedNodeImpl(null);
         $triple1 = new StatementImpl($subject1, $predicate1, $object1, $graph1);
 
         $query = $this->fixture->hasMatchingStatement($triple1);

@@ -5,7 +5,7 @@ namespace Saft\Store;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
-use Saft\Rdf\NamedNode;
+use Saft\Rdf\NamedNodeImpl;
 
 /**
  * Predefined sparql Store. All Triple methods reroute to the query-method. In the specific sparql-Store those
@@ -153,7 +153,7 @@ abstract class AbstractSparqlStore implements StoreInterface
                 $graph = $st->getGraph();
                 if (null !== $graphUri) {
                     if (true === is_string($graphUri)) {
-                        if (NamedNode::check($graphUri)) {
+                        if (NamedNodeImpl::check($graphUri)) {
                             $con = 'Graph <'. $graphUri .'> {'. $con .'}';
                         } elseif ('?' == substr($graphUri, 0, 1)) {
                             $con = 'Graph '. $graphUri .' {'. $con .'}';
