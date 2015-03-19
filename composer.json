@@ -1,0 +1,51 @@
+{
+    "name": "saft/saft",
+    "type": "library",
+    "description": "Saft library provides tools and an infrastructure to build Semantic Web and Linked Data applications.",
+    "keywords": ["Saft", "Linked Data", "Semantic Web"],
+    "homepage": "https://safting.github.io/",
+    "license": "GPL2",
+    "authors": [
+        {
+            "name": "Natanael Arndt",
+            "homepage": "http://aksw.org/NatanaelArndt",
+            "email": "arndtn@gmail.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Konrad Abicht",
+            "homepage": "http://www.inspirito.de",
+            "email": "hi@inspirito.de",
+            "role": "Developer"
+        },
+        {
+            "name": "Viktor Befort",
+            "email": "viktor.befort@stud.htwk-leipzig.de",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+
+        "easyrdf/easyrdf": "*",
+        "php-curl-class/php-curl-class": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.5.*",
+        "squizlabs/php_codesniffer": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Saft\\": [
+                "src/Saft/"
+            ]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Saft\\": [
+                "test/integration/Saft", "test/unit/Saft"
+            ]
+        }
+    }
+}

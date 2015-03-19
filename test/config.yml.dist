@@ -1,0 +1,5 @@
+# Feel free to copy it to config.yml and adapt. You can reuse existing configurations or you can use your own.
+
+phparrayCacheConfig: &phparrayCacheConfig
+    key_prefix: "phparray-"
+    type: "phparray"
