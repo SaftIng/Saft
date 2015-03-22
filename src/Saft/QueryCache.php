@@ -30,7 +30,7 @@ class QueryCache implements StoreInterface
     
     /**
      * Key-value pair based cache.
-     * 
+     *
      * @var Saft\Cache
      */
     protected $cache;
@@ -45,7 +45,7 @@ class QueryCache implements StoreInterface
     
     /**
      * Contains latest results which were stored in the cache.
-     * 
+     *
      * @var array
      */
     protected $latestResults;
@@ -70,12 +70,12 @@ class QueryCache implements StoreInterface
     /**
      * @var array
      */
-    protected $runningTransactions;    
+    protected $runningTransactions;
     
     /**
-     * If set, all statement- and query related operations have to be in close collaboration with the 
+     * If set, all statement- and query related operations have to be in close collaboration with the
      * successor.
-     * 
+     *
      * @var instance which implements Saft\Store\StoreInterface.
      */
     protected $successor;
@@ -170,9 +170,9 @@ class QueryCache implements StoreInterface
     
     /**
      * Drops an existing graph.
-     * 
+     *
      * @param string $graphUri          URI of the graph to drop.
-     * @param array  $options  optional It contains key-value pairs and should provide additional introductions 
+     * @param array  $options  optional It contains key-value pairs and should provide additional introductions
      *                                  for the store and/or its adapter(s).
      * @throw \Exception
      */
@@ -180,7 +180,6 @@ class QueryCache implements StoreInterface
     {
         // if successor is set, ask it first before run the command yourself.
         if ($this->successor instanceof StoreInterface) {
-            
             // if successor has this function and it is callable
             if (true === is_callable(array($this->successor, 'dropGraph'), true)) {
                 // delete according query cache entries
@@ -294,7 +293,7 @@ class QueryCache implements StoreInterface
     
     /**
      * Returns previously set chain successor.
-     * 
+     *
      * @return StoreInterface
      */
     public function getChainSuccessor()
@@ -321,7 +320,7 @@ class QueryCache implements StoreInterface
      * - statement's object is either equal to the object of a statement of the graph or it is null.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph. If set, you will get all matching 
+     * @param  string    $graphUri  optional Overrides target graph. If set, you will get all matching
      *                                       statements of that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
@@ -532,17 +531,18 @@ class QueryCache implements StoreInterface
     /**
      * Invalidates according graphId entry, the result and all triple pattern.
      *
-     * @param  string  $query                                       All data according to this query will be 
+     * @param  string  $query                                       All data according to this query will be
      *                                                              invalidated.
      * @param  boolean $checkTransaction optionally                 True, if you wanna check for active transactions.
-     *                                                              False if you just want to execute regardless of 
+     *                                                              False if you just want to execute regardless of
      *                                                              active transactions.
      * @param  boolean $checkForRelatedQueryCacheEntries optionally True, if you wanna check, if there are
      *                                                              related QueryCache entries and if so, invalidate
      *                                                              them.
      * @throw \Exception
      */
-    public function invalidateByQuery($query, $checkTransaction = true, $checkForRelatedQueryCacheEntries = true) {
+    public function invalidateByQuery($query, $checkTransaction = true, $checkForRelatedQueryCacheEntries = true)
+    {
         // if a transaction is active, stop further execution and save this function
         // call under 'placed operations' of the according active transaction
         if (true === $checkTransaction && true === $this->isATransactionActive()) {
@@ -622,8 +622,8 @@ class QueryCache implements StoreInterface
     
     /**
      * Invalidate all query cache entries which refering to given resources (subject).
-     * 
-     * @param StatementIterator $statements Statement iterator containing statements to be created. They will 
+     *
+     * @param StatementIterator $statements Statement iterator containing statements to be created. They will
      *                                      be invalidated first.
      * @param string            $graphUri   URI of the graph which is related to the statements.
      * @throw \Exception
@@ -648,27 +648,24 @@ class QueryCache implements StoreInterface
             }
         }
         
-        // get according query ids 
+        // get according query ids
         $queryIds = $this->cache->get($graphId);
         
         // check if something is there to delete
         if (null !== $queryIds) {
-        
             // get content according to the queryId
             foreach ($queryIds as $queryId) {
-                
                 // get query container
                 $queryContainer = $this->cache->get($queryId);
                 
                 foreach ($queryContainer['triplePattern'][$graphId] as $pattern) {
-                    
                     foreach ($subjectUris as $subjectUri) {
                         $subjectUriId = $this->generateShortId($subjectUri, false);
                         
                         // look for the hashed subject URI of a joker sign on the subjects position ...
                         if (false !== strpos($pattern, $graphId .'_'. $subjectUriId)
                             || false !== strpos($pattern, $graphId .'_*_')) {
-                            // ... in case a match takes place, remove everything, which is related to the 
+                            // ... in case a match takes place, remove everything, which is related to the
                             // according query of the current pattern
                             $this->invalidateByQuery($queryContainer['query']);
                         }
@@ -694,7 +691,7 @@ class QueryCache implements StoreInterface
      * @param  string $query            The SPARQL query to send to the store.
      * @param  array  $options optional It contains key-value pairs and should provide additional
      *                                  introductions for the store and/or its adapter(s).
-     * @return Saft\Sparql\Result Returns result of the query. Depending on the query type, it returns either 
+     * @return Saft\Sparql\Result Returns result of the query. Depending on the query type, it returns either
      *                            an instance of ResultIterator, StatementIterator, or ResultValue
      * @throws \Exception If query is no string.
      *                    If query is malformed.
@@ -736,7 +733,7 @@ class QueryCache implements StoreInterface
      *
      * @param  string  $query            SPARQL query
      * @param  array   $result           Result array of previously executed query
-     * @param  boolean $checkTransaction optional True, if you wanna check for active transactions. False if 
+     * @param  boolean $checkTransaction optional True, if you wanna check for active transactions. False if
      *                                            you just want to execute regardless of active transactions.
      */
     public function rememberQueryResult($query, $result, $checkTransaction = true)
@@ -874,13 +871,13 @@ class QueryCache implements StoreInterface
         $this->cache->set($queryId, $queryCacheEntry);
         
         // remember this result in this instance too.
-        $this->latestResults[$queryId] = $queryCacheEntry; 
-    }    
+        $this->latestResults[$queryId] = $queryCacheEntry;
+    }
     
     /**
      * Set successor instance. This method is useful, if you wanna build chain of instances which implement
-     * Saft\Store\StoreInterface. It sets another instance which will be later called, if a statement- or 
-     * query-related function gets called. 
+     * Saft\Store\StoreInterface. It sets another instance which will be later called, if a statement- or
+     * query-related function gets called.
      * E.g. you chain a query cache and a virtuoso instance. In this example all queries will be handled by
      * the query cache first, but if no cache entry was found, the virtuoso instance gets called.
      */

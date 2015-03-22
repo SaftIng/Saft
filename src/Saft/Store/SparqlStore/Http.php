@@ -31,7 +31,7 @@ class Http extends AbstractSparqlStore
     
     /**
      * Name of the store, which runs on the server, e.g. virtuoso.
-     * 
+     *
      * @var string
      */
     protected $storeName = '';
@@ -86,7 +86,7 @@ class Http extends AbstractSparqlStore
     public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
     {
         if ('virtuoso' == $this->storeName) {
-            /* 
+            /*
              * Bcause Virtuoso wont accepts queries like:
              *              
              *          INSERT DATA {Graph <...> {<...> <...> <...>}}
@@ -119,8 +119,7 @@ class Http extends AbstractSparqlStore
             $batchSize = 100;
             $batchStatements = array();
 
-            foreach($statements as $statement) {
-                
+            foreach ($statements as $statement) {
                 // given $graphUri forces usage of it and not the graph from the statement instance
                 if (null !== $graphUri) {
                     $graphUriToUse = $graphUri;
@@ -139,20 +138,21 @@ class Http extends AbstractSparqlStore
                  *         sparqlFormat call.
                  */
                 $batchStatements[$graphUriToUse]->append(new StatementImpl(
-                    $statement->getSubject(), $statement->getPredicate(), $statement->getObject()
+                    $statement->getSubject(),
+                    $statement->getPredicate(),
+                    $statement->getObject()
                 ));
                 
                 // after batch is full, execute collected statements all at once
                 if (0 === $counter % $batchSize) {
-                    
                     /**
                      * $batchStatements is an array with graphUri('s) as key(s) and ArrayStatementIteratorImpl
-                     * instances as value. Each entry is related to a certain graph and contains a bunch of 
+                     * instances as value. Each entry is related to a certain graph and contains a bunch of
                      * statement instances.
                      */
                     foreach ($batchStatements as $graphUriToUse => $statementBatch) {
                         $this->query(
-                            'INSERT INTO GRAPH <'. $graphUriToUse .'> {'. $this->sparqlFormat($statementBatch) .'}', 
+                            'INSERT INTO GRAPH <'. $graphUriToUse .'> {'. $this->sparqlFormat($statementBatch) .'}',
                             $options
                         );
                     }
@@ -169,7 +169,7 @@ class Http extends AbstractSparqlStore
 
     /**
      * Checks that all requirements for queries via HTTP are fullfilled.
-     * 
+     *
      * @return boolean True, if all requirements are fullfilled.
      * @throws \Exception If PHP CURL extension was not loaded.
      */
@@ -249,14 +249,14 @@ class Http extends AbstractSparqlStore
 
     /**
      * Determines store on the server.
-     * 
+     *
      * @return string Name of the store on the server. If not possible, returns null.
      */
     public function determineStoreOnServer($responseHeaders)
     {
         $store = null;
         
-        // Virtuoso usually set Server key in the response array with value such as: 
+        // Virtuoso usually set Server key in the response array with value such as:
         //
         //      Virtuoso/06.01.3127 (Linux) i686-pc-linux-gnu
         if ('Virtuoso' === substr($responseHeaders['Server'], 0, 8)) {
@@ -461,7 +461,7 @@ class Http extends AbstractSparqlStore
     /**
      * Set successor instance. This method is useful, if you wanna build chain of instances which implement
      * StoreInterface. It sets another instance which will be later called, if a statement- or query-related
-     * function gets called. 
+     * function gets called.
      * E.g. you chain a query cache and a virtuoso instance. In this example all queries will be handled by
      * the query cache first, but if no cache entry was found, the virtuoso instance gets called.
      *

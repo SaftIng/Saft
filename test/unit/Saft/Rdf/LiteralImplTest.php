@@ -11,6 +11,4 @@ class LiteralImplTest extends Test\LiteralAbstractTest
     {
         return new LiteralImpl($value, $param);
     }
-
-
 }

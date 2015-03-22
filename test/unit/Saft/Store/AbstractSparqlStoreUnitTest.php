@@ -33,7 +33,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
     }
 
     /**
-     * 
+     *
      */
     public function getFilledTestArrayStatementIterator()
     {
@@ -49,14 +49,14 @@ class AbstractSparqlStoreUnitTest extends TestCase
     }
 
     /**
-     * 
+     *
      */
     public function testGetMatchingStatements()
     {
         $query = $this->fixture->getMatchingStatements($this->getTestStatement());
         $this->assertEquals(
             'SELECT * WHERE { Graph <http://saft/test/g1> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>'. 
+            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>'.
             '} }',
             $query
         );
@@ -79,7 +79,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
     }
 
     /**
-     * 
+     *
      */
     public function testDeleteMatchingStatements()
     {
@@ -92,7 +92,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
     }
 
     /**
-     * 
+     *
      */
     public function testhasMatchingStatement()
     {
@@ -129,7 +129,6 @@ class AbstractSparqlStoreUnitTest extends TestCase
             'INSERT DATA { '.
             'Graph <'. $this->testGraphUri .'> {'.
             '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer>} '.
-            
             'Graph <'. $this->testGraphUri .'> {'.
             '<http://saft/test/s1> <http://saft/test/p1> ""John""^^<http://www.w3.org/2001/XMLSchema#string>} '.
             '}',

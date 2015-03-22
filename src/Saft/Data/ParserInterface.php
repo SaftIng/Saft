@@ -20,5 +20,4 @@ interface ParserInterface
      * @return array with a prefix mapping of the prefixes parsed so far
      */
     public function getCurrentPrefixlist();
-
 }

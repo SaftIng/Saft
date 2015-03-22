@@ -11,7 +11,7 @@ abstract class RestAbstract
 {
     /**
      * concrete implementation of StoreInterface.
-     * 
+     *
      * @var \Saft\StoreInterface\StoreInterface
      */
     protected $store;

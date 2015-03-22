@@ -13,9 +13,9 @@ use Saft\Rdf\StatementIterator;
 abstract class AbstractSparqlStore implements StoreInterface
 {
     /**
-     * If set, all statement- and query related operations have to be in close collaboration with the 
+     * If set, all statement- and query related operations have to be in close collaboration with the
      * successor.
-     * 
+     *
      * @var instance which implements Saft\Store\StoreInterface.
      */
     protected $successor;
@@ -62,8 +62,7 @@ abstract class AbstractSparqlStore implements StoreInterface
             $batchSize = 100;
             $batchStatements = array();
             
-            foreach($statements as $statement) {
-                
+            foreach ($statements as $statement) {
                 // given $graphUri forces usage of it and not the graph from the statement instance
                 if (null !== $graphUri) {
                     $graphUriToUse = $graphUri;
@@ -80,16 +79,15 @@ abstract class AbstractSparqlStore implements StoreInterface
                 
                 // after batch is full, execute collected statements all at once
                 if (0 === $counter % $batchSize) {
-                    
                     /**
                      * $batchStatements is an array with graphUri('s) as key(s) and ArrayStatementIteratorImpl
-                     * instances as value. Each entry is related to a certain graph and contains a bunch of 
+                     * instances as value. Each entry is related to a certain graph and contains a bunch of
                      * statement instances.
                      */
                     foreach ($batchStatements as $graphUriToUse => $batch) {
                         foreach ($batch as $batchStatements) {
                             $this->query(
-                                'INSERT DATA {'. $this->sparqlFormat($batchStatements, $graphUriToUse) .'}', 
+                                'INSERT DATA {'. $this->sparqlFormat($batchStatements, $graphUriToUse) .'}',
                                 $options
                             );
                         }
@@ -188,7 +186,7 @@ abstract class AbstractSparqlStore implements StoreInterface
     /**
      * Set successor instance. This method is useful, if you wanna build chain of instances which implement
      * StoreInterface. It sets another instance which will be later called, if a statement- or query-related
-     * function gets called. 
+     * function gets called.
      * E.g. you chain a query cache and a virtuoso instance. In this example all queries will be handled by
      * the query cache first, but if no cache entry was found, the virtuoso instance gets called.
      *
@@ -210,7 +208,6 @@ abstract class AbstractSparqlStore implements StoreInterface
         $query = '';
         foreach ($statements as $statement) {
             if ($statement instanceof Statement) {
-                
                 if (null !== $graphUri && true === $statement->isTriple()) {
                     $sparqlString = 'Graph <'. $graphUri .'> {' . $statement->toSparqlFormat() .'}';
                 } else {

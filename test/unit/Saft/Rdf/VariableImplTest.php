@@ -101,7 +101,7 @@ class VariableTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Tests isVariable
-     * 
+     *
      */
     public function testIsVariable()
     {

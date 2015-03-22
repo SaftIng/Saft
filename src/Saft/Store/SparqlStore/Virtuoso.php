@@ -105,8 +105,7 @@ class Virtuoso extends AbstractSparqlStore
         $batchSize = 100;
         $batchStatements = array();
         
-        foreach($statements as $statement) {
-            
+        foreach ($statements as $statement) {
             // given $graphUri forces usage of it and not the graph from the statement instance
             if (null !== $graphUri) {
                 $graphUriToUse = $graphUri;
@@ -123,28 +122,29 @@ class Virtuoso extends AbstractSparqlStore
             /**
              * Notice: add a triple to the batch, even a quad was given, because we dont want the quad
              *         sparqlFormat call, because Virtuoso wont accepts queries like:
-             *              
+             *
              *          INSERT DATA {Graph <> {...}}
              *
              *         so we have to change it to:
-             *          
+             *
              *          INSERT INTO GRAPH <> {<...> <...> <...>. ...}
              */
             $batchStatements[$graphUriToUse]->append(new StatementImpl(
-                $statement->getSubject(), $statement->getPredicate(), $statement->getObject()
+                $statement->getSubject(),
+                $statement->getPredicate(),
+                $statement->getObject()
             ));
             
             // after batch is full, execute collected statements all at once
             if (0 === $counter % $batchSize) {
-                
                 /**
                  * $batchStatements is an array with graphUri('s) as key(s) and ArrayStatementIteratorImpl
-                 * instances as value. Each entry is related to a certain graph and contains a bunch of 
+                 * instances as value. Each entry is related to a certain graph and contains a bunch of
                  * statement instances.
                  */
                 foreach ($batchStatements as $graphUriToUse => $statementBatch) {
                     $this->query(
-                        'INSERT INTO GRAPH <'. $graphUriToUse .'> {'. $this->sparqlFormat($statementBatch) .'}', 
+                        'INSERT INTO GRAPH <'. $graphUriToUse .'> {'. $this->sparqlFormat($statementBatch) .'}',
                         $options
                     );
                 }
@@ -157,7 +157,7 @@ class Virtuoso extends AbstractSparqlStore
 
     /**
      * Checks that all requirements for queries via HTTP are fullfilled.
-     * 
+     *
      * @return boolean True, if all requirements are fullfilled.
      * @throws \Exception If PHP ODBC extension was not loaded.
      * @throws \Exception If PHP PDO-ODBC extension was not loaded.
@@ -241,9 +241,9 @@ class Virtuoso extends AbstractSparqlStore
 
     /**
      * Drops an existing graph.
-     * 
+     *
      * @param string $graphUri          URI of the graph to drop.
-     * @param array  $options  optional It contains key-value pairs and should provide additional introductions 
+     * @param array  $options  optional It contains key-value pairs and should provide additional introductions
      *                                  for the store and/or its adapter(s).
      * @throw \Exception
      */
@@ -294,7 +294,9 @@ class Virtuoso extends AbstractSparqlStore
         // FROM part.
         $statementIterator = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                $statement->getSubject(), $statement->getPredicate(), $statement->getObject()
+                $statement->getSubject(),
+                $statement->getPredicate(),
+                $statement->getObject()
             )
         ));
         
@@ -325,7 +327,7 @@ class Virtuoso extends AbstractSparqlStore
         $result = $this->query('SELECT COUNT(?s) as ?count FROM <'. $graphUri .'> WHERE {?s ?p ?o.}');
 
         return $result[0]['count'];
-    }    
+    }
 
     /**
      * Checks if a certain graph is available in the store.

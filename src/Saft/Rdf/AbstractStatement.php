@@ -45,7 +45,7 @@ abstract class AbstractStatement implements Statement
     {
         // if quad, integrate Graph, even it is null
         if (true === $this->isQuad()) {
-            return 'Graph '. $this->getGraph()->toNQuads() .' {'. 
+            return 'Graph '. $this->getGraph()->toNQuads() .' {'.
                    $this->getSubject()->toNQuads() .' '.
                    $this->getPredicate()->toNQuads() .' '.
                    $this->getObject()->toNQuads() .

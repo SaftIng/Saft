@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace Saft\Store;
 
 use Saft\Cache;
@@ -13,15 +13,15 @@ class StoreChain implements StoreInterface
 {
     /**
      * Contains the chain of store instances.
-     * 
+     *
      * @var array of instances which implement Saft\Store\StoreInterface.
      */
     protected $chainEntries = array();
     
     /**
-     * If set, all statement- and query related operations have to be in close collaboration with the 
+     * If set, all statement- and query related operations have to be in close collaboration with the
      * successor.
-     * 
+     *
      * @var StoreInterface
      */
     protected $successor;
@@ -62,7 +62,7 @@ class StoreChain implements StoreInterface
      *                                       that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
-     * @return boolean Returns true, if function performed without errors. In case an error occur, an exception 
+     * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
      *                 will be thrown.
      */
     public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
@@ -103,7 +103,7 @@ class StoreChain implements StoreInterface
     
     /**
      * Get saved chain entries.
-     * 
+     *
      * @return array Array which contains chain entries, which are instances which implement StoreInterface.
      */
     public function getChainEntries()
@@ -129,7 +129,6 @@ class StoreChain implements StoreInterface
         $result = null;
         
         if (0 < count($this->getChainEntries())) {
-            
             $result = $this->chainEntries[0]->getMatchingStatements($statement, $graphUri, $options);
         
             if (false === empty($result)) {
@@ -183,7 +182,6 @@ class StoreChain implements StoreInterface
         $result = null;
         
         if (0 < count($this->getChainEntries())) {
-            
             $result = $this->chainEntries[0]->hasMatchingStatement($statement, $graphUri, $options);
         
             // only return result if it is of type boolean
@@ -197,7 +195,7 @@ class StoreChain implements StoreInterface
             // just forward command to successor and return its result.
             return $this->successor->hasMatchingStatement($statement, $graphUri, $options);
             
-        } 
+        }
         
         // if the function is here, no chain entries and successor are available.
         throw new \Exception('No chain entries available and no successor set.');
@@ -236,7 +234,7 @@ class StoreChain implements StoreInterface
     /**
      * Set successor instance. This method is useful, if you wanna build chain of instances which implement
      * StoreInterface. It sets another instance which will be later called, if a statement- or query-related
-     * function gets called. 
+     * function gets called.
      * E.g. you chain a query cache and a virtuoso instance. In this example all queries will be handled by
      * the query cache first, but if no cache entry was found, the virtuoso instance gets called.
      *
@@ -249,7 +247,7 @@ class StoreChain implements StoreInterface
     
     /**
      * Setup a chain of instances, which implement Saft\Store\StoreInterface.
-     * 
+     *
      * @param array $configuration Based on the this array stores will be setup by this instance. This array must
      *                             be 2-dimensional with first dimension contains arrays and the second dimension
      *                             are key-value pairs. E.g. array(array('type' => 'virtuoso', ...),...)
@@ -266,7 +264,7 @@ class StoreChain implements StoreInterface
             
             /**
              * Basic structure of the $configuration array:
-             * 
+             *
              * array(
              *      array(
              *          type => 'virtuoso',
@@ -298,7 +296,7 @@ class StoreChain implements StoreInterface
     
     /**
      * Setup a chain entry with a given configuration.
-     * 
+     *
      * @param  array                     $configEntry
      * @return Saft\Store\StoreInterface
      * @throws \Exception If a requirement of the store instance is not fullfilled.
@@ -317,7 +315,7 @@ class StoreChain implements StoreInterface
                     break;
                     
                 case 'querycache';
-                    // TODO change that, so that you only give a config array and QueryCache init cache by 
+                    // TODO change that, so that you only give a config array and QueryCache init cache by
                     //      itself
                     $cache = new Cache(array('type' => 'file'));
                     
