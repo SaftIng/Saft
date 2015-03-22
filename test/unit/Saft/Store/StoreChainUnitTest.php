@@ -41,7 +41,7 @@ class StoreChainUnitTest extends \PHPUnit_Framework_TestCase
      *
      */
     public function tearDown()
-    {   
+    {
         parent::tearDown();
     }
 
@@ -51,6 +51,17 @@ class StoreChainUnitTest extends \PHPUnit_Framework_TestCase
 
     public function testGetChainEntries()
     {
+        /**
+         * check for configuration entries; if they are not set, skip test
+         */
+        if (false === isset($this->config['queryCacheConfig'])) {
+            $this->markTestSkipped('Array queryCacheConfig is not set in the config.yml.');
+            return;
+        } elseif (false === isset($this->config['virtuosoConfig'])) {
+            $this->markTestSkipped('Array virtuosoConfig is not set in the config.yml.');
+            return;
+        }
+        
         $this->fixture->setupChain(array($this->config['queryCacheConfig'], $this->config['virtuosoConfig']));
         
         $chainEntries = $this->fixture->getChainEntries();
@@ -70,13 +81,6 @@ class StoreChainUnitTest extends \PHPUnit_Framework_TestCase
         $this->fixture->setupChain(array());
     }
     
-    public function testSetupChainOnlyHttp()
-    {
-        $this->fixture->setupChain(array($this->config['httpConfig']));
-        
-        // load configuration and init HTTP instance. no errors expected.
-    }
-
     public function testSetupChainInvalidVirtuosoConfig()
     {
         $this->setExpectedException('\Exception');
@@ -95,15 +99,19 @@ class StoreChainUnitTest extends \PHPUnit_Framework_TestCase
         $this->fixture->setupChain(array(array('type' => 'unknown')));
     }
     
-    public function testSetupChainOnlyVirtuoso()
-    {
-        $this->fixture->setupChain(array($this->config['virtuosoConfig']));
-        
-        // load configuration and init Virtuoso instance. no errors expected.
-    }
-    
     public function testSetupChainQueryCacheAndVirtuoso()
     {
+        /**
+         * check for configuration entries; if they are not set, skip test
+         */
+        if (false === isset($this->config['queryCacheConfig'])) {
+            $this->markTestSkipped('Array queryCacheConfig is not set in the config.yml.');
+            return;
+        } elseif (false === isset($this->config['virtuosoConfig'])) {
+            $this->markTestSkipped('Array virtuosoConfig is not set in the config.yml.');
+            return;
+        }
+        
         $this->fixture->setupChain(array($this->config['queryCacheConfig'], $this->config['virtuosoConfig']));
         
         // load configuration and init Virtuoso instance. no errors expected.
@@ -122,6 +130,14 @@ class StoreChainUnitTest extends \PHPUnit_Framework_TestCase
     
     public function testSetupChainEntryHttp()
     {
+        /**
+         * check for configuration entries; if they are not set, skip test
+         */
+        if (false === isset($this->config['httpConfig'])) {
+            $this->markTestSkipped('Array httpConfig is not set in the config.yml.');
+            return;
+        }
+        
         $this->fixture->setupChainEntry($this->config['httpConfig']);
         
         // load configuration and init HTTP instance. no errors expected.
@@ -147,6 +163,14 @@ class StoreChainUnitTest extends \PHPUnit_Framework_TestCase
     
     public function testSetupChainEntryVirtuoso()
     {
+        /**
+         * check for configuration entries; if they are not set, skip test
+         */
+        if (false === isset($this->config['virtuosoConfig'])) {
+            $this->markTestSkipped('Array virtuosoConfig is not set in the config.yml.');
+            return;
+        }
+        
         $this->fixture->setupChainEntry($this->config['virtuosoConfig']);
         
         // load configuration and init Virtuoso instance. no errors expected.

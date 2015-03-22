@@ -49,7 +49,8 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
 
         if (true === isset($this->config['virtuosoConfig'])) {
             $this->fixture = new \Saft\Store\SparqlStore\Virtuoso($this->config['virtuosoConfig']);
-        } elseif ('virtuoso' === $this->config['configuration']['standardStore']['type']) {
+        } elseif (true === isset($this->config['configuration']['standardStore'])
+            && 'virtuoso' === $this->config['configuration']['standardStore']['type']) {
             $this->fixture = new \Saft\Store\SparqlStore\Virtuoso(
                 $this->config['configuration']['standardStore']
             );

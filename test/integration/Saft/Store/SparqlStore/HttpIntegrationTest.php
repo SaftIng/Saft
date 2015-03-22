@@ -49,7 +49,8 @@ class HttpIntegrationTest extends \PHPUnit_Framework_TestCase
 
         if (true === isset($this->config['httpConfig'])) {
             $this->fixture = new \Saft\Store\SparqlStore\Http($this->config['httpConfig']);
-        } elseif ('http' === $this->config['configuration']['standardStore']['type']) {
+        } elseif (true === isset($this->config['configuration']['standardStore'])
+            && 'http' === $this->config['configuration']['standardStore']['type']) {
             $this->fixture = new \Saft\Store\SparqlStore\Http(
                 $this->config['configuration']['standardStore']
             );
