@@ -397,8 +397,8 @@ class Virtuoso extends AbstractSparqlStore
      * @return Result Returns result of the query. Depending on the query
      *                type, it returns either an instance of ResultIterator, StatementIterator, or ResultValue
      * @throws \Exception If query is no string.
-     *                    If query is malformed.
-     *                    If $options[resultType] = is neither extended nor array
+     * @throws \Exception If query is malformed.
+     * @throws \Exception If $options[resultType] = is neither extended nor array
      */
     public function query($query, array $options = array())
     {
