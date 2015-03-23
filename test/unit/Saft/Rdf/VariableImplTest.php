@@ -43,7 +43,7 @@ class VariableTest extends \PHPUnit_Framework_TestCase
     {
         $this->fixture = new VariableImpl('?s');
         
-        $this->assertEquals('?s', $this->fixture->getName());
+        $this->assertEquals('?s', $this->fixture->getValue());
     }
 
     /**
@@ -64,7 +64,7 @@ class VariableTest extends \PHPUnit_Framework_TestCase
     public function testInstanciationNull()
     {
         $this->fixture = new VariableImpl(null);
-        $this->assertTrue(null !== $this->fixture->getName());
+        $this->assertTrue(null !== $this->fixture->getValue());
     }
 
     /**

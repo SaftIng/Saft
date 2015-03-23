@@ -10,5 +10,5 @@ interface Variable extends Node
     /**
      * @return string
      */
-    public function getName();
+    public function getValue();
 }

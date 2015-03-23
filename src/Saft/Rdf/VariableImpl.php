@@ -7,25 +7,25 @@ class VariableImpl implements Variable
     /**
      * @var string
      */
-    protected $name;
+    protected $value;
 
     /**
-     * @param mixed $name optional The Name of the variable. If not given, a random hash will be used later on.
+     * @param mixed $value optional The Name of the variable. If not given, a random hash will be used later on.
      * @param string $lang optional Will be ignore because a Variable has no language.
-     * @throws \Exception If parameter $name is not a valid URI.
+     * @throws \Exception If parameter $value is not a valid URI.
      */
-    public function __construct($name = null, $lang = null)
+    public function __construct($value = null, $lang = null)
     {
-        // $name is a variable, like ?s
-        if (null !== $name && true === is_string($name) && '?' == substr($name, 0, 1)) {
-            $this->name = $name;
+        // $value is a variable, like ?s
+        if (null !== $value && true === is_string($value) && '?' == substr($value, 0, 1)) {
+            $this->value = $value;
             
-        // $name is null, means we have to generate a random variable name
-        } elseif (null === $name) {
+        // $value is null, means we have to generate a random variable name
+        } elseif (null === $value) {
             $variable = hash('sha1', microtime(true) . rand(0, time()));
-            $this->name = '?'. substr($variable, 0, 10);
+            $this->value = '?'. substr($variable, 0, 10);
         } else {
-            throw new \Exception('Parameter $name is not a string or not null.');
+            throw new \Exception('Parameter $value is not a string or not null.');
         }
     }
 
@@ -34,7 +34,7 @@ class VariableImpl implements Variable
      */
     public function __toString()
     {
-        return $this->getName();
+        return $this->getValue();
     }
 
     /**
@@ -67,7 +67,7 @@ class VariableImpl implements Variable
     {
         // It only compares URIs, everything will be quit with false.
         if (true === $toCompare->isVariable()) {
-            return $this->getName() == $toCompare->getName();
+            return $this->getValue() == $toCompare->getValue();
         }
 
         return false;
@@ -76,9 +76,9 @@ class VariableImpl implements Variable
     /**
      * @return string URI of the node.
      */
-    public function getName()
+    public function getValue()
     {
-        return $this->name;
+        return $this->value;
     }
 
     /**
@@ -126,6 +126,6 @@ class VariableImpl implements Variable
      */
     public function toNQuads()
     {
-        return $this->name;
+        return $this->value;
     }
 }
