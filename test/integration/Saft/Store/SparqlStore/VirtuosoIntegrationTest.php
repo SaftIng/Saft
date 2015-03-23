@@ -91,6 +91,32 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
      * function addStatements
      */
 
+    public function testAddStatements()
+    {
+        // graph is empty
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+
+        // 2 triples
+        $statements = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
+            ),
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
+            ),
+        ));
+
+        // add triples
+        $this->assertTrue($this->fixture->addStatements($statements, $this->testGraphUri));
+
+        // graph has two entries
+        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraphUri));
+    }
+    
     public function testAddStatementsLanguageTags()
     {
         // graph is empty
@@ -116,31 +142,30 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
         // graph has now two entries
         $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraphUri));
     }
-
-    public function testAddStatements()
+    
+    public function testAddStatementsWithSuccessor()
     {
-        // graph is empty
-        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
-
-        // 2 triples
-        $statements = new ArrayStatementIteratorImpl(array(
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/'),
-                new NamedNodeImpl('http://o/')
-            ),
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/'),
-                new LiteralImpl('test literal')
-            ),
-        ));
-
-        // add triples
-        $this->fixture->addStatements($statements, $this->testGraphUri);
-
-        // graph has two entries
-        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraphUri));
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        // creates a subclass of the mock and adds a dummy function
+        $class = 'virtuosoMock_TestAddStatementsWithSuccessor';
+        $instance = null;
+        // TODO simplify that eval call or get rid of it
+        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // function which just return what was given. That was done to avoid working with concrete store 
+        // backend implementations like Virtuoso.
+        eval(
+            'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
+                public function addStatements(Saft\Rdf\StatementIterator $statements, $graphUri = null, '.
+                    'array $options = array()) {
+                    return $statements;
+                }
+            }
+            $instance = new '. $class .'();'
+        );
+        
+        $this->fixture->setChainSuccessor($instance);
+        
+        $this->assertTrue($this->fixture->addStatements(new ArrayStatementIteratorImpl(array())));
     }
 
     /**
@@ -184,6 +209,202 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
     }
 
+    /**
+     * Tests deleteMatchingStatements
+     */
+    
+    public function testDeleteMatchingStatementsWithSuccessor()
+    {
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        // creates a subclass of the mock and adds a dummy function
+        $class = 'virtuosoMock_TestDeleteMatchingStatementsWithSuccessor';
+        $instance = null;
+        // TODO simplify that eval call or get rid of it
+        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // function which just return what was given. That was done to avoid working with concrete store 
+        // backend implementations like Virtuoso.
+        eval(
+            'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
+                public function deleteMatchingStatements(Saft\Rdf\Statement $statement, $graphUri = null, '.
+                    'array $options = array()) {
+                    return $statement;
+                }
+            }
+            $instance = new '. $class .'();'
+        );
+        
+        $this->fixture->setChainSuccessor($instance);
+        
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        $this->assertTrue($this->fixture->deleteMatchingStatements($statement, $this->testGraphUri));
+    }
+    
+    /**
+     * Tests getMatchingStatements
+     */
+    
+    public function testGetMatchingStatements()
+    {
+        // 2 triples
+        $statements = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
+            ),
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
+            ),
+        ));
+
+        // add triples
+        $this->fixture->addStatements($statements, $this->testGraphUri);
+        
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        $this->assertEquals(
+            array(
+                array(
+                    $statement->getSubject()->getValue() => 'http://s/',
+                    $statement->getPredicate()->getValue() => 'http://p/',
+                    $statement->getObject()->getValue() => 'http://o/'
+                ),
+                array(
+                    $statement->getSubject()->getValue() => 'http://s/',
+                    $statement->getPredicate()->getValue() => 'http://p/',
+                    $statement->getObject()->getValue() => 'test literal'
+                ),
+            ),
+            $this->fixture->getMatchingStatements($statement, $this->testGraphUri)
+        );
+    }
+    
+    public function testGetMatchingStatementsEmptyGraph()
+    {
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        $this->assertEquals(
+            array(),
+            $this->fixture->getMatchingStatements($statement, $this->testGraphUri)
+        );
+    }
+    
+    public function testGetMatchingStatementsWithSuccessor()
+    {
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        // creates a subclass of the mock and adds a dummy function
+        $class = 'virtuosoMock_TestGetMatchingStatementsWithSuccessor';
+        $instance = null;
+        // TODO simplify that eval call or get rid of it
+        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // function which just return what was given. That was done to avoid working with concrete store 
+        // backend implementations like Virtuoso.
+        eval(
+            'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
+                public function getMatchingStatements(Saft\Rdf\Statement $statement, $graphUri = null, '.
+                    'array $options = array()) {
+                    return $statement;
+                }
+            }
+            $instance = new '. $class .'();'
+        );
+        
+        $this->fixture->setChainSuccessor($instance);
+        
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        $this->assertEquals(
+            array(),
+            $this->fixture->getMatchingStatements($statement, $this->testGraphUri)
+        );
+    }
+    
+    /**
+     * Tests hasMatchingStatements
+     */
+    
+    public function testHasMatchingStatement()
+    {
+        // 2 triples
+        $statements = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
+            ),
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
+            ),
+        ));
+
+        // add triples
+        $this->fixture->addStatements($statements, $this->testGraphUri);
+        
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraphUri));
+    }
+    
+    public function testHasMatchingStatementEmptyGraph()
+    {
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        // TODO known bug, that Virtuoso returns true even the graph is empty, fix that
+        
+        $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraphUri));
+    }
+    
+    public function testHasMatchingStatementWithSuccessor()
+    {
+        // 2 triples
+        $statements = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
+            ),
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
+            ),
+        ));
+
+        // add triples
+        $this->fixture->addStatements($statements, $this->testGraphUri);
+        
+        /**
+         * Mock
+         */
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        // creates a subclass of the mock and adds a dummy function
+        $class = 'virtuosoMock_TestHasMatchingStatementWithSuccessor';
+        $instance = null;
+        // TODO simplify that eval call or get rid of it
+        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // function which just return what was given. That was done to avoid working with concrete store 
+        // backend implementations like Virtuoso.
+        eval(
+            'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
+                public function hasMatchingStatements(Saft\Rdf\Statement $statement, $graphUri = null, '.
+                    'array $options = array()) {
+                    return $statement;
+                }
+            }
+            $instance = new '. $class .'();'
+        );
+        
+        $this->fixture->setChainSuccessor($instance);
+        
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraphUri));
+    }
 
     /**
      * function query
@@ -227,6 +448,31 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
                 "SELECT ?s ?p ?o
                    FROM <" . $this->testGraphUri . ">
                   WHERE {?s ?p ?o.}"
+            )
+        );
+    }
+
+    public function testQueryAsk()
+    {
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+
+        // 2 triples
+        $statements = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
+            ),
+        ));
+
+        // add triples
+        $this->fixture->addStatements($statements, $this->testGraphUri);
+
+        $this->assertTrue(
+            $this->fixture->query(
+                'ASK { SELECT * FROM <'. $this->testGraphUri . '> WHERE {
+                    <http://s/> <http://p/> ?o.
+                }}'
             )
         );
     }
@@ -394,6 +640,35 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->fixture->query(
             'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}',
             array('resultType' => 'invalid')
+        );
+    }
+    
+    public function testQueryWithSuccessor()
+    {
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        // creates a subclass of the mock and adds a dummy function
+        $class = 'virtuosoMock_testQueryWithSuccessor';
+        $instance = null;
+        // TODO simplify that eval call or get rid of it
+        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // function which just return what was given. That was done to avoid working with concrete store 
+        // backend implementations like Virtuoso.
+        eval(
+            'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
+                public function query($query, array $options = array()) {
+                    return $query;
+                }
+            }
+            $instance = new '. $class .'();'
+        );
+        
+        $this->fixture->setChainSuccessor($instance);
+        
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        $this->assertEquals(
+            array(),
+            $this->fixture->getMatchingStatements($statement, $this->testGraphUri)
         );
     }
 }

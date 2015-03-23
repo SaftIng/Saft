@@ -30,6 +30,14 @@ class Virtuoso extends AbstractSparqlStore
      * @var \PDO
      */
     protected $connection = null;
+    
+    /**
+     * If set, all statement- and query related operations have to be in close collaboration with the
+     * successor.
+     *
+     * @var instance which implements Saft\Store\StoreInterface.
+     */
+    protected $successor;
 
     /**
      * Constructor.
@@ -153,6 +161,13 @@ class Virtuoso extends AbstractSparqlStore
                 $batchStatements = array();
             }
         }
+        
+        // if successor is set, ask it too.
+        if ($this->successor instanceof StoreInterface) {
+            $this->successor->addStatements($statements, $graphUri, $options);
+        }
+        
+        return true;
     }
 
     /**
@@ -203,13 +218,13 @@ class Virtuoso extends AbstractSparqlStore
      *                                       that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
-     * @return boolean Returns true, if function performed without errors. In case
-     *                 an error occur, an exception will be thrown.
+     * @return boolean Returns true, if function performed without errors. In case an error occur, an exception 
+     *                 will be thrown.
      */
     public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
         /**
-         * At least Virtuoso 6.1.8 does not understand DELETE DATA calls containing variables such as:
+         * At least Virtuoso 6.1.8 does not understand DELETE DATA calls containing graph and variables such as:
          *
          *      DELETE DATA {
          *          Graph <http://localhost/Saft/TestGraph/> {<http://s/> <http://p/> ?o.}
@@ -235,6 +250,11 @@ class Virtuoso extends AbstractSparqlStore
         $condition = $this->sparqlFormat($statementIterator);
         $query = 'WITH <'. $graphUri .'> DELETE {'. $condition .'} WHERE {'. $condition .'}';
         $this->query($query, $options);
+        
+        // if successor is set, ask it too.
+        if ($this->successor instanceof StoreInterface) {
+            $this->successor->deleteMatchingStatements($statement, $graphUri, $options);
+        }
 
         return true;
     }
@@ -289,6 +309,11 @@ class Virtuoso extends AbstractSparqlStore
      */
     public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
+        // if successor is set, ask it too.
+        if ($this->successor instanceof StoreInterface) {
+            $this->successor->getMatchingStatements($statement, $graphUri, $options);
+        }
+        
         // Remove, maybe available, graph from given statement and put it into an iterator
         // reason for the removal of the graph is to avoid quads in the query. Virtuoso wants the graph in the
         // FROM part.
@@ -327,6 +352,26 @@ class Virtuoso extends AbstractSparqlStore
         $result = $this->query('SELECT COUNT(?s) as ?count FROM <'. $graphUri .'> WHERE {?s ?p ?o.}');
 
         return $result[0]['count'];
+    }
+    
+    /**
+     * Returns true or false depending on whether or not the statements pattern
+     * has any matches in the given graph.
+     *
+     * @param  Statement $statement          It can be either a concrete or pattern-statement.
+     * @param  string    $graphUri  optional Overrides target graph.
+     * @param  array     $options   optional It contains key-value pairs and should provide additional
+     *                                       introductions for the store and/or its adapter(s).
+     * @return boolean Returns true if at least one match was found, false otherwise.
+     */
+    public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
+    {
+        // if successor is set, ask it too.
+        if ($this->successor instanceof StoreInterface) {
+            $this->successor->deleteMatchingStatements($statement, $graphUri, $options);
+        }
+
+        return parent::hasMatchingStatement($statement, $graphUri, $options);
     }
 
     /**
@@ -455,6 +500,11 @@ class Virtuoso extends AbstractSparqlStore
 
         } catch (\PDOException $e) {
             throw new \Exception($e->getMessage());
+        }
+        
+        // if successor is set, ask it too.
+        if ($this->successor instanceof StoreInterface) {
+            $this->successor->query($query, $options);
         }
 
         // transform result to array in case we fired a non-UPDATE query
