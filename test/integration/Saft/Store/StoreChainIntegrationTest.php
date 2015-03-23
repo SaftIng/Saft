@@ -642,4 +642,13 @@ class StoreChainIntegrationTest extends TestCase
         
         $this->assertEquals($virtuoso->query($testQuery), $this->fixture->query($testQuery));
     }
+    
+    /**
+     * Tests setChainSuccessor
+     */
+
+    public function testSetChainSuccessor()
+    {
+        $this->fixture->setChainSuccessor($this->getMockBuilder('Saft\Store\StoreInterface')->getMock());
+    }
 }

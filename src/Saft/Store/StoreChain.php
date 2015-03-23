@@ -242,7 +242,7 @@ class StoreChain implements StoreInterface
      */
     public function setChainSuccessor(StoreInterface $successor)
     {
-        throw new \Exception('TODO implement setChainSuccessor');
+        $this->successor = $successor;
     }
     
     /**
