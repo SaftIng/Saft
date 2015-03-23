@@ -23,7 +23,7 @@ class VariableImpl implements Variable
         // $value is null, means we have to generate a random variable name
         } elseif (null === $value) {
             $variable = hash('sha1', microtime(true) . rand(0, time()));
-            $this->value = '?'. substr($variable, 0, 10);
+            $this->value = substr($variable, 0, 10);
         } else {
             throw new \Exception('Parameter $value is not a string or not null.');
         }
@@ -126,6 +126,6 @@ class VariableImpl implements Variable
      */
     public function toNQuads()
     {
-        return $this->value;
+        return '?'. $this->value;
     }
 }
