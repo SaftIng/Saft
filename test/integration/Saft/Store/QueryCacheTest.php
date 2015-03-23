@@ -2,6 +2,10 @@
 
 namespace Saft\Store;
 
+use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\StatementImpl;
+use Saft\Rdf\StatementIterator;
+use Saft\Rdf\VariableImpl;
 use Symfony\Component\Yaml\Parser;
 
 /**
@@ -170,6 +174,87 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests addStatements
+     */
+
+    public function testAddStatements()
+    {
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        // creates a subclass of the mock and adds a dummy function
+        $class = 'queryCacheMock'. rand(0, 10000);
+        $instance = null;
+        // TODO simplify that eval call or get rid of it
+        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // function which just return what was given. That was done to avoid working with concrete store 
+        // backend implementations like Virtuoso.
+        eval(
+            'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
+                public function addStatements(Saft\Rdf\StatementIterator $statements, $graphUri = null, '.
+                    'array $options = array()) {
+                    return $statements;
+                }
+            }
+            $instance = new '. $class .'();'
+        );
+        
+        $this->fixture->setChainSuccessor($instance);
+        
+        $this->assertEquals(
+            new ArrayStatementIteratorImpl(array()), 
+            $this->fixture->addStatements(new ArrayStatementIteratorImpl(array()))
+        );
+    }
+
+    public function testAddStatementsNoSuccessor()
+    {
+        $this->setExpectedException('\Exception');
+        
+        $this->fixture->addStatements(new ArrayStatementIteratorImpl(array()));
+    }
+    
+    /**
+     * Tests deleteMatchingStatements
+     */
+    
+    public function testDeleteMatchingStatements()
+    {
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        // creates a subclass of the mock and adds a dummy function
+        $class = 'queryCacheMock'. rand(0, 10000);
+        $instance = null;
+        // TODO simplify that eval call or get rid of it
+        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // function which just return what was given. That was done to avoid working with concrete store 
+        // backend implementations like Virtuoso.
+        eval(
+            'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
+                public function deleteMatchingStatements(Saft\Rdf\Statement $statement, $graphUri = null, '.
+                    'array $options = array()) {
+                    return $statement;
+                }
+            }
+            $instance = new '. $class .'();'
+        );
+        
+        $this->fixture->setChainSuccessor($instance);
+        
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        $this->assertEquals($statement, $this->fixture->deleteMatchingStatements($statement));
+    }
+    
+    public function testDeleteMatchingStatementsNoSuccessor()
+    {
+        $this->setExpectedException('\Exception');
+        
+        $this->fixture->deleteMatchingStatements(new StatementImpl(
+            new VariableImpl(), 
+            new VariableImpl(), 
+            new VariableImpl()
+        ));
+    }
+
+    /**
      * Tests dropGraph
      */
 
@@ -177,9 +262,9 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
     {
         $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
         // creates a subclass of the mock and adds a dummy dropGraph function
-        if (false == class_exists('successorMock')) {
+        if (false == class_exists('queryCacheMock')) {
             eval(
-                'class successorMock extends '. get_class($storeInterfaceMock) .' {
+                'class queryCacheMock extends '. get_class($storeInterfaceMock) .' {
                     public function dropGraph($graphUri) {
                         return null;
                     }
@@ -187,7 +272,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
             );
         }
         
-        $this->fixture->setChainSuccessor(new \successorMock());
+        $this->fixture->setChainSuccessor(new \queryCacheMock());
         
         $this->fixture->dropGraph($this->testGraphUri);
     }
@@ -212,14 +297,95 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
             $this->fixture->generateShortId($str)
         );
     }
-
+    
     /**
-     * instanciation
+     * Tests getMatchingStatements
      */
-
-    public function testInstanciation()
+    
+    public function testGetMatchingStatements()
     {
-        $queryCache = new QueryCache($this->cache);
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        // creates a subclass of the mock and adds a dummy function
+        $class = 'queryCacheMock'. rand(0, 10000);
+        $instance = null;
+        // TODO simplify that eval call or get rid of it
+        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // function which just return what was given. That was done to avoid working with concrete store 
+        // backend implementations like Virtuoso.
+        eval(
+            'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
+                public function getMatchingStatements(Saft\Rdf\Statement $statement, $graphUri = null, '.
+                    'array $options = array()) {
+                    return new Saft\Rdf\ArrayStatementIteratorImpl(array($statement));
+                }
+            }
+            $instance = new '. $class .'();'
+        );
+        
+        $this->fixture->setChainSuccessor($instance);
+        
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        $this->assertEquals(
+            new ArrayStatementIteratorImpl(array($statement)), 
+            $this->fixture->getMatchingStatements($statement)
+        );
+    }
+    
+    public function testGetMatchingStatementsNoSuccessor()
+    {
+        $this->setExpectedException('\Exception');
+        
+        $this->fixture->getMatchingStatements(new StatementImpl(
+            new VariableImpl(), 
+            new VariableImpl(), 
+            new VariableImpl()
+        ));
+    }
+    
+    /**
+     * Tests hasMatchingStatement
+     */
+    
+    public function testHasMatchingStatement()
+    {
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        // creates a subclass of the mock and adds a dummy function
+        $class = 'queryCacheMock'. rand(0, 10000);
+        $instance = null;
+        // TODO simplify that eval call or get rid of it
+        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // function which just return what was given. That was done to avoid working with concrete store 
+        // backend implementations like Virtuoso.
+        eval(
+            'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
+                public function hasMatchingStatement(Saft\Rdf\Statement $statement, $graphUri = null, '.
+                    'array $options = array()) {
+                    return new Saft\Rdf\ArrayStatementIteratorImpl(array($statement));
+                }
+            }
+            $instance = new '. $class .'();'
+        );
+        
+        $this->fixture->setChainSuccessor($instance);
+        
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        $this->assertEquals(
+            new ArrayStatementIteratorImpl(array($statement)), 
+            $this->fixture->hasMatchingStatement($statement)
+        );
+    }
+    
+    public function testHasMatchingStatementNoSuccessor()
+    {
+        $this->setExpectedException('\Exception');
+        
+        $this->fixture->hasMatchingStatement(new StatementImpl(
+            new VariableImpl(), 
+            new VariableImpl(), 
+            new VariableImpl()
+        ));
     }
 
     /**
@@ -366,6 +532,46 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
             }
         }
     }
+    
+    
+    /**
+     * Tests query
+     */
+    
+    public function testQuery()
+    {
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        // creates a subclass of the mock and adds a dummy function
+        $class = 'queryCacheMock'. rand(0, 10000);
+        $instance = null;
+        // TODO simplify that eval call or get rid of it
+        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // function which just return what was given. That was done to avoid working with concrete store 
+        // backend implementations like Virtuoso.
+        eval(
+            'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
+                public function query($query, array $options = array()) {
+                    return $query;
+                }
+            }
+            $instance = new '. $class .'();'
+        );
+        
+        $this->fixture->setChainSuccessor($instance);
+
+        $this->assertEquals('foo', $this->fixture->query('foo'));
+    }
+    
+    public function testQueryNoSuccessor()
+    {
+        $this->setExpectedException('\Exception');
+        
+        $this->fixture->getMatchingStatements(new StatementImpl(
+            new VariableImpl(), 
+            new VariableImpl(), 
+            new VariableImpl()
+        ));
+    }
 
     /**
      * function rememberQueryResult
@@ -406,6 +612,15 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
          * query container
          */
         $this->assertEquals($testData['queryContainer'], $this->fixture->getCache()->get($testData['queryId']));
+    }    
+    
+    /**
+     * Tests setChainSuccessor
+     */
+
+    public function testSetChainSuccessor()
+    {
+        $this->fixture->setChainSuccessor($this->getMockBuilder('Saft\Store\StoreInterface')->getMock());
     }
 
     /**
