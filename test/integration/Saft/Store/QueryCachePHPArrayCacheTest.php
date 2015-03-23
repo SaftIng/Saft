@@ -1,6 +1,8 @@
 <?php
 
-namespace Saft;
+namespace Saft\Store;
+
+use Saft\Cache;
 
 class QueryCachePHPArrayCacheTest extends QueryCacheTest
 {
@@ -13,7 +15,7 @@ class QueryCachePHPArrayCacheTest extends QueryCacheTest
         
         $this->cache = new Cache($this->config['phparrayCacheConfig']);
 
-        $this->fixture = new \Saft\QueryCache($this->cache);
+        $this->fixture = new QueryCache($this->cache);
         $this->fixture->getCache()->clean();
     }
 }

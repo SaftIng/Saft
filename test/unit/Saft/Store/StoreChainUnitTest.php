@@ -2,7 +2,7 @@
 
 namespace Saft\Store;
 
-use Saft\QueryCache;
+use Saft\Store\QueryCache;
 use Saft\Store\SparqlStore\Virtuoso;
 use Saft\Store\StoreInterface;
 use Symfony\Component\Yaml\Parser;

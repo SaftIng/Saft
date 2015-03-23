@@ -1,6 +1,6 @@
 <?php
 
-namespace Saft;
+namespace Saft\Store;
 
 use Symfony\Component\Yaml\Parser;
 
@@ -128,7 +128,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
         
         // set path to test dir
-        $saftRootDir = dirname(__FILE__) . '/../../';
+        $saftRootDir = dirname(__FILE__) . '/../../../';
         $configFilepath = $saftRootDir . 'config.yml';
 
         // check for config file

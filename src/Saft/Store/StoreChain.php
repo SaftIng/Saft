@@ -2,9 +2,9 @@
 namespace Saft\Store;
 
 use Saft\Cache;
-use Saft\QueryCache;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
+use Saft\Store\QueryCache;
 use Saft\Store\StoreInterface;
 use Saft\Store\SparqlStore\Http;
 use Saft\Store\SparqlStore\Virtuoso;

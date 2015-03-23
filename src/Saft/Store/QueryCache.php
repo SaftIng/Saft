@@ -1,5 +1,5 @@
 <?php
-namespace Saft;
+namespace Saft\Store;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Statement;
