@@ -21,11 +21,6 @@ namespace Saft\Sparql;
 class Query
 {
     /**
-     * @var string
-     */
-    protected $prologuePart = null;
-
-    /**
      * @var array
      */
     protected $from = array();
@@ -36,19 +31,14 @@ class Query
     protected $fromNamed = array();
 
     /**
-     * @var string
+     * @var int
      */
-    protected $wherePart = null;
-
+    protected $limit = null;
+    
     /**
      * @var string
      */
     protected $orderClause = null;
-
-    /**
-     * @var int
-     */
-    protected $limit = null;
     
     /**
      * List of widely used namespaces.
@@ -105,16 +95,33 @@ class Query
      * @var int
      */
     protected $offset = null;
+    
+    /**
+     * @var string
+     */
+    protected $prologuePart = null;
 
     /**
      * @var string
      */
-    protected $query = "";
+    protected $query = '';
 
     /**
      * @var array
      */
     protected $queryParts;
+    
+    /**
+     * Type of the query. Can be either ask, select, describe, insertInto, insertData, delete, deleteData
+     * 
+     * @var string
+     */
+    protected $type = null;
+    
+    /**
+     * @var string
+     */
+    protected $wherePart = null;
 
     /**
      */
@@ -558,24 +565,62 @@ class Query
         return array_values(array_unique($matches[1]));
     }
 
+    /**
+     * @var string
+     */
     public function getFrom()
     {
         return $this->from;
     }
 
+    /**
+     * @var string
+     */
     public function getFromNamed()
     {
         return $this->fromNamed;
     }
 
+    /**
+     * @var string
+     */
     public function getLimit()
     {
         return $this->limit;
     }
 
+    /**
+     * @var string
+     */
     public function getOffset()
     {
         return $this->offset;
+    }
+    
+    /**
+     * @var string
+     */
+    public function getProloguePart()
+    {
+        return $this->prologuePart;
+    }
+
+    /**
+     * Synonym for getProloguePart
+     * 
+     * @var string
+     */
+    public function getSelect()
+    {
+        return $this->getProloguePart();
+    }
+
+    /**
+     * @var string
+     */
+    public function getWhere()
+    {
+        return $this->wherePart;
     }
 
     /**
@@ -600,6 +645,47 @@ class Query
         }
 
         return $result;
+    }
+    
+    /**
+     * Determines type of the internal query.
+     * 
+     * @return string Returns either ask, select, describe, insertInto, insertData, delete, deleteData.
+     */
+    public function getType()
+    {
+        if (null === $this->type) {
+            // ASK query
+            if (false !== strpos($this->query, 'ASK')) {
+                $this->type = 'ask';
+            
+            // DELETE DATA query
+            } elseif (false !== strpos($this->getProloguePart(), 'DELETE DATA')) {
+                $this->type = 'deleteData';
+            
+            // DELETE query
+            } elseif (false !== strpos($this->getProloguePart(), 'DELETE')) {
+                $this->type = 'delete';
+            
+            // DESCRIBE query
+            } elseif (false !== strpos($this->getProloguePart(), 'DESCRIBE DATA')) {
+                $this->type = 'describe';
+                
+            // INSERT DATA query
+            } elseif (false !== strpos($this->getProloguePart(), 'INSERT DATA')) {
+                $this->type = 'insertData';
+            
+            // INSERT INTO query
+            } elseif (false !== strpos($this->getProloguePart(), 'INSERT INTO')) {
+                $this->type = 'insertInto';
+                
+            // SELECT query
+            } elseif (false !== strpos($this->getProloguePart(), 'SELECT')) {
+                $this->type = 'select';
+            }
+        } 
+        
+        return $this->type;
     }
     
     /**
@@ -660,13 +746,18 @@ class Query
     }
 
     /**
-     *
-     * @param
-     * @return
-     * @throw
+     * Init Query instance with a SPARQL query string. This function tries to parse the query and use as much
+     * information as possible. But unfortunatly not every SPARQL 1.0/1.1 aspect is supported.
+     * 
+     * @param string $queryString
+     * @throws \Exception If $queryString is empty.
      */
     public function init($queryString)
     {
+        if (true === empty($queryString) || null === $queryString) {
+            throw new \Exception('Parameter $queryString is empty or null.');
+        }
+        
         $this->query = $queryString;
 
         $parts = array(
@@ -680,11 +771,22 @@ class Query
         );
 
         $var = '[?$]{1}[\w\d]+';
+        
+        // TODO support INSERT DATA queries
+        // TODO support INSERT INTO queries
+        // TODO support DELETE DATA queries
+        // TODO support DELETE queries
         $tokens = array(
             'prologue'   => '/(' .
 
-                            // BASE PREFIX ASK SELECT DISTINCT
-                            '(BASE.*\s)?(PREFIX.*?\s)*(ASK|((SELECT(\s)+)(DISTINCT(\s)+)'.
+                            // BASE and PREFIX part
+                            '(BASE.*\s)?(PREFIX.*?\s)*('.
+                            
+                            // ASK query; matches queries like ASK { ?s ?p ?o }
+                            'ASK\s*\{(.*)\}|'.
+                            
+                            // SELECT part
+                            '((SELECT(\s)+)(DISTINCT(\s)+)'.
 
                             // COUNT
                             '?(COUNT(\s)*(\(.*?\)(\s)))?)(\?\w+\s+|\*)*'.
@@ -706,7 +808,14 @@ class Query
         }
 
         if (isset($parts['prologue'][0][0])) {
-            $this->setProloguePart(trim($parts['prologue'][0][0]) . ' ');   // whole match
+            // ASK query match is on another position
+            if (false !== strpos($parts['prologue'][0][0], 'ASK')) {
+                $this->setProloguePart(trim($parts['prologue'][5][0]) . ' ');
+            
+            // for all other queries
+            } else {
+                $this->setProloguePart(trim($parts['prologue'][0][0]) . ' ');
+            }
         }
 
         if (isset($parts['from'][1][0])) {
@@ -732,67 +841,9 @@ class Query
         if (isset($parts['offset'][1][0])) {
             $this->setOffset($parts['offset'][1][0]);
         }
-    }
-    
-    /**
-     * Checks if query is an ASK query.
-     *
-     * @return boolean
-     */
-    public function isAskQuery()
-    {
-        return false !== strpos($this->getProloguePart(), 'ASK');
-    }
-    
-    /**
-     * Checks if query is a DELETE query.
-     *
-     * @return boolean
-     */
-    public function isDeleteQuery()
-    {
-        return false !== strpos($this->getProloguePart(), 'DELETE');
-    }
-    
-    /**
-     * Checks if query is an INSERT query.
-     *
-     * @return boolean
-     */
-    public function isInsertQuery()
-    {
-        return false !== strpos($this->getProloguePart(), 'INSERT');
-    }
-    
-    /**
-     * Checks if query is SPARQL UPDATE by checking if its either an insert- or delete query.
-     *
-     * @return boolean
-     */
-    public function isUpdateQuery()
-    {
-        return $this->isInsertQuery() || $this->isDeleteQuery();
-    }
-
-    public function getProloguePart()
-    {
-        return $this->prologuePart;
-    }
-
-    /**
-     * Synonym for getProloguePart
-     */
-    public function getSelect()
-    {
-        return $this->getProloguePart();
-    }
-
-    /**
-     *
-     */
-    public function getWhere()
-    {
-        return $this->wherePart;
+        
+        // call function to set type
+        $this->getType();
     }
 
     public function resetInstance()

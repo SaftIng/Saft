@@ -368,7 +368,7 @@ class Virtuoso extends AbstractSparqlStore
     {
         // if successor is set, ask it too.
         if ($this->successor instanceof StoreInterface) {
-            $this->successor->deleteMatchingStatements($statement, $graphUri, $options);
+            $this->successor->hasMatchingStatement($statement, $graphUri, $options);
         }
 
         return parent::hasMatchingStatement($statement, $graphUri, $options);
@@ -473,7 +473,7 @@ class Virtuoso extends AbstractSparqlStore
         /**
          * SPARQL query (usually to fetch data)
          */
-        if (false === $queryObject->isUpdateQuery()) {
+        if (false === in_array($queryObject->getType(), array('insertData', 'insertInto', 'deleteData', 'delete'))) {
             $graphUri = 'NULL';
             $graphSpec = '';
 
@@ -512,7 +512,7 @@ class Virtuoso extends AbstractSparqlStore
             $result = $pdoQuery->fetchAll(\PDO::FETCH_ASSOC);
             
             // if it was an ASK query, return true or false.
-            if (true === $queryObject->isAskQuery()) {
+            if ('ask' === $queryObject->getType()) {
                 // TODO fix that ASK queries return true even the graph is empty
                 return '1' === $result[0]['__ask_retval'];
                 

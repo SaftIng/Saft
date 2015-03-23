@@ -414,7 +414,7 @@ class Http extends AbstractSparqlStore
         /**
          * SPARQL query (usually to fetch data)
          */
-        if (false === $queryObject->isUpdateQuery()) {
+        if (false === in_array($queryObject->getType(), array('insertData', 'insertInto', 'deleteData', 'delete'))) {
             $this->client->sendSparqlSelectQuery($query);
             
             if ('extended' == $options['resultType']) {
