@@ -10,9 +10,19 @@ class Literal extends AbstractLiteral
      */
     protected $redlandNode;
 
-    public function __construct($redlandNode)
+    public function __construct($value, $lang = null, $datatype = null)
     {
-        $this->redlandNode = $redlandNode;
+        if (gettype($value) == "resource" && get_resource_type($value) == "_p_librdf_node_s") {
+            $this->redlandNode = $value;
+        } else {
+            $world = librdf_new_world();
+            if ($datatype !== null) {
+                $datatypeUri = librdf_new_uri($world, $datatype);
+            } else {
+                $datatypeUri = null;
+            }
+            $this->redlandNode = librdf_new_node_from_typed_literal($world, $value, $lang, $datatypeUri);
+        }
     }
 
     /**
