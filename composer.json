@@ -39,8 +39,6 @@
     },
     "require": {
         "php": ">=5.3.3",
-
-        "easyrdf/easyrdf": "*",
         "php-curl-class/php-curl-class": "*"
     },
     "require-dev": {
