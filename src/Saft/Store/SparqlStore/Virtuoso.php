@@ -218,7 +218,7 @@ class Virtuoso extends AbstractSparqlStore
      *                                       that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
-     * @return boolean Returns true, if function performed without errors. In case an error occur, an exception 
+     * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
      *                 will be thrown.
      */
     public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())

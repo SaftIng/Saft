@@ -113,7 +113,7 @@ class Query
     
     /**
      * Type of the query. Can be either ask, select, describe, insertInto, insertData, delete, deleteData
-     * 
+     *
      * @var string
      */
     protected $type = null;
@@ -607,7 +607,7 @@ class Query
 
     /**
      * Synonym for getProloguePart
-     * 
+     *
      * @var string
      */
     public function getSelect()
@@ -649,7 +649,7 @@ class Query
     
     /**
      * Determines type of the internal query.
-     * 
+     *
      * @return string Returns either ask, select, describe, insertInto, insertData, delete, deleteData.
      */
     public function getType()
@@ -683,7 +683,7 @@ class Query
             } elseif (false !== strpos($this->getProloguePart(), 'SELECT')) {
                 $this->type = 'select';
             }
-        } 
+        }
         
         return $this->type;
     }
@@ -748,7 +748,7 @@ class Query
     /**
      * Init Query instance with a SPARQL query string. This function tries to parse the query and use as much
      * information as possible. But unfortunatly not every SPARQL 1.0/1.1 aspect is supported.
-     * 
+     *
      * @param string $queryString
      * @throws \Exception If $queryString is empty.
      */

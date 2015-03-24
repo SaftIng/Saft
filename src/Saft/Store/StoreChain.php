@@ -310,11 +310,11 @@ class StoreChain implements StoreInterface
             $chainEntry = null;
             
             switch ($configEntry['type']) {
-                case 'http';
+                case 'http':
                     $chainEntry = new Http($configEntry);
                     break;
                     
-                case 'querycache';
+                case 'querycache':
                     // TODO change that, so that you only give a config array and QueryCache init cache by
                     //      itself
                     $cache = new Cache(array('type' => 'file'));
@@ -322,7 +322,7 @@ class StoreChain implements StoreInterface
                     $chainEntry = new QueryCache($cache);
                     break;
                     
-                case 'virtuoso';
+                case 'virtuoso':
                     $chainEntry = new Virtuoso($configEntry);
                     break;
             
