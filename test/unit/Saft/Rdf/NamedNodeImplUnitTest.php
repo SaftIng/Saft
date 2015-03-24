@@ -2,7 +2,7 @@
 
 namespace Saft\Rdf;
 
-class NamedNodeImplTest extends \PHPUnit_Framework_TestCase
+class NamedNodeImplUnitTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $testUri = 'http://saft/test/';

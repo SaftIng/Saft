@@ -2,7 +2,7 @@
 
 namespace Saft\Store;
 
-class AbstractTriplePatternStoreTest extends \PHPUnit_Framework_TestCase
+class AbstractTriplePatternStoreUnitTest extends \PHPUnit_Framework_TestCase
 {
 
     protected function setUp()

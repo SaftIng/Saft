@@ -151,7 +151,7 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
         $instance = null;
         // TODO simplify that eval call or get rid of it
         // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
-        // function which just return what was given. That was done to avoid working with concrete store 
+        // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
             'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
@@ -221,7 +221,7 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
         $instance = null;
         // TODO simplify that eval call or get rid of it
         // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
-        // function which just return what was given. That was done to avoid working with concrete store 
+        // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
             'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
@@ -300,7 +300,7 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
         $instance = null;
         // TODO simplify that eval call or get rid of it
         // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
-        // function which just return what was given. That was done to avoid working with concrete store 
+        // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
             'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
@@ -387,7 +387,7 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
         $instance = null;
         // TODO simplify that eval call or get rid of it
         // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
-        // function which just return what was given. That was done to avoid working with concrete store 
+        // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
             'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
@@ -651,7 +651,7 @@ class VirtuosoIntegrationTest extends \PHPUnit_Framework_TestCase
         $instance = null;
         // TODO simplify that eval call or get rid of it
         // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
-        // function which just return what was given. That was done to avoid working with concrete store 
+        // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
             'class '. $class .' extends '. get_class($storeInterfaceMock) .' {

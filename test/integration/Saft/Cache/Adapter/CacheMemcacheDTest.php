@@ -1,6 +1,8 @@
 <?php
 
-namespace Saft;
+namespace Saft\Cache\Adapter;
+
+use Saft\CacheTest;
 
 class CacheMemcacheDTest extends CacheTest
 {

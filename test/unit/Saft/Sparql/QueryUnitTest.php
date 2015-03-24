@@ -2,7 +2,7 @@
 
 namespace Saft\Sparql;
 
-class QueryTest extends \Saft\TestCase
+class QueryUnitTest extends \Saft\TestCase
 {
     public function setUp()
     {

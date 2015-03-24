@@ -14,7 +14,7 @@ use Symfony\Component\Yaml\Parser;
  *
  * This way we can run all the tests for different configuration with minimum overhead.
  */
-abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
+abstract class QueryCacheIntegrationTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Saft\Cache
@@ -185,7 +185,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $instance = null;
         // TODO simplify that eval call or get rid of it
         // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
-        // function which just return what was given. That was done to avoid working with concrete store 
+        // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
             'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
@@ -200,7 +200,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $this->fixture->setChainSuccessor($instance);
         
         $this->assertEquals(
-            new ArrayStatementIteratorImpl(array()), 
+            new ArrayStatementIteratorImpl(array()),
             $this->fixture->addStatements(new ArrayStatementIteratorImpl(array()))
         );
     }
@@ -224,7 +224,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $instance = null;
         // TODO simplify that eval call or get rid of it
         // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
-        // function which just return what was given. That was done to avoid working with concrete store 
+        // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
             'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
@@ -248,8 +248,8 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('\Exception');
         
         $this->fixture->deleteMatchingStatements(new StatementImpl(
-            new VariableImpl(), 
-            new VariableImpl(), 
+            new VariableImpl(),
+            new VariableImpl(),
             new VariableImpl()
         ));
     }
@@ -310,7 +310,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $instance = null;
         // TODO simplify that eval call or get rid of it
         // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
-        // function which just return what was given. That was done to avoid working with concrete store 
+        // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
             'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
@@ -327,7 +327,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
         
         $this->assertEquals(
-            new ArrayStatementIteratorImpl(array($statement)), 
+            new ArrayStatementIteratorImpl(array($statement)),
             $this->fixture->getMatchingStatements($statement)
         );
     }
@@ -337,8 +337,8 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('\Exception');
         
         $this->fixture->getMatchingStatements(new StatementImpl(
-            new VariableImpl(), 
-            new VariableImpl(), 
+            new VariableImpl(),
+            new VariableImpl(),
             new VariableImpl()
         ));
     }
@@ -355,7 +355,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $instance = null;
         // TODO simplify that eval call or get rid of it
         // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
-        // function which just return what was given. That was done to avoid working with concrete store 
+        // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
             'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
@@ -372,7 +372,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
         
         $this->assertEquals(
-            new ArrayStatementIteratorImpl(array($statement)), 
+            new ArrayStatementIteratorImpl(array($statement)),
             $this->fixture->hasMatchingStatement($statement)
         );
     }
@@ -382,8 +382,8 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('\Exception');
         
         $this->fixture->hasMatchingStatement(new StatementImpl(
-            new VariableImpl(), 
-            new VariableImpl(), 
+            new VariableImpl(),
+            new VariableImpl(),
             new VariableImpl()
         ));
     }
@@ -546,7 +546,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $instance = null;
         // TODO simplify that eval call or get rid of it
         // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
-        // function which just return what was given. That was done to avoid working with concrete store 
+        // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
             'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
@@ -567,8 +567,8 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('\Exception');
         
         $this->fixture->getMatchingStatements(new StatementImpl(
-            new VariableImpl(), 
-            new VariableImpl(), 
+            new VariableImpl(),
+            new VariableImpl(),
             new VariableImpl()
         ));
     }
@@ -612,7 +612,7 @@ abstract class QueryCacheTest extends \PHPUnit_Framework_TestCase
          * query container
          */
         $this->assertEquals($testData['queryContainer'], $this->fixture->getCache()->get($testData['queryId']));
-    }    
+    }
     
     /**
      * Tests setChainSuccessor

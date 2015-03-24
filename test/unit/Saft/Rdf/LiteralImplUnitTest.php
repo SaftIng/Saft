@@ -1,7 +1,7 @@
 <?php
 namespace Saft\Rdf;
 
-class LiteralImplTest extends Test\LiteralAbstractTest
+class LiteralImplUnitTest extends Test\LiteralAbstractTest
 {
 
     /**

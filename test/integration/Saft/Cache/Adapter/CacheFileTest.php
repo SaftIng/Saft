@@ -1,8 +1,10 @@
 <?php
 
-namespace Saft;
+namespace Saft\Cache\Adapter;
 
-class CacheFileTest extends CacheTest
+use Saft\CacheTest;
+
+class CacheFileIntegrationTest extends CacheTest
 {
 
     /**

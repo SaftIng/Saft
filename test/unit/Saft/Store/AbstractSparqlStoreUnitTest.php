@@ -86,7 +86,8 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $query = $this->fixture->deleteMatchingStatements($this->getTestStatement());
         //echo $query;
         $this->assertEquals(
-            'DELETE DATA { Graph <http://saft/test/g1> {<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>} }',
+            'DELETE DATA { Graph <http://saft/test/g1> '.
+            '{<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>} }',
             $query
         );
     }
@@ -99,7 +100,8 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $query = $this->fixture->hasMatchingStatement($this->getTestStatement());
         
         $this->assertEquals(
-            'ASK { Graph <http://saft/test/g1> {<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>} }',
+            'ASK { Graph <http://saft/test/g1> {'.
+            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>} }',
             $query
         );
     }

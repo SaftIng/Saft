@@ -4,10 +4,10 @@ namespace Saft\Store;
 
 use Saft\Cache;
 
-class QueryCacheFileCacheTest extends QueryCacheTest
+class QueryCacheFileCacheIntegrationTest extends QueryCacheIntegrationTest
 {
     /**
-     * Overrides setUp method of QueryCacheTest.php and loads a certain cache configuration (File).
+     * Overrides setUp method of QueryCacheIntegrationTest.php and loads a certain cache configuration (File).
      */
     public function setUp()
     {

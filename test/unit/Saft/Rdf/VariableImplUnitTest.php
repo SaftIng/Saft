@@ -2,7 +2,7 @@
 
 namespace Saft\Rdf;
 
-class VariableTest extends \PHPUnit_Framework_TestCase
+class VariableUnitTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $testUri = 'http://saft/test/';

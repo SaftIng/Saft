@@ -149,7 +149,9 @@ class StoreChainIntegrationTest extends TestCase
         
         $this->fixture->setupChain(array($this->config['queryCacheConfig']));
         
-        $this->fixture->deleteMatchingStatements(new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()));
+        $this->fixture->deleteMatchingStatements(
+            new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl())
+        );
     }
      
     public function testDeleteMatchingStatementsChainQueryCacheAndVirtuoso()
@@ -215,7 +217,9 @@ class StoreChainIntegrationTest extends TestCase
     {
         $this->setExpectedException('\Exception');
         
-        $this->fixture->deleteMatchingStatements(new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()));
+        $this->fixture->deleteMatchingStatements(
+            new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl())
+        );
     }
 
     /**
@@ -277,7 +281,11 @@ class StoreChainIntegrationTest extends TestCase
         // setup chain: query cache -> virtuoso
         $this->fixture->setupChain(array($this->config['queryCacheConfig']));
         
-        $statement = new StatementImpl(new NamedNodeImpl('http://s/'), new NamedNodeImpl('http://p/'), new VariableImpl());
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new VariableImpl()
+        );
         $this->fixture->getMatchingStatements($statement, $this->testGraphUri);
     }
 
@@ -321,11 +329,16 @@ class StoreChainIntegrationTest extends TestCase
         $chainEntries[0]->getCache()->clean();
         
         // check that no cache entry is available for the test query
-        $statement = new StatementImpl(new NamedNodeImpl('http://s/'), new NamedNodeImpl('http://p/'), new VariableImpl());
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new VariableImpl()
+        );
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $this->assertTrue(
             null === $chainEntries[0]->getCache()->get($chainEntries[0]->generateShortId(
-                'SELECT * FROM <'. $this->testGraphUri .'> WHERE {'. $chainEntries[0]->sparqlFormat($statementIterator) .'}'
+                'SELECT * FROM <'. $this->testGraphUri .'> '.
+                'WHERE {'. $chainEntries[0]->sparqlFormat($statementIterator) .'}'
             ))
         );
         
@@ -388,7 +401,11 @@ class StoreChainIntegrationTest extends TestCase
         $chainEntries[0]->getCache()->clean();
         
         // check that no cache entry is available for the test query
-        $statement = new StatementImpl(new NamedNodeImpl('http://s/'), new NamedNodeImpl('http://p/'), new VariableImpl());
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new VariableImpl()
+        );
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $testQuery = 'SELECT * FROM <'. $this->testGraphUri .'> '.
                      'WHERE {'. $chainEntries[0]->sparqlFormat($statementIterator) .'}';
@@ -561,7 +578,11 @@ class StoreChainIntegrationTest extends TestCase
         
         $this->assertTrue(
             $this->fixture->hasMatchingStatement(
-                new StatementImpl(new NamedNodeImpl('http://s/'), new NamedNodeImpl('http://p/'), new VariableImpl()),
+                new StatementImpl(
+                    new NamedNodeImpl('http://s/'),
+                    new NamedNodeImpl('http://p/'),
+                    new VariableImpl()
+                ),
                 $this->testGraphUri
             )
         );
