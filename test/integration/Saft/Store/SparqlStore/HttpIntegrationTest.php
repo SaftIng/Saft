@@ -1,13 +1,6 @@
 <?php
 namespace Saft\Store\SparqlStore;
 
-use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Rdf\LiteralImpl;
-use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\VariableImpl;
-use Saft\Rdf\StatementImpl;
-use Symfony\Component\Yaml\Parser;
-
 class HttpIntegrationTest extends SparqlStoreIntegrationTest
 {
     public function setUp()

@@ -178,7 +178,7 @@ class Http extends AbstractSparqlStore
         
         // if successor is set, ask it too.
         if ($this->successor instanceof StoreInterface) {
-            $this->successor->addStatements($statementsgraphUri, $options);
+            $this->successor->addStatements($statements, $graphUri, $options);
         }
         
         return $result;
