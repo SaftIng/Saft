@@ -16,9 +16,7 @@ class NamedNodeImpl extends AbstractNamedNode
      */
     public function __construct($value, $lang = null)
     {
-        if (true === self::check($value)
-            || null === $value
-            || true === self::isVariable($value)) {
+        if (true === self::check($value) || null === $value) {
             $this->value = $value;
         } else {
             throw new \Exception('Parameter $value is not a valid URI.');

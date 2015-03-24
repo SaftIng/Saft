@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Rdf;
 
 abstract class AbstractStatement implements Statement
@@ -33,7 +34,7 @@ abstract class AbstractStatement implements Statement
         if ($this->isConcrete()) {
             return $this->toSparqlFormat();
         } else {
-            throw new \Exception("A statement has to be concrete in N-Quads.");
+            throw new \Exception('A statement has to be concrete in N-Quads.');
         }
     }
 
@@ -42,15 +43,17 @@ abstract class AbstractStatement implements Statement
      */
     public function toSparqlFormat()
     {
-        if ($this->isQuad()) {
-            return $this->getSubject()->toNQuads() . ' ' .
-                   $this->getPredicate()->toNQuads() . ' ' .
-                   $this->getObject()->toNQuads() . ' ' .
-                   $this->getGraph()->toNQuads() . '.';
+        // if quad, integrate Graph, even it is null
+        if (true === $this->isQuad()) {
+            return 'Graph '. $this->getGraph()->toNQuads() .' {'.
+                   $this->getSubject()->toNQuads() .' '.
+                   $this->getPredicate()->toNQuads() .' '.
+                   $this->getObject()->toNQuads() .
+                   '}';
         } else {
-            return $this->getSubject()->toNQuads() . ' ' .
-                   $this->getPredicate()->toNQuads() . ' ' .
-                   $this->getObject()->toNQuads() . '.';
+            return $this->getSubject()->toNQuads() .' '.
+                   $this->getPredicate()->toNQuads() .' '.
+                   $this->getObject()->toNQuads();
         }
     }
 }

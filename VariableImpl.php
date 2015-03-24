@@ -2,7 +2,7 @@
 
 namespace Saft\Rdf;
 
-class Variable implements Node
+class VariableImpl implements Variable
 {
     /**
      * @var string
@@ -23,7 +23,7 @@ class Variable implements Node
         // $value is null, means we have to generate a random variable name
         } elseif (null === $value) {
             $variable = hash('sha1', microtime(true) . rand(0, time()));
-            $this->value = '?'. substr($variable, 0, 10);
+            $this->value = substr($variable, 0, 10);
         } else {
             throw new \Exception('Parameter $value is not a string or not null.');
         }
@@ -58,12 +58,15 @@ class Variable implements Node
     }
 
     /**
-     * @see \Saft\Rdf\Node
+     * Check if a given instance of \Saft\Rdf\Node is equal to this instance.
+     *
+     * @param \Saft\Rdf\Node $toCompare
+     * @return boolean True, if both instances are semantically equal, false otherwise.
      */
     public function equals(Node $toCompare)
     {
         // It only compares URIs, everything will be quit with false.
-        if (true === $toCompare->isNamed()) {
+        if (true === $toCompare->isVariable()) {
             return $this->getValue() == $toCompare->getValue();
         }
 
@@ -113,14 +116,6 @@ class Variable implements Node
     /**
      * @return boolean
      */
-    public function isReturnable()
-    {
-        return false;
-    }
-
-    /**
-     * @return boolean
-     */
     public function isVariable()
     {
         return true;
@@ -131,6 +126,6 @@ class Variable implements Node
      */
     public function toNQuads()
     {
-        return $this->value;
+        return '?'. $this->value;
     }
 }

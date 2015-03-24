@@ -2,7 +2,7 @@
 
 namespace Saft\Rdf;
 
-class NamedNodeTest extends \PHPUnit_Framework_TestCase
+class NamedNodeImplUnitTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $testUri = 'http://saft/test/';
@@ -14,7 +14,7 @@ class NamedNodeTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->fixture = new \Saft\Rdf\NamedNodeImpl($this->testUri);
+        $this->fixture = new NamedNodeImpl($this->testUri);
     }
 
     /**
@@ -46,18 +46,18 @@ class NamedNodeTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('\Exception');
 
-        $this->fixture = new \Saft\Rdf\NamedNodeImpl('foo');
+        $this->fixture = new NamedNodeImpl('foo');
     }
 
     public function testInstanciationNull()
     {
-        $this->fixture = new \Saft\Rdf\NamedNodeImpl(null);
+        $this->fixture = new NamedNodeImpl(null);
         $this->assertEquals(null, $this->fixture->getValue());
     }
 
     public function testInstanciationValidUri()
     {
-        $this->fixture = new \Saft\Rdf\NamedNodeImpl($this->testUri);
+        $this->fixture = new NamedNodeImpl($this->testUri);
         $this->assertEquals($this->testUri, $this->fixture->getValue());
     }
 
@@ -74,7 +74,7 @@ class NamedNodeTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsConcrete()
     {
-        $this->fixture = new \Saft\Rdf\NamedNodeImpl($this->testUri);
+        $this->fixture = new NamedNodeImpl($this->testUri);
         $this->assertTrue($this->fixture->isConcrete());
     }
 

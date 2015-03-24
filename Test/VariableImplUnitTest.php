@@ -2,7 +2,7 @@
 
 namespace Saft\Rdf;
 
-class VariableTest extends \PHPUnit_Framework_TestCase
+class VariableUnitTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $testUri = 'http://saft/test/';
@@ -14,7 +14,7 @@ class VariableTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->fixture = new \Saft\Rdf\Variable('?s');
+        $this->fixture = new VariableImpl('?s');
     }
 
     /**
@@ -41,7 +41,7 @@ class VariableTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetValue()
     {
-        $this->fixture = new \Saft\Rdf\Variable('?s');
+        $this->fixture = new VariableImpl('?s');
         
         $this->assertEquals('?s', $this->fixture->getValue());
     }
@@ -51,20 +51,20 @@ class VariableTest extends \PHPUnit_Framework_TestCase
      */
     public function testInstanciation()
     {
-        $this->fixture = new \Saft\Rdf\Variable('?foo');
+        $this->fixture = new VariableImpl('?foo');
     }
     
     public function testInstanciationInvalidValue()
     {
         $this->setExpectedException('\Exception');
         
-        $this->fixture = new \Saft\Rdf\Variable(2);
+        $this->fixture = new VariableImpl(2);
     }
 
     public function testInstanciationNull()
     {
-        $this->fixture = new \Saft\Rdf\NamedNodeImpl(null);
-        $this->assertEquals(null, $this->fixture->getValue());
+        $this->fixture = new VariableImpl(null);
+        $this->assertTrue(null !== $this->fixture->getValue());
     }
 
     /**

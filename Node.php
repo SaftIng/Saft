@@ -38,12 +38,6 @@ interface Node
     public function isBlank();
 
     /**
-     * TODO: what for is this?
-     * @return boolean
-     */
-    public function isReturnable();
-
-    /**
      * @return boolean
      */
     public function isVariable();
