@@ -1,0 +1,31 @@
+{
+    "description": "Data interface for parsind and serializing RDF data for the Saft library.",
+    "keywords": ["Saft", "Linked Data", "Semantic Web", "RDF", "Parser", "Serializer"],
+    "homepage": "https://safting.github.io/",
+    "license": "GPL2",
+    "name": "saft/saft-data",
+    "require": {
+        "php": ">=5.3.3",
+
+        "saft/saft-rdf": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.3",
+        "squizlabs/php_codesniffer": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Saft\\": [
+                "src/Saft/"
+            ]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Saft\\": [
+                "test/Saft"
+            ]
+        }
+    },
+    "minimum-stability":"dev"
+}
