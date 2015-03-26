@@ -14,8 +14,8 @@
     </php>
     <testsuites>
         <testsuite name="Saft">
-            <directory>./test/integration</directory>
-            <directory>./test/unit</directory>
+            <directory>./src/Saft/*/Test</directory>
+            <directory>./src/Saft/Backend/*/Test</directory>
         </testsuite>
     </testsuites>
 </phpunit>

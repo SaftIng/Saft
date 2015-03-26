@@ -1,6 +1,8 @@
 <?php
 
-namespace Saft\Rdf;
+namespace Saft\Rdf\Test;
+
+use Saft\Rdf\VariableImpl;
 
 class VariableUnitTest extends \PHPUnit_Framework_TestCase
 {

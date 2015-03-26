@@ -1,13 +1,12 @@
 <?php
 namespace Saft\Store;
 
-use Saft\Cache;
+use Saft\Cache\Cache;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
-use Saft\Store\QueryCache;
-use Saft\Store\StoreInterface;
-use Saft\Store\SparqlStore\Http;
-use Saft\Store\SparqlStore\Virtuoso;
+use Saft\QueryCache\QueryCache;
+use Saft\Backend\HttpStore\Store\Http;
+use Saft\Backend\Virtuoso\Store\Virtuoso;
 
 class StoreChain implements StoreInterface
 {

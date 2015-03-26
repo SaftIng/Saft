@@ -1,5 +1,5 @@
 <?php
-namespace Saft\Rdf;
+namespace Saft\Rdf\Test;
 
 class LiteralImplTestFactory
 {
