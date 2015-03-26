@@ -14,7 +14,8 @@ interface ParserInterface
      * @unstable
      * @return \Saft\Rdf\StatementIterator a StatementIterator containing all the Statements parsed by the parser to far
      */
-    public function parseStreamToIterator();
+    public function parseStreamToIterator($inputStream, $baseUri);
+
 
     /**
      * @return array with a prefix mapping of the prefixes parsed so far

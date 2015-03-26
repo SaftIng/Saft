@@ -10,7 +10,7 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
      * @todo The factory method approach could also be extended to use a factory object
      * @param Literal
      */
-    abstract public function newInstance($value, $param);
+    abstract public function newInstance($value, $lang = null, $datatype = null);
 
     /**
      * Tests equals
