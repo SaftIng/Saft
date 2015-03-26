@@ -26,7 +26,7 @@
     "autoload-dev": {
         "psr-4": {
             "Saft\\Backend\\Redland\\Tests\\": [
-                "test/Saft"
+                "test/"
             ]
         }
     }
