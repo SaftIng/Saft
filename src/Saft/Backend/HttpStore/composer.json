@@ -2,8 +2,8 @@
     "name": "saft/saft-store-http",
     "type": "library",
     "description": "HTTP/REST store implementation.",
-    "keywords": ["Saft", "REST", "HTTP", "Store"],
-    "homepage": "https://github.com/SaftIng/Saft.store.http",
+    "keywords": ["Saft", "REST", "HTTP", "Store", "RDF", "Triple Store"],
+    "homepage": "https://safting.github.io/",
     "license": "GPL2",
     "authors": [
         {
@@ -31,15 +31,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Saft\\": "src/Saft/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Saft\\": [
-                "test/integration/Saft",
-                "test/unit/Saft"
-            ]
+            "Saft\\Backend\\HttpStore\\": "."
         }
     },
     "minimum-stability": "dev"

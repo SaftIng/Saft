@@ -2,8 +2,8 @@
     "name": "saft/saft-store",
     "type": "library",
     "description": "Store package for library Saft.",
-    "keywords": ["Saft", "Linked Data", "Semantic Web", "Store", "TripleStore"],
-    "homepage": "https://github.com/SaftIng/Saft.store",
+    "keywords": ["Saft", "Linked Data", "Semantic Web", "Store", "Triple Store"],
+    "homepage": "https://safting.github.io/",
     "license": "GPL2",
     "authors": [
         {
@@ -33,7 +33,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Saft\\": "src/Saft/"
+            "Saft\\Store\\": "."
         }
     }
 }

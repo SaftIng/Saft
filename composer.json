@@ -51,12 +51,5 @@
                 "src/Saft/"
             ]
         }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Saft\\": [
-                "test/integration/Saft", "test/unit/Saft"
-            ]
-        }
     }
 }

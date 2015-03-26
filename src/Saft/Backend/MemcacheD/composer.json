@@ -3,7 +3,7 @@
     "type": "library",
     "description": "MemcacheD cache adapter from the library Saft.",
     "keywords": ["Saft", "Cache", "MemcacheD"],
-    "homepage": "https://github.com/SaftIng/Saft.cache.memcached",
+    "homepage": "https://safting.github.io/",
     "license": "GPL2",
     "authors": [
         {
@@ -22,7 +22,7 @@
     "require": {
         "php": ">=5.3.0",
         "ext-memcached": "*",
-        
+
         "saft/saft-cache": "*"
     },
     "require-dev": {
@@ -31,15 +31,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Saft\\": "src/Saft/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Saft\\": [
-                "test/integration/Saft",
-                "test/unit/Saft"
-            ]
+            "Saft\\Backend\\MemcacheD\\": "."
         }
     },
     "minimum-stability":"dev"

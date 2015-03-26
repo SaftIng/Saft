@@ -2,8 +2,8 @@
     "name": "saft/saft-store-virtuoso",
     "type": "library",
     "description": "Virtuoso store implementation.",
-    "keywords": ["Saft", "TripleStore", "Virtuoso"],
-    "homepage": "https://github.com/SaftIng/Saft.store.virtuoso",
+    "keywords": ["Saft", "Triple Store", "Virtuoso", "RDF"],
+    "homepage": "https://safting.github.io/",
     "license": "GPL2",
     "authors": [
         {
@@ -31,15 +31,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Saft\\": "src/Saft/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Saft\\": [
-                "test/integration/Saft",
-                "test/unit/Saft"
-            ]
+            "Saft\\Backend\\Virtuoso\\": "."
         }
     },
     "minimum-stability":"dev"

@@ -3,7 +3,7 @@
     "type": "library",
     "description": "File cache adapter from the library Saft.",
     "keywords": ["Saft", "Cache", "File"],
-    "homepage": "https://github.com/SaftIng/Saft.cache.file",
+    "homepage": "https://safting.github.io/",
     "license": "GPL2",
     "authors": [
         {
@@ -21,7 +21,7 @@
     ],
     "require": {
         "php": ">5.3.3",
-        
+
         "saft/saft-cache": "*"
     },
     "require-dev": {
@@ -30,15 +30,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Saft\\": "src/Saft/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Saft\\": [
-                "test/integration/Saft",
-                "test/unit/Saft"
-            ]
+            "Saft\\Backend\\FileCache\\": "."
         }
     },
     "minimum-stability":"dev"

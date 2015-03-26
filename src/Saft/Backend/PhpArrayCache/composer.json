@@ -3,8 +3,22 @@
     "type": "library",
     "description": "PHP-Array cache adapter from the library Saft.",
     "keywords": ["Saft", "Cache", "PHPArray"],
-    "homepage": "https://github.com/SaftIng/Saft.cache.phparray",
+    "homepage": "https://safting.github.io/",
     "license": "GPL2",
+    "authors": [
+        {
+            "name": "Natanael Arndt",
+            "homepage": "http://aksw.org/NatanaelArndt",
+            "email": "arndtn@gmail.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Konrad Abicht",
+            "homepage": "http://www.inspirito.de",
+            "email": "hi@inspirito.de",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php": ">5.3.3",
 
@@ -16,15 +30,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Saft\\": "src/Saft/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Saft\\": [
-                "test/integration/Saft",
-                "test/unit/Saft"
-            ]
+            "Saft\\Backend\\PhpArrayCache\\": "."
         }
     },
     "minimum-stability":"dev"
