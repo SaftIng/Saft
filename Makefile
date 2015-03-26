@@ -22,24 +22,24 @@ codebeautifier:
 # TODO change this somehow to a loop
 push-subtrees:
 	git subtree split -P src/Saft/Cache -b saft.cache
-	git push saft.cache saft.cache:main
+	git push saft.cache saft.cache:master
 	git subtree split -P src/Saft/Backend/FileCache -b saft.cache.file
-	git push saft.cache.file saft.cache.file:main
+	git push saft.cache.file saft.cache.file:master
 	git subtree split -P src/Saft/Backend/MemcacheD -b saft.cache.memcached
-	git push saft.cache.memcached saft.cache.memcached:main
+	git push saft.cache.memcached saft.cache.memcached:master
 	git subtree split -P src/Saft/Backend/PhpArrayCache -b saft.cache.phparray
-	git push saft.cache.phparray saft.cache.phparray:main
+	git push saft.cache.phparray saft.cache.phparray:master
 	git subtree split -P src/Saft/Data -b saft.data
-	git push saft.data saft.data:main
+	git push saft.data saft.data:master
 	git subtree split -P src/Saft/QueryCache -b saft.querycache
-	git push saft.querycache saft.querycache:main
+	git push saft.querycache saft.querycache:master
 	git subtree split -P src/Saft/Rdf -b saft.rdf
-	git push saft.rdf saft.rdf:main
+	git push saft.rdf saft.rdf:master
 	git subtree split -P src/Saft/Sparql -b saft.sparql
-	git push saft.sparql saft.sparql:main
+	git push saft.sparql saft.sparql:master
 	git subtree split -P src/Saft/Store -b saft.store
-	git push saft.store saft.store:main
+	git push saft.store saft.store:master
 	git subtree split -P src/Saft/Backend/HttpStore -b saft.store.http
-	git push saft.store.http saft.store.http:main
+	git push saft.store.http saft.store.http:master
 	git subtree split -P src/Saft/Backend/Virtuoso -b saft.store.virtuoso
-	git push saft.store.virtuoso saft.store.virtuoso:main
+	git push saft.store.virtuoso saft.store.virtuoso:master
