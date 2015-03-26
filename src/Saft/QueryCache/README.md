@@ -1,0 +1,1 @@
+# Saft.querycache
