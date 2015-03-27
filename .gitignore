@@ -1,3 +1,4 @@
-/composer.lock
-/test/config.yml
+composer.lock
+.idea
+/test-config.yml
 /vendor
