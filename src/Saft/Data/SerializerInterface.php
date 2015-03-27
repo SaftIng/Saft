@@ -1,5 +1,5 @@
 <?php
-namespace \Saft\Data;
+namespace Saft\Data;
 
 interface SerializerInterface
 {

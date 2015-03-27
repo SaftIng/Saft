@@ -1,5 +1,5 @@
 <?php
-namespace \Saft\Data;
+namespace Saft\Data;
 
 /**
  * @note We have to decide how the ParserInterface should be implemented. One option
