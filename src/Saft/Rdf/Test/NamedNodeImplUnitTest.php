@@ -6,7 +6,6 @@ use Saft\Rdf\NamedNodeImpl;
 
 class NamedNodeImplUnitTest extends NamedNodeAbstractTest
 {
-
     /**
      * Return a new instance of NamedNodeImpl
      */
