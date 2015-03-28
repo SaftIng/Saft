@@ -10,9 +10,18 @@ class NamedNode extends AbstractNamedNode
      */
     protected $redlandNode;
 
-    public function __construct($redlandNode)
+    public function __construct($value)
     {
-        $this->redlandNode = $redlandNode;
+        if ($value === null) {
+            throw new \Exception("Can't initialize node with null.");
+        }
+        if (gettype($value) == "resource" && get_resource_type($value) == "_p_librdf_node_s") {
+            $this->redlandNode = $value;
+        } else {
+            $world = librdf_new_world();
+            $uri = librdf_new_uri($world, $value);
+            $this->redlandNode = librdf_new_node_from_uri($world, $uri);
+        }
     }
 
     /**
