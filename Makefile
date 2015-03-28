@@ -14,10 +14,10 @@ setup-test-environment:
 	cp test/config.yml.dist test/config.yml
 
 codesniffer:
-	$(PHPCS) --standard=PSR1,PSR2 --extensions=php -p src/* test/*
+	$(PHPCS) --standard=PSR1,PSR2 --extensions=php -p src/*
 
 codebeautifier:
-	$(PHPCBF) --standard=PSR1,PSR2 --extensions=php -p src/* test/*
+	$(PHPCBF) --standard=PSR1,PSR2 --extensions=php -p src/*
 
 # TODO change this somehow to a loop
 split-subtrees:
