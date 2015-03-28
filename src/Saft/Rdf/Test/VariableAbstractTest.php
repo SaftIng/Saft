@@ -86,5 +86,4 @@ abstract class VariableAbstractTest extends \PHPUnit_Framework_TestCase
         $fixture = $this->newInstance('?s');
         $this->assertTrue($fixture->isVariable());
     }
-
 }

@@ -1,7 +1,6 @@
 <?php
 namespace Saft\Rdf\Test;
 
-
 abstract class NamedNodeAbstractTest extends \PHPUnit_Framework_TestCase
 {
 
