@@ -6,10 +6,8 @@ abstract class NamedNodeAbstractTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * An abstract method which returns new instances of Literal
-     * @todo somehow also support datatypes
+     * An abstract method which returns new instances of NamedNode
      * @todo The factory method approach could also be extended to use a factory object
-     * @param Literal
      */
     abstract public function newInstance($uri);
 
@@ -42,15 +40,14 @@ abstract class NamedNodeAbstractTest extends \PHPUnit_Framework_TestCase
 
     public function testInstanciationNull()
     {
-        $this->setExpectedException('\Exception');
-
-        $this->newInstance(null);
+        $fixture = $this->newInstance(null);
+        $this->assertEquals(null, $fixture->getValue());
     }
 
     public function testInstanciationValidUri()
     {
-        $this->newInstance('http://saft/test');
-        $this->assertEquals('http://saft/test', $this->fixture->getValue());
+        $fixture = $this->newInstance('http://saft/test');
+        $this->assertEquals('http://saft/test', $fixture->getValue());
     }
 
     /**

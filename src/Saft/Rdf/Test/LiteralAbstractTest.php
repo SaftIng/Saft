@@ -6,9 +6,7 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
 
     /**
      * An abstract method which returns new instances of Literal
-     * @todo somehow also support datatypes
      * @todo The factory method approach could also be extended to use a factory object
-     * @param Literal
      */
     abstract public function newInstance($value, $lang = null, $datatype = null);
 

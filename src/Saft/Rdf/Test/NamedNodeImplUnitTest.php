@@ -4,11 +4,11 @@ namespace Saft\Rdf\Test;
 
 use Saft\Rdf\NamedNodeImpl;
 
-class NamedNodeImplUnitTest extends \PHPUnit_Framework_TestCase
+class NamedNodeImplUnitTest extends NamedNodeAbstractTest
 {
 
     /**
-     *
+     * Return a new instance of NamedNodeImpl
      */
     public function newInstance($uri)
     {
