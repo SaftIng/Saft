@@ -9,8 +9,8 @@ class LiteralImplUnitTest extends LiteralAbstractTest
     /**
      * Return a new instance of LiteralImpl
      */
-    public function newInstance($value, $param = null)
+    public function newInstance($value, $lang = null, $datatype = null)
     {
-        return new LiteralImpl($value, $param);
+        return new LiteralImpl($value, $lang);
     }
 }
