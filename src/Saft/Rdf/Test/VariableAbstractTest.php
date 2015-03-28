@@ -11,18 +11,6 @@ abstract class VariableAbstractTest extends \PHPUnit_Framework_TestCase
     abstract public function newInstance($name);
 
     /**
-     * Tests check
-     */
-    public function testCheck()
-    {
-        $fixture = $this->newInstance('?irgendwas');
-        $this->assertTrue($fixture->check('?s'));
-        $this->assertTrue($fixture->check('?longVariable'));
-
-        $this->assertFalse($fixture->check('not a ?variable'));
-    }
-
-    /**
      * Tests getValue
      */
     public function testGetValue()

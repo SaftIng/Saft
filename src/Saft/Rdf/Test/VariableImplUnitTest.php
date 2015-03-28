@@ -14,4 +14,17 @@ class VariableUnitTest extends VariableAbstractTest
     {
         return new VariableImpl($name);
     }
+
+    /**
+     * Tests check
+     * What is this check for? There shouldn't be a method check
+     */
+    public function testCheck()
+    {
+        $fixture = $this->newInstance('?irgendwas');
+        $this->assertTrue($fixture->check('?s'));
+        $this->assertTrue($fixture->check('?longVariable'));
+
+        $this->assertFalse($fixture->check('not a ?variable'));
+    }
 }
