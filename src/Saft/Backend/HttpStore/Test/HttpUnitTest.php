@@ -140,7 +140,7 @@ class HttpUnitTest extends \PHPUnit_Framework_TestCase
      */
     public function testExistence()
     {
-        $this->assertTrue(class_exists('\Saft\Store\SparqlStore\Http'));
+        $this->assertTrue(class_exists('\Saft\Backend\HttpStore\Store\Http'));
     }
 
     /**

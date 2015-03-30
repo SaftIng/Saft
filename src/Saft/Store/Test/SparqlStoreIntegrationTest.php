@@ -85,6 +85,9 @@ abstract class SparqlStoreIntegrationTest extends \PHPUnit_Framework_TestCase
 
     public function testAddStatements()
     {
+        // remove all triples from the test graph
+        $this->fixture->query('CLEAR GRAPH <' . $this->testGraphUri . '>');
+        
         // graph is empty
         $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
 

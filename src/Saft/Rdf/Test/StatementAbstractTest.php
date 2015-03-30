@@ -11,23 +11,24 @@ abstract class StatementAbstractTest extends \PHPUnit_Framework_TestCase
 
     public function testNQuadsResource()
     {
-        $node = $this->newNamedNodeInstance("http://example.org/test");
+        $node = $this->newNamedNodeInstance('http://example.org/test');
         $fixture = $this->newInstance($node, $node, $node);
 
         $this->assertEquals(
-            "<http://example.org/test> <http://example.org/test> <http://example.org/test> .",
+            '<http://example.org/test> <http://example.org/test> <http://example.org/test> .',
             $fixture->toNQuads()
         );
     }
 
     public function testNQuadsResourceLiteral()
     {
-        $node = $this->newNamedNodeInstance("http://example.org/test");
-        $literal = $this->newLiteralInstance("http://example.org/test");
+        $node = $this->newNamedNodeInstance('http://example.org/test');
+        $literal = $this->newLiteralInstance('http://example.org/test');
         $fixture = $this->newInstance($node, $node, $literal);
 
         $this->assertEquals(
-            '<http://example.org/test> <http://example.org/test> "http://example.org/test" .',
+            '<http://example.org/test> <http://example.org/test> '.
+            '"http://example.org/test"^^<http://www.w3.org/2001/XMLSchema#string> .',
             $fixture->toNQuads()
         );
     }

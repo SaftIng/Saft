@@ -2,7 +2,7 @@
 
 namespace Saft\Store\Test;
 
-use Saft\Store\QueryCache;
+use Saft\QueryCache\QueryCache;
 use Saft\Backend\Virtuoso\Store\Virtuoso;
 use Symfony\Component\Yaml\Parser;
 use Saft\Store\StoreChain;

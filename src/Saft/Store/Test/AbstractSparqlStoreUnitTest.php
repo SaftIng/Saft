@@ -130,9 +130,9 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $this->assertEquals(
             'INSERT DATA { '.
             'Graph <'. $this->testGraphUri .'> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer>} '.
+            '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer> .} '.
             'Graph <'. $this->testGraphUri .'> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> ""John""^^<http://www.w3.org/2001/XMLSchema#string>} '.
+            '<http://saft/test/s1> <http://saft/test/p1> ""John""^^<http://www.w3.org/2001/XMLSchema#string> .} '.
             '}',
             $query
         );
@@ -147,7 +147,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $this->assertEquals(
             $query,
             'INSERT DATA { Graph <http://saft/test/graph> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer>'.
+            '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer> .'.
             '} }'
         );
     }

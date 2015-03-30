@@ -130,7 +130,7 @@ class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
      */
     public function testExistence()
     {
-        $this->assertTrue(class_exists('\Saft\Store\SparqlStore\Virtuoso'));
+        $this->assertTrue(class_exists('\Saft\Backend\Virtuoso\Store\Virtuoso'));
     }
 
     /**
