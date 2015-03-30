@@ -11,7 +11,7 @@ default:
 	@echo ""
 
 setup-test-environment:
-	cp test/config.yml.dist test/config.yml
+	cp test-config.yml.dist test-config.yml
 
 codesniffer:
 	$(PHPCS) --standard=PSR1,PSR2 --extensions=php -p src/*
