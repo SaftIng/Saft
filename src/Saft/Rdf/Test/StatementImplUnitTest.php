@@ -7,7 +7,7 @@ use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\VariableImpl;
 
-class StatementImpUnitTest extends StatementAbstractTest
+class StatementImplUnitTest extends StatementAbstractTest
 {
 
     public function newLiteralInstance($value, $lang = null, $datatype = null)
