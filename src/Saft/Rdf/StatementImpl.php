@@ -26,7 +26,7 @@ class StatementImpl extends AbstractStatement
     /**
      *
      * @param NamedNode|BlankNode|Variable $subject
-     * @param NamedNode                    $predicate
+     * @param NamedNode|Variable           $predicate
      * @param Node                         $object
      * @param NodeNode                     $graph
      * @return

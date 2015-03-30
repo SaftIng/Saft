@@ -5,7 +5,6 @@ use Saft\Rdf\LiteralImpl;
 
 class LiteralImplUnitTest extends LiteralAbstractTest
 {
-
     /**
      * Return a new instance of LiteralImpl
      */
