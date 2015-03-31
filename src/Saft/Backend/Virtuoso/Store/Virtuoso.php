@@ -437,10 +437,10 @@ class Virtuoso extends AbstractSparqlStore
      * This method sends a SPARQL query to the store.
      *
      * @param  string $query            The SPARQL query to send to the store.
-     * @param  array  $options optional It contains key-value pairs and should provide additional
-     *                                  introductions for the store and/or its adapter(s).
-     * @return Result Returns result of the query. Depending on the query
-     *                type, it returns either an instance of ResultIterator, StatementIterator, or ResultValue
+     * @param  array  $options optional It contains key-value pairs and should provide additional introductions
+     *                                  for the store and/or its adapter(s).
+     * @return Result Returns result of the query. Depending on the query type, it returns either an instance
+     *                of ResultIterator, StatementIterator, or ResultValue
      * @throws \Exception If query is no string.
      * @throws \Exception If query is malformed.
      * @throws \Exception If $options[resultType] = is neither extended nor array

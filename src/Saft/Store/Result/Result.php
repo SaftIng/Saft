@@ -17,7 +17,7 @@ abstract class Result
     }
     
     /**
-     * 
+     *
      * @return mixed
      */
     public function getResultObject()

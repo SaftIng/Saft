@@ -8,7 +8,7 @@ class SetResult extends Result implements \Iterator
 {
     /**
      * Constructor.
-     * 
+     *
      * @param mixed $resultObject optional Must be null or an instance of a class which implements \Iterator.
      */
     public function __construct($resultObject = null)

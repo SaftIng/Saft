@@ -14,7 +14,7 @@ class SetResultUnitTest extends \PHPUnit_Framework_TestCase
     protected $fixture;
     
     /**
-     * 
+     *
      */
     public function setUp()
     {

@@ -3,7 +3,8 @@ namespace Saft\Data;
 
 use Saft\Rdf\StatementIterator;
 
-class NQuadsSerializerImpl implements SerializerInterface {
+class NQuadsSerializerImpl implements SerializerInterface
+{
 
     /**
      * Prefixes are ignored in the NQuads serialization
@@ -11,7 +12,8 @@ class NQuadsSerializerImpl implements SerializerInterface {
      * @return void
      */
     public function setPrefixes(array $prefixes)
-    {}
+    {
+    }
 
     /**
      * @unstable
