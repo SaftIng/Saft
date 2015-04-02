@@ -2,6 +2,8 @@
 namespace Saft\Backend\LocalStore\Test;
 
 use Saft\Backend\LocalStore\Store\LocalStore;
+use Saft\Rdf\StatementImpl;
+use Saft\Rdf\VariableImpl;
 
 class LocalStoreUnitTest extends \PHPUnit_Framework_TestCase
 {
@@ -78,24 +80,59 @@ class LocalStoreUnitTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($graphs);
     }
 
+    const STORE_FILE_CONTENT = <<<EOD
+{
+    "mapping": {
+        "http://localhost:8890/foo": "/foaf.nt",
+        "http://dbpedia.org/data/ireland": "/ireland.nt"
+    }
+}
+EOD;
+
     public function testGetAvailableGraphs()
     {
         $this->tempDirectory = TestUtil::createTempDirectory();
-        // .store content with two graphs
-        $content =
-            "{\n"
-            . "    \"mapping\": {\n"
-            . "        \"http://localhost:8890/foo\": \"/foaf.nt\",\n"
-            . "        \"http://dbpedia.org/data/ireland\": \"/ireland.nt\"\n"
-            . "    }\n"
-            . "}\n";
-        $this->writeStoreFile($this->tempDirectory, $content);
+        $this->writeStoreFile($this->tempDirectory, self::STORE_FILE_CONTENT);
 
         $store = new LocalStore($this->tempDirectory);
         $store->initialize();
         $graphs = $store->getAvailableGraphs();
         $this->assertContains('http://localhost:8890/foo', $graphs);
         $this->assertContains('http://dbpedia.org/data/ireland', $graphs);
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testIsGraphAvailableChecksIfInitialized()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        // Must intiailized before
+        $store->isGraphAvailable('foo');
+    }
+    
+    public function testIsGraphAvailable()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $this->writeStoreFile($this->tempDirectory, self::STORE_FILE_CONTENT);
+    
+        $store = new LocalStore($this->tempDirectory);
+        $store->initialize();
+        $this->assertTrue($store->isGraphAvailable('http://localhost:8890/foo'));
+        $this->assertTrue($store->isGraphAvailable('http://dbpedia.org/data/ireland'));
+        $this->assertFalse($store->isGraphAvailable('http://non.existing/graph'));
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testHasMatchingStatementChecksIfInitialized()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        $statement = self::createAllPattern();
+        $store->hasMatchingStatement($statement);
     }
 
     private static function writeStoreFile($dir, $content)
@@ -107,5 +144,15 @@ class LocalStoreUnitTest extends \PHPUnit_Framework_TestCase
         }
         fwrite($file, $content);
         fclose($file);
+    }
+
+    private static function createAllPattern()
+    {
+        $pattern = new StatementImpl(
+            new VariableImpl('?s'),
+            new VariableImpl('?p'),
+            new VariableImpl('?o')
+        );
+        return $pattern;
     }
 }

@@ -51,6 +51,17 @@ class LocalStore extends AbstractTriplePatternStore
         return array_keys($this->graphUriFileMapping);
     }
 
+    public function isGraphAvailable($uri)
+    {
+        if (!Util::isValidUri($uri)) {
+            throw new \InvalidArgumentException(
+                '$uri ' . $uri . ' is not valid'
+            );
+        }
+        $this->ensureInitialized();
+        return array_key_exists($uri, $this->graphUriFileMapping);
+    }
+    
     /**
      * {@inheritdoc}
      */
@@ -58,12 +69,15 @@ class LocalStore extends AbstractTriplePatternStore
     {
         throw new \Exception('Unsupported Operation');
     }
-
+    
     /**
      * {@inheritdoc}
      */
     public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
+        $graphUri = $this->resolveGraphUri($graphUri, $statement);
+        $graphFile = $this->getGraphFile($graphUri);
+
         throw new \Exception('Unsupported Operation');
     }
 
@@ -72,15 +86,46 @@ class LocalStore extends AbstractTriplePatternStore
      */
     public function getMatchingStatements(Statement $Statement, $graphUri = null, array $options = array())
     {
+        $graphUri = $this->resolveGraphUri($graphUri, $statement);
+        $graphFile = $this->getGraphFile($graphUri);
+
         throw new \Exception('Unsupported Operation');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasMatchingStatement(Statement $Statement, $graphUri = null, array $options = array())
+    public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
     {
+        $graphUri = $this->resolveGraphUri($graphUri, $statement);
+        $graphFile = $this->getGraphFile($graphUri);
+
         throw new \Exception('Unsupported Operation');
+    }
+
+    protected function resolveGraphUri($graphUri, Statement $statement)
+    {
+        if (is_null($graphUri)) {
+            if (!$statement->isQuad()) {
+                throw new \InvalidArgumentException(
+                    'Graph URI is not specified. '
+                    . '$graphUri is null and $statement is not a quad.'
+                );
+            }
+            $graphUri = $statement->getGraph()->getValue();
+        }
+        return $graphUri;
+    }
+
+    protected function getGraphFile($graphUri)
+    {
+        if (!$this->isGraphAvailable($graphUri)) {
+            throw new \Exception(
+                'Graph with uri ' . $graphUri . ' is not available'
+            );
+        }
+        $graphFile = $this->graphUriFileMapping[$graphUri];
+        return $graphFile;
     }
 
     /**
