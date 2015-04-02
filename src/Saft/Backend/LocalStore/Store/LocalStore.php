@@ -22,6 +22,7 @@ class LocalStore extends AbstractTriplePatternStore
     protected $log;
     protected $baseDir;
     protected $fileSystem;
+    private $graphUriFileMapping;
 
     public function __construct($baseDir)
     {
@@ -37,6 +38,8 @@ class LocalStore extends AbstractTriplePatternStore
         $this->baseDir = $baseDir;
         $this->fileSystem = new Filesystem(new LocalAdapter($baseDir));
         $this->log->info('Using base dir: ' . $baseDir);
+
+        $this->graphUriFileMapping = array();
     }
 
     /**
@@ -145,9 +148,38 @@ class LocalStore extends AbstractTriplePatternStore
         if (is_null($jsonFile)) {
             $jsonFile = $this->getStoreFile();
         }
-        
-        // TODO load store info
-        $this->log->addInfo('Load Store Info from ' . $jsonFile->getPathname());
+
+        $json = $jsonFile->getContents();
+        $content = json_decode($json, true);
+        if (is_null($content)) {
+            throw new \Exception('.store file seems to be corrupted');
+        }
+        static::checkStoreInfo($content);
+        foreach ($content['mapping'] as $uri => $path) {
+            $this->graphUriFileMapping[$uri] =
+                $this->fileSystem->getFile($path);
+        }
+        // Load more meta information here
+    }
+
+    protected static function checkStoreInfo($content)
+    {
+        if (!array_key_exists('mapping', $content)) {
+            throw new \Exception('Key mapping not found');
+        } elseif (!is_array($content['mapping'])) {
+            throw new \Exception('mapping is not an array');
+        } else {
+            // Check all URIs in the mapping
+            foreach ($content['mapping'] as $uri => $path) {
+                if (!Util::isValidUri($uri)) {
+                    throw new \Exception('Graph URI ' . $uri
+                        . ' is not a valid uri');
+                } elseif (!is_string($path)) {
+                    throw new \Exception('Path for uri ' . $uri
+                        . ' is not a string');
+                }
+            }
+        }
     }
 
     protected function saveStoreInfo(File $jsonFile = null)
@@ -156,7 +188,16 @@ class LocalStore extends AbstractTriplePatternStore
             $jsonFile = $this->getStoreFile();
         }
 
-        // TODO load store info
-        $this->log->addInfo('Save Store Info to ' . $jsonFile->getPathname());
+        $mapping = array();
+        foreach ($this->graphUriFileMapping as $graphUri => $file) {
+            $mapping[$graphUri] = $file->getPathname();
+        }
+        $content = array(
+            // Add more meta information here
+            'mapping' => $mapping
+        );
+        $json = json_encode($content, JSON_PRETTY_PRINT
+            | JSON_UNESCAPED_SLASHES | JSON_FORCE_OBJECT);
+        $jsonFile->setContents($json);
     }
 }
