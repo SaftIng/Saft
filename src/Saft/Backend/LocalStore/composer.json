@@ -4,12 +4,20 @@
 	"description" : "File based store implementation.",
 	"homepage" : "https://safting.github.io/",
 	"license" : "GPL2",
+    "repositories" : [
+        {
+            "type": "vcs",
+            "url": "https://github.com/discordier/php-filesystem.git"
+        }
+    ],
 	"require" : {
 		"php" : ">=5.3.0",
 		"saft/saft-store" : "dev-master"
 	},
 	"require-dev" : {
-		"phpunit/phpunit" : "4.5.*"
+		"phpunit/phpunit" : "4.5.*",
+        "monolog/monolog": "1.11.*",
+        "filicious/filicious" : "dev-master"
 	},
 	"autoload" : {
 		"psr-4" : {
