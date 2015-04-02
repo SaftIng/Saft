@@ -7,14 +7,14 @@ class LocalStoreUnitTest extends \PHPUnit_Framework_TestCase
 {
     // Used for temporary base dirs
     private $tempDirectory = null;
-    
+
     public function tearDown()
     {
         if (!is_null($this->tempDirectory)) {
             TestUtil::deleteDirectory($this->tempDirectory);
         }
     }
-    
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -56,5 +56,56 @@ class LocalStoreUnitTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($store->isInitialized());
         $store->initialize();
         $this->assertTrue($store->isInitialized());
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testGetAvailableGraphsChecksIfInitialized()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        // Must intiailized before
+        $store->getAvailableGraphs();
+    }
+
+    public function testNoAvailableGraphsAfterInitializingAnEmptyBaseDir()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        $store->initialize();
+        $graphs = $store->getAvailableGraphs();
+        $this->assertEmpty($graphs);
+    }
+
+    public function testGetAvailableGraphs()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        // .store content with two graphs
+        $content =
+            "{\n"
+            . "    \"mapping\": {\n"
+            . "        \"http://localhost:8890/foo\": \"/foaf.nt\",\n"
+            . "        \"http://dbpedia.org/data/ireland\": \"/ireland.nt\"\n"
+            . "    }\n"
+            . "}\n";
+        $this->writeStoreFile($this->tempDirectory, $content);
+
+        $store = new LocalStore($this->tempDirectory);
+        $store->initialize();
+        $graphs = $store->getAvailableGraphs();
+        $this->assertContains('http://localhost:8890/foo', $graphs);
+        $this->assertContains('http://dbpedia.org/data/ireland', $graphs);
+    }
+
+    private static function writeStoreFile($dir, $content)
+    {
+        $fileName = $dir . DIRECTORY_SEPARATOR . '.store';
+        $file = fopen($fileName, 'w');
+        if ($file === false) {
+            throw new \Exception('Unable to write .store file ' . $fileName);
+        }
+        fwrite($file, $content);
+        fclose($file);
     }
 }

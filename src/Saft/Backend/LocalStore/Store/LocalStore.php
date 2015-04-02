@@ -47,7 +47,8 @@ class LocalStore extends AbstractTriplePatternStore
      */
     public function getAvailableGraphs()
     {
-        throw new \Exception('Unsupported Operation');
+        $this->ensureInitialized();
+        return array_keys($this->graphUriFileMapping);
     }
 
     /**
@@ -101,6 +102,14 @@ class LocalStore extends AbstractTriplePatternStore
     public function isInitialized()
     {
         return $this->initialized;
+    }
+
+    
+    protected function ensureInitialized()
+    {
+        if (!$this->initialized) {
+            throw new \LogicException('Not initialized');
+        }
     }
 
     public function initialize()
