@@ -6,13 +6,13 @@ use Saft\Backend\LocalStore\Store\LocalStore;
 class LocalStoreUnitTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException \Exception
+     * @expectedException \InvalidArgumentException
      */
     public function testFoo()
     {
-        $store = new LocalStore();
         $this->assertTrue(true, "Nonsense test failed");
-        // Should fail with \Exception
-        $store->getAvailableGraphs();
+        // Should failed
+        $store = new LocalStore(null);
+        $store->initialize();
     }
 }
