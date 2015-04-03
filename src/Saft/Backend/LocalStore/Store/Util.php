@@ -86,8 +86,8 @@ final class Util
         for ($i = 0, $n = strlen($str); $i < $n; $i++) {
             if ($str[$i] === '\\') {
                 if ($i + 1 >= $n) {
-                    //TODO Syntax Error Exception
-                    throw new \Exception('Expected escape char, but was end');
+                    throw new
+                        SyntaxException('Unexpected end', SyntaxException::UNDEFINED, $i);
                 }
                 $i++;
                 switch ($str[$i]) {
@@ -136,14 +136,20 @@ final class Util
                                 . chr((($code >> 6) & 63) + 128)
                                 . chr(($code & 63) + 128);
                         } else {
-                            //TODO Syntax Error Exception
-                            throw new \Exception('SyntaxError');
+                            throw new SyntaxException(
+                                'Invalid unicode',
+                                SyntaxException::UNDEFINED,
+                                $i - (1 + strlen($hex))
+                            );
                         }
                         $out .= $char;
                         break;
                     default:
-                        //TODO Syntax Error Exception
-                        throw new \Exception('Invalid escape char: ' . $str[$i]);
+                        throw new SyntaxException(
+                            'Invalid escape char',
+                            SyntaxException::UNDEFINED,
+                            $i - 1
+                        );
                 }
             } else {
                 $out .= $str[$i];

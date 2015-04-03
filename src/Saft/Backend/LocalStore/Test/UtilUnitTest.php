@@ -2,23 +2,30 @@
 namespace Saft\Backend\LocalStore\Test;
 
 use Saft\Backend\LocalStore\Store\Util;
+use Saft\Backend\LocalStore\Store\SyntaxException;
 
 class UtilUnitTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @expectedException \Exception
-     */
     public function testUnescapeOfNonEscapeChar()
     {
-        Util::unescape('\\x');
+        try {
+            Util::unescape('01234\\x');
+            $this->fail();
+        } catch (SyntaxException $e) {
+            $this->assertFalse($e->isRowDefined());
+            $this->assertEquals(5, $e->getColum());
+        }
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testUnescapeWithBackshlashAtTheEnd()
     {
-        Util::unescape('LoremIpsum\\');
+        try {
+            Util::unescape('01234\\');
+            $this->fail();
+        } catch (SyntaxException $e) {
+            $this->assertFalse($e->isRowDefined());
+            $this->assertEquals(5, $e->getColum());
+        }
     }
 
     public function testUnescape()
