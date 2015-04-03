@@ -66,4 +66,105 @@ final class Util
         // separators.
         return $full;
     }
+
+    /**
+     * Unescape the given string. An escaping starts with a backslash followed
+     * by one of the following escape chars 't', 'b', 'r', 'n', 'f', '"', '\''
+     * or an unicode hex code starting by an 'u'.
+     * @param string $str String to unescape
+     * @throws \Exception when a syntax error has occured
+     * @return string Unescaped string
+     */
+    public static function unescape($str)
+    {
+        // Skip, if there are no escape characters
+        if (strpos($str, '\\') === false) {
+            return $str;
+        }
+
+        $out = '';
+        for ($i = 0, $n = strlen($str); $i < $n; $i++) {
+            if ($str[$i] === '\\') {
+                if ($i + 1 >= $n) {
+                    //TODO Syntax Error Exception
+                    throw new \Exception('Expected escape char, but was end');
+                }
+                $i++;
+                switch ($str[$i]) {
+                    case 't':
+                        $out .= "\t";
+                        break;
+                    case 'b':
+                        $out .= "\b";
+                        break;
+                    case 'n':
+                        $out .= "\n";
+                        break;
+                    case 'r':
+                        $out .= "\r";
+                        break;
+                    case 'f':
+                        $out .= "\f";
+                        break;
+                    case '"':
+                        $out .= "\"";
+                        break;
+                    case '\'':
+                        $out .= "\'";
+                        break;
+                    case 'u':
+                        $i++;
+                        $hex = '';
+                        while (($i < $n) && self::isAlphaNumeric($str[$i])) {
+                            $hex .= $str[$i];
+                            $i++;
+                        }
+                        $i--;
+                        $code = hexdec($hex);
+                        if ($code < 0x80) {
+                            $char = chr($code);
+                        } elseif ($code < 0x800) {
+                            $char = chr(($code >> 6) + 192)
+                                . chr(($code & 63) + 128);
+                        } elseif ($code < 0x10000) {
+                            $char = chr(($code >> 12) + 224)
+                                . chr((($code >> 6) & 63) + 128)
+                                . chr(($code & 63) + 128);
+                        } elseif ($code < 0x200000) {
+                            $char = chr(($code >> 18) + 240)
+                                . chr((($code >> 12) & 63) + 128)
+                                . chr((($code >> 6) & 63) + 128)
+                                . chr(($code & 63) + 128);
+                        } else {
+                            //TODO Syntax Error Exception
+                            throw new \Exception('SyntaxError');
+                        }
+                        $out .= $char;
+                        break;
+                    default:
+                        //TODO Syntax Error Exception
+                        throw new \Exception('Invalid escape char: ' . $str[$i]);
+                }
+            } else {
+                $out .= $str[$i];
+            }
+        }
+        return $out;
+    }
+    
+    public static function isAlphaNumeric($char)
+    {
+        return self::isDigit($char) || self::isAlpha($char);
+    }
+
+    public static function isDigit($char)
+    {
+        return '0' <= $char && $char <= '9';
+    }
+
+    public static function isAlpha($char)
+    {
+        return ('A' <= $char && $char <= 'Z')
+            || ('a' <= $char && $char <= 'z');
+    }
 }
