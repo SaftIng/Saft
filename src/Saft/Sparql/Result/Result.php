@@ -1,5 +1,5 @@
 <?php
-namespace Saft\Store\Result;
+namespace Saft\Sparql\Result;
 
 /**
  * This class represents the result of store operation, usually a SPARQL query.

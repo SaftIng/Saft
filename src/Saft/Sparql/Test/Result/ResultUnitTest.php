@@ -1,7 +1,5 @@
 <?php
-namespace Saft\Store\Test\Result;
-
-use Saft\Store\Result\Result;
+namespace Saft\Sparql\Test\Result;
 
 class ResultUnitTest extends \PHPUnit_Framework_TestCase
 {

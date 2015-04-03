@@ -1,9 +1,9 @@
 <?php
-namespace Saft\Store\Test\Result;
+namespace Saft\Sparql\Test\Result;
 
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\VariableImpl;
-use Saft\Store\Result\StatementResult;
+use Saft\Sparql\Result\StatementResult;
 
 class StatementResultUnitTest extends \PHPUnit_Framework_TestCase
 {

@@ -6,6 +6,7 @@ use Saft\Rdf;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\ResultIterator;
+use Saft\Sparql\Result\Result;
 
 /**
  * Declaration of methods that any Store implementation must have, whether its
@@ -89,7 +90,8 @@ interface StoreInterface
      * @param  array  $options optional It contains key-value pairs and should provide additional
      *                                  introductions for the store and/or its adapter(s).
      * @return Result Returns result of the query. Depending on the query
-     *                type, it returns either an instance of ResultIterator, StatementIterator, or ResultValue
+     *                type, it returns either an instance of SetResult, StatementResult ore ValueResult. In case of an
+     *                exception it returns an instance of ExceptionResult.
      * @throws \Exception If query is no string.
      *                    If query is malformed.
      */
