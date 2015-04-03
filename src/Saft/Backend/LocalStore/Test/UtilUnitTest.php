@@ -6,25 +6,20 @@ use Saft\Backend\LocalStore\Store\SyntaxException;
 
 class UtilUnitTest extends \PHPUnit_Framework_TestCase
 {
-    public function testUnescapeOfNonEscapeChar()
+    public function testUnescapeTellsSyntaxErrorAtTheRightPosition()
     {
-        try {
-            Util::unescape('01234\\x');
-            $this->fail();
-        } catch (SyntaxException $e) {
-            $this->assertFalse($e->isRowDefined());
-            $this->assertEquals(5, $e->getColum());
-        }
+        $this->testSyntaxError('01234\\x', 5);
+        $this->testSyntaxError('01234\\', 5);
+        $this->testSyntaxError('x\\yz', 1);
     }
-
-    public function testUnescapeWithBackshlashAtTheEnd()
+    
+    private function testSyntaxError($str, $colum = SyntaxException::UNDEFINED)
     {
         try {
-            Util::unescape('01234\\');
-            $this->fail();
+            Util::unescape($str);
+            $this->fail('Expected syntax error for "' . $str . '"');
         } catch (SyntaxException $e) {
-            $this->assertFalse($e->isRowDefined());
-            $this->assertEquals(5, $e->getColum());
+            $this->assertEquals($colum, $e->getColum());
         }
     }
 
