@@ -15,7 +15,7 @@ class ResultUnitTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->fixture = $this->getMockBuilder('Saft\Store\Result\Result')->getMock();
+        $this->fixture = $this->getMockBuilder('Saft\Sparql\Result\Result')->getMock();
     }
     
     /**
