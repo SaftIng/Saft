@@ -1,13 +1,11 @@
 <?php
-
 namespace Saft\Backend\PhpArrayCache\Test;
 
-use Saft\Cache\Test\CacheTest;
+use Saft\Cache\Test\AbstractCacheTest;
 use Saft\Cache\Cache;
 
-class CachePhpArrayTest extends CacheTest
+class CachePhpArrayTest extends AbstractCacheTest
 {
-
     /**
      *
      */

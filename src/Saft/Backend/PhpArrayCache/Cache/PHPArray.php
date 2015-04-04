@@ -2,6 +2,7 @@
 
 namespace Saft\Backend\PhpArrayCache\Cache;
 
+use Saft\Cache\Cache;
 use Saft\Cache\CacheInterface;
 
 class PHPArray implements CacheInterface
@@ -45,8 +46,28 @@ class PHPArray implements CacheInterface
      */
     public function get($key)
     {
+        $entry = $this->getCompleteEntry($key);
+        return null !== $entry ? $entry['value'] : null; 
+    }
+
+    /**
+     * Returns the value to a given key, if it exists in the cache.
+     *
+     * @param string $key ID of the entry to return the value from.
+     * @return mixed Value of the entry.
+     */
+    public function getCompleteEntry($key)
+    {
+        $filename = hash('sha256', $key);
+
         if (true === $this->isCached($key)) {
-            return json_decode($this->cache[$key], true);
+            /**
+             * Update meta data
+             */
+            ++$this->cache[$key]['get_count'];
+            
+            return $this->cache[$key];
+            
         } else {
             return null;
         }
@@ -80,8 +101,17 @@ class PHPArray implements CacheInterface
      * @param mixed $value Value to store in the cache.
      */
     public function set($key, $value)
-    {
-        $this->cache[$key] = json_encode($value);
+    {   
+        if (true === $this->isCached($key)) {
+            $this->cache[$key]['value'] = $value;
+            
+            ++$this->cache[$key]['set_count'];
+        } else {
+            $this->cache[$key] = array();
+            $this->cache[$key]['get_count'] = 0;
+            $this->cache[$key]['set_count'] = 1;
+            $this->cache[$key]['value'] = $value;
+        }
     }
 
     /**

@@ -64,10 +64,29 @@ class MemcacheD implements CacheInterface
      */
     public function get($key)
     {
-        $value = $this->cache->get($this->keyPrefix . $key);
+        $entry = $this->getCompleteEntry($key);
+        return null !== $entry ? $entry['value'] : null;
+    }
+
+    /**
+     * Returns the complete cache entry to a given key, if it exists in the cache.
+     *
+     * @param  string $key ID of the entry.
+     * @return mixed Value of the entry.
+     */
+    public function getCompleteEntry($key)
+    {
+        if (true === $this->isCached($key)) {
+            $container = $this->cache->get($this->keyPrefix . $key);
         
-        if (false !== $value) {
-            return $value;
+            /**
+             * Update meta data
+             */
+            ++$container['get_count'];
+            $this->cache->set($this->keyPrefix . $key, $container);
+            
+            return $container;
+            
         } else {
             return null;
         }
@@ -102,7 +121,19 @@ class MemcacheD implements CacheInterface
      */
     public function set($key, $value)
     {
-        $this->cache->set($this->keyPrefix . $key, $value);
+        if (true === $this->isCached($key)) {
+            $container = $this->cache->get($this->keyPrefix . $key);
+            $container['value'] = $value;
+            
+            ++$container['set_count'];
+        } else {
+            $container = array();
+            $container['get_count'] = 0;
+            $container['set_count'] = 1;
+            $container['value'] = $value;
+        }
+        
+        $this->cache->set($this->keyPrefix . $key, $container);
     }
 
     /**
