@@ -7,7 +7,7 @@ namespace Saft\Backend\LocalStore\Store;
  * Because the text file is opened, after using the iterator,
  * you have to close it.
  */
-final class CommentIgnoringLineIterator implements \Iterator
+final class IgnoringLineIterator implements \Iterator
 {
     private $pointer;
     private $closed = false;

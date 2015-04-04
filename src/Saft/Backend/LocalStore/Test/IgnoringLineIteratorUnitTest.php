@@ -1,9 +1,9 @@
 <?php
 namespace Saft\Backend\LocalStore\Test;
 
-use Saft\Backend\LocalStore\Store\CommentIgnoringLineIterator;
+use Saft\Backend\LocalStore\Store\IgnoringLineIterator;
 
-class CommentIgnoringLineIteratorUnitTest extends \PHPUnit_Framework_TestCase
+class IgnoringLineIteratorUnitTest extends \PHPUnit_Framework_TestCase
 {
     // Used for temporary text files
     private $tempDirectory = null;
@@ -25,7 +25,7 @@ class CommentIgnoringLineIteratorUnitTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructorChecksForNull()
     {
-        new CommentIgnoringLineIterator(null);
+        new IgnoringLineIterator(null);
     }
 
     const NUM_REWINDS = 3;
@@ -37,7 +37,7 @@ class CommentIgnoringLineIteratorUnitTest extends \PHPUnit_Framework_TestCase
         $filename = $this->randomFileName();
         $this->writeFile($filename, self::NO_CONTENT);
 
-        $it = new CommentIgnoringLineIterator($filename);
+        $it = new IgnoringLineIterator($filename);
         for ($i = 1; $i <= self::NUM_REWINDS; $i++) {
             $it->rewind();
             $this->assertFalse($it->valid());
@@ -54,7 +54,7 @@ EOD;
         $filename = $this->randomFileName();
         $this->writeFile($filename, self::ONLY_ONE_COMMENT);
 
-        $it = new CommentIgnoringLineIterator($filename);
+        $it = new IgnoringLineIterator($filename);
         for ($i = 1; $i <= self::NUM_REWINDS; $i++) {
             $it->rewind();
             $this->assertFalse($it->valid());
@@ -72,7 +72,7 @@ EOD;
         $filename = $this->randomFileName();
         $this->writeFile($filename, self::ONLY_CONTENT);
 
-        $it = new CommentIgnoringLineIterator($filename);
+        $it = new IgnoringLineIterator($filename);
         for ($i = 1; $i <= self::NUM_REWINDS; $i++) {
             $it->rewind();
             $this->assertTrue($it->valid());
@@ -97,7 +97,7 @@ EOD;
         $filename = $this->randomFileName();
         $this->writeFile($filename, self::STARTING_COMMENT);
 
-        $it = new CommentIgnoringLineIterator($filename);
+        $it = new IgnoringLineIterator($filename);
         for ($i = 1; $i <= self::NUM_REWINDS; $i++) {
             $it->rewind();
             $this->assertTrue($it->valid());
@@ -122,7 +122,7 @@ EOD;
         $filename = $this->randomFileName();
         $this->writeFile($filename, self::ENDING_COMMENT);
 
-        $it = new CommentIgnoringLineIterator($filename);
+        $it = new IgnoringLineIterator($filename);
         for ($i = 1; $i <= self::NUM_REWINDS; $i++) {
             $it->rewind();
             $this->assertTrue($it->valid());
@@ -148,7 +148,7 @@ EOD;
         $filename = $this->randomFileName();
         $this->writeFile($filename, self::STARTING_AND_ENDING_COMMENT);
 
-        $it = new CommentIgnoringLineIterator($filename);
+        $it = new IgnoringLineIterator($filename);
         for ($i = 1; $i <= self::NUM_REWINDS; $i++) {
             $it->rewind();
             $this->assertTrue($it->valid());
@@ -177,7 +177,7 @@ EOD;
         $filename = $this->randomFileName();
         $this->writeFile($filename, self::IGNORE);
     
-        $it = new CommentIgnoringLineIterator($filename);
+        $it = new IgnoringLineIterator($filename);
         $it->rewind();
         $this->assertTrue($it->valid());
         $this->assertEquals('Lorem ipsum dolor sit amet,', $it->current());
