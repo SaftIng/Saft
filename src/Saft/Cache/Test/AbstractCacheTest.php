@@ -167,7 +167,7 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testSet()
     {
-  /*      // int
+        // int
         $this->fixture->set('testSet_int', 1);
         $this->assertEquals(1, $this->fixture->get('testSet_int'));
 
@@ -182,7 +182,7 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
         // object instance
         $this->fixture->set('testSet_object', new Cache(array('type' => 'phparray')));
         $this->assertEquals(new Cache(array('type' => 'phparray')), $this->fixture->get('testSet_object'));
-*/
+
         // object instance in array
         $this->fixture->set('testSet_object', array('foo' => new Cache(array('type' => 'phparray'))));
         $this->assertEquals(
