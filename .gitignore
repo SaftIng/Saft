@@ -7,3 +7,5 @@ composer.phar
 .project
 .settings
 .buildpath
+/gen
+/tmp

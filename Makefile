@@ -28,7 +28,10 @@ apidoc:
 	$(SAMI) update -n -v --force sami-config.php
 
 clean:
-	rm -r ./samicache ./docs ./vendor
+	rm -r ./gen ./tmp
+
+mrpropper: clean
+	rm -r ./vendor
 
 # TODO change this somehow to a loop
 split-subtrees:
