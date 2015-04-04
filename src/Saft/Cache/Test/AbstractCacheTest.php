@@ -98,6 +98,10 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $this->fixture->get('foo'));
     }
 
+    /**
+     * tests getCompleteEntry
+     */
+
     public function testGetCompleteEntry()
     {
         $this->fixture->set('foo', 'bar');
@@ -115,6 +119,30 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
     public function testGetCompleteEntryNoEntry()
     {
         $this->assertNull($this->fixture->getCompleteEntry('foo'));
+    }
+
+    public function testGetCompleteEntryCallMultipleTimes()
+    {
+        $value = array(
+            'foo' => new Cache(array('type' => 'phparray'))
+        );
+        
+        $this->fixture->set('foo', $value);
+        
+        $this->assertEquals(
+            array('get_count' => 1, 'set_count' => 1, 'value' => $value),
+            $this->fixture->getCompleteEntry('foo')
+        );
+        
+        $this->assertEquals(
+            array('get_count' => 2, 'set_count' => 1, 'value' => $value),
+            $this->fixture->getCompleteEntry('foo')
+        );
+        
+        $this->assertEquals(
+            array('get_count' => 3, 'set_count' => 1, 'value' => $value),
+            $this->fixture->getCompleteEntry('foo')
+        );
     }
 
     public function testGetCompleteEntryMultipleAccessesBefore()

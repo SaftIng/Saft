@@ -89,11 +89,6 @@ class File implements CacheInterface
 
             $container = json_decode($encodedContainer, true);
             
-            // unserialize objects, if available
-            if (true === Cache::isSerialized($container['value'])) {
-                $container['value'] = unserialize($container['value']);
-            }
-            
             /**
              * Store meta data
              */
@@ -102,6 +97,11 @@ class File implements CacheInterface
             // save adapted $container
             $encodedContainer = json_encode($container);
             file_put_contents($this->cacheDir . $filename .'.cache', $encodedContainer);
+            
+            // unserialize value, if it is serialized
+            if (true === Cache::isSerialized($container['value'])) {
+                $container['value'] = unserialize($container['value']);
+            }
             
             return $container;
             
