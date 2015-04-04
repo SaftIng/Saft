@@ -63,4 +63,32 @@ abstract class AbstractStatement implements Statement
                    $this->getObject()->toNQuads() . ' .';
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    final public function matches(Statement $pattern)
+    {
+        if ($this->isPattern()) {
+            throw new \LogicException('This must be concrete');
+        }
+
+        $subjectsMatch = $this->getSubject()->matches($pattern->getSubject());
+        $predicatesMatch = $this->getPredicate()->matches($pattern->getPredicate());
+        $objectsMatch = $this->getObject()->matches($pattern->getObject());
+        if ($this->isQuad() && $pattern->isQuad()) {
+            $graphsMatch = $this->getGraph()->matches($pattern->getGraph());
+        } elseif ($this->isQuad() && $pattern->isTriple()) {
+            $graphsMatch = true;
+        } elseif ($this->isTriple() && $pattern->isQuad()) {
+            $graphsMatch = !$pattern->getGraph()->isConcrete();
+        } elseif ($this->isTriple() && $pattern->isTriple()) {
+            $graphsMatch = true;
+        }
+
+        return $subjectsMatch
+            && $predicatesMatch
+            && $objectsMatch
+            && $graphsMatch;
+    }
 }

@@ -58,4 +58,12 @@ interface Statement
      * @return boolean
      */
     public function toSparqlFormat();
+
+    /**
+     * Returns true, if this matches the given pattern. This
+     * have to be concrete.
+     * @param Statement $pattern
+     * @throws \LogicException when !$this->isConcrete()
+     */
+    public function matches(Statement $pattern);
 }
