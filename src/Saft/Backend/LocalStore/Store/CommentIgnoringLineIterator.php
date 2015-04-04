@@ -23,7 +23,7 @@ final class CommentIgnoringLineIterator implements \Iterator
     public function __construct($filename)
     {
         if (is_null($filename)) {
-            throw new \InvalidArgumentException('');
+            throw new \InvalidArgumentException('$filenname is null');
         }
 
         $this->pointer = fopen($filename, 'r');
