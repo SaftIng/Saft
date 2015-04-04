@@ -77,8 +77,10 @@ EOD;
             $it->rewind();
             $this->assertTrue($it->valid());
             $this->assertEquals('Lorem ipsum dolor sit amet,', $it->current());
+            $this->assertEquals(0, $it->key());
             $it->next();
             $this->assertEquals('consetetur sadipscing elitr,', $it->current());
+            $this->assertEquals(1, $it->key());
             $it->next();
             $this->assertFalse($it->valid());
         }
@@ -102,8 +104,10 @@ EOD;
             $it->rewind();
             $this->assertTrue($it->valid());
             $this->assertEquals('Lorem ipsum dolor sit amet,', $it->current());
+            $this->assertEquals(1, $it->key());
             $it->next();
             $this->assertEquals('consetetur sadipscing elitr,', $it->current());
+            $this->assertEquals(3, $it->key());
             $it->next();
             $this->assertFalse($it->valid());
         }
@@ -127,8 +131,10 @@ EOD;
             $it->rewind();
             $this->assertTrue($it->valid());
             $this->assertEquals('Lorem ipsum dolor sit amet,', $it->current());
+            $this->assertEquals(0, $it->key());
             $it->next();
             $this->assertEquals('consetetur sadipscing elitr,', $it->current());
+            $this->assertEquals(2, $it->key());
             $it->next();
             $this->assertFalse($it->valid());
         }
@@ -153,8 +159,10 @@ EOD;
             $it->rewind();
             $this->assertTrue($it->valid());
             $this->assertEquals('Lorem ipsum dolor sit amet,', $it->current());
+            $this->assertEquals(1, $it->key());
             $it->next();
             $this->assertEquals('consetetur sadipscing elitr,', $it->current());
+            $this->assertEquals(3, $it->key());
             $it->next();
             $this->assertFalse($it->valid());
         }
@@ -181,13 +189,30 @@ EOD;
         $it->rewind();
         $this->assertTrue($it->valid());
         $this->assertEquals('Lorem ipsum dolor sit amet,', $it->current());
+        $this->assertEquals(0, $it->key());
         $it->next();
         $this->assertEquals('consetetur sadipscing elitr,', $it->current());
+        $this->assertEquals(7, $it->key());
         $it->next();
         $this->assertFalse($it->valid());
         $it->close();
     }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testCurrentChecksIfClosed()
+    {
+        $filename = $this->randomFileName();
+        $this->writeFile($filename, self::ONLY_CONTENT);
     
+        $it = new IgnoringLineIterator($filename);
+        $it->rewind();
+        $it->close();
+        // Will fail while closed
+        $it->current();
+    }
+
     private function randomFileName()
     {
         return $this->tempDirectory . DIRECTORY_SEPARATOR . uniqid() . '.txt';
