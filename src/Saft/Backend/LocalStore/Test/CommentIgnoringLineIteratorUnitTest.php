@@ -161,22 +161,23 @@ EOD;
         $it->close();
     }
 
-    const LINES_TO_IGNORE = <<<EOD
+    const IGNORE = <<<EOD
 Lorem ipsum dolor sit amet,
-#Some comment
-  # Comment with starting space
- # Followed by a blank line
+# Some comment
+  # A comment with starting space
+# Followed by a blank line
 
-# Followed by blank line with stating space
-    
+# Followed by a blank line with starting space
+  
 consetetur sadipscing elitr,
 EOD;
-
-    public function testIgnoringLines()
+    
+    public function testLineIgnoring()
     {
         $filename = $this->randomFileName();
-        $this->writeFile($filename, self::LINES_TO_IGNORE);
-
+        $this->writeFile($filename, self::IGNORE);
+    
+        $it = new CommentIgnoringLineIterator($filename);
         $it->rewind();
         $this->assertTrue($it->valid());
         $this->assertEquals('Lorem ipsum dolor sit amet,', $it->current());
@@ -186,7 +187,7 @@ EOD;
         $this->assertFalse($it->valid());
         $it->close();
     }
-
+    
     private function randomFileName()
     {
         return $this->tempDirectory . DIRECTORY_SEPARATOR . uniqid() . '.txt';

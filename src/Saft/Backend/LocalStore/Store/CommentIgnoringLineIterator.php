@@ -118,12 +118,11 @@ final class CommentIgnoringLineIterator implements \Iterator
         }
     }
 
-    // Ignore blank lines and comments
-    const IGNORE_REGEX = '/^\s*#\s*$/';
+    const IGNORE_REGEX = '/^\s*(#.*)?$/';
 
     private function canIgnore($line)
     {
-        return preg_match(IGNORE_REGEX, $line);
+        return preg_match(self::IGNORE_REGEX, $line) === 1;
     }
 
     /**
