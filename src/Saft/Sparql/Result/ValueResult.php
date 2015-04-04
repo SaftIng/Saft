@@ -1,5 +1,5 @@
 <?php
-namespace Saft\Store\Result;
+namespace Saft\Sparql\Result;
 
 class ValueResult extends Result
 {

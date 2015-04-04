@@ -1,7 +1,5 @@
 <?php
-namespace Saft\Store\Test\Result;
-
-use Saft\Store\Result\Result;
+namespace Saft\Sparql\Test\Result;
 
 class ResultUnitTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,7 +15,7 @@ class ResultUnitTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->fixture = $this->getMockBuilder('Saft\Store\Result\Result')->getMock();
+        $this->fixture = $this->getMockBuilder('Saft\Sparql\Result\Result')->getMock();
     }
     
     /**
