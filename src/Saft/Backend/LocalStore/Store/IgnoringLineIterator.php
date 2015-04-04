@@ -54,7 +54,7 @@ final class IgnoringLineIterator implements \Iterator
         if (!$this->valid()) {
             throw new \Exception('No such element');
         }
-        return $this->lineCount;
+        return $this->lineCount - 1;
     }
 
     /**
@@ -146,7 +146,7 @@ final class IgnoringLineIterator implements \Iterator
     private function ensureNotClosed()
     {
         if ($this->closed) {
-            throw new \Exception('Closed');
+            throw new \LogicException('Closed');
         }
     }
 }
