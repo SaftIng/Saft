@@ -70,7 +70,7 @@ class File implements CacheInterface
     public function get($key)
     {
         $entry = $this->getCompleteEntry($key);
-        return null !== $entry ? $entry['value'] : null; 
+        return null !== $entry ? $entry['value'] : null;
     }
 
     /**
@@ -86,6 +86,7 @@ class File implements CacheInterface
         if (true === $this->isCached($key)) {
             // load content from cache file and decode it
             $encodedContainer = file_get_contents($this->cacheDir . $filename . '.cache');
+
             $container = json_decode($encodedContainer, true);
             
             // unserialize objects, if available
@@ -143,10 +144,7 @@ class File implements CacheInterface
     {
         $filename = hash('sha256', $key);
         
-        // if value is an instance, serialize it as string
-        if (true === is_object($value)) {
-            $value = serialize($value);
-        } 
+        $value = serialize($value);
         
         if (true === $this->isCached($key)) {
             $content = file_get_contents($this->cacheDir . $filename . '.cache');

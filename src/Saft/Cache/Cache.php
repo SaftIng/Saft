@@ -150,18 +150,18 @@ class Cache
      * and/or modify it under the terms of the Do What The Fuck You Want
      * To Public License, Version 2, as published by Sam Hocevar. See
      * http://sam.zoy.org/wtfpl/COPYING for more details.
-     */ 
+     */
 
     /**
      * Tests if an input is valid PHP serialized string.
      *
-     * Checks if a string is serialized using quick string manipulation to throw out obviously incorrect strings. 
+     * Checks if a string is serialized using quick string manipulation to throw out obviously incorrect strings.
      * Unserialize is then run on the string to perform the final verification.
-     * 
+     *
      * Copied from https://gist.github.com/cs278/217091
-     * 
+     *
      * We adapted it for our purposes.
-     * 
+     *
      * @author      Chris Smith <code+php@chris.cs278.org>
      * @copyright   Copyright (c) 2009 Chris Smith (http://www.cs278.org/)
      * @license     http://sam.zoy.org/wtfpl/WTFPL
@@ -215,7 +215,7 @@ class Cache
                     case 7:
                     case 8:
                     case 9:
-                    break;
+                        break;
 
                     default:
                         return false;
@@ -223,7 +223,7 @@ class Cache
             case 'N':
                 $end .= ';';
 
-                if ($value[$length - 1] !== $end[0]){
+                if ($value[$length - 1] !== $end[0]) {
                     return false;
                 }
                 break;

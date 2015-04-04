@@ -47,7 +47,7 @@ class PHPArray implements CacheInterface
     public function get($key)
     {
         $entry = $this->getCompleteEntry($key);
-        return null !== $entry ? $entry['value'] : null; 
+        return null !== $entry ? $entry['value'] : null;
     }
 
     /**
@@ -101,7 +101,7 @@ class PHPArray implements CacheInterface
      * @param mixed $value Value to store in the cache.
      */
     public function set($key, $value)
-    {   
+    {
         if (true === $this->isCached($key)) {
             $this->cache[$key]['value'] = $value;
             
