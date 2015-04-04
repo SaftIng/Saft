@@ -12,10 +12,26 @@
         <ini name="intl.error_level" value="0" />
         <ini name="memory_limit" value="-1" />
     </php>
+    <!-- Enable Code Coverage report -->
+    <logging>
+        <log type="coverage-html" target="gen/coverage/" title="Saft" />
+    </logging>
+    <!-- Define which files are included in the code coverage report -->
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src</directory>
+            <exclude>
+                <directory suffix="Test.php">./src/Saft/*/Test</directory>
+                <directory suffix="Test.php">./src/Saft/Backend/*/Test</directory>
+                <file>./src/Saft/TestCase.php</file>
+            </exclude>
+        </whitelist>
+    </filter>
+    <!-- Define wich test cases should be executed -->
     <testsuites>
         <testsuite name="Saft">
-            <directory>./src/Saft/*/Test</directory>
-            <directory>./src/Saft/Backend/*/Test</directory>
+            <directory suffix="Test.php">./src/Saft/*/Test</directory>
+            <directory suffix="Test.php">./src/Saft/Backend/*/Test</directory>
         </testsuite>
     </testsuites>
 </phpunit>

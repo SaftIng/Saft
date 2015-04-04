@@ -69,7 +69,7 @@ class Virtuoso extends AbstractSparqlStore
      * @param  string $graphUri URI of the graph to create.
      * @throws \Exception
      */
-    public function addGraph($graphUri, array $options = array())
+    public function addGraph($graphUri)
     {
         $this->query('CREATE SILENT GRAPH <'. $graphUri .'>');
     }

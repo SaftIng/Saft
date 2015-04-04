@@ -701,7 +701,6 @@ class Query
     /**
      * Parsing the given queryand extract its parts.
      *
-     * @param  string $queryString Query to extract parts from
      * @return array $queryParts Triples and graphs
     */
     public function getQueryParts()
