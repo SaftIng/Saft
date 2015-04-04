@@ -89,6 +89,7 @@ final class IgnoringLineIterator implements \Iterator
      */
     public function valid()
     {
+        $this->ensureNotClosed();
         return !is_null($this->currentLine);
     }
     

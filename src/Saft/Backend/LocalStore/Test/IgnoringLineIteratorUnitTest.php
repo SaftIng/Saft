@@ -179,12 +179,12 @@ Lorem ipsum dolor sit amet,
   
 consetetur sadipscing elitr,
 EOD;
-    
+
     public function testLineIgnoring()
     {
         $filename = $this->randomFileName();
         $this->writeFile($filename, self::IGNORE);
-    
+
         $it = new IgnoringLineIterator($filename);
         $it->rewind();
         $this->assertTrue($it->valid());
@@ -198,6 +198,28 @@ EOD;
         $it->close();
     }
 
+    public function testIsClosed()
+    {
+        $filename = $this->randomFileName();
+        $this->writeFile($filename, self::ONLY_CONTENT);
+
+        $it = new IgnoringLineIterator($filename);
+        $this->assertFalse($it->isClosed());
+        $it->close();
+        $this->assertTrue($it->isClosed());
+    }
+
+    public function testClose()
+    {
+        $filename = $this->randomFileName();
+        $this->writeFile($filename, self::ONLY_CONTENT);
+
+        $it = new IgnoringLineIterator($filename);
+        $it->rewind();
+        $it->close();
+        $this->assertTrue($it->isClosed());
+    }
+
     /**
      * @expectedException \LogicException
      */
@@ -205,12 +227,126 @@ EOD;
     {
         $filename = $this->randomFileName();
         $this->writeFile($filename, self::ONLY_CONTENT);
-    
+
         $it = new IgnoringLineIterator($filename);
         $it->rewind();
         $it->close();
         // Will fail while closed
         $it->current();
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testCurrentChecksIfValid()
+    {
+        $filename = $this->randomFileName();
+        $this->writeFile($filename, self::ONLY_CONTENT);
+
+        $it = new IgnoringLineIterator($filename);
+        // Read to the end
+        while ($it->valid()) {
+            $it->next();
+        }
+        assert(!$it->valid());
+        // No such element
+        $it->current();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testKeyChecksIfClosed()
+    {
+        $filename = $this->randomFileName();
+        $this->writeFile($filename, self::ONLY_CONTENT);
+
+        $it = new IgnoringLineIterator($filename);
+        $it->rewind();
+        $it->close();
+        // Will fail while closed
+        $it->key();
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testKeyChecksIfValid()
+    {
+        $filename = $this->randomFileName();
+        $this->writeFile($filename, self::ONLY_CONTENT);
+
+        $it = new IgnoringLineIterator($filename);
+        // Read to the end
+        while ($it->valid()) {
+            $it->next();
+        }
+        assert(!$it->valid());
+        // No such element
+        $it->key();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testNextChecksIfClosed()
+    {
+        $filename = $this->randomFileName();
+        $this->writeFile($filename, self::ONLY_CONTENT);
+
+        $it = new IgnoringLineIterator($filename);
+        $it->rewind();
+        $it->close();
+        // Will fail while closed
+        $it->next();
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testNextChecksIfValid()
+    {
+        $filename = $this->randomFileName();
+        $this->writeFile($filename, self::ONLY_CONTENT);
+
+        $it = new IgnoringLineIterator($filename);
+        // Read to the end
+        while ($it->valid()) {
+            $it->next();
+        }
+        assert(!$it->valid());
+        // No such element
+        $it->next();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testRewindChecksIfClosed()
+    {
+        $filename = $this->randomFileName();
+        $this->writeFile($filename, self::ONLY_CONTENT);
+
+        $it = new IgnoringLineIterator($filename);
+        $it->rewind();
+        $it->close();
+        // Will fail while closed
+        $it->rewind();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testValidChecksIfClosed()
+    {
+        $filename = $this->randomFileName();
+        $this->writeFile($filename, self::ONLY_CONTENT);
+
+        $it = new IgnoringLineIterator($filename);
+        $it->rewind();
+        $it->close();
+        // Will fail while closed
+        $it->valid();
     }
 
     private function randomFileName()
