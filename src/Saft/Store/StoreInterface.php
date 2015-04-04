@@ -62,7 +62,7 @@ interface StoreInterface
      * @return StatementIterator It contains Statement instances  of all matching
      *                           statements of the given graph.
      */
-    public function getMatchingStatements(Statement $Statement, $graphUri = null, array $options = array());
+    public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array());
 
     /**
      * Returns true or false depending on whether or not the statements pattern
@@ -74,7 +74,7 @@ interface StoreInterface
      *                                       introductions for the store and/or its adapter(s).
      * @return boolean Returns true if at least one match was found, false otherwise.
      */
-    public function hasMatchingStatement(Statement $Statement, $graphUri = null, array $options = array());
+    public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array());
 
     /**
      * Get information about the store and its features.
