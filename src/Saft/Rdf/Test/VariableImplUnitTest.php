@@ -4,7 +4,7 @@ namespace Saft\Rdf\Test;
 
 use Saft\Rdf\VariableImpl;
 
-class VariableUnitTest extends VariableAbstractTest
+class VariableImplUnitTest extends VariableAbstractTest
 {
 
     /**

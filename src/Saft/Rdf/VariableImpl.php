@@ -128,4 +128,12 @@ class VariableImpl implements Variable
     {
         return '?'. $this->value;
     }
+
+    /**
+     * @throws \LogicException alway, because a variable is a pattern
+     */
+    public function matches(Node $pattern)
+    {
+        throw new \LogicException('A pattern can\'t matches another pattern');
+    }
 }

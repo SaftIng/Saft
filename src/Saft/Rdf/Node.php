@@ -46,4 +46,14 @@ interface Node
      * @return string
      */
     public function toNQuads();
+
+    /**
+     * Returns true, if this matches the given pattern. This have to be
+     * concrete. The given pattern can either a variable node or a concrete node.
+     * Only concrete nodes of the same type can match.
+     * @param Node $pattern
+     * @return boolean true, if this matches the pattern, else false
+     * @throws \LogicException when $this->isPattern()
+     */
+    public function matches(Node $pattern);
 }

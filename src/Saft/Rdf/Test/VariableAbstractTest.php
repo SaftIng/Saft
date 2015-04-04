@@ -1,6 +1,8 @@
 <?php
 namespace Saft\Rdf\Test;
 
+use Saft\Rdf\VariableImpl;
+
 abstract class VariableAbstractTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -85,5 +87,16 @@ abstract class VariableAbstractTest extends \PHPUnit_Framework_TestCase
     {
         $fixture = $this->newInstance('?s');
         $this->assertTrue($fixture->isVariable());
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    final public function testMatchesWillAlwaysThrowLogicException()
+    {
+        $fixture = $this->newInstance('?s');
+        $pattern = new VariableImpl('?p');
+        // Both are patterns. They can't match, so it will fail.
+        $fixture->matches($pattern);
     }
 }
