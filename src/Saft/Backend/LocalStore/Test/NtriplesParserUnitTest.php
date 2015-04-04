@@ -107,7 +107,7 @@ class NtriplesParserUnitTest extends \PHPUnit_Framework_TestCase
     {
         //TODO data type
         //$expected = new LiteralImpl('123', 'xsd:integer');
-        //$actual = NtriplesParser::parseObject('"123"^^xsd:integer');
+        //$actual = NtriplesParser::parseObject('"123"^^<http://www.w3.org/2001/XMLSchema#integer>');
         //$this->assertEquals($expected, $actual);
     }
 
