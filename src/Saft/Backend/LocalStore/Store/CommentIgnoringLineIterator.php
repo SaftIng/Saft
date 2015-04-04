@@ -100,7 +100,7 @@ final class CommentIgnoringLineIterator implements \Iterator
                 // feof is not true at start but fgets returns false
                 // when dealing with empty files.
                 break;
-            } elseif (!$this->isComment($line)) {
+            } elseif (!$this->canIgnore($line)) {
                 $this->currentLine = rtrim($line, "\n\r");
                 break;
             }
@@ -118,9 +118,12 @@ final class CommentIgnoringLineIterator implements \Iterator
         }
     }
 
-    private function isComment($line)
+    // Ignore blank lines and comments
+    const IGNORE_REGEX = '/^\s*#\s*$/';
+
+    private function canIgnore($line)
     {
-        return (strpos($line, '#') === 0);
+        return preg_match(IGNORE_REGEX, $line);
     }
 
     /**
