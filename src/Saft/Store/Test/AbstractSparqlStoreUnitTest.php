@@ -169,6 +169,21 @@ class AbstractSparqlStoreUnitTest extends TestCase
             ' ?s1 <http://saft/test/p1> <http://saft/test/o1> . }',
             $query
         );
+
+        /**
+         * graph is a pattern variable
+         */
+        $graph1 = new VariableImpl('?g1');
+        $statement = new StatementImpl($subject, $predicate, $object, $graph1);
+
+        $query = $this->fixture->hasMatchingStatement($statement);
+        
+        $this->assertEquals(
+            'ASK {'.
+            'Graph ?g1 {'.
+            ' ?s1 <http://saft/test/p1> <http://saft/test/o1> . } }',
+            $query
+        );
     }
 
     /**
@@ -185,6 +200,16 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $this->assertEquals(
             $query,
             'INSERT DATA { Graph <http://saft/test/foograph> {'.
+            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>'.
+            '} }'
+        );
+
+        // use the given graphUri-variable
+        $query = $this->fixture->addStatements($statements, '?foo');
+        
+        $this->assertEquals(
+            $query,
+            'INSERT DATA { Graph ?foo {'.
             '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>'.
             '} }'
         );
