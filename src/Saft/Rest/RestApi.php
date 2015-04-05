@@ -11,7 +11,7 @@ use Saft\Rdf\StatementImpl;
 /**
  * @todo  hasMatchingStatement missing
  */
-class RestApi extends \Saft\Rest\RestAbstract
+class RestApi extends AbstractRest
 {
     public function __construct($request, $origin, StoreInterface $store)
     {
