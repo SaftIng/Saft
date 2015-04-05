@@ -27,4 +27,10 @@ class VariableImplUnitTest extends VariableAbstractTest
 
         $this->assertFalse($fixture->check('not a ?variable'));
     }
+
+    public function testToNQuads()
+    {
+        $fixture = $this->newInstance('?s');
+        $this->assertEquals($fixture->toNQuads(), '?s');
+    }
 }

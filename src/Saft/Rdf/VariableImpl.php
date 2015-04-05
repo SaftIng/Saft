@@ -126,7 +126,7 @@ class VariableImpl implements Variable
      */
     public function toNQuads()
     {
-        return '?'. $this->value;
+        return $this->value;
     }
 
     /**
