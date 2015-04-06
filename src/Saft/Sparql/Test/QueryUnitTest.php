@@ -13,6 +13,181 @@ class QueryUnitTest extends TestCase
     }
 
     /**
+     * Tests determineObjectDatatype
+     */
+
+    public function testDetermineObjectDatatype()
+    {
+        $this->assertEquals(
+            'http://www.w3.org/2001/XMLSchema#string',
+            $this->fixture->determineObjectDatatype('"Foo"')
+        );
+        
+        $this->assertEquals(
+            'http://www.w3.org/2001/XMLSchema#string',
+            $this->fixture->determineObjectDatatype('"Foo"^^<http://www.w3.org/2001/XMLSchema#string>')
+        );
+        
+        $this->assertEquals(
+            'http://www.w3.org/2001/XMLSchema#boolean',
+            $this->fixture->determineObjectDatatype('"true"^^<http://www.w3.org/2001/XMLSchema#boolean>')
+        );
+    }
+
+    public function testDetermineObjectDatatypeUnknownType()
+    {
+        $this->assertNull($this->fixture->determineObjectDatatype('Foo'));
+    }
+    
+    /**
+     * Tests determineEntityType
+     */
+
+    public function testDetermineEntityType()
+    {
+        $this->assertEquals(
+            'var',
+            $this->fixture->determineEntityType('Foo')
+        );
+    }
+    
+    /**
+     * Tests determineObjectLanguage
+     */
+
+    public function testDetermineObjectLanguage()
+    {
+        $this->assertEquals(
+            'en',
+            $this->fixture->determineObjectLanguage('"Foo"@en')
+        );
+    }
+
+    public function testDetermineObjectLanguageUnknownLanguage()
+    {
+        $this->assertNull($this->fixture->determineObjectLanguage('"Foo"'));
+        $this->assertNull($this->fixture->determineObjectLanguage('"Foo"@'));
+        $this->assertNull($this->fixture->determineObjectLanguage('"Foo@"'));
+    }
+    
+    /**
+     * Tests determineObjectValue
+     */
+
+    public function testDetermineObjectValue()
+    {
+        $this->assertEquals(
+            'Foo',
+            $this->fixture->determineObjectValue('"Foo"')
+        );
+        
+        // with datatype
+        $this->assertEquals(
+            'Foo',
+            $this->fixture->determineObjectValue('"Foo"^^<http://www.w3.org/2001/XMLSchema#string>')
+        );
+        
+        // with language
+        $this->assertEquals(
+            'Foo',
+            $this->fixture->determineObjectValue('"Foo"@en')
+        );
+    }
+
+    public function testDetermineObjectValueUnknownValue()
+    {
+        $this->assertNull($this->fixture->determineObjectValue(42));
+        $this->assertNull($this->fixture->determineObjectValue('Foo'));
+        $this->assertNull($this->fixture->determineObjectValue('"Foo@'));
+        $this->assertNull($this->fixture->determineObjectValue('Foo@"^^<'));
+    }
+
+    /**
+     * Tests extractTriplePattern
+     */
+     
+    public function testExtractTriplePatternLiteral()
+    {
+        $this->assertEquals(
+            array(
+                array(
+                    'type' => 'triple',
+                    's' => 's',
+                    'p' => 'http://www.w3.org/2000/01/rdf-schema#label',
+                    'o' => 'Foo',
+                    's_type' => 'var',
+                    'p_type' => 'uri',
+                    'o_type' => 'literal',
+                    'o_datatype' => '',
+                    'o_lang' => 'en'
+                )
+            ),
+            $this->fixture->extractTriplePattern(
+                '?s <http://www.w3.org/2000/01/rdf-schema#label> "Foo"@en .'
+            )
+        );
+    }
+     
+    public function testExtractTriplePatternTypedLiteral()
+    {
+        $this->assertEquals(
+            array(
+                array(
+                    'type' => 'triple',
+                    's' => 's',
+                    'p' => 'http://www.w3.org/2000/01/rdf-schema#label',
+                    'o' => 'Foo',
+                    's_type' => 'var',
+                    'p_type' => 'uri',
+                    'o_type' => 'typed-literal',
+                    'o_datatype' => 'http://www.w3.org/2001/XMLSchema#string',
+                    'o_lang' => ''
+                )
+            ),
+            $this->fixture->extractTriplePattern(
+                '?s <http://www.w3.org/2000/01/rdf-schema#label> "Foo"^^<http://www.w3.org/2001/XMLSchema#string> .'
+            )
+        );
+    }
+
+    public function testExtractTriplePatternVariables()
+    {
+        $this->assertEquals(
+            array(
+                array(
+                    'type' => 'triple',
+                    's' => 's',
+                    'p' => 'p',
+                    'o' => 'o',
+                    's_type' => 'var',
+                    'p_type' => 'var',
+                    'o_type' => 'var',
+                    'o_datatype' => '',
+                    'o_lang' => ''
+                )
+            ),
+            $this->fixture->extractTriplePattern('?s ?p ?o.')
+        );
+        
+        $this->assertEquals(
+            array(
+                array(
+                    'type' => 'triple',
+                    's' => 's',
+                    'p' => 'p',
+                    'o' => 'o',
+                    's_type' => 'var',
+                    'p_type' => 'var',
+                    'o_type' => 'var',
+                    'o_datatype' => '',
+                    'o_lang' => ''
+                )
+            ),
+            $this->fixture->extractTriplePattern('?s?p?o')
+        );
+    }
+
+    /**
      * Tests getQueryParts
      */
 
@@ -26,7 +201,7 @@ class QueryUnitTest extends TestCase
                     ?s ?p ?o.
                     ?s?p?o.
                     ?s <http://www.w3.org/2000/01/rdf-schema#label> "Foo"^^<http://www.w3.org/2001/XMLSchema#string> .
-                    ?s ?foo "val EN"@en .
+                    ?s ?foo "val EN"@en
                     FILTER (?o = "Bar")
                     FILTER (?o > 40)
                     FILTER regex(?g, "r", "i")
@@ -112,7 +287,7 @@ class QueryUnitTest extends TestCase
                 // ?s ?p ?o.
                 // ?s?p?o.
                 // ?s <http://www.w3.org/2000/01/rdf-schema#label> \'Foo\'^^<http://www.w3.org/2001/XMLSchema#string> .
-                // ?s ?foo \'val EN\'@en .
+                // ?s ?foo \'val EN\'@en
                 array(
                     'type'      => 'triples',
                     'patterns'  => array(

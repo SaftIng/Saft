@@ -177,6 +177,125 @@ class Query
 
         return $this;
     }
+    
+    /**
+     * Determines type of a entity.
+     * 
+     * @param string $entity Entity string.
+     * @return string|null Returns either literal, typed-literal, uri or var. Returns null if it couldnt be 
+     *                     determined.
+     */
+    public function determineEntityType($entity)
+    {
+        // checks if $entity is an URL
+        if (true === \Saft\Rdf\NamedNodeImpl::check($entity)) {
+            return 'uri';
+        
+        // checks if ^^< is in $entity OR if $entity is surrounded by quotation marks
+        } elseif (false !== strpos($entity, '"^^<')
+            || ('"' == substr($entity, 0, 1) 
+                && '"' == substr($entity, strlen($entity)-1, 1))) {
+            return 'typed-literal';
+            
+        // checks if "@ is in $entity
+        } elseif (false !== strpos($entity, '"@')) {
+            return 'literal';
+            
+        // checks if $entity is a string; only strings can be a variable
+        } elseif (true === is_string($entity)) {
+            return 'var';
+            
+        // unknown type
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Determines SPARQL datatype of a given string, usually of an object value.
+     * 
+     * @param string $objectString Object value, incl. datatype information.
+     * @return string|null Returns datatype of object, e.g. http://www.w3.org/2001/XMLSchema#string. Returns
+     *                     null if datatype couldnt be determined.
+     */
+    public function determineObjectDatatype($objectString)
+    {
+        $datatype = null;
+        
+        // checks if ^^< is in $objectString
+        $arrowPos = strpos($objectString, '"^^<');
+        
+        // checks if $objectString starts with " and contains "^^< 
+        if ('"' === substr($objectString, 0, 1) && false !== $arrowPos) {
+            // extract datatype URI
+            $datatype = substr($objectString, $arrowPos + 4);
+            return substr($datatype, 0, strlen($datatype)-1);
+            
+        // checks for surrounding ", without ^^<
+        } elseif ('"' == substr($objectString, 0, 1) 
+            && '"' == substr($objectString, strlen($objectString)-1, 1)) {
+            // if we land here, there are surrounding quotation marks, but no datatype
+            return 'http://www.w3.org/2001/XMLSchema#string';
+        
+        // malformed string, return null as datatype
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Determines SPARQL language of a given string, usually of an object value.
+     * 
+     * @param string $objectString Object value, incl. language information.
+     * @return string|null Returns language of object, e.g. en. Returns null if language couldnt be determined.
+     */
+    public function determineObjectLanguage($objectString)
+    {
+        $atPos = strpos($objectString, '"@');
+        
+        // check for language @
+        if (false !== $atPos) {
+            $language = substr($objectString, $atPos + 2);
+            return 2 <= strlen($language) ? $language : null; 
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Determines SPARQL language of a given string, usually of an object value.
+     * 
+     * @param string $objectString Object value, incl. language information.
+     * @return string Returns value of object. Returns null, if value couldnt be determined.
+     */
+    public function determineObjectValue($objectString)
+    {
+        // checks if ^^< is in $objectString
+        $arrowPos = strpos($objectString, '"^^<');
+        $atPos = strpos($objectString, '"@');
+        
+        // checks if $objectString starts with " and contains "^^< 
+        if ('"' === substr($objectString, 0, 1) && false !== $arrowPos) {
+            return substr($objectString, 1, $arrowPos-1);
+            
+        // checks for surrounding ", without ^^<
+        } elseif ('"' == substr($objectString, 0, 1) 
+            && '"' == substr($objectString, strlen($objectString)-1, 1)) {
+            return substr($objectString, 1, strlen($objectString)-2);
+            
+        // checks for "@
+        } elseif (false !== $atPos) {
+            return substr($objectString, 1, $atPos - 1);
+        
+        // checks for ? at the beginning
+        } elseif ('?' === substr($objectString, 0, 1)) {
+            return substr($objectString, 1);
+        
+        // malformed string, return null as datatype
+        } else {
+            return null;
+        }
+    }
 
     /**
      * Extracts dataset from query, which are named and unnamed graph URIs.
@@ -348,83 +467,51 @@ class Query
             '(' .
             '\<[a-zA-Z0-9\.\/\:#\-]+\>|' .          // e.g. <http://foobar/a>
             '\?[a-zA-Z0-9\_]+|' .                   // e.g. ?s
-            '\".*\"|' .                             // e.g. "Foo"
+            '\".*\"[\s|\.|\}]|' .                   // e.g. "Foo"
             '\".*\"\^\^\<[a-zA-Z0-9\.\/\:#]+\>|' .  // e.g. "Foo"^^<http://www.w3.org/2001/XMLSchema#string>
             '\".*\"\@[a-zA-Z\-]{2,}' .              // e.g. "Foo"@en
             ')' .
-            // final point
-            '\s*\.' .
             '/',
             $wherePart,
             $matches
         );
 
         $lineIndex = 0;
-
+        
         foreach ($matches[0] as $match) {
+            
             /**
-             * remove the following chars: < > ?
+             * Handle type and value of subject and predicate
              */
             $s = str_replace(array('?', '>', '<'), '', $matches[1][$lineIndex]);
             $p = str_replace(array('?', '>', '<'), '', $matches[2][$lineIndex]);
-
-            // object is a literal (with either langauge or datatype)
-            $arrowPos = strpos($matches[3][$lineIndex], '"^^<'); // datatype
-            $atPos = strpos($matches[3][$lineIndex], '"@'); // language
-            if (false !== $arrowPos) {
-                $o = substr($matches[3][$lineIndex], 1, $arrowPos - 1);
-            } elseif (false !== $atPos) {
-                $o = substr($matches[3][$lineIndex], 1, $atPos - 1);
-            } else {
-                $o = str_replace(array('?', '>', '<'), '', $matches[3][$lineIndex]);
-            }
-
+            $o = $matches[3][$lineIndex];
+            
             /**
-             * determine type of subject, predicate and object
+             * Determine types of subject, predicate and object
              */
-            $sType = true === \Saft\Rdf\NamedNodeImpl::check($s) ? 'uri' : 'var';
-            $pType = true === \Saft\Rdf\NamedNodeImpl::check($p) ? 'uri' : 'var';
-            if (true === \Saft\Rdf\NamedNodeImpl::check($o)) {
-                $oType = 'uri';
-            } elseif (false !== $arrowPos) {
-                $oType = 'typed-literal';
-            } elseif (false !== $atPos) {
-                $oType = 'literal';
-            } else {
-                $oType = 'var';
-            }
-
+            $sType = $this->determineEntityType($s);
+            $pType = $this->determineEntityType($p);
+            $oType = $this->determineEntityType($o);
+            
             /**
-             * set objects datatype and lang
+             * Determine all aspects of the object
              */
-            if ('typed-literal' == $oType) {
-                // save only the datatype URI, e.g. http://www.w3.org/2001/XMLSchema#string
-                $oDatatype = str_replace(
-                    '>',
-                    '',
-                    substr($matches[3][$lineIndex], $arrowPos + 4)
-                );
-                $oLang = '';
-            } elseif ('literal' == $oType) {
-                $oDatatype = '';
-                // save only the name of the language, e.g. en
-                $oLang = substr($matches[3][$lineIndex], $atPos + 2);
-            } else {
-                $oDatatype = '';
-                $oLang = '';
-            }
+            $oDatatype = $this->determineObjectDatatype($o);
+            $oLang = $this->determineObjectLanguage($o);
+            $oValue = $this->determineObjectValue($o);
 
             // set pattern array
             $pattern[] = array(
                 'type'          => 'triple',
                 's'             => $s,
                 'p'             => $p,
-                'o'             => $o,
+                'o'             => $oValue,
                 's_type'        => $sType,
                 'p_type'        => $pType,
                 'o_type'        => $oType,
                 'o_datatype'    => $oDatatype,
-                'o_lang'        => $oLang
+                'o_lang'        => null == $oLang ? '' : $oLang
             );
 
             ++$lineIndex;
@@ -655,28 +742,45 @@ class Query
     public function getType()
     {
         if (null === $this->type) {
+            // ADD GRAPH query
+            if (false !== strpos($this->getQuery(), 'ADD GRAPH')) {
+                $this->type = 'addGraph';
+            
             // ASK query
-            if (false !== strpos($this->query, 'ASK')) {
+            } elseif (false !== strpos($this->query, 'ASK')) {
                 $this->type = 'ask';
             
+            // CLEAR GRAPH query
+            } elseif (false !== strpos($this->getQuery(), 'CLEAR GRAPH')) {
+                $this->type = 'clearGraph';
+            
             // DELETE DATA query
-            } elseif (false !== strpos($this->getProloguePart(), 'DELETE DATA')) {
+            // TODO use prologue part
+            } elseif (false !== strpos($this->getQuery(), 'DELETE DATA')) {
                 $this->type = 'deleteData';
             
             // DELETE query
-            } elseif (false !== strpos($this->getProloguePart(), 'DELETE')) {
+            // TODO use prologue part
+            } elseif (false !== strpos($this->getQuery(), 'DELETE')) {
                 $this->type = 'delete';
             
             // DESCRIBE query
             } elseif (false !== strpos($this->getProloguePart(), 'DESCRIBE DATA')) {
                 $this->type = 'describe';
+            
+            // DROP GRAPH or DROP SILENT GRAPH query
+            } elseif (false !== strpos($this->getQuery(), 'DROP GRAPH')
+                || false !== strpos($this->getQuery(), 'DROP SILENT GRAPH')) {
+                $this->type = 'dropGraph';
                 
             // INSERT DATA query
-            } elseif (false !== strpos($this->getProloguePart(), 'INSERT DATA')) {
+            // TODO use prologue part
+            } elseif (false !== strpos($this->getQuery(), 'INSERT DATA')) {
                 $this->type = 'insertData';
             
             // INSERT INTO query
-            } elseif (false !== strpos($this->getProloguePart(), 'INSERT INTO')) {
+            // TODO use prologue part
+            } elseif (false !== strpos($this->getQuery(), 'INSERT INTO')) {
                 $this->type = 'insertInto';
                 
             // SELECT query
@@ -776,6 +880,9 @@ class Query
         // TODO support INSERT INTO queries
         // TODO support DELETE DATA queries
         // TODO support DELETE queries
+        // TODO support ADD GRAPH
+        // TODO support CLEAR GRAPH
+        // TODO support DROP GRAPH
         $tokens = array(
             'prologue'   => '/(' .
 
