@@ -22,6 +22,14 @@ class StatementResult extends SetResult
     }
     
     /**
+     * @return boolean True
+     */
+    public function isEmptyResult()
+    {
+        return false;
+    }
+    
+    /**
      * @return boolean False
      */
     public function isExceptionResult()

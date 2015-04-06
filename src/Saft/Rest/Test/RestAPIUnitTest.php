@@ -148,7 +148,7 @@ class RestAPIUnitTest extends TestCase
                 'INSERT DATA { Graph <> {'.
                 '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer>'.
                 '} Graph <> {'.
-                '<http://saft/test/s2> <http://saft/test/p2> ""John""^^<http://www.w3.org/2001/XMLSchema#string>'.
+                '<http://saft/test/s2> <http://saft/test/p2> "John"^^<http://www.w3.org/2001/XMLSchema#string>'.
                 '} }',
                 $query
             );

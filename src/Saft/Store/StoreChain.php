@@ -1,12 +1,14 @@
 <?php
 namespace Saft\Store;
 
-use Saft\Cache\Cache;
-use Saft\Rdf\Statement;
-use Saft\Rdf\StatementIterator;
-use Saft\QueryCache\QueryCache;
 use Saft\Backend\HttpStore\Store\Http;
 use Saft\Backend\Virtuoso\Store\Virtuoso;
+use Saft\Cache\Cache;
+use Saft\QueryCache\QueryCache;
+use Saft\Rdf\Statement;
+use Saft\Rdf\StatementIterator;
+use Saft\Store\Result\Result;
+use Saft\Store\Result\EmptyResult;
 
 class StoreChain implements StoreInterface
 {
@@ -66,14 +68,14 @@ class StoreChain implements StoreInterface
      */
     public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
+        // run command on chain entries
+        if (0 < count($this->getChainEntries())) {
+            return $this->chainEntries[0]->deleteMatchingStatements($statement, $graphUri, $options);
+        
         // if successor is set, ask it first before run the command yourself.
-        if ($this->successor instanceof StoreInterface) {
+        } elseif ($this->successor instanceof StoreInterface) {
             // just forward command to successor and return its result.
             return $this->successor->deleteMatchingStatements($statement, $graphUri, $options);
-            
-        // run command on chain entries
-        } elseif (0 < count($this->getChainEntries())) {
-            return $this->chainEntries[0]->deleteMatchingStatements($statement, $graphUri, $options);
             
         } else {
             throw new \Exception('No chain entries available and no successor set.');
@@ -142,7 +144,7 @@ class StoreChain implements StoreInterface
             
         // both chain entries and, if available, the successor returned empty result.
         } else {
-            return array();
+            return new EmptyResult();
         }
     }
     
@@ -181,12 +183,7 @@ class StoreChain implements StoreInterface
         $result = null;
         
         if (0 < count($this->getChainEntries())) {
-            $result = $this->chainEntries[0]->hasMatchingStatement($statement, $graphUri, $options);
-        
-            // only return result if it is of type boolean
-            if (true === is_bool($result)) {
-                return $result;
-            }
+            return $this->chainEntries[0]->hasMatchingStatement($statement, $graphUri, $options);
         }
         
         // if successor is set, ask it if chain entries returned empty result.
@@ -206,28 +203,24 @@ class StoreChain implements StoreInterface
      * @param  string $query            The SPARQL query to send to the store.
      * @param  array  $options optional It contains key-value pairs and should provide additional
      *                                  introductions for the store and/or its adapter(s).
-     * @return Result Returns result of the query. Depending on the query
-     *                type, it returns either an instance of ResultIterator, StatementIterator, or ResultValue
+     * @return Result Returns result of the query. Depending on the query type, it returns either an instance
+     *                of EmptyResult, ExceptionResult, SetResult, StatementResult or ValueResult.
      * @throws \Exception If query is no string.
-     *                    If query is malformed.
-     *                    If $options[resultType] = is neither extended nor array
+     * @throws \Exception If query is malformed.
      */
     public function query($query, array $options = array())
     {
         $result = $this->chainEntries[0]->query($query, $options);
         
-        if (false === empty($result)) {
+        if ($result instanceof Result && false === $result->isEmptyResult()) {
             return $result;
-        
-        // if successor is set, ask it if chain entries returned empty result.
+            
         } elseif (true === empty($result) && $this->successor instanceof StoreInterface) {
             // just forward command to successor and return its result.
-            return $this->successor->getAvailableGraphs();
-            
-        // both chain entries and, if available, the successor returned empty result.
-        } else {
-            return array();
+            return $this->successor->query($query, $options);
         }
+        
+        return new EmptyResult();
     }
     
     /**

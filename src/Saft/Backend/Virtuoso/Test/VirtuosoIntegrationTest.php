@@ -1,10 +1,10 @@
 <?php
 namespace Saft\Backend\Virtuoso\Test;
 
-use Saft\Store\Test\SparqlStoreIntegrationTest;
 use Saft\Backend\Virtuoso\Store\Virtuoso;
+use Saft\Store\Test\AbstractSparqlStoreIntegrationTest;
 
-class VirtuosoIntegrationTest extends SparqlStoreIntegrationTest
+class VirtuosoIntegrationTest extends AbstractSparqlStoreIntegrationTest
 {
     public function setUp()
     {

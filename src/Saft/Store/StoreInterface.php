@@ -88,10 +88,10 @@ interface StoreInterface
      * @param  string $query            The SPARQL query to send to the store.
      * @param  array  $options optional It contains key-value pairs and should provide additional
      *                                  introductions for the store and/or its adapter(s).
-     * @return Result Returns result of the query. Depending on the query
-     *                type, it returns either an instance of ResultIterator, StatementIterator, or ResultValue
+     * @return Result Returns result of the query. Depending on the query type, it returns either an instance
+     *                of EmptyResult, ExceptionResult, SetResult, StatementResult or ValueResult.
      * @throws \Exception If query is no string.
-     *                    If query is malformed.
+     * @throws \Exception If query is malformed.
      */
     public function query($query, array $options = array());
     

@@ -21,7 +21,8 @@ use Saft\Sparql\Query;
  *
  * ----------------------------------------------------------------------------------------
  *
- * The implementation here uses a key-value-pair based cache mechanism.
+ * The implementation here uses a key-value-pair based cache mechanism. The original approach was using a
+ * relation database to store and manage query cache related entities.
  */
 class QueryCache implements StoreInterface
 {
@@ -85,11 +86,11 @@ class QueryCache implements StoreInterface
     /**
      * Set the mode which determines how to handle transactions. Possible are:
      *
-     *  0 = Transactions depending on each other, which means, if one operation of
-     *      a transaction gets invalidated or was not successfully executed, all
-     *      according transactions and their operations will be invalidated as well.
+     *  0 = Transactions depending on each other, which means, if one operation of a transaction gets
+     *      invalidated or was not successfully executed, all according transactions and their operations
+     *      will be invalidated as well.
      *
-     *  1 = ??
+     *  1 = to be continued ...
      *
      * @var int
      */
@@ -135,7 +136,7 @@ class QueryCache implements StoreInterface
     {
         // if successor is set, ask it first before run the command yourself.
         if ($this->successor instanceof StoreInterface) {
-            $this->invalidateSubjectResources($statements, $graphUri);
+            $this->invalidateBySubjectResources($statements, $graphUri);
             
             return $this->successor->addStatements($statements, $graphUri, $options);
             
@@ -160,7 +161,7 @@ class QueryCache implements StoreInterface
     {
         // if successor is set, ask it first before run the command yourself.
         if ($this->successor instanceof StoreInterface) {
-            $this->invalidateSubjectResources(new ArrayStatementIteratorImpl(array($statement)), $graphUri);
+            $this->invalidateBySubjectResources(new ArrayStatementIteratorImpl(array($statement)), $graphUri);
             
             return $this->successor->deleteMatchingStatements($statement, $graphUri, $options);
             
@@ -176,7 +177,8 @@ class QueryCache implements StoreInterface
      * @param string $graphUri          URI of the graph to drop.
      * @param array  $options  optional It contains key-value pairs and should provide additional introductions
      *                                  for the store and/or its adapter(s).
-     * @throw \Exception
+     * @throws \Exception If successor does not have a callable dropGraph method.
+     * @throws \Exception If successor is available, because QueryCache does not support droping graphs.
      */
     public function dropGraph($graphUri, array $options = array())
     {
@@ -192,7 +194,7 @@ class QueryCache implements StoreInterface
             
             // otherwise throw exception
             } else {
-                throw new \Exception('Successor does not have a callable dropGraph function.');
+                throw new \Exception('Successor does not have a callable dropGraph method.');
             }
             
         // dont run command by myself
@@ -205,7 +207,7 @@ class QueryCache implements StoreInterface
      * Executes an operation which is either invalidateByGraphUri, invalidateByQuery or rememberQueryResult.
      *
      * @param array $operation Array containing information of a function to execute
-     * @throw \Exception If key 'function' is not set or invalid.
+     * @throws \Exception If key 'function' is not set or invalid.
      */
     public function executeOperation($operation)
     {
@@ -331,9 +333,36 @@ class QueryCache implements StoreInterface
      */
     public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
-        // build matching query and check for cache entry
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-        $query = 'SELECT * FROM <'. $graphUri .'> WHERE {'. $this->sparqlFormat($statementIterator) .'}';
+        /**
+         * build matching query and check for cache entry
+         */
+        // Remove, maybe available, graph from given statement and put it into an iterator.
+        // reason for the removal of the graph is to avoid quads in the query. Virtuoso wants the graph
+        // in the FROM part.
+        $query = 'SELECT ?s ?p ?o FROM <'. $graphUri .'> WHERE { ?s ?p ?o ';
+
+        // create shortcuts for S, P and O
+        $s = $statement->getSubject();
+        $p = $statement->getPredicate();
+        $o = $statement->getObject();
+            
+        // add filter, if subject is a named node or literal
+        if (true === $s->isNamed() || true == $s->isLiteral()) {
+            $query .= 'FILTER (str(?s) = "'. $s->getValue() .'") ';
+        }
+        
+        // add filter, if predicate is a named node or literal
+        if (true === $p->isNamed() || true == $p->isLiteral()) {
+            $query .= 'FILTER (str(?p) = "'. $p->getValue() .'") ';
+        }
+        
+        // add filter, if predicate is a named node or literal
+        if (true === $o->isNamed() || true == $o->isLiteral()) {
+            $query .= 'FILTER (str(?o) = "'. $o->getValue() .'") ';
+        }
+        
+        $query .= '}';
+        
         $queryId = $this->generateShortId($query);
         $result = $this->cache->get($queryId);
         
@@ -344,6 +373,7 @@ class QueryCache implements StoreInterface
         // if no cache entry available, run query by successor and save its result in the cache
         } elseif ($this->successor instanceof StoreInterface) {
             $result = $this->successor->getMatchingStatements($statement, $graphUri, $options);
+            
             $this->rememberQueryResult($query, $result);
             
         // dont run command by myself
@@ -410,6 +440,7 @@ class QueryCache implements StoreInterface
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return boolean Returns true if at least one match was found, false otherwise.
+     * @todo cache ask queries
      */
     public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
     {
@@ -594,13 +625,9 @@ class QueryCache implements StoreInterface
         }
 
         // if activate and if there are related QueryCache entries, invalidate them
-        if (true === $checkForRelatedQueryCacheEntries
-            && '' != $queryContainer['relatedQueryCacheEntries']
-        ) {
+        if (true === $checkForRelatedQueryCacheEntries && '' != $queryContainer['relatedQueryCacheEntries']) {
             // get entries
-            $relatedQueryCacheEntries = $this->cache->get(
-                $queryContainer['relatedQueryCacheEntries']
-            );
+            $relatedQueryCacheEntries = $this->cache->get($queryContainer['relatedQueryCacheEntries']);
 
             // invalidate entries by their query
             foreach ($relatedQueryCacheEntries as $queryCacheEntryId) {
@@ -628,9 +655,9 @@ class QueryCache implements StoreInterface
      * @param StatementIterator $statements Statement iterator containing statements to be created. They will
      *                                      be invalidated first.
      * @param string            $graphUri   URI of the graph which is related to the statements.
-     * @throw \Exception
+     * @throws \Exception
      */
-    public function invalidateSubjectResources(StatementIterator $statements, $graphUri)
+    public function invalidateBySubjectResources(StatementIterator $statements, $graphUri)
     {
         $subjectUris = array();
         
@@ -639,15 +666,7 @@ class QueryCache implements StoreInterface
         // collect all relevant subject URIs
         foreach ($statements as $statement) {
             // check if subject URI was invalidate before, to prevent obsolete work
-            if (false === isset($subjectUris[(string)$statement->getSubject()])) {
-                // invalidate resource (triple subject)
-                $this->invalidateByQuery(
-                    'SELECT ?p ?o FROM <'. $graphUri .'> WHERE {'. $statement->getSubject()->toNQuads() .' ?p ?o.}'
-                );
-                
-                // remember triple subject
-                $subjectUris[(string)$statement->getSubject()] = true;
-            }
+            $subjectUris[(string)$statement->getSubject()] = (string)$statement->getSubject();
         }
         
         // get according query ids
@@ -722,7 +741,7 @@ class QueryCache implements StoreInterface
             
             // if successor is not set, return empty array.
             } else {
-                $result = array();
+                $result = new EmptyResult();
                 $this->rememberQueryResult($query, $result);
             }
         }
@@ -741,8 +760,8 @@ class QueryCache implements StoreInterface
      */
     public function rememberQueryResult($query, $result, $checkTransaction = true)
     {
-        // if a transaction is active, stop further execution and save this function
-        // call under 'placed operations' of the according active transaction
+        // if a transaction is active, stop further execution and save this function call under
+        // 'placed operations' of the according active transaction
         if (true === $checkTransaction && true === $this->isATransactionActive()) {
             // save function call + parameter
             $this->addPlacedOperation(
@@ -762,7 +781,7 @@ class QueryCache implements StoreInterface
         /**
          * init query
          */
-        $simpleQuery = new Query($query);
+        $queryObject = new Query($query);
         $queryId = $this->generateShortId($query);
 
 
@@ -773,7 +792,7 @@ class QueryCache implements StoreInterface
          *      + according result which belongs to the query
          */
         $queryCacheEntry = $this->cache->get($queryId);
-        if (false !== $queryCacheEntry) {
+        if (null !== $queryCacheEntry) {
             // check, if a cache entry with the $queryId already exists; thats
             // usually not possible, but in case it happens, invalidate all cache
             // entries using given $query
@@ -793,7 +812,7 @@ class QueryCache implements StoreInterface
          * hash id of the given SPARQL query.
          */
         $graphIds = array();
-        foreach ($simpleQuery->getFrom() as $graphUri) {
+        foreach ($queryObject->getFrom() as $graphUri) {
             // generate short hash based on the URI of the graph
             $graphId = $this->generateShortId($graphUri);
 
@@ -805,19 +824,17 @@ class QueryCache implements StoreInterface
                 $graphContainer = array();
             }
 
-            // no doublings possible, because in case the cache entry already exists
-            // than it will be used and no further execution of this function takes
-            // place
+            // no doublings possible, because in case the cache entry already exists than it will be used and
+            // no further execution of this function takes place
             $graphContainer[$queryId] = $queryId;
 
             // save updated/created graph entry
             $this->cache->set($graphId, $graphContainer);
 
             /**
-             * save references of the graph ids in the query cache entry, which
-             * represents the given SPARQL query. now there is a bidirectional
-             * relation between the graphs used in the Query and the Query cache
-             * entry itself.
+             * save references of the graph ids in the query cache entry, which represents the given SPARQL
+             * query. now there is a bidirectional relation between the graphs used in the Query and the
+             * Query cache entry itself.
              */
             $queryCacheEntry['graphIds'][] = $graphId;
         }
@@ -831,7 +848,7 @@ class QueryCache implements StoreInterface
          * if available. In case we found a match, all according data will be deleted
          * from the cache to avoid having outdated data in the cache.
          */
-        $triplePatterns = $simpleQuery->getTriplePatterns();
+        $triplePatterns = $queryObject->getTriplePatterns();
         $hashedTriplePattern = array();
 
         foreach ($graphIds as $graphId) {
@@ -858,6 +875,7 @@ class QueryCache implements StoreInterface
                  */
                 $patternKey = $graphId . '_' . $subjectHash . '_' . $predicateHash .
                                          '_' . $objectHash;
+                                         
                 $this->cache->set($patternKey, $queryId);
 
                 // collect all pattern which are related to a certain graph
@@ -871,6 +889,7 @@ class QueryCache implements StoreInterface
         $queryCacheEntry['result']          = $result;
         $queryCacheEntry['query']           = $query;
         $queryCacheEntry['triplePattern']   = $hashedTriplePattern;
+        
         $this->cache->set($queryId, $queryCacheEntry);
         
         // remember this result in this instance too.
@@ -921,10 +940,8 @@ class QueryCache implements StoreInterface
     }
 
     /**
-     * Starts a new transaction. Means, that all query cache related operations
-     * will be redirect to this new transaction.
-     *
-     * @return void
+     * Starts a new transaction. Means, that all query cache related operations will be redirect to this new
+     * transaction.
      */
     public function startTransaction()
     {
@@ -937,11 +954,10 @@ class QueryCache implements StoreInterface
     }
 
     /**
-     * Stops the active transaction. This function assumes this transaction has
-     * no nested transactions, which means, that all of its placed operations
-     * will be immediately executed.
+     * Stops the active transaction. This function assumes this transaction has no nested transactions, which
+     * means, that all of its placed operations will be immediately executed.
      *
-     * @throws \Exception Various reasons possible
+     * @throws \Exception If unknown transaction mode choosen.
      * @todo Implement rollback support, in case something went wrong
      */
     public function stopTransaction()
@@ -949,8 +965,7 @@ class QueryCache implements StoreInterface
         // operations to be done for this transaction
         $placedOperations = $this->placedOperations[$this->activeTransaction];
 
-        // execute placed operations which are belongs to this, currently active,
-        // transaction
+        // execute placed operations which are belongs to this, currently active, transaction
         foreach ($placedOperations as $operation) {
             $this->executeOperation($operation);
         }
@@ -959,8 +974,8 @@ class QueryCache implements StoreInterface
         if (0 == $this->transactionMode) {
             $relatedQueryCacheEntries = array();
 
-            // go through all placed operations of each transaction and collect
-            // all ids of related QueryCache entries
+            // go through all placed operations of each transaction and collect all ids of related QueryCache
+            // entries
             foreach ($this->placedOperations as $transactionId => $operations) {
                 foreach ($operations as $operation) {
                     if ('rememberQueryResult' == $operation['function']) {
@@ -970,10 +985,9 @@ class QueryCache implements StoreInterface
                 }
             }
 
-            // now we know, which transaction has a relation to which QueryCache
-            // entries. We save this information is each of these QueryCache
-            // entries, because in case one of these gets invalidated, it will
-            // invalidate all according QueryCache entries as well.
+            // now we know, which transaction has a relation to which QueryCache entries. We save this
+            // information is each of these QueryCache entries, because in case one of these gets invalidated,
+            // it will invalidate all according QueryCache entries as well.
 
             // FYI:
             // this list grows or keeps its size, but it does not shrink
@@ -990,12 +1004,10 @@ class QueryCache implements StoreInterface
                 // load according query cache entry
                 $queryContainer = $this->cache->get($queryCacheEntryId);
 
-                // in case there are already query entry IDs, don't override
-                // them, but add the new ones
+                // in case there are already query entry IDs, don't override them, but add the new ones
                 $queryContainer['relatedQueryCacheEntries'] = $entryId;
 
-                // TODO test the case that there is already according QueryCache
-                //      entries
+                // TODO test the case that there is already according QueryCache entries
 
                 $this->cache->set($queryCacheEntryId, $queryContainer);
             }
@@ -1006,8 +1018,8 @@ class QueryCache implements StoreInterface
             $this->runningTransactions[$this->activeTransaction] = 'finished';
 
             if (0 < $this->activeTransaction) {
-                // set transaction active, which has the highest number but is still
-                // active e.g. if current one was 3, then the next active one is 2.
+                // set transaction active, which has the highest number but is still active e.g. if current one
+                // was 3, then the next active one is 2.
                 $transactionIds = array_keys($this->runningTransactions);
                 rsort($transactionIds);
                 foreach ($transactionIds as $id) {
@@ -1017,13 +1029,17 @@ class QueryCache implements StoreInterface
                     }
                 }
 
-                // if the last running transaction gets closed
+            // if the last running transaction gets closed
             } else {
                 $this->activeTransaction = null;
                 $this->invalidatedEntriesDuringTransaction = array();
                 $this->placedOperations = array();
                 $this->runningTransactions = array();
             }
+        
+        // throw an exception if an unknown transaction mode was choosen.
+        } else {
+            throw new \Exception('Unknown transaction mode choosen.');
         }
     }
 }

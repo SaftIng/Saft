@@ -1,14 +1,15 @@
 <?php
 namespace Saft\Store\Result;
 
-class ValueResult extends Result
+/**
+ * Represents an empty result, usually after an INSERT or UPDATE SPARQL query.
+ */
+class EmptyResult extends Result
 {
     /**
-     * @param mixed $scalar
      */
-    public function __construct($scalar)
+    public function __construct()
     {
-        $this->setResultObject($scalar);
     }
     
     /**
@@ -16,11 +17,11 @@ class ValueResult extends Result
      */
     public function isEmptyResult()
     {
-        return false;
+        return true;
     }
     
     /**
-     * @return boolean False
+     * @return boolean True
      */
     public function isExceptionResult()
     {
@@ -44,23 +45,10 @@ class ValueResult extends Result
     }
     
     /**
-     * @return boolean True
+     * @return boolean False
      */
     public function isValueResult()
     {
-        return true;
-    }
-    
-    /**
-     * @param mixed
-     */
-    public function setResultObject($resultObject)
-    {
-        if (true === is_scalar($resultObject)) {
-            parent::setResultObject($resultObject);
-            
-        } else {
-            throw new \Exception('Parameter $resultObject must be a scalar.');
-        }
+        return false;
     }
 }

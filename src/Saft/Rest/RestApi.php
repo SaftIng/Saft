@@ -2,6 +2,7 @@
 namespace Saft\Rest;
 
 use Saft\Store\StoreInterface;
+use Saft\Rdf\AbstractNamedNode;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\LiteralImpl;
@@ -42,7 +43,7 @@ class RestApi extends \Saft\Rest\RestAbstract
             }
             $graphUri = null;
             if (isset($_POST['graphUri'])) {
-                if (true === NamedNodeImpl::check($_POST['graphUri'])) {
+                if (true === AbstractNamedNode::check($_POST['graphUri'])) {
                     $graphUri = new NamedNodeImpl($_POST['graphUri']);
                 } else {
                     throw new \Exception('graphUri not a valid URI.');
@@ -121,7 +122,7 @@ class RestApi extends \Saft\Rest\RestAbstract
     private function createNode($value)
     {
         //TODO triple-pattern
-        if (true === NamedNodeImpl::check($value) || null === $value) {
+        if (true === AbstractNamedNode::check($value) || null === $value) {
             return new NamedNodeImpl($value);
         } else {
             return new LiteralImpl($value);

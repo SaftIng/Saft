@@ -3,13 +3,11 @@ namespace Saft\Rdf\Test;
 
 abstract class NamedNodeAbstractTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * An abstract method which returns new instances of NamedNode
      * @todo The factory method approach could also be extended to use a factory object
      */
     abstract public function newInstance($uri);
-
 
     /**
      * Tests instanciation

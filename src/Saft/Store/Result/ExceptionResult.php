@@ -12,6 +12,14 @@ class ExceptionResult extends Result
     }
     
     /**
+     * @return boolean False
+     */
+    public function isEmptyResult()
+    {
+        return false;
+    }
+    
+    /**
      * @return boolean True
      */
     public function isExceptionResult()

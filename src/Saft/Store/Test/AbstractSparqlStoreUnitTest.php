@@ -132,7 +132,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
             'Graph <'. $this->testGraphUri .'> {'.
             '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer> .} '.
             'Graph <'. $this->testGraphUri .'> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> ""John""^^<http://www.w3.org/2001/XMLSchema#string> .} '.
+            '<http://saft/test/s1> <http://saft/test/p1> "John"^^<http://www.w3.org/2001/XMLSchema#string> .} '.
             '}',
             $query
         );

@@ -4,11 +4,14 @@ namespace Saft\Store\Test;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\VariableImpl;
 use Saft\Rdf\StatementImpl;
+use Saft\Rdf\VariableImpl;
+use Saft\Store\Result\StatementResult;
+use Saft\Store\Result\SetResult;
+use Saft\Store\Result\ValueResult;
 use Symfony\Component\Yaml\Parser;
 
-abstract class SparqlStoreIntegrationTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractSparqlStoreIntegrationTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Saft\Cache
@@ -164,7 +167,7 @@ abstract class SparqlStoreIntegrationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * function deleteMatchingStatements
+     * Tests deleteMatchingStatements
      */
 
     public function testDeleteMatchingStatements()
@@ -235,11 +238,48 @@ abstract class SparqlStoreIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->fixture->deleteMatchingStatements($statement, $this->testGraphUri));
     }
     
+    public function testDeleteMatchingStatementsWithVariables()
+    {
+        /**
+         * Create some test data
+         */
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+
+        // 2 triples
+        $statements = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
+            ),
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
+            ),
+        ));
+
+        // add triples
+        $this->fixture->addStatements($statements, $this->testGraphUri);
+
+        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraphUri));
+
+        /**
+         * drop all triples
+         */
+        $this->fixture->deleteMatchingStatements(
+            new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
+            $this->testGraphUri
+        );
+
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+    }
+    
     /**
      * Tests getMatchingStatements
      */
     
-    public function testGetMatchingStatements()
+    public function testGetMatchingStatements1()
     {
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -258,21 +298,34 @@ abstract class SparqlStoreIntegrationTest extends \PHPUnit_Framework_TestCase
         // add triples
         $this->fixture->addStatements($statements, $this->testGraphUri);
         
-        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new VariableImpl()
+        );
+        
+        /**
+         * Build SetResult instance to check against
+         */
+        $statementResultToCheckAgainst = new StatementResult();
+        $statementResultToCheckAgainst->setVariables(array('s', 'p', 'o'));
+        $statementResultToCheckAgainst->append(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
+            )
+        );
+        $statementResultToCheckAgainst->append(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
+            )
+        );
         
         $this->assertEquals(
-            array(
-                array(
-                    $statement->getSubject()->getValue() => 'http://s/',
-                    $statement->getPredicate()->getValue() => 'http://p/',
-                    $statement->getObject()->getValue() => 'http://o/'
-                ),
-                array(
-                    $statement->getSubject()->getValue() => 'http://s/',
-                    $statement->getPredicate()->getValue() => 'http://p/',
-                    $statement->getObject()->getValue() => 'test literal'
-                ),
-            ),
+            $statementResultToCheckAgainst,
             $this->fixture->getMatchingStatements($statement, $this->testGraphUri)
         );
     }
@@ -281,8 +334,11 @@ abstract class SparqlStoreIntegrationTest extends \PHPUnit_Framework_TestCase
     {
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
         
+        $statementResult = new StatementResult();
+        $statementResult->setVariables(array('s', 'p', 'o'));
+        
         $this->assertEquals(
-            array(),
+            $statementResult,
             $this->fixture->getMatchingStatements($statement, $this->testGraphUri)
         );
     }
@@ -311,8 +367,11 @@ abstract class SparqlStoreIntegrationTest extends \PHPUnit_Framework_TestCase
         
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
         
+        $statementResult = new StatementResult();
+        $statementResult->setVariables(array('s', 'p', 'o'));
+        
         $this->assertEquals(
-            array(),
+            $statementResult,
             $this->fixture->getMatchingStatements($statement, $this->testGraphUri)
         );
     }
@@ -347,15 +406,10 @@ abstract class SparqlStoreIntegrationTest extends \PHPUnit_Framework_TestCase
     
     public function testHasMatchingStatementEmptyGraph()
     {
-        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraphUri .'>');
         
-        // TODO known bug, that Virtuoso returns true even the graph is empty, fix that
-        if ('VirtuosoIntegrationTest' === $this->className) {
-            $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraphUri));
-            
-        } else {
-            $this->assertFalse($this->fixture->hasMatchingStatement($statement, $this->testGraphUri));
-        }
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $this->assertFalse($this->fixture->hasMatchingStatement($statement, $this->testGraphUri));
     }
     
     public function testHasMatchingStatementWithSuccessor()
@@ -406,12 +460,12 @@ abstract class SparqlStoreIntegrationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * function query
+     * Tests query
      */
 
     public function testQuery()
     {
-        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraphUri .'>');
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -423,12 +477,55 @@ abstract class SparqlStoreIntegrationTest extends \PHPUnit_Framework_TestCase
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new NamedNodeImpl('http://o/1')
+                new LiteralImpl('"foobar"')
             ),
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new NamedNodeImpl('http://o/2')
+                new LiteralImpl(42)
+            ),
+        ));
+
+        // add triples
+        $this->fixture->addStatements($statements, $this->testGraphUri);
+        
+        /**
+         * Build SetResult instance to check against
+         */
+        $setResultToCheckAgainst = new SetResult();
+        $setResultToCheckAgainst->setVariables(array('s', 'o'));
+        $setResultToCheckAgainst->append(array(
+            's' => new NamedNodeImpl('http://s/'),
+            'o' => new LiteralImpl('"foobar"')
+        ));
+        $setResultToCheckAgainst->append(array(
+            's' => new NamedNodeImpl('http://s/'),
+            'o' => new NamedNodeImpl('http://o/')
+        ));
+        $setResultToCheckAgainst->append(array(
+            's' => new NamedNodeImpl('http://s/'),
+            'o' => new LiteralImpl(42)
+        ));
+        
+        // check
+        $this->assertEquals(
+            $setResultToCheckAgainst,
+            $this->fixture->query('SELECT ?s ?o FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.} ORDER BY ?o')
+        );
+    }
+
+    public function testQueryAsk()
+    {
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraphUri .'>');
+        
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+
+        // 2 triples
+        $statements = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
             ),
         ));
 
@@ -436,208 +533,21 @@ abstract class SparqlStoreIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->fixture->addStatements($statements, $this->testGraphUri);
 
         $this->assertEquals(
-            array(array(
-                's' => 'http://s/', 'p' => 'http://p/', 'o' => 'http://o/'
-            ), array(
-                's' => 'http://s/', 'p' => 'http://p/', 'o' => 'http://o/1'
-            ), array(
-                's' => 'http://s/', 'p' => 'http://p/', 'o' => 'http://o/2'
-            )),
-            $this->fixture->query(
-                'SELECT ?s ?p ?o
-                   FROM <' . $this->testGraphUri . '>
-                  WHERE {?s ?p ?o.}'
-            )
-        );
-    }
-
-    public function testQueryAsk()
-    {
-        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
-
-        // 2 triples
-        $statements = new ArrayStatementIteratorImpl(array(
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/'),
-                new NamedNodeImpl('http://o/')
-            ),
-        ));
-
-        // add triples
-        $this->fixture->addStatements($statements, $this->testGraphUri);
-
-        $this->assertTrue(
+            new ValueResult(true),
             $this->fixture->query(
                 'ASK { SELECT * FROM <'. $this->testGraphUri . '> WHERE {<http://s/> <http://p/> ?o.}}'
             )
         );
     }
 
-    public function testQueryDifferentResultTypes()
-    {
-        $this->assertEquals(
-            array(),
-            $this->fixture->query('SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}')
-        );
-
-        $this->assertEquals(
-            array(),
-            $this->fixture->query(
-                'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}',
-                array('resultType' => 'array')
-            )
-        );
-    }
-
     public function testQueryEmptyResult()
     {
+        $setResult = new SetResult();
+        $setResult->setVariables(array('s', 'p', 'o'));
+        
         $this->assertEquals(
-            array(),
+            $setResult,
             $this->fixture->query('SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}')
-        );
-    }
-
-    public function testQueryExtendedResult()
-    {
-        // triples
-        $statements = new ArrayStatementIteratorImpl(array(
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/1'),
-                new LiteralImpl('val EN', 'en')
-            ),
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/2'),
-                new LiteralImpl('val DE', 'de')
-            ),
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/3'),
-                new LiteralImpl(1337)
-            ),
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/4'),
-                new LiteralImpl(0)
-            ),
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/5'),
-                new LiteralImpl(false)
-            ),
-        ));
-
-        // add triples
-        $this->fixture->addStatements($statements, $this->testGraphUri);
-
-        $this->assertEqualsArrays(
-            array(
-                'head' => array(
-                    'link' => array(),
-                    'vars' => array('s', 'p', 'o')
-                ),
-                'results' => array(
-                    'distinct'  => false,
-                    'ordered'   => true,
-                    'bindings'  => array(
-                        array(
-                            's' => array(
-                                'type'  => 'uri',
-                                'value' => 'http://s/'
-                            ),
-                            'p' => array(
-                                'type'  => 'uri',
-                                'value' => 'http://p/1'
-                            ),
-                            'o' => array(
-                                'type'      => 'literal',
-                                'value'     => 'val EN',
-                                'xml:lang'  => 'en'
-                            )
-                        ),
-                        array(
-                            's' => array(
-                                'type'  => 'uri',
-                                'value' => 'http://s/'
-                            ),
-                            'p' => array(
-                                'type'  => 'uri',
-                                'value' => 'http://p/2'
-                            ),
-                            'o' => array(
-                                'xml:lang'  => 'de',
-                                'type'      => 'literal',
-                                'value'     => 'val DE'
-                            )
-                        ),
-                        array(
-                            's' => array(
-                                'type'  => 'uri',
-                                'value' => 'http://s/'
-                            ),
-                            'p' => array(
-                                'type'  => 'uri',
-                                'value' => 'http://p/3'
-                            ),
-                            'o' => array(
-                                'datatype'  => 'http://www.w3.org/2001/XMLSchema#integer',
-                                'type'      => 'typed-literal',
-                                'value'     => '1337'
-                            )
-                        ),
-                        array(
-                            's' => array(
-                                'type'  => 'uri',
-                                'value' => 'http://s/'
-                            ),
-                            'p' => array(
-                                'type'  => 'uri',
-                                'value' => 'http://p/4'
-                            ),
-                            'o' => array(
-                                'datatype'  => 'http://www.w3.org/2001/XMLSchema#integer',
-                                'type'      => 'typed-literal',
-                                'value'     => '0'
-                            )
-                        ),
-                        array(
-                            's' => array(
-                                'type'  => 'uri',
-                                'value' => 'http://s/'
-                            ),
-                            'p' => array(
-                                'type'  => 'uri',
-                                'value' => 'http://p/5'
-                            ),
-                            // The value was false, but now its 0. Virtuoso cast boolean values to 0 or 1.
-                            // The problem is, after you fetch entries, the datatype changed, like here, from
-                            // xsd:boolean to xsd:integer.
-                            // TODO how to handle boolean values? save boolean, but fetch integer later on...
-                            'o' => array(
-                                'datatype'  => 'http://www.w3.org/2001/XMLSchema#integer',
-                                'type'      => 'typed-literal',
-                                'value'     => '0'
-                            )
-                        )
-                    )
-                )
-            ),
-            $this->fixture->query(
-                'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.} ORDER BY ?p',
-                array('resultType' => 'extended')
-            )
-        );
-    }
-
-    public function testQueryInvalidResultType()
-    {
-        $this->setExpectedException('\Exception');
-
-        $this->fixture->query(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}',
-            array('resultType' => 'invalid')
         );
     }
     
@@ -662,11 +572,12 @@ abstract class SparqlStoreIntegrationTest extends \PHPUnit_Framework_TestCase
         
         $this->fixture->setChainSuccessor($instance);
         
-        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $setResult = new SetResult();
+        $setResult->setVariables(array('s', 'p', 'o'));
         
         $this->assertEquals(
-            array(),
-            $this->fixture->getMatchingStatements($statement, $this->testGraphUri)
+            $setResult,
+            $this->fixture->query('SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}')
         );
     }
 }

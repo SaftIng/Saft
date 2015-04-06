@@ -180,7 +180,13 @@ abstract class AbstractSparqlStore implements StoreInterface
     public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
     {
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-        return $this->query('ASK { '. $this->sparqlFormat($statementIterator, $graphUri) .'}', $options);
+        $result = $this->query('ASK { '. $this->sparqlFormat($statementIterator, $graphUri) .'}', $options);
+        
+        if (true === is_object($result)) {
+            return $result->getResultObject();
+        } else {
+            return $result;
+        }
     }
     
     /**

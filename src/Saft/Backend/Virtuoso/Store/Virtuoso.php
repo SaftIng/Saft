@@ -2,7 +2,10 @@
 
 namespace Saft\Backend\Virtuoso\Store;
 
+use Saft\Rdf\AbstractLiteral;
+use Saft\Rdf\AbstractNamedNode;
 use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
@@ -11,6 +14,11 @@ use Saft\Rdf\Triple;
 use Saft\Sparql\Query;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\StoreInterface;
+use Saft\Store\Result\EmptyResult;
+use Saft\Store\Result\ExceptionResult;
+use Saft\Store\Result\SetResult;
+use Saft\Store\Result\StatementResult;
+use Saft\Store\Result\ValueResult;
 
 /**
  * SparqlStore implementation of OpenLink Virtuoso. It supports version 6.1.8+
@@ -249,6 +257,7 @@ class Virtuoso extends AbstractSparqlStore
 
         $condition = $this->sparqlFormat($statementIterator);
         $query = 'WITH <'. $graphUri .'> DELETE {'. $condition .'} WHERE {'. $condition .'}';
+
         $this->query($query, $options);
         
         // if successor is set, ask it too.
@@ -306,6 +315,7 @@ class Virtuoso extends AbstractSparqlStore
      *                           statements of the given graph.
      * @todo FILTER select
      * @todo check if graph URI is valid
+     * @todo make it possible to read graphUri from $statement, if given $graphUri is null
      */
     public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
@@ -314,21 +324,57 @@ class Virtuoso extends AbstractSparqlStore
             $this->successor->getMatchingStatements($statement, $graphUri, $options);
         }
         
-        // Remove, maybe available, graph from given statement and put it into an iterator
-        // reason for the removal of the graph is to avoid quads in the query. Virtuoso wants the graph in the
-        // FROM part.
-        $statementIterator = new ArrayStatementIteratorImpl(array(
-            new StatementImpl(
-                $statement->getSubject(),
-                $statement->getPredicate(),
-                $statement->getObject()
-            )
-        ));
+        // Remove, maybe available, graph from given statement and put it into an iterator.
+        // reason for the removal of the graph is to avoid quads in the query. Virtuoso wants the graph
+        // in the FROM part.
+        $query = 'SELECT ?s ?p ?o ' .
+            'FROM <'. $graphUri .'> '.
+            'WHERE { ?s ?p ?o ';
+            
+        // create shortcuts for S, P and O
+        $s = $statement->getSubject();
+        $p = $statement->getPredicate();
+        $o = $statement->getObject();
+            
+        // add filter, if subject is a named node or literal
+        if (true === $s->isNamed() || true == $s->isLiteral()) {
+            $query .= 'FILTER (str(?s) = "'. $s->getValue() .'") ';
+        }
         
-        return $this->query(
-            'SELECT * FROM <'. $graphUri .'> WHERE {'. $this->sparqlFormat($statementIterator) .'}',
-            $options
-        );
+        // add filter, if predicate is a named node or literal
+        if (true === $p->isNamed() || true == $p->isLiteral()) {
+            $query .= 'FILTER (str(?p) = "'. $p->getValue() .'") ';
+        }
+        
+        // add filter, if predicate is a named node or literal
+        if (true === $o->isNamed() || true == $o->isLiteral()) {
+            $query .= 'FILTER (str(?o) = "'. $o->getValue() .'") ';
+        }
+        
+        $query .= '}';
+        
+        // execute query and save result
+        // TODO transform getMatchingStatements into lazy loading, so a batch loading is possible
+        $result = $this->query($query, $options);
+        
+        /**
+         * Transform SetResult into StatementResult
+         */
+        $statementResult = new StatementResult();
+        $statementResult->setVariables($result->getVariables());
+        
+        foreach ($result as $entry) {
+            $statementList = array();
+            $i = 0;
+            foreach ($result->getVariables() as $variable) {
+                $statementList[$i++] = $entry[$variable];
+            }
+            $statementResult->append(
+                new StatementImpl($statementList[0], $statementList[1], $statementList[2])
+            );
+        }
+        
+        return $statementResult;
     }
     
     /**
@@ -349,9 +395,15 @@ class Virtuoso extends AbstractSparqlStore
      */
     public function getTripleCount($graphUri)
     {
-        $result = $this->query('SELECT COUNT(?s) as ?count FROM <'. $graphUri .'> WHERE {?s ?p ?o.}');
+        if (true === AbstractNamedNode::check($graphUri)) {
+            $result = $this->query('SELECT (COUNT(*) AS ?count) FROM <' . $graphUri . '> WHERE {?s ?p ?o.}');
+            $result = $result->getResultObject();
+            
+            return $result[0]['count']->getValue();
 
-        return $result[0]['count'];
+        } else {
+            throw new \Exception('Parameter $graphUri is not valid or empty.');
+        }
     }
     
     /**
@@ -440,89 +492,157 @@ class Virtuoso extends AbstractSparqlStore
      * @param  array  $options optional It contains key-value pairs and should provide additional introductions
      *                                  for the store and/or its adapter(s).
      * @return Result Returns result of the query. Depending on the query type, it returns either an instance
-     *                of ResultIterator, StatementIterator, or ResultValue
+     *                of EmptyResult, ExceptionResult, SetResult, StatementResult or ValueResult.
      * @throws \Exception If query is no string.
      * @throws \Exception If query is malformed.
-     * @throws \Exception If $options[resultType] = is neither extended nor array
+     * @throws \Exception If PDO query is false.
+     * @todo handle multiple graphs in FROM clause
      */
     public function query($query, array $options = array())
     {
-        /**
-         * result type not set, use array instead
-         */
-        if (false === isset($options['resultType'])) {
-            // if nothing was set, array is default result type. Possible are: array, extended
-            $options['resultType'] = 'array';
-
-        /**
-         * extended result type
-         */
-        } elseif ('array' != $options['resultType'] && 'extended' != $options['resultType']) {
-            throw new \Exception('Given resultType is invalid, allowed are array and extended.');
-        }
-
-        // prepare query
-        $queryPrefix = '';
-        if ('extended' == $options['resultType']) {
-            $queryPrefix = 'define output:format "JSON"';
-        }
-
         $queryObject = new Query($query);
-        $sparqlQuery = $queryPrefix . PHP_EOL . $query;
-
+        
         /**
          * SPARQL query (usually to fetch data)
          */
-        if (false === in_array($queryObject->getType(), array('insertData', 'insertInto', 'deleteData', 'delete'))) {
+        if ('select' === $queryObject->getType()) {
+            // force extended result to have detailed information about given result entries, such as datatype and
+            // language information.
+            $sparqlQuery = 'define output:format "JSON"' . PHP_EOL . $query;
+            
+            // escape characters that delimit the query within the query using addcslashes
             $graphUri = 'NULL';
             $graphSpec = '';
-
             // escape characters that delimit the query within the query
-            $sparqlQuery = $graphSpec . 'CALL DB.DBA.SPARQL_EVAL(\''.
-                           addcslashes($sparqlQuery, '\'\\') . '\', \''.
-                           $graphUri . '\', 0)';
+            $sparqlQuery = $graphSpec . 'CALL DB.DBA.SPARQL_EVAL(\''. addcslashes($sparqlQuery, '\'\\') . '\', '.
+                           '\''. $graphUri . '\', 0)';
 
+            // execute query
+            try {
+                $pdoQuery = $this->connection->prepare(
+                    $sparqlQuery,
+                    array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY)
+                );
+
+                $pdoQuery->execute();
+
+            } catch (\PDOException $e) {
+                return new ExceptionResult($e);
+            }
+            
+            // if successor is set, ask it too.
+            if ($this->successor instanceof StoreInterface) {
+                $this->successor->query($query, $options);
+            }
+
+            $setResult = new SetResult();
+
+            // transform result to array in case we fired a non-UPDATE query
+            if (false !== $pdoQuery) {
+                $resultArray = json_decode(current(current($pdoQuery->fetchAll(\PDO::FETCH_ASSOC))), true);
+                
+                $variables = $resultArray['head']['vars'];
+                
+                // in case the result was empty, Virtuoso does not return a list of variables, which are
+                // usually located in the SELECT part. so we try to extract the variables by ourselves.
+                if (0 == count($variables)) {
+                    $variables = $queryObject->extractVariablesFromQuery($query);
+                }
+                
+                $setResult->setVariables($variables);
+                
+                /**
+                 * go through all bindings and create according objects for SetResult instance.
+                 *
+                 * $bindingParts will look like:
+                 *
+                 * array(
+                 *      's' => array(
+                 *          'type' => 'uri',
+                 *          'value' => '...'
+                 *      ), ...
+                 * )
+                 */
+                foreach ($resultArray['results']['bindings'] as $bindingParts) {
+                    $newEntry = array();
+                    
+                    /**
+                     * A part looks like:
+                     * array(
+                     *      'type' => 'uri',
+                     *      'value' => '...'
+                     * )
+                     */
+                    foreach ($bindingParts as $variable => $part) {
+                        switch ($part['type']) {
+                            /**
+                             * Literal (language'd)
+                             */
+                            case 'literal':
+                                $newEntry[$variable] = new LiteralImpl($part['value'], $part['xml:lang']);
+                                
+                                break;
+                            /**
+                             * Typed-Literal
+                             */
+                            case 'typed-literal':
+                                // get a value which has the same datatype as described in the given result
+                                // e.g. xsd:string => "foo" instead of only foo
+                                $newEntry[$variable] = AbstractLiteral::getRealValueBasedOnDatatype(
+                                    $part['datatype'],
+                                    $part['value']
+                                );
+                                
+                                break;
+                            
+                            /**
+                             * NamedNode
+                             */
+                            case 'uri':
+                                $newEntry[$variable] = new NamedNodeImpl($part['value']);
+                                break;
+                        
+                            default:
+                                throw new \Exception('Unknown type given.');
+                                break;
+                        }
+                    }
+                    
+                    $setResult->append($newEntry);
+                }
+
+                return $setResult;
+            
+            } else {
+                throw new \Exception('PDO query is false.');
+            }
+            
         /**
          * SPARPQL Update query
          */
         } else {
-            $sparqlQuery = 'SPARQL ' . $sparqlQuery;
-        }
-
-        // execute query
-        try {
-            $pdoQuery = $this->connection->prepare(
-                $sparqlQuery,
-                array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY)
-            );
-
-            $pdoQuery->execute();
-
-        } catch (\PDOException $e) {
-            throw new \Exception($e->getMessage());
-        }
-        
-        // if successor is set, ask it too.
-        if ($this->successor instanceof StoreInterface) {
-            $this->successor->query($query, $options);
-        }
-
-        // transform result to array in case we fired a non-UPDATE query
-        if (false !== $pdoQuery) {
-            $result = $pdoQuery->fetchAll(\PDO::FETCH_ASSOC);
+            $sparqlQuery = 'SPARQL ' . $query;
             
-            // if it was an ASK query, return true or false.
-            if ('ask' === $queryObject->getType()) {
-                // TODO fix that ASK queries return true even the graph is empty
-                return '1' === $result[0]['__ask_retval'];
-                
-            // encode as JSON string
-            } elseif ('extended' === $options['resultType']) {
-                $result = current(current($result));
-                $result = json_decode($result, true);
-            }
+            // execute query
+            try {
+                $pdoQuery = $this->connection->prepare(
+                    $sparqlQuery,
+                    array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY)
+                );
 
-            return $result;
+                $pdoQuery->execute();
+
+            } catch (\PDOException $e) {
+                throw new \Exception($e->getMessage());
+            }
+            
+            // ask result
+            if ('ask' === $queryObject->getType()) {
+                $pdoResult = $pdoQuery->fetchAll(\PDO::FETCH_ASSOC);
+                return new ValueResult(true !== empty($pdoResult));
+            } else {
+                return new EmptyResult();
+            }
         }
     }
     

@@ -180,9 +180,9 @@ class Query
     
     /**
      * Determines type of a entity.
-     * 
+     *
      * @param string $entity Entity string.
-     * @return string|null Returns either literal, typed-literal, uri or var. Returns null if it couldnt be 
+     * @return string|null Returns either literal, typed-literal, uri or var. Returns null if it couldnt be
      *                     determined.
      */
     public function determineEntityType($entity)
@@ -193,7 +193,7 @@ class Query
         
         // checks if ^^< is in $entity OR if $entity is surrounded by quotation marks
         } elseif (false !== strpos($entity, '"^^<')
-            || ('"' == substr($entity, 0, 1) 
+            || ('"' == substr($entity, 0, 1)
                 && '"' == substr($entity, strlen($entity)-1, 1))) {
             return 'typed-literal';
             
@@ -213,7 +213,7 @@ class Query
     
     /**
      * Determines SPARQL datatype of a given string, usually of an object value.
-     * 
+     *
      * @param string $objectString Object value, incl. datatype information.
      * @return string|null Returns datatype of object, e.g. http://www.w3.org/2001/XMLSchema#string. Returns
      *                     null if datatype couldnt be determined.
@@ -225,14 +225,14 @@ class Query
         // checks if ^^< is in $objectString
         $arrowPos = strpos($objectString, '"^^<');
         
-        // checks if $objectString starts with " and contains "^^< 
+        // checks if $objectString starts with " and contains "^^<
         if ('"' === substr($objectString, 0, 1) && false !== $arrowPos) {
             // extract datatype URI
             $datatype = substr($objectString, $arrowPos + 4);
             return substr($datatype, 0, strlen($datatype)-1);
             
         // checks for surrounding ", without ^^<
-        } elseif ('"' == substr($objectString, 0, 1) 
+        } elseif ('"' == substr($objectString, 0, 1)
             && '"' == substr($objectString, strlen($objectString)-1, 1)) {
             // if we land here, there are surrounding quotation marks, but no datatype
             return 'http://www.w3.org/2001/XMLSchema#string';
@@ -245,7 +245,7 @@ class Query
     
     /**
      * Determines SPARQL language of a given string, usually of an object value.
-     * 
+     *
      * @param string $objectString Object value, incl. language information.
      * @return string|null Returns language of object, e.g. en. Returns null if language couldnt be determined.
      */
@@ -256,7 +256,7 @@ class Query
         // check for language @
         if (false !== $atPos) {
             $language = substr($objectString, $atPos + 2);
-            return 2 <= strlen($language) ? $language : null; 
+            return 2 <= strlen($language) ? $language : null;
         }
         
         return null;
@@ -264,7 +264,7 @@ class Query
     
     /**
      * Determines SPARQL language of a given string, usually of an object value.
-     * 
+     *
      * @param string $objectString Object value, incl. language information.
      * @return string Returns value of object. Returns null, if value couldnt be determined.
      */
@@ -274,12 +274,12 @@ class Query
         $arrowPos = strpos($objectString, '"^^<');
         $atPos = strpos($objectString, '"@');
         
-        // checks if $objectString starts with " and contains "^^< 
+        // checks if $objectString starts with " and contains "^^<
         if ('"' === substr($objectString, 0, 1) && false !== $arrowPos) {
             return substr($objectString, 1, $arrowPos-1);
             
         // checks for surrounding ", without ^^<
-        } elseif ('"' == substr($objectString, 0, 1) 
+        } elseif ('"' == substr($objectString, 0, 1)
             && '"' == substr($objectString, strlen($objectString)-1, 1)) {
             return substr($objectString, 1, strlen($objectString)-2);
             
@@ -479,7 +479,6 @@ class Query
         $lineIndex = 0;
         
         foreach ($matches[0] as $match) {
-            
             /**
              * Handle type and value of subject and predicate
              */

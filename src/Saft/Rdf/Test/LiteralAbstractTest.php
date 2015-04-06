@@ -3,7 +3,6 @@ namespace Saft\Rdf\Test;
 
 abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * An abstract method which returns new instances of Literal
      * @todo The factory method approach could also be extended to use a factory object
@@ -71,7 +70,7 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDatatypeString()
     {
-        $fixture = $this->newInstance('foo');
+        $fixture = $this->newInstance('"foo"');
 
         $this->assertEquals(
             'http://www.w3.org/2001/XMLSchema#string',

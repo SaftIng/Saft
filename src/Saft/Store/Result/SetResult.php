@@ -7,6 +7,13 @@ namespace Saft\Store\Result;
 class SetResult extends Result implements \Iterator
 {
     /**
+     * Contains a list of variable names.
+     *
+     * @var array
+     */
+    protected $variables = array();
+    
+    /**
      * Constructor.
      *
      * @param mixed $resultObject optional Must be null or an instance of a class which implements \Iterator.
@@ -30,6 +37,32 @@ class SetResult extends Result implements \Iterator
     public function current()
     {
         return $this->resultObject->current();
+    }
+    
+    /**
+     * Returns the number of stored entries.
+     *
+     * @return int
+     */
+    public function getEntryCount()
+    {
+        return count($this->resultObject);
+    }
+    
+    /**
+     *
+     */
+    public function getVariables()
+    {
+        return $this->variables;
+    }
+    
+    /**
+     * @return boolean True
+     */
+    public function isEmptyResult()
+    {
+        return false;
     }
     
     /**
@@ -82,7 +115,7 @@ class SetResult extends Result implements \Iterator
     }
     
     /**
-     * @param mixed
+     * @param mixed $resultObject Instance of a class which implements \Iterator interface.
      */
     public function setResultObject($resultObject)
     {
@@ -97,6 +130,14 @@ class SetResult extends Result implements \Iterator
         } else {
             throw new \Exception('Parameter $resultObject must implement Iterator interface.');
         }
+    }
+    
+    /**
+     *
+     */
+    public function setVariables($variables)
+    {
+        $this->variables = $variables;
     }
 
     /**
