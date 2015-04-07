@@ -192,18 +192,21 @@ abstract class AbstractLiteral implements Literal
      * A literal matches only another literal if there values, datatypes and
      * languages are equal.
      * {@inheritdoc}
-     * @throws \Exception when $pattern is neither an instance of Literal nor Variable
      */
     public function matches(Node $pattern)
     {
-        if (!($pattern instanceof Literal || $pattern instanceof Variable)) {
-            throw new \Exception('$pattern must be of type Literal or Variable');
+        if (!$this->isConcrete()) {
+            throw new \LogicException('This have to be concrete');
         }
 
         if ($pattern->isConcrete()) {
-            return $this->getValue() === $pattern->getValue()
-                && $this->getDatatype() === $pattern->getDatatype()
-                && $this->getLanguage() === $pattern->getLanguage();
+            if ($pattern instanceof Literal) {
+                return $this->getValue() === $pattern->getValue()
+                    && $this->getDatatype() === $pattern->getDatatype()
+                    && $this->getLanguage() === $pattern->getLanguage();
+            } else {
+                return false;
+            }
         } else {
             // All Literals matches a variable/pattern
             return true;

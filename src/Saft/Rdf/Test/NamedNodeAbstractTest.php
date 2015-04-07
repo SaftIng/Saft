@@ -4,6 +4,7 @@ namespace Saft\Rdf\Test;
 use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\VariableImpl;
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\LiteralImpl;
 
 abstract class NamedNodeAbstractTest extends \PHPUnit_Framework_TestCase
 {
@@ -85,16 +86,6 @@ abstract class NamedNodeAbstractTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($fixture->isVariable());
     }
 
-    /**
-     * @expectedException \Exception
-     */
-    final public function testMatchesChecksPatternType()
-    {
-        $fixture = $this->newInstance('http://example.net');
-        // Will fail. Pattern must be of type NamedNode or Variable
-        $fixture->matches(new BlankNodeImpl('foo'));
-    }
-
     final public function testMatches()
     {
         $fixture = $this->newInstance('http://example.net');
@@ -102,5 +93,6 @@ abstract class NamedNodeAbstractTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($fixture->matches(new VariableImpl('?s')));
         $this->assertTrue($fixture->matches(new NamedNodeImpl('http://example.net')));
         $this->assertFalse($fixture->matches(new NamedNodeImpl('http://other.net')));
+        $this->assertFalse($fixture->matches(new LiteralImpl('example')));
     }
 }

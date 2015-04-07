@@ -84,16 +84,19 @@ abstract class AbstractNamedNode implements NamedNode
     /**
      * A named node matches a another named node if there URIs are equals.
      * {@inheritdoc}
-     * @throws \Exception when $pattern is neither an instance of NamedNode nor Variable
      */
     public function matches(Node $pattern)
     {
-        if (!($pattern instanceof NamedNode || $pattern instanceof Variable)) {
-            throw new \Exception('$pattern must be of type NamedNode or Variable');
+        if (!$this->isConcrete()) {
+            throw new \LogicException('This have to be concrete');
         }
 
         if ($pattern->isConcrete()) {
-            return $this->getUri() === $pattern->getUri();
+            if ($pattern instanceof NamedNode) {
+                return $this->getUri() === $pattern->getUri();
+            } else {
+                return false;
+            }
         } else {
             // All named nodes matches a variable/pattern
             return true;
