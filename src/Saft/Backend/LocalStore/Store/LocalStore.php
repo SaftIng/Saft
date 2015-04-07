@@ -7,10 +7,10 @@ use Saft\Store\AbstractTriplePatternStore;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\Statement;
 use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
 use Filicious\Filesystem;
 use Filicious\Local\LocalAdapter;
 use Filicious\File;
+use Monolog\Handler\NullHandler;
 
 /**
  * Simple file based store working in a single directory. A .store file in the
@@ -32,8 +32,9 @@ class LocalStore extends AbstractTriplePatternStore
 
         $className = get_class($this);
         $this->log = new Logger($className);
-        //TODO Log handler should be configurable
-        $this->log->pushHandler(new StreamHandler('php://output'));
+        //TODO Log Handler
+        // $this->log->pushHandler(new StreamHandler('php://output'));
+        $this->log->pushHandler(new NullHandler());
 
         $this->baseDir = $baseDir;
         $this->fileSystem = new Filesystem(new LocalAdapter($baseDir));
