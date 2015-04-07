@@ -215,15 +215,13 @@ abstract class AbstractLiteral implements Literal
         // xsd:boolean
         } elseif (true === is_bool($this->value)) {
             /**
-             * Note that according to [1] the lexical representation of a boolean
-             * is defined as:
+             * Note that according to [1] the lexical representation of a boolean is defined as:
              *
              * > An instance of a datatype that is defined as boolean can have
              * > the following legal literals {true, false, 1, 0}.
              *
-             * But because of PHP's dynamic type system and the fact, that an user
-             * can change values of a variable when he wants, we only determine the
-             * values true and false as boolean.
+             * But because of PHP's dynamic type system and the fact, that an user can change values of a 
+             * variable when he wants, we only determine the values true and false as boolean.
              *
              * [1] - http://www.w3.org/TR/xmlschema-2/#boolean
              */
@@ -337,5 +335,27 @@ abstract class AbstractLiteral implements Literal
         }
 
         return $string;
+    }
+
+    /**
+     * A literal matches only another literal if there values, datatypes and languages are equal.
+     * 
+     * {@inheritdoc}
+     * @throws \Exception when $pattern is neither an instance of Literal nor Variable
+     */
+    public function matches(Node $pattern)
+    {
+        if (!($pattern instanceof Literal || $pattern instanceof Variable)) {
+            throw new \Exception('$pattern must be of type Literal or Variable');
+        }
+
+        if ($pattern->isConcrete()) {
+            return $this->getValue() === $pattern->getValue()
+                && $this->getDatatype() === $pattern->getDatatype()
+                && $this->getLanguage() === $pattern->getLanguage();
+        } else {
+            // All Literals matches a variable/pattern
+            return true;
+        }
     }
 }

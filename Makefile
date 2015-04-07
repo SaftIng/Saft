@@ -1,5 +1,7 @@
-PHPCS = ./vendor/squizlabs/php_codesniffer/scripts/phpcs
-PHPCBF = ./vendor/squizlabs/php_codesniffer/scripts/phpcbf
+PHPUNIT = ./vendor/bin/phpunit
+PHPCS = ./vendor/bin/phpcs
+PHPCBF = ./vendor/bin/phpcbf
+SAMI = ./vendor/bin/sami.php
 
 default:
 	@echo ""
@@ -13,11 +15,23 @@ default:
 setup-test-environment:
 	cp test-config.yml.dist test-config.yml
 
+test:
+	$(PHPUNIT)
+
 codesniffer:
 	$(PHPCS) --standard=PSR1,PSR2 --extensions=php -p src/*
 
 codebeautifier:
 	$(PHPCBF) --standard=PSR1,PSR2 --extensions=php -p src/*
+
+apidoc:
+	$(SAMI) update -n -v --force sami-config.php
+
+clean:
+	rm -r ./gen ./tmp
+
+mrpropper: clean
+	rm -r ./vendor
 
 # TODO change this somehow to a loop
 split-subtrees:

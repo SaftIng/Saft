@@ -6,15 +6,13 @@ use Saft\Rdf\AbstractNamedNode;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\LiteralImpl;
+use Saft\Rdf\VariableImpl;
 use Saft\Rdf\StatementImpl;
 
 /**
- * @todo add documentation
- * @todo eliminate redundancy
- * @todo statement-pattern missing
- * @todo hasMatchingStatement missing
+ * @todo  hasMatchingStatement missing
  */
-class RestApi extends \Saft\Rest\RestAbstract
+class RestApi extends AbstractRest
 {
     public function __construct($request, $origin, StoreInterface $store)
     {
@@ -23,40 +21,46 @@ class RestApi extends \Saft\Rest\RestAbstract
 
     /**
      * Rest-Endpoint
-     * @return [type] [description]
+     * servername/store/statements
+     * * POST for add statements
+     * * DELETE for delete matching statement
+     * * GET for get matching statement
+     * servername/store/graph
+     * * GET for get available Graphs
+     * @return mixed
      */
     protected function store()
     {
-        if ($this->verb == 'statements') {
+        //servername/store/statements
+        if ($this->verb == "statements") {
             if (!isset($_POST['statementsarray'])) {
                 throw new \Exception('no statements passed.');
             }
-            $statementsPost = $_POST['statementsarray'];
-            foreach ($statementsPost as $st) {
+            $statements = $_POST['statementsarray'];
+            foreach ($statements as $st) {
                 if (!is_array($st)) {
-                    if (sizeof($statementsPost) == 3) {
-                        $statementsPost[3] = null;
-                    } elseif (sizeof($statementsPost) != 4) {
+                    if (sizeof($statements) == 3) {
+                        $statements[3] = null;
+                    } elseif (sizeof($statements) != 4) {
                         throw new \Exception('wrong statements-format. not a triple an not a quad');
                     }
                 }
             }
+            // set graphUri if given
             $graphUri = null;
             if (isset($_POST['graphUri'])) {
-                if (true === AbstractNamedNode::check($_POST['graphUri'])) {
-                    $graphUri = new NamedNodeImpl($_POST['graphUri']);
+                if (NamedNodeImpl::check($_POST['graphUri']) || '?' == substr($_POST['graphUri'], 0, 1)) {
+                    $graphUri = $_POST['graphUri'];
                 } else {
-                    throw new \Exception('graphUri not a valid URI.');
+                    throw new \Exception('graphUri not valid.');
                 }
             }
-
-            //TODO eliminate redundancy
             
             //AddStatements
             if ($this->method == 'POST') {
-                $statements = array();
+                $array = array();
                 $i = 0;
-                foreach ($statementsPost as $st) {
+                foreach ($statements as $st) {
                     if (sizeof($st) == 3) {
                         $statement = $this->createStatement($st[0], $st[1], $st[2]);
                     } elseif (sizeof($st) == 4) {
@@ -64,50 +68,60 @@ class RestApi extends \Saft\Rest\RestAbstract
                     } else {
                         throw new \Exception('wrong statements-format. not a triple an not a quad');
                     }
-                    $statements[$i] = $statement;
+                    $array[$i] = $statement;
                     $i++;
                 }
-                $statements = new ArrayStatementIteratorImpl($statements);
-                return $this->store->addStatements($statements, $graphUri);
-
-            //deleteMatchingStatements
-            } elseif ($this->method == 'DELETE') {
-                if (is_array($statementsPost[0])) {
-                    throw new \Exception('expect just one statement');
-                }
-                $statement = $this->createStatement(
-                    $statementsPost[0],
-                    $statementsPost[1],
-                    $statementsPost[2],
-                    $statementsPost[3]
-                );
-                return $this->store->deleteMatchingStatements($statement, $graphUri);
-
-            //getMatchingStatements
-            } elseif ($this->method == 'GET') {
-                if (is_array($statementsPost[0])) {
-                    throw new \Exception('expect just one statement');
-                }
-                $statement = $this->createStatement(
-                    $statementsPost[0],
-                    $statementsPost[1],
-                    $statementsPost[2],
-                    $statementsPost[3]
-                );
-                return $this->store->getMatchingStatements($statement, $graphUri);
+                $stArray = new ArrayStatementIteratorImpl($array);
+                return $this->store->addStatements($stArray, $graphUri);
 
             } else {
-                return 'Only accepts POST/GET/DELETE requests';
+                if (is_array($statements[0])) {
+                    throw new \Exception('expect just one statement');
+                }
+                //deleteMatchingStatements
+                if ($this->method == 'DELETE') {
+                    $statement = $this->createStatement(
+                        $statements[0],
+                        $statements[1],
+                        $statements[2],
+                        $statements[3]
+                    );
+                    return $this->store->deleteMatchingStatements($statement, $graphUri);
+
+                    //getMatchingStatements
+                } elseif ($this->method == 'GET') {
+                    $statement = $this->createStatement(
+                        $statements[0],
+                        $statements[1],
+                        $statements[2],
+                        $statements[3]
+                    );
+                    return $this->store->getMatchingStatements($statement, $graphUri);
+
+                } else {
+                    return "Only accepts POST/GET/DELETE requests";
+                }
             }
-        } if ($this->verb == 'store') {
+            //servername/store/graph
+        } elseif ($this->verb == "graph") {
             if ($this->method == 'GET') {
-                //get Graphs
+                return $this->store->getAvailableGraphs();
+            } else {
+                return "Only accepts POST requests";
             }
         } else {
-            return 'Wrong input';
+            return "Wrong input";
         }
     }
 
+    /**
+     * Create a Statement from strings.
+     * @param  string $sub
+     * @param  string $pred
+     * @param  string $obj
+     * @param  string $gr
+     * @return Statement
+     */
     private function createStatement($sub, $pred, $obj, $gr = null)
     {
         $subject = $this->createNode($sub);
@@ -119,11 +133,19 @@ class RestApi extends \Saft\Rest\RestAbstract
         return $statement;
     }
 
+    /**
+     * Create a Node from string.
+     *
+     * @param  string $value value of Node
+     * @return Node   Returns NamedNode, Variable or Literal
+     */
     private function createNode($value)
     {
         //TODO triple-pattern
         if (true === AbstractNamedNode::check($value) || null === $value) {
             return new NamedNodeImpl($value);
+        } elseif ('?' == substr($value, 0, 1)) {
+            return new VariableImpl($value);
         } else {
             return new LiteralImpl($value);
         }

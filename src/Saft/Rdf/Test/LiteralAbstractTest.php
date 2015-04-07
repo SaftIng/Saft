@@ -1,6 +1,10 @@
 <?php
 namespace Saft\Rdf\Test;
 
+use Saft\Rdf\VariableImpl;
+use Saft\Rdf\LiteralImpl;
+use Saft\Rdf\BlankNodeImpl;
+
 abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -165,5 +169,26 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
             '"foo"^^<http://www.w3.org/2001/XMLSchema#string>',
             $fixture->toNQuads()
         );
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    final public function testMatchesChecksPatternType()
+    {
+        $fixture = $this->newInstance('foo', 'en-US');
+        // Will fail. Pattern must be of type Literal or Variable
+        $fixture->matches(new BlankNodeImpl('foo'));
+    }
+
+    final public function testMatches()
+    {
+        $fixture = $this->newInstance('foo', 'en-US');
+
+        $this->assertTrue($fixture->matches(new VariableImpl('?o')));
+        $this->assertTrue($fixture->matches(new LiteralImpl('foo', 'en-US')));
+        $this->assertFalse($fixture->matches(new LiteralImpl('foo', 'de')));
+        $this->assertFalse($fixture->matches(new LiteralImpl('foo')));
+        $this->assertFalse($fixture->matches(new LiteralImpl('bar', 'en-US')));
     }
 }

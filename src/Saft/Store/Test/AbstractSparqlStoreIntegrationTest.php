@@ -409,6 +409,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends \PHPUnit_Framework_Tes
         $this->fixture->query('CLEAR GRAPH <'. $this->testGraphUri .'>');
         
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
         $this->assertFalse($this->fixture->hasMatchingStatement($statement, $this->testGraphUri));
     }
     

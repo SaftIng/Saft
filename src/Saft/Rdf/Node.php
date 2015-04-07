@@ -10,10 +10,10 @@ interface Node
     public function __toString();
 
     /**
-     * Check if a given instance of \Saft\Rdf\Node is equal to this instance.
+     * Check if a given instance of Node is equal to this instance.
      *
-     * @param \Saft\Rdf\Node $toCompare
-     * @return boolean True, if both instances are semantically equal, false otherwise.
+     * @param  Node    $toCompare Node instance to check against.
+     * @return boolean            True, if both instances are semantically equal, false otherwise.
      */
     public function equals(\Saft\Rdf\Node $toCompare);
     
@@ -46,4 +46,14 @@ interface Node
      * @return string
      */
     public function toNQuads();
+
+    /**
+     * Returns true, if this matches the given pattern. This have to be concrete. The given pattern can either
+     * a variable node or a concrete node. Only concrete nodes of the same type can match.
+     *
+     * @param  Node    $pattern Node instance to check against.
+     * @return boolean          True, if this matches the pattern, otherwise false.
+     * @throws \LogicException  If isConcrete() returns true.
+     */
+    public function matches(Node $pattern);
 }

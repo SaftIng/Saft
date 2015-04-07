@@ -7,19 +7,19 @@ class NamedNodeImpl extends AbstractNamedNode
     /**
      * @var string
      */
-    protected $value;
+    protected $uri;
 
     /**
-     * @param mixed $value The URI of the node.
+     * @param mixed $uri The URI of the node.
      * @param string $lang optional Will be ignore because a NamedNode has no language.
      * @throws \Exception If parameter $value is not a valid URI.
      */
-    public function __construct($value, $lang = null)
+    public function __construct($uri, $lang = null)
     {
-        if (true === self::check($value) || null === $value) {
-            $this->value = $value;
+        if (true === self::check($uri) || null === $uri) {
+            $this->uri = $uri;
         } else {
-            throw new \Exception('Parameter $value is not a valid URI.');
+            throw new \Exception('First parameter ($uri) is not a valid URI.');
         }
     }
 
@@ -28,6 +28,6 @@ class NamedNodeImpl extends AbstractNamedNode
      */
     public function getValue()
     {
-        return $this->value;
+        return $this->uri;
     }
 }

@@ -10,22 +10,23 @@ class VariableImpl implements Variable
     protected $value;
 
     /**
-     * @param mixed $value optional The Name of the variable. If not given, a random hash will be used later on.
-     * @param string $lang optional Will be ignore because a Variable has no language.
-     * @throws \Exception If parameter $value is not a valid URI.
+     * @param  mixed      $value optional The Name of the variable. If not given, a random hash will be used 
+     *                                    later on.
+     * @param  string     $lang  optional Will be ignore because a Variable has no language.
+     * @throws \Exception                 If parameter $value is not a valid URI.
      */
     public function __construct($value = null, $lang = null)
     {
         // $value is a variable, like ?s
         if (null !== $value && true === is_string($value) && '?' == substr($value, 0, 1)) {
-            $this->value = $value;
+            $this->value = substr($value, 1);
             
         // $value is null, means we have to generate a random variable name
         } elseif (null === $value) {
             $variable = hash('sha1', microtime(true) . rand(0, time()));
             $this->value = substr($variable, 0, 10);
         } else {
-            throw new \Exception('Parameter $value is not a string or not null.');
+            throw new \Exception('Parameter $value is neither a string with ?-prefix nor null.');
         }
     }
 
@@ -126,6 +127,14 @@ class VariableImpl implements Variable
      */
     public function toNQuads()
     {
-        return '?'. $this->value;
+        return '?' . $this->getValue();
+    }
+
+    /**
+     * @throws \LogicException always, because a variable is a pattern
+     */
+    public function matches(Node $pattern)
+    {
+        throw new \LogicException('A pattern can\'t matches another pattern.');
     }
 }

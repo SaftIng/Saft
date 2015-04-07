@@ -6,6 +6,7 @@ use Saft\Rdf;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\ResultIterator;
+use Saft\Sparql\Result\Result;
 
 /**
  * Declaration of methods that any Store implementation must have, whether its
@@ -32,12 +33,12 @@ interface StoreInterface
      * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
      *                 will be thrown.
      */
-    public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array());
+    public function addStatements(StatementIterator $Statements, $graphUri = null, array $options = array());
 
     /**
      * Removes all statements from a (default-) graph which match with given statement.
      *
-     * @param  Statement $statement          It can be either a concrete or pattern-statement.
+     * @param  Statement $Statement          It can be either a concrete or pattern-statement.
      * @param  string    $graphUri  optional Overrides target graph. If set, all statements will be delete in
      *                                       that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
@@ -45,7 +46,7 @@ interface StoreInterface
      * @return boolean Returns true, if function performed without errors. In case
      *                 an error occur, an exception will be thrown.
      */
-    public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array());
+    public function deleteMatchingStatements(Statement $Statement, $graphUri = null, array $options = array());
 
     /**
      * It gets all statements of a given graph which match the following conditions:
@@ -53,13 +54,12 @@ interface StoreInterface
      * - statement's predicate is either equal to the predicate of the same statement of the graph or it is null.
      * - statement's object is either equal to the object of a statement of the graph or it is null.
      *
-     * @param  Statement $statement          It can be either a concrete or pattern-statement.
+     * @param  Statement $Statement          It can be either a concrete or pattern-statement.
      * @param  string    $graphUri  optional Overrides target graph. If set, you will get all
      *                                       matching statements of that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
-     * @return StatementIterator It contains Statement instances  of all matching
-     *                           statements of the given graph.
+     * @return StatementIterator It contains Statement instances  of all matching statements of the given graph.
      */
     public function getMatchingStatements(Statement $Statement, $graphUri = null, array $options = array());
 
@@ -67,7 +67,7 @@ interface StoreInterface
      * Returns true or false depending on whether or not the statements pattern
      * has any matches in the given graph.
      *
-     * @param  Statement $statement          It can be either a concrete or pattern-statement.
+     * @param  Statement $Statement          It can be either a concrete or pattern-statement.
      * @param  string    $graphUri  optional Overrides target graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).

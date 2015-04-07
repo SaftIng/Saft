@@ -8,15 +8,40 @@ namespace Saft\Store;
  */
 abstract class AbstractTriplePatternStore implements StoreInterface
 {
+    /**
+     * @param string $query SPARQL query string.
+     * @return ?
+     * @throws ?
+     */
+    public function delete($query)
+    {
+        return $query;
+    }
+    
+    /**
+     * @param string $query SPARQL query string.
+     * @return ?
+     * @throws ?
+     */
+    public function get($query)
+    {
+        return $query;
+    }
+    
+    /**
+     * @param string $query            SPARQL query string.
+     * @param string $options optional Further configurations.
+     * @throws ?
+     */
     public function query($query, array $options = array())
     {
         //@TODO
-        if (stristr($a, 'select') || stristr($a, 'construct')) {
-            $this->get($a);
-        } elseif (stristr($a, 'deslete')) {
-            $this->delete($a);
-        } elseif (stristr($a, 'insert')) {
-            $this->delete($a);
+        if (stristr($query, 'select') || stristr($query, 'construct')) {
+            $this->get($query);
+        } elseif (stristr($query, 'delete')) {
+            $this->delete($query);
+        } elseif (stristr($query, 'insert')) {
+            $this->delete($query);
         }
     }
 }

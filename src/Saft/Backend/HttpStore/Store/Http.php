@@ -14,6 +14,7 @@ use Saft\Rdf\StatementIterator;
 use Saft\Sparql\Query;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\StoreInterface;
+use Saft\Store\Result\ExceptionResult;
 use Saft\Store\Result\EmptyResult;
 use Saft\Store\Result\StatementResult;
 use Saft\Store\Result\SetResult;
@@ -461,23 +462,55 @@ class Http extends AbstractSparqlStore
     }
     
     /**
-     * Returns true or false depending on whether or not the statements pattern
-     * has any matches in the given graph.
+     * Returns true or false depending on whether or not the statements pattern has any matches in the given 
+     * graph. It overrides AbstractSparqlStore's hasMatchingStatement in case the target store needs a different
+     * query structure, such as Virtuoso. 
      *
-     * @param  Statement $statement          It can be either a concrete or pattern-statement.
+     * @param  Statement $Statement          It can be either a concrete or pattern-statement.
      * @param  string    $graphUri  optional Overrides target graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return boolean Returns true if at least one match was found, false otherwise.
      */
-    public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
+    public function hasMatchingStatement(Statement $Statement, $graphUri = null, array $options = array())
     {
         // if successor is set, ask it too.
         if ($this->successor instanceof StoreInterface) {
-            $this->successor->hasMatchingStatement($statement, $graphUri, $options);
+            $this->successor->hasMatchingStatement($Statement, $graphUri, $options);
         }
 
-        return parent::hasMatchingStatement($statement, $graphUri, $options);
+        /**
+         * Virtuoso
+         */
+        if ('virtuoso' === $this->storeName) {
+            // set graphUri, use that from the statement if $graphUri is null
+            if (null === $graphUri) {
+                $graph = $Statement->getGraph();
+                $graphUri = $graph->getValue();
+            }
+            
+            if (false === AbstractNamedNode::check($graphUri)) {
+                throw new \Exception('Neither $Statement has a valid graph nor $graphUri is valid URI.');
+            }
+            
+            $statementIterator = new ArrayStatementIteratorImpl(array($Statement));
+            $result = $this->query(
+                'ASK FROM <'. $graphUri .'> { '. $this->sparqlFormat($statementIterator) .'}', 
+                $options
+            );
+            
+            if (true === is_object($result)) {
+                return $result->getResultObject();
+            } else {
+                return $result;
+            }
+            
+        /**
+         * Standard SPARQL
+         */
+        } else {
+            return parent::hasMatchingStatement($statement, $graphUri, $options);
+        }
     }
 
     /**
@@ -624,7 +657,16 @@ class Http extends AbstractSparqlStore
             
             if ('ask' === $queryObject->getType()) {
                 $askResult = json_decode($result, true);
-                $return = new ValueResult($askResult['boolean']);
+                
+                if (true === isset($askResult['boolean'])) {
+                    $return = new ValueResult($askResult['boolean']);
+                
+                } elseif('Virtuoso' === substr($result, 0, 8)) {
+                    $return = new ExceptionResult(new \Exception($result));
+                    
+                } else {
+                    $return = new EmptyResult();
+                }
             } else {
                 $return = new EmptyResult();
             }
@@ -645,5 +687,32 @@ class Http extends AbstractSparqlStore
     public function setChainSuccessor(StoreInterface $successor)
     {
         $this->successor = $successor;
+    }
+    
+    /**
+     * Returns the Statement-Data in SPARQL-format. It overrides the sparqlFormat method of AbstractSparqlStore,
+     * because Virtuoso does not support Graph in condition, so $graphUri will be ignored.
+     *
+     * @param StatementIterator $statements   List of statements to format as SPARQL string.
+     * @param string            $graphUri     Will be ignored, because Virtuoso does not support Graph in 
+     *                                        condition.
+     * @return string, part of query
+     */
+    protected function sparqlFormat(StatementIterator $statements, $graphUri = null)
+    {
+        if ('virtuoso' === $this->storeName) {
+            $query = '';
+            foreach ($statements as $statement) {
+                if ($statement instanceof Statement) {
+                    $query .= $sparqlString = $statement->toSparqlFormat() .' ';
+                } else {
+                    throw new \Exception('sparqlFormat only accepts Statement instances.');
+                }
+            }
+            return $query;
+            
+        } else {
+            return parent::sparqlFormat($statements, $graphUri);
+        }
     }
 }
