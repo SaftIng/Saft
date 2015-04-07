@@ -4,6 +4,8 @@ namespace Saft\Store;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Statement;
+use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\Node;
 use Saft\Rdf\StatementIterator;
 
 /**
@@ -201,6 +203,8 @@ abstract class AbstractSparqlStore implements StoreInterface
      * Returns the Statement-Data in sparql-Format.
      *
      * @param StatementIterator $statements   List of statements to format as SPARQL string.
+     * @param string            $graphUri     Use if each statement is a triple and to use another graph as
+     *                                        the default.
      * @return string, part of query
      */
     protected function sparqlFormat(StatementIterator $statements, $graphUri = null)
@@ -208,8 +212,18 @@ abstract class AbstractSparqlStore implements StoreInterface
         $query = '';
         foreach ($statements as $statement) {
             if ($statement instanceof Statement) {
-                if (null !== $graphUri && true === $statement->isTriple()) {
-                    $sparqlString = 'Graph <'. $graphUri .'> {' . $statement->toSparqlFormat() .'}';
+                $con = $this->getNodeInSparqlF($statement->getSubject()) . ' ' .
+                    $this->getNodeInSparqlF($statement->getPredicate()) . ' ' .
+                    $this->getNodeInSparqlF($statement->getObject());
+
+                if (null !== $graphUri && true === is_string($graphUri)) {
+                    if (NamedNodeImpl::check($graphUri)) {
+                        $sparqlString = 'Graph <'. $graphUri .'> {' . $con .'}';
+                    } elseif ('?' == substr($graphUri, 0, 1)) {
+                        $sparqlString = 'Graph '. $graphUri .' {' . $con .'}';
+                    } else {
+                        throw new \Exception('bad graphUri');
+                    }
                 } else {
                     $sparqlString = $statement->toSparqlFormat();
                 }
@@ -220,5 +234,19 @@ abstract class AbstractSparqlStore implements StoreInterface
             }
         }
         return $query;
+    }
+
+    /**
+     * Retrun Node in SparqlFormat
+     * @param  Node   $node
+     * @return string
+     */
+    private function getNodeInSparqlF(Node $node)
+    {
+        if ($node->isConcrete()) {
+            return $node->toNQuads();
+        } else {
+            return $node->__toString();
+        }
     }
 }

@@ -7,40 +7,29 @@ use Saft\Store\StoreInterface;
  * @todo
  * http://coreymaynard.com/blog/creating-a-restful-api-with-php/
  */
-abstract class RestAbstract
+abstract class AbstractRest
 {
     /**
      * concrete implementation of StoreInterface.
-     *
      * @var \Saft\StoreInterface\StoreInterface
      */
     protected $store;
-    
     /**
      * Property: method
      * The HTTP method this request was made in, either GET, POST or DELETE
-     *
-     * @var string
      */
     protected $method = '';
-    
     /**
      * Property: endpoint
      * The Model requested in the URI. eg: /files
-     *
-     * @var string
      */
     protected $endpoint = '';
-    
     /**
      * Property: verb
      * An optional additional descriptor about the endpoint, used for things that can
      * not be handled by the basic methods. eg: /files/process
-     *
-     * @var string
      */
     protected $verb = '';
-    
     /**
      * Property: args
      * Any additional URI components after the endpoint and verb have been removed, in our
