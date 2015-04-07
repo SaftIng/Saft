@@ -5,7 +5,7 @@ use Saft\Cache\Cache;
 use Saft\QueryCache\Test\AbstractQueryCacheIntegrationTest;
 use Saft\QueryCache\QueryCache;
 
-class QueryCacheMemcacheDCacheIntegrationTest // extends AbstractQueryCacheIntegrationTest
+class QueryCacheMemcacheDCacheIntegrationTest extends AbstractQueryCacheIntegrationTest
 {
     /**
      * Overrides setUp method of AbstractQueryCacheIntegrationTest.php and loads a certain cache configuration
@@ -19,5 +19,6 @@ class QueryCacheMemcacheDCacheIntegrationTest // extends AbstractQueryCacheInteg
 
         $this->fixture = new QueryCache($this->cache);
         $this->fixture->getCache()->clean();
+        $this->className = 'QueryCacheMemcacheDCacheIntegrationTest';
     }
 }

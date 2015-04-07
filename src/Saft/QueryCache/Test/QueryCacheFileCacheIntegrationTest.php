@@ -19,5 +19,6 @@ class QueryCacheFileCacheIntegrationTest extends AbstractQueryCacheIntegrationTe
 
         $this->fixture = new QueryCache($this->cache);
         $this->fixture->getCache()->clean();
+        $this->className = 'QueryCacheFileCacheIntegrationTest';
     }
 }

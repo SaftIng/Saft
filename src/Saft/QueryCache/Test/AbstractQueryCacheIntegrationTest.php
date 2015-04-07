@@ -24,6 +24,11 @@ abstract class AbstractQueryCacheIntegrationTest extends \PHPUnit_Framework_Test
      * @var Saft\Cache
      */
     protected $cache;
+    
+    /**
+     * @var string
+     */
+    protected $className;
 
     /**
      * @var array
@@ -279,7 +284,7 @@ abstract class AbstractQueryCacheIntegrationTest extends \PHPUnit_Framework_Test
         
         $this->fixture->dropGraph($this->testGraphUri);
     }
-
+    
     public function testDropGraphNoSuccessor()
     {
         $this->setExpectedException('\Exception');
