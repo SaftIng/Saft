@@ -109,9 +109,9 @@ class MatchingStatementIteratorUnitTest extends \PHPUnit_Framework_TestCase
             $this->fail('Expected SyntaxException');
         } catch (SyntaxException $e) {
             $this->assertEquals(12, $e->getRow());
-        } finally {
-            $it->close();
         }
+        
+        $it->close();
     }
     
     /**
