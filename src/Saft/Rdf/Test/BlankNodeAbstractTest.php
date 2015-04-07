@@ -12,16 +12,6 @@ abstract class BlankNodeAbstractTest extends \PHPUnit_Framework_TestCase
      */
     abstract public function newInstance($id);
 
-    /**
-     * @expectedException \Exception
-     */
-    final public function testMatchesChecksPatternType()
-    {
-        $fixture = $this->newInstance('foo');
-        // Will fail. Pattern must be of type BlankNode or Variable
-        $fixture->matches(new LiteralImpl('foo'));
-    }
-
     final public function testMatches()
     {
         $fixture = $this->newInstance('foo');
@@ -29,5 +19,6 @@ abstract class BlankNodeAbstractTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($fixture->matches(new VariableImpl('?s')));
         $this->assertTrue($fixture->matches(new BlankNodeImpl('foo')));
         $this->assertFalse($fixture->matches(new BlankNodeImpl('bar')));
+        $this->assertFalse($fixture->matches(new LiteralImpl('foo')));
     }
 }

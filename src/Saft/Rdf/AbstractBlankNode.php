@@ -78,16 +78,19 @@ abstract class AbstractBlankNode implements BlankNode
     /**
      * A blank node matches another blank node, if there blank ids are equal.
      * {@inheritdoc}
-     * @throws \Exception when $pattern is neither an instance of BlankNode nor Variable
      */
     public function matches(Node $pattern)
     {
-        if (!($pattern instanceof BlankNode || $pattern instanceof Variable)) {
-            throw new \Exception('$pattern must be of type BlankNode or Variable');
+        if (!$this->isConcrete()) {
+            throw new \LogicException('This have to be concrete');
         }
 
         if ($pattern->isConcrete()) {
-            return $this->getBlankId() === $pattern->getBlankId();
+            if ($pattern instanceof BlankNode) {
+                return $this->getBlankId() === $pattern->getBlankId();
+            } else {
+                return false;
+            }
         } else {
             // All BlankNodes matches a variable/pattern
             return true;
