@@ -1,5 +1,5 @@
 <?php
-namespace Saft\Sparql\Result;
+namespace Saft\Store\Result;
 
 /**
  * This class represents the result of store operation, usually a SPARQL query.
@@ -24,6 +24,11 @@ abstract class Result
     {
         return $this->resultObject;
     }
+    
+    /**
+     * @return boolean True, if this instance is an EmptyResult
+     */
+    abstract public function isEmptyResult();
     
     /**
      * @return boolean True, if this instance is an ExceptionResult

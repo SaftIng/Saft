@@ -9,7 +9,21 @@ abstract class AbstractNamedNode implements NamedNode
      */
     public function __toString()
     {
-        return $this->getUri();
+        return $this->getValue();
+    }
+
+    /**
+     * Checks the general syntax of a given URI. Protocol-specific syntaxes are
+     * not checked. Instead, only characters disallowed an all URIs lead to a
+     * rejection of the check.
+     *
+     * @param string $string String to check if its a URI or not.
+     * @return boolean True if given string is a valid URI, false otherwise.
+     */
+    public static function check($string)
+    {
+        $regEx = '/^([a-zA-Z][a-zA-Z0-9+.-]+):([^\x00-\x0f\x20\x7f<>{}|\[\]`"^\\\\])+$/';
+        return (1 === preg_match($regEx, (string)$string));
     }
 
     /**
@@ -19,7 +33,7 @@ abstract class AbstractNamedNode implements NamedNode
     {
         // It only compares URIs, everything will be quit with false.
         if (true === $toCompare->isNamed()) {
-            return $this->getUri() == $toCompare->getUri();
+            return $this->getValue() == $toCompare->getValue();
         }
 
         return false;
@@ -78,7 +92,7 @@ abstract class AbstractNamedNode implements NamedNode
      */
     public function toNQuads()
     {
-        return '<' . $this->getUri() . '>';
+        return '<' . $this->getValue() . '>';
     }
 
     /**
@@ -93,7 +107,7 @@ abstract class AbstractNamedNode implements NamedNode
 
         if ($pattern->isConcrete()) {
             if ($pattern instanceof NamedNode) {
-                return $this->getUri() === $pattern->getUri();
+                return $this->getValue() === $pattern->getValue();
             } else {
                 return false;
             }

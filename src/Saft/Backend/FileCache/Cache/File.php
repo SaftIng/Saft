@@ -2,6 +2,7 @@
 
 namespace Saft\Backend\FileCache\Cache;
 
+use Saft\Cache\Cache;
 use Saft\Cache\CacheInterface;
 
 class File implements CacheInterface
@@ -68,13 +69,42 @@ class File implements CacheInterface
      */
     public function get($key)
     {
+        $entry = $this->getCompleteEntry($key);
+        return null !== $entry ? $entry['value'] : null;
+    }
+
+    /**
+     * Returns the complete cache entry to a given key, if it exists in the cache.
+     *
+     * @param string $key ID of the entry to return the value from.
+     * @return mixed Value of the entry. Returns null if there is no cache entry.
+     */
+    public function getCompleteEntry($key)
+    {
         $filename = hash('sha256', $key);
 
         if (true === $this->isCached($key)) {
-            return json_decode(
-                file_get_contents($this->cacheDir . $filename . '.cache'),
-                true
-            );
+            // load content from cache file and decode it
+            $encodedContainer = file_get_contents($this->cacheDir . $filename . '.cache');
+
+            $container = json_decode($encodedContainer, true);
+            
+            /**
+             * Store meta data
+             */
+            ++$container['get_count'];
+            
+            // save adapted $container
+            $encodedContainer = json_encode($container);
+            file_put_contents($this->cacheDir . $filename .'.cache', $encodedContainer);
+            
+            // unserialize value, if it is serialized
+            if (true === Cache::isSerialized($container['value'])) {
+                $container['value'] = unserialize($container['value']);
+            }
+            
+            return $container;
+            
         } else {
             return null;
         }
@@ -104,17 +134,35 @@ class File implements CacheInterface
     }
 
     /**
-     * Stores a new entry in the cache or overrides an existing one.
+     * Stores a new entry in the cache or overrides an existing one. Further information to that new entry
+     * will be stored.
      *
      * @param string $key Identifier of the value to store.
-     * @param mixed $value Value to store in the cache.
+     * @param mixed $value Content to store in the cache.
      */
     public function set($key, $value)
     {
         $filename = hash('sha256', $key);
-        $value = json_encode($value);
+        
+        $value = serialize($value);
+        
+        if (true === $this->isCached($key)) {
+            $content = file_get_contents($this->cacheDir . $filename . '.cache');
+            $container = json_decode($content, true);
+            
+            $container['value'] = $value;
+            
+            ++$container['set_count'];
+        } else {
+            $container = array();
+            $container['get_count'] = 0;
+            $container['set_count'] = 1;
+            $container['value'] = $value;
+        }
+        
+        $encodedContainer = json_encode($container);
 
-        file_put_contents($this->cacheDir . $filename .'.cache', $value);
+        file_put_contents($this->cacheDir . $filename .'.cache', $encodedContainer);
     }
 
     /**

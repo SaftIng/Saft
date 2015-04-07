@@ -106,11 +106,17 @@ class RestAPIUnitTest extends TestCase
         $_POST['statementsarray'] = $statements;
         
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $this->callRestApi(
-            'INSERT DATA {'.
-            ' Graph <> {<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer>}'.
-            ' Graph <> {<http://saft/test/s2> <http://saft/test/p2> ""John""^^<http://www.w3.org/2001/XMLSchema#string>} '.
-            '}'
+        
+        $API = new RestApi($_POST['request'], $_SERVER['HTTP_ORIGIN'], $this->fixture);
+        $query = $API->processAPI();
+        
+        $this->assertEquals(
+            'INSERT DATA { Graph <> {'.
+            '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer>'.
+            '} Graph <> {'.
+            '<http://saft/test/s2> <http://saft/test/p2> "John"^^<http://www.w3.org/2001/XMLSchema#string>'.
+            '} }',
+            $query
         );
     }
 
@@ -187,7 +193,7 @@ class RestAPIUnitTest extends TestCase
         //$this->callRestApi('');
     }
 
-    private function callRestApi($value)
+    protected function callRestApi($value)
     {
         try {
             $API = new RestApi(

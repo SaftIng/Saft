@@ -1,5 +1,5 @@
 <?php
-namespace Saft\Sparql\Result;
+namespace Saft\Store\Result;
 
 class ValueResult extends Result
 {
@@ -9,6 +9,14 @@ class ValueResult extends Result
     public function __construct($scalar)
     {
         $this->setResultObject($scalar);
+    }
+    
+    /**
+     * @return boolean True
+     */
+    public function isEmptyResult()
+    {
+        return false;
     }
     
     /**

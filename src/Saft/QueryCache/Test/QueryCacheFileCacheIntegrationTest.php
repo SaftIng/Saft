@@ -1,14 +1,15 @@
 <?php
-namespace Saft\Backend\FileCache\Test;
+namespace Saft\QueryCache\Test;
 
 use Saft\Cache\Cache;
 use Saft\QueryCache\QueryCache;
-use Saft\QueryCache\Test\QueryCacheIntegrationTest;
+use Saft\QueryCache\Test\AbstractQueryCacheIntegrationTest;
 
-class QueryCacheFileCacheIntegrationTest extends QueryCacheIntegrationTest
+class QueryCacheFileCacheIntegrationTest extends AbstractQueryCacheIntegrationTest
 {
     /**
-     * Overrides setUp method of QueryCacheIntegrationTest.php and loads a certain cache configuration (File).
+     * Overrides setUp method of AbstractQueryCacheIntegrationTest.php and loads a certain cache configuration
+     * (File).
      */
     public function setUp()
     {

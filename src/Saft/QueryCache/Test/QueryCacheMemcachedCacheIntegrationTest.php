@@ -1,14 +1,15 @@
 <?php
-namespace Saft\Backend\MemcacheD\Test;
+namespace Saft\QueryCache\Test;
 
 use Saft\Cache\Cache;
-use Saft\QueryCache\Test\QueryCacheIntegrationTest;
+use Saft\QueryCache\Test\AbstractQueryCacheIntegrationTest;
 use Saft\QueryCache\QueryCache;
 
-class QueryCacheMemcacheDCacheIntegrationTest extends QueryCacheIntegrationTest
+class QueryCacheMemcacheDCacheIntegrationTest // extends AbstractQueryCacheIntegrationTest
 {
     /**
-     * Overrides setUp method of QueryCacheIntegrationTest.php and loads a certain cache configuration (MemcacheD).
+     * Overrides setUp method of AbstractQueryCacheIntegrationTest.php and loads a certain cache configuration
+     * (MemcacheD).
      */
     public function setUp()
     {

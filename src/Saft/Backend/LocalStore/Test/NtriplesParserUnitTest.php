@@ -13,20 +13,20 @@ class NtriplesParserUnitTest extends \PHPUnit_Framework_TestCase
     public function testParseStatementTellsSyntaxErrorAtTheRightPosition()
     {
         // Error on the whole line
-        $this->testSyntaxError(' .');
+        $this->checkSyntaxError(' .');
         // Subject is malformed
-        $this->testSyntaxError('  _ <http://example.net> "xyz\\x" .', 2);
+        $this->checkSyntaxError('  _ <http://example.net> "xyz\\x" .', 2);
         // Predicate is malformed (must be a URI)
-        $this->testSyntaxError('_:foo _:bar "xyz\\x" .', 6);
+        $this->checkSyntaxError('_:foo _:bar "xyz\\x" .', 6);
         // Object is malformed (missing closing ")
-        $this->testSyntaxError('_:foo <http://example.net> "xyz .', 27);
+        $this->checkSyntaxError('_:foo <http://example.net> "xyz .', 27);
         // Error in object value: \x is not an valid escape char
-        $this->testSyntaxError('_:foo <http://example.net> "xyz\\x" .', 31);
+        $this->checkSyntaxError('_:foo <http://example.net> "xyz\\x" .', 31);
         // Object is malformed
-        $this->testSyntaxError('_:foo <http://example.net> _ .', 27);
+        $this->checkSyntaxError('_:foo <http://example.net> _ .', 27);
     }
 
-    private function testSyntaxError($line, $colum = SyntaxException::UNDEFINED)
+    public function checkSyntaxError($line, $colum = SyntaxException::UNDEFINED)
     {
         try {
             NtriplesParser::parseStatment($line);
@@ -103,13 +103,14 @@ class NtriplesParserUnitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /*
     public function testParseObjectLiteralWithDataType()
     {
         //TODO data type
-        //$expected = new LiteralImpl('123', 'xsd:integer');
-        //$actual = NtriplesParser::parseObject('"123"^^<http://www.w3.org/2001/XMLSchema#integer>');
-        //$this->assertEquals($expected, $actual);
-    }
+        $expected = new LiteralImpl('123', 'xsd:integer');
+        $actual = NtriplesParser::parseObject('"123"^^<http://www.w3.org/2001/XMLSchema#integer>');
+        $this->assertEquals($expected, $actual);
+    }*/
 
     public function testParseObjectLiteralWithLang()
     {

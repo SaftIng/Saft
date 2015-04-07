@@ -3,13 +3,14 @@
 namespace Saft\Store\Test;
 
 use Saft\TestCase;
+use Saft\Backend\Virtuoso\Store\Virtuoso;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\VariableImpl;
 use Saft\Store\StoreChain;
-use Saft\Backend\Virtuoso\Store\Virtuoso;
+use Saft\Store\Result\StatementResult;
 use Symfony\Component\Yaml\Parser;
 
 class StoreChainIntegrationTest extends TestCase
@@ -111,17 +112,25 @@ class StoreChainIntegrationTest extends TestCase
             $this->testGraphUri
         );
         
-        // only compare array values and ignore keys, because of the variables they are random
-        $this->assertEquals(
-            array(
-                array('http://s/', 'http://p/', 'http://o/'),
-                array('http://s/', 'http://p/', 'test literal'),
-            ),
-            array(
-                0 => array_values($result[0]),
-                1 => array_values($result[1])
+        $statementResultToCheckAgainst = new StatementResult();
+        $statementResultToCheckAgainst->setVariables(array('s', 'p', 'o'));
+        $statementResultToCheckAgainst->append(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
             )
         );
+        $statementResultToCheckAgainst->append(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
+            )
+        );
+        
+        // only compare array values and ignore keys, because of the variables they are random
+        $this->assertEquals($statementResultToCheckAgainst, $result);
     }
 
     public function testAddStatementsNoChainEntries()
@@ -175,8 +184,7 @@ class StoreChainIntegrationTest extends TestCase
         $chainEntries[0]->getCache()->clean();
         
         // create graph freshly
-        $chainEntries[1]->dropGraph($this->testGraphUri);
-        $chainEntries[1]->addGraph($this->testGraphUri);
+        $chainEntries[1]->query('CLEAR GRAPH <'. $this->testGraphUri .'>');
         
         $this->fixture->addStatements(
             new ArrayStatementIteratorImpl(array(
@@ -195,10 +203,17 @@ class StoreChainIntegrationTest extends TestCase
         );
         
         // only compare array values and ignore keys, because of the variables they are random
-        $this->assertEquals(2, count($this->fixture->getMatchingStatements(
-            new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
-            $this->testGraphUri
-        )));
+        $this->assertEquals(
+            2,
+            $this->fixture->getMatchingStatements(
+                new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
+                $this->testGraphUri
+            )->getEntryCount()
+        );
+        
+        
+        $latestResults = $chainEntries[0]->getLatestResults();
+        $firstOne = current(array_values($latestResults));
         
         // remove all statements
         $this->fixture->deleteMatchingStatements(
@@ -206,11 +221,17 @@ class StoreChainIntegrationTest extends TestCase
             $this->testGraphUri
         );
         
+        $statementResult = new StatementResult();
+        $statementResult->setVariables(array('s', 'p', 'o'));
+        
         // check that everything was removed accordingly
-        $this->assertEquals(0, count($this->fixture->getMatchingStatements(
-            new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
-            $this->testGraphUri
-        )));
+        $this->assertEquals(
+            $statementResult,
+            $this->fixture->getMatchingStatements(
+                new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
+                $this->testGraphUri
+            )
+        );
     }
      
     public function testDeleteMatchingStatementsNoChainEntries()
@@ -342,21 +363,30 @@ class StoreChainIntegrationTest extends TestCase
             ))
         );
         
+        // build statement result to check against
+        $statementResultToCheckAgainst = new StatementResult();
+        $statementResultToCheckAgainst->setVariables(array('s', 'p', 'o'));
+        $statementResultToCheckAgainst->append(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
+            )
+        );
+        $statementResultToCheckAgainst->append(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
+            )
+        );
+        
+        $result = $this->fixture->getMatchingStatements($statement, $this->testGraphUri);
+        
         /**
          * check both results
-         *
-         * FYI: because we use a variable, the result keys are random, so we re-use them and only check values.
          */
-        $result = $this->fixture->getMatchingStatements($statement, $this->testGraphUri);
-        $_result = array_keys($result[0]);
-        $key = reset($_result);
-        $this->assertEquals(
-            array(
-                array($key => 'http://o/'),
-                array($key => 'test literal'),
-            ),
-            $result
-        );
+        $this->assertEquals($statementResultToCheckAgainst, $result);
     }
 
     // basically the same function as testGetMatchingStatementsChainQueryCacheCacheOffAndVirtuoso,
@@ -414,38 +444,69 @@ class StoreChainIntegrationTest extends TestCase
         );
         $this->assertEquals(0, count($chainEntries[0]->getLatestResults()));
         
-        /**
-         * check both results
-         *
-         * FYI: because we use a variable, the result keys are random, so we re-use them and only check values.
-         */
-        $this->fixture->getMatchingStatements($statement, $this->testGraphUri);
+        // call to fill cache
+        $firstResult = $this->fixture->getMatchingStatements($statement, $this->testGraphUri);
         
         // call again to use the cache instead of the store
-        $result = $this->fixture->getMatchingStatements($statement, $this->testGraphUri);
-        $_ = array_keys($result[0]);
-        $key = reset($_);
-        $this->assertEquals(
-            array(
-                array($key => 'http://o/'),
-                array($key => 'test literal'),
-            ),
-            $result
+        $statementResult = new StatementResult();
+        $statementResult->setVariables(array('s', 'p', 'o'));
+        $statementResult->append(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
+            )
         );
+        $statementResult->append(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
+            )
+        );
+        
+        $cachedResult = $this->fixture->getMatchingStatements($statement, $this->testGraphUri);
+        
+        $this->assertEquals($statementResult, $cachedResult);
         
         // check count
         $latestQueryCacheEntries = $chainEntries[0]->getLatestResults();
         $this->assertEquals(1, count($latestQueryCacheEntries));
         
+        $statementResult = new StatementResult();
+        $statementResult->setVariables(array('s', 'p', 'o'));
+        $statementResult->append(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
+            )
+        );
+        $statementResult->append(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
+            )
+        );
+        
         // check result
-        $_ = array_values($latestQueryCacheEntries);
-        $firstEntry = reset($_);
         $this->assertEquals(
             array(
-                array($key => 'http://o/'),
-                array($key => 'test literal'),
+                array(
+                    'graphIds' => array(0 => 'saft-qC-05f6680daccd57a437570d5f59b0e6'),
+                    'query' => 'SELECT ?s ?p ?o FROM <http://localhost/Saft/TestGraph/> '.
+                               'WHERE { ?s ?p ?o FILTER (str(?s) = "http://s/") FILTER (str(?p) = "http://p/") }',
+                    'relatedQueryCacheEntries' => '',
+                    'result' => $statementResult,
+                    'triplePattern' => array(
+                        'saft-qC-05f6680daccd57a437570d5f59b0e6' => array(
+                            'saft-qC-05f6680daccd57a437570d5f59b0e6_*_*_*'
+                        )
+                    )
+                )
             ),
-            $firstEntry['result']
+            array_values($latestQueryCacheEntries)
         );
     }
     
@@ -654,14 +715,8 @@ class StoreChainIntegrationTest extends TestCase
         /**
          * check both results
          */
-        $this->assertEquals($virtuoso->query($testQuery), $this->fixture->query($testQuery));
-        
-        // check that a query cache entry was created
-        $this->assertFalse(
-            null === $chainEntries[0]->getCache()->get($chainEntries[0]->generateShortId($testQuery))
-        );
-        
-        $this->assertEquals($virtuoso->query($testQuery), $this->fixture->query($testQuery));
+        $result = $this->fixture->query($testQuery);
+        $this->assertEquals($virtuoso->query($testQuery), $result);
     }
     
     /**

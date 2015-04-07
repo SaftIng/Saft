@@ -2,15 +2,23 @@
 
 namespace Saft\Backend\HttpStore\Store;
 
+use Saft\Backend\HttpStore\Net\Client;
+use Saft\Rdf\AbstractLiteral;
+use Saft\Rdf\AbstractNamedNode;
 use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\Query;
-use Saft\Store\StoreInterface;
 use Saft\Store\AbstractSparqlStore;
-use Saft\Backend\HttpStore\Net\Client;
+use Saft\Store\StoreInterface;
+use Saft\Store\Result\ExceptionResult;
+use Saft\Store\Result\EmptyResult;
+use Saft\Store\Result\StatementResult;
+use Saft\Store\Result\SetResult;
+use Saft\Store\Result\ValueResult;
 
 /**
  * SparqlStore implementation of a client which handles store operations via HTTP. It is able to determine some
@@ -320,11 +328,13 @@ class Http extends AbstractSparqlStore
     public function getAvailableGraphs()
     {
         $result = $this->query('SELECT DISTINCT ?g WHERE { GRAPH ?g {?s ?p ?o.} }');
+        $result = $result->getResultObject();
         
         $graphs = array();
 
+        // $entry is of type NamedNode
         foreach ($result as $entry) {
-            $graphs[$entry['g']] = $entry['g'];
+            $graphs[$entry['g']->getValue()] = $entry['g']->getValue();
         }
         
         return $graphs;
@@ -355,6 +365,7 @@ class Http extends AbstractSparqlStore
      *                           statements of the given graph.
      * @todo FILTER select
      * @todo check if graph URI is valid
+     * @TODO make it dynamic to be able to do lazy loading
      */
     public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
@@ -367,18 +378,54 @@ class Http extends AbstractSparqlStore
             // Remove, maybe available, graph from given statement and put it into an iterator.
             // reason for the removal of the graph is to avoid quads in the query. Virtuoso wants the graph
             // in the FROM part.
-            $statementIterator = new ArrayStatementIteratorImpl(array(
-                new StatementImpl(
-                    $statement->getSubject(),
-                    $statement->getPredicate(),
-                    $statement->getObject()
-                )
-            ));
+            $query = 'SELECT ?s ?p ?o ' .
+                'FROM <'. $graphUri .'> '.
+                'WHERE { ?s ?p ?o ';
+                
+            // create shortcuts for S, P and O
+            $s = $statement->getSubject();
+            $p = $statement->getPredicate();
+            $o = $statement->getObject();
+                
+            // add filter, if subject is a named node or literal
+            if (true === $s->isNamed() || true == $s->isLiteral()) {
+                $query .= 'FILTER (str(?s) = "'. $s->getValue() .'") ';
+            }
             
-            return $this->query(
-                'SELECT * FROM <'. $graphUri .'> WHERE {'. $this->sparqlFormat($statementIterator) .'}',
-                $options
-            );
+            // add filter, if predicate is a named node or literal
+            if (true === $p->isNamed() || true == $p->isLiteral()) {
+                $query .= 'FILTER (str(?p) = "'. $p->getValue() .'") ';
+            }
+            
+            // add filter, if predicate is a named node or literal
+            if (true === $o->isNamed() || true == $o->isLiteral()) {
+                $query .= 'FILTER (str(?o) = "'. $o->getValue() .'") ';
+            }
+            
+            $query .= '}';
+            
+            // execute query and save result
+            // TODO transform getMatchingStatements into lazy loading, so a batch loading is possible
+            $result = $this->query($query, $options);
+            
+            /**
+             * Transform SetResult into StatementResult
+             */
+            $statementResult = new StatementResult();
+            $statementResult->setVariables($result->getVariables());
+            
+            foreach ($result as $entry) {
+                $statementList = array();
+                $i = 0;
+                foreach ($result->getVariables() as $variable) {
+                    $statementList[$i++] = $entry[$variable];
+                }
+                $statementResult->append(
+                    new StatementImpl($statementList[0], $statementList[1], $statementList[2])
+                );
+            }
+            
+            return $statementResult;
             
         } else {
             return parent::getMatchingStatements($statement, $graphUri, $options);
@@ -403,10 +450,11 @@ class Http extends AbstractSparqlStore
      */
     public function getTripleCount($graphUri)
     {
-        if (true === NamedNodeImpl::check($graphUri)) {
+        if (true === AbstractNamedNode::check($graphUri)) {
             $result = $this->query('SELECT (COUNT(*) AS ?count) FROM <' . $graphUri . '> WHERE {?s ?p ?o.}');
+            $result = $result->getResultObject();
             
-            return $result[0]['count'];
+            return $result[0]['count']->getValue();
 
         } else {
             throw new \Exception('Parameter $graphUri is not valid or empty.');
@@ -414,23 +462,55 @@ class Http extends AbstractSparqlStore
     }
     
     /**
-     * Returns true or false depending on whether or not the statements pattern
-     * has any matches in the given graph.
+     * Returns true or false depending on whether or not the statements pattern has any matches in the given 
+     * graph. It overrides AbstractSparqlStore's hasMatchingStatement in case the target store needs a different
+     * query structure, such as Virtuoso. 
      *
-     * @param  Statement $statement          It can be either a concrete or pattern-statement.
+     * @param  Statement $Statement          It can be either a concrete or pattern-statement.
      * @param  string    $graphUri  optional Overrides target graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return boolean Returns true if at least one match was found, false otherwise.
      */
-    public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
+    public function hasMatchingStatement(Statement $Statement, $graphUri = null, array $options = array())
     {
         // if successor is set, ask it too.
         if ($this->successor instanceof StoreInterface) {
-            $this->successor->hasMatchingStatement($statement, $graphUri, $options);
+            $this->successor->hasMatchingStatement($Statement, $graphUri, $options);
         }
 
-        return parent::hasMatchingStatement($statement, $graphUri, $options);
+        /**
+         * Virtuoso
+         */
+        if ('virtuoso' === $this->storeName) {
+            // set graphUri, use that from the statement if $graphUri is null
+            if (null === $graphUri) {
+                $graph = $Statement->getGraph();
+                $graphUri = $graph->getValue();
+            }
+            
+            if (false === AbstractNamedNode::check($graphUri)) {
+                throw new \Exception('Neither $Statement has a valid graph nor $graphUri is valid URI.');
+            }
+            
+            $statementIterator = new ArrayStatementIteratorImpl(array($Statement));
+            $result = $this->query(
+                'ASK FROM <'. $graphUri .'> { '. $this->sparqlFormat($statementIterator) .'}', 
+                $options
+            );
+            
+            if (true === is_object($result)) {
+                return $result->getResultObject();
+            } else {
+                return $result;
+            }
+            
+        /**
+         * Standard SPARQL
+         */
+        } else {
+            return parent::hasMatchingStatement($statement, $graphUri, $options);
+        }
     }
 
     /**
@@ -487,77 +567,109 @@ class Http extends AbstractSparqlStore
      * @param  string $query            The SPARQL query to send to the store.
      * @param  array  $options optional It contains key-value pairs and should provide additional
      *                                  introductions for the store and/or its adapter(s).
-     * @return Result Returns result of the query. Depending on the query
-     *                type, it returns either an instance of ResultIterator, StatementIterator, or ResultValue
+     * @return Result Returns result of the query. Depending on the query type, it returns either an instance
+     *                of EmptyResult, ExceptionResult, SetResult, StatementResult or ValueResult.
      * @throws \Exception If query is no string.
      *                    If query is malformed.
-     *                    If $options[resultType] = is neither extended nor array
+     * @todo add support for DESCRIBE queries
+     * @todo current behavior only for Virtuoso, change that
      */
     public function query($query, array $options = array())
     {
-        /**
-         * result type not set, use array instead
-         */
-        if (false === isset($options['resultType'])) {
-            // if nothing was set, array is default result type. Possible are: array, extended
-            $options['resultType'] = 'array';
-
-        /**
-         * extended result type
-         */
-        } elseif ('array' != $options['resultType'] && 'extended' != $options['resultType']) {
-            throw new \Exception('Given resultType is invalid, allowed are array and extended.');
-        }
-
         $queryObject = new Query($query);
 
         /**
          * SPARQL query (usually to fetch data)
          */
-        if (false === in_array($queryObject->getType(), array('insertData', 'insertInto', 'deleteData', 'delete'))) {
-            $this->client->sendSparqlSelectQuery($query);
+        if ('select' == $queryObject->getType()) {
+            $resultArray = json_decode($this->client->sendSparqlSelectQuery($query), true);
             
-            if ('extended' == $options['resultType']) {
-                $result = $this->client->sendSparqlSelectQuery($query);
-                // TODO check result type automatically
-                $return = json_decode($result, true);
-
-            // array == $option['resultType']
-            } else {
-                $responseString = $this->client->sendSparqlSelectQuery($query);
-
-                $return = array();
-
-                // TODO check result type automatically
-                $responseArray = json_decode($responseString, true);
-
-                // in case $responseArray is null, something went wrong.
-                if (null == $responseArray) {
-                    throw new \Exception('SPARQL error: '. $responseString);
+            $setResult = new SetResult();
+            $setResult->setVariables($resultArray['head']['vars']);
+            
+            /**
+             * go through all bindings and create according objects for SetResult instance.
+             *
+             * $bindingParts will look like:
+             *
+             * array(
+             *      's' => array(
+             *          'type' => 'uri',
+             *          'value' => '...'
+             *      ), ...
+             * )
+             */
+            foreach ($resultArray['results']['bindings'] as $bindingParts) {
+                $newEntry = array();
                 
-                // if it was an ASK query, we expect a boolean result
-                } elseif ('ask' === $queryObject->getType()) {
-                    return $responseArray['boolean'];
+                /**
+                 * A part looks like:
+                 * array(
+                 *      'type' => 'uri',
+                 *      'value' => '...'
+                 * )
+                 */
+                foreach ($bindingParts as $variable => $part) {
+                    switch ($part['type']) {
+                        /**
+                         * Literal (language'd)
+                         */
+                        case 'literal':
+                            $newEntry[$variable] = new LiteralImpl($part['value'], $part['xml:lang']);
+                            
+                            break;
+                        /**
+                         * Typed-Literal
+                         */
+                        case 'typed-literal':
+                            // get a value which has the same datatype as described in the given result
+                            // e.g. xsd:string => "foo" instead of only foo
+                            $newEntry[$variable] = AbstractLiteral::getRealValueBasedOnDatatype(
+                                $part['datatype'],
+                                $part['value']
+                            );
+                            
+                            break;
+                        
+                        /**
+                         * NamedNode
+                         */
+                        case 'uri':
+                            $newEntry[$variable] = new NamedNodeImpl($part['value']);
+                            break;
                     
-                } else {
-                    foreach ($responseArray['results']['bindings'] as $entry) {
-                        $returnEntry = array();
-
-                        foreach ($responseArray['head']['vars'] as $var) {
-                            $returnEntry[$var] = $entry[$var]['value'];
-                        }
-
-                        $return[] = $returnEntry;
+                        default:
+                            throw new \Exception('Unknown type given.');
+                            break;
                     }
                 }
+                
+                $setResult->append($newEntry);
             }
-
+            
+            $return = $setResult;
+            
         /**
          * SPARPQL Update query
          */
         } else {
-            $this->client->sendSparqlUpdateQuery($query);
-            $return = null;
+            $result = $this->client->sendSparqlUpdateQuery($query);
+            
+            if ('ask' === $queryObject->getType()) {
+                $askResult = json_decode($result, true);
+                
+                if (true === isset($askResult['boolean'])) {
+                    $return = new ValueResult($askResult['boolean']);
+                
+                } elseif('Virtuoso' === substr($result, 0, 8)) {
+                    $return = new ExceptionResult(new \Exception($result));
+                    
+                } else {
+                    $return = new EmptyResult();
+                }
+            } else {
+                $return = new EmptyResult();
+            }
         }
 
         return $return;
@@ -575,5 +687,32 @@ class Http extends AbstractSparqlStore
     public function setChainSuccessor(StoreInterface $successor)
     {
         $this->successor = $successor;
+    }
+    
+    /**
+     * Returns the Statement-Data in SPARQL-format. It overrides the sparqlFormat method of AbstractSparqlStore,
+     * because Virtuoso does not support Graph in condition, so $graphUri will be ignored.
+     *
+     * @param StatementIterator $statements   List of statements to format as SPARQL string.
+     * @param string            $graphUri     Will be ignored, because Virtuoso does not support Graph in 
+     *                                        condition.
+     * @return string, part of query
+     */
+    protected function sparqlFormat(StatementIterator $statements, $graphUri = null)
+    {
+        if ('virtuoso' === $this->storeName) {
+            $query = '';
+            foreach ($statements as $statement) {
+                if ($statement instanceof Statement) {
+                    $query .= $sparqlString = $statement->toSparqlFormat() .' ';
+                } else {
+                    throw new \Exception('sparqlFormat only accepts Statement instances.');
+                }
+            }
+            return $query;
+            
+        } else {
+            return parent::sparqlFormat($statements, $graphUri);
+        }
     }
 }

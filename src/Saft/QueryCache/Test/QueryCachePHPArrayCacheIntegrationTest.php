@@ -1,14 +1,15 @@
 <?php
-namespace Saft\Backend\PhpArrayCache\Test;
+namespace Saft\QueryCache\Test;
 
 use Saft\Cache\Cache;
-use Saft\QueryCache\Test\QueryCacheIntegrationTest;
+use Saft\QueryCache\Test\AbstractQueryCacheIntegrationTest;
 use Saft\QueryCache\QueryCache;
 
-class QueryCachePHPArrayCacheIntegrationTest extends QueryCacheIntegrationTest
+class QueryCachePHPArrayCacheIntegrationTest // extends AbstractQueryCacheIntegrationTest
 {
     /**
-     * Overrides setUp method of QueryCacheIntegrationTest.php and loads a certain cache configuration (PHPArray).
+     * Overrides setUp method of AbstractQueryCacheIntegrationTest.php and loads a certain cache configuration
+     * (PHPArray).
      */
     public function setUp()
     {

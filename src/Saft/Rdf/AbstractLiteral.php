@@ -5,6 +5,48 @@ namespace Saft\Rdf;
 abstract class AbstractLiteral implements Literal
 {
     /**
+     * @var string
+     */
+    protected $lang;
+    
+    /**
+     * @var mixed
+     */
+    protected $value;
+    
+    /**
+     * @param mixed $value
+     * @param string $lang optional
+     */
+    public function __construct($value, $lang = null)
+    {
+        $this->value = $value;
+        $this->lang = $lang;
+        
+        // fix wrong string notation ("foo" instead of just foo, without ")
+        // TODO throw an exception instead?
+        if (null === $lang && true === is_string($value)) {
+            try {
+                // check datatype and force throwing an exception if given value is of type string but has no
+                // surrounding "
+                $this->getDatatype();
+            
+            // an exception will be thrown, if the given value is a string and has no surrounding "
+            } catch (\Exception $e) {
+                // add " to the left, if missing
+                if ('"' != substr($this->value, 0, 1)) {
+                    $this->value = '"' . $this->value;
+                }
+                // add " to the right, if missing
+                if ('"' != substr($this->value, strlen($this->value)-1, 1)) {
+                    $this->value = $this->value . '"';
+                }
+
+            }
+        }
+    }
+    
+    /**
      * @return string
      */
     public function __toString()
@@ -99,6 +141,39 @@ abstract class AbstractLiteral implements Literal
 
         return $value;
     }
+    
+    /**
+     * It checks the given $datatype and casts the given value the right way. That is important if you wanna
+     * keep the type of the data synchronized with PHP variable types.
+     *
+     * @param string $datatype
+     * @param scalar $value
+     * @return mixed
+     * @throws \Exception If an unknown datatype was given.
+     */
+    public static function getRealValueBasedOnDatatype($datatype, $value)
+    {
+        switch($datatype) {
+            // xsd:boolean
+            case 'http://www.w3.org/2001/XMLSchema#boolean':
+                return new LiteralImpl((boolean)$value);
+                
+            // xsd:float
+            case 'http://www.w3.org/2001/XMLSchema#float':
+                return new LiteralImpl(floatval($value));
+                
+            // xsd:integer
+            case 'http://www.w3.org/2001/XMLSchema#integer':
+                return new LiteralImpl((int)$value);
+                
+            // xsd:string
+            case 'http://www.w3.org/2001/XMLSchema#string':
+                return new LiteralImpl('"'. $value .'"');
+            
+            default:
+                throw new \Exception('Unknown $datatype given.');
+        }
+    }
 
     /**
      * @see \Saft\Node
@@ -113,6 +188,78 @@ abstract class AbstractLiteral implements Literal
         // TODO what about cases like 1 == 1.0 or 1 == "1"?
 
         return false;
+    }
+    
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    public function getDatatype()
+    {
+        $xsd = 'http://www.w3.org/2001/XMLSchema#';
+
+        // If a language was set, than datatype is not possible.
+        if (2 <= strlen($this->lang)) {
+            return null;
+        }
+
+        /**
+         * An overview about all XML Schema datatypes:
+         * http://www.w3.org/TR/xmlschema-2/#built-in-datatypes
+         */
+
+        // xsd:???
+        if (null === $this->value) {
+            throw new \Exception('TODO: Implement case for getDatatype when value is null.');
+
+        // xsd:boolean
+        } elseif (true === is_bool($this->value)) {
+            /**
+             * Note that according to [1] the lexical representation of a boolean is defined as:
+             *
+             * > An instance of a datatype that is defined as boolean can have
+             * > the following legal literals {true, false, 1, 0}.
+             *
+             * But because of PHP's dynamic type system and the fact, that an user can change values of a 
+             * variable when he wants, we only determine the values true and false as boolean.
+             *
+             * [1] - http://www.w3.org/TR/xmlschema-2/#boolean
+             */
+            return $xsd . 'boolean';
+
+        // xsd:string (value must be surrounded by "
+        } elseif (true === is_string($this->value)
+            && '"' === substr($this->value, 0, 1) && '"' === substr($this->value, strlen($this->value)-1, 1)) {
+            return $xsd . 'string';
+
+        // xsd:integer
+        } elseif (true === is_int($this->value)) {
+            return $xsd . 'integer';
+
+        // xsd:decimal
+        } elseif (true === is_float($this->value)) {
+            return $xsd . 'decimal';
+
+        // In case it can't determine the type of the value.
+        } else {
+            throw new \Exception('Value has no valid XML schema datatype.');
+        }
+    }
+    
+    /**
+     * @return string|null
+     */
+    public function getLanguage()
+    {
+        return $this->lang;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
     }
 
     /**
@@ -175,6 +322,8 @@ abstract class AbstractLiteral implements Literal
             } else {
                 $string = '"false"';
             }
+        } elseif ('http://www.w3.org/2001/XMLSchema#string' == $this->getDatatype()) {
+            $string = $this->getValue();
         } else {
             $string = '"' . $this->getValue() . '"';
         }
@@ -189,8 +338,8 @@ abstract class AbstractLiteral implements Literal
     }
 
     /**
-     * A literal matches only another literal if there values, datatypes and
-     * languages are equal.
+     * A literal matches only another literal if there values, datatypes and languages are equal.
+     * 
      * {@inheritdoc}
      */
     public function matches(Node $pattern)

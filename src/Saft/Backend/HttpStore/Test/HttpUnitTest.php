@@ -151,7 +151,7 @@ class HttpUnitTest extends \PHPUnit_Framework_TestCase
     {
         // assumption here is that the SPARQL endpoint contains at least one graph.
 
-        $this->assertTrue(0 <$this->fixture->getAvailableGraphs());
+        $this->assertTrue(0 < count($this->fixture->getAvailableGraphs()));
     }
 
     /**

@@ -8,13 +8,11 @@ use Saft\Rdf\LiteralImpl;
 
 abstract class NamedNodeAbstractTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * An abstract method which returns new instances of NamedNode
      * @todo The factory method approach could also be extended to use a factory object
      */
     abstract public function newInstance($uri);
-
 
     /**
      * Tests instanciation
@@ -32,13 +30,13 @@ abstract class NamedNodeAbstractTest extends \PHPUnit_Framework_TestCase
     public function testInstanciationNull()
     {
         $fixture = $this->newInstance(null);
-        $this->assertEquals(null, $fixture->getUri());
+        $this->assertEquals(null, $fixture->getValue());
     }
 
     public function testInstanciationValidUri()
     {
         $fixture = $this->newInstance('http://saft/test');
-        $this->assertEquals('http://saft/test', $fixture->getUri());
+        $this->assertEquals('http://saft/test', $fixture->getValue());
     }
 
     /**

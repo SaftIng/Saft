@@ -1,12 +1,8 @@
 <?php
 namespace Saft\Backend\LocalStore\Test;
 
-final class TestUtil
+class TestUtil
 {
-    private function __construct()
-    {
-    }
-
     public static function createTempDirectory()
     {
         // Use upload_tmp_dir instead of sys_get_temp_dir().

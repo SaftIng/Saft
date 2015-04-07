@@ -23,7 +23,7 @@ class NamedNodeImplUnitTest extends NamedNodeAbstractTest
         $fixture = $this->newInstance('http://saft/test');
         $this->assertFalse($fixture->check(''));
         $this->assertFalse($fixture->check('http//foobar/'));
-
+        
         $this->assertTrue($fixture->check('http:foobar/'));
         $this->assertTrue($fixture->check('http://foobar/'));
         $this->assertTrue($fixture->check('http://foobar:42/'));

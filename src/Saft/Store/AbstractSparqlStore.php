@@ -182,7 +182,13 @@ abstract class AbstractSparqlStore implements StoreInterface
     public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
     {
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-        return $this->query('ASK { '. $this->sparqlFormat($statementIterator, $graphUri) .'}', $options);
+        $result = $this->query('ASK { '. $this->sparqlFormat($statementIterator, $graphUri) .'}', $options);
+        
+        if (true === is_object($result)) {
+            return $result->getResultObject();
+        } else {
+            return $result;
+        }
     }
     
     /**
@@ -212,17 +218,22 @@ abstract class AbstractSparqlStore implements StoreInterface
         $query = '';
         foreach ($statements as $statement) {
             if ($statement instanceof Statement) {
-                $con = $this->getNodeInSparqlF($statement->getSubject()) . ' ' .
-                    $this->getNodeInSparqlF($statement->getPredicate()) . ' ' .
-                    $this->getNodeInSparqlF($statement->getObject());
+                $con = $this->getNodeInSparqlFormat($statement->getSubject()) . ' ' .
+                    $this->getNodeInSparqlFormat($statement->getPredicate()) . ' ' .
+                    $this->getNodeInSparqlFormat($statement->getObject());
 
                 if (null !== $graphUri && true === is_string($graphUri)) {
-                    if (NamedNodeImpl::check($graphUri)) {
+                    // check if its a valid URI
+                    if (true === NamedNodeImpl::check($graphUri)) {
                         $sparqlString = 'Graph <'. $graphUri .'> {' . $con .'}';
+                    
+                    // check for variable, which has a ? as first char
                     } elseif ('?' == substr($graphUri, 0, 1)) {
                         $sparqlString = 'Graph '. $graphUri .' {' . $con .'}';
+                        
+                    // invalid $graphUri
                     } else {
-                        throw new \Exception('bad graphUri');
+                        throw new \Exception('Parameter $graphUri is neither a valid URI nor variable.');
                     }
                 } else {
                     $sparqlString = $statement->toSparqlFormat();
@@ -237,13 +248,14 @@ abstract class AbstractSparqlStore implements StoreInterface
     }
 
     /**
-     * Retrun Node in SparqlFormat
-     * @param  Node   $node
-     * @return string
+     * Returns given Node instance in SPARQL format.
+     * 
+     * @param  Node   $node Node instance to format.
+     * @return string       Either NQuad notation (if node is concrete) or string representation of given node.
      */
-    private function getNodeInSparqlF(Node $node)
+    protected function getNodeInSparqlFormat(Node $node)
     {
-        if ($node->isConcrete()) {
+        if (true === $node->isConcrete()) {
             return $node->toNQuads();
         } else {
             return $node->__toString();

@@ -60,10 +60,10 @@ interface Statement
     public function toSparqlFormat();
 
     /**
-     * Returns true, if this matches the given pattern. This
-     * have to be concrete.
-     * @param Statement $pattern
-     * @throws \LogicException when !$this->isConcrete()
+     * Returns true, if this matches the given pattern. This have to be concrete.
+     *
+     * @param  Statement       $pattern
+     * @throws \LogicException If isConcrete() returns false.
      */
     public function matches(Statement $pattern);
 }

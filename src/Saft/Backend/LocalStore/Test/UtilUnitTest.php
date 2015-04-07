@@ -8,12 +8,12 @@ class UtilUnitTest extends \PHPUnit_Framework_TestCase
 {
     public function testUnescapeTellsSyntaxErrorAtTheRightPosition()
     {
-        $this->testSyntaxError('01234\\x', 5);
-        $this->testSyntaxError('01234\\', 5);
-        $this->testSyntaxError('x\\yz', 1);
+        $this->checkSyntaxError('01234\\x', 5);
+        $this->checkSyntaxError('01234\\', 5);
+        $this->checkSyntaxError('x\\yz', 1);
     }
     
-    private function testSyntaxError($str, $colum = SyntaxException::UNDEFINED)
+    public function checkSyntaxError($str, $colum = SyntaxException::UNDEFINED)
     {
         try {
             Util::unescape($str);

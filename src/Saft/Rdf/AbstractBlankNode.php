@@ -72,14 +72,14 @@ abstract class AbstractBlankNode implements BlankNode
      */
     public function toNQuads()
     {
-        return "_:" . $this->getBlankId();
+        return '_:' . $this->getBlankId();
     }
 
     /**
      * A blank node matches another blank node, if there blank ids are equal.
      * {@inheritdoc}
      */
-    final public function matches(Node $pattern)
+    public function matches(Node $pattern)
     {
         if (!$this->isConcrete()) {
             throw new \LogicException('This have to be concrete');

@@ -64,7 +64,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
     }
 
     /**
-     * 
+     *
      */
     public function testAddStatements()
     {
@@ -165,8 +165,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $query = $this->fixture->hasMatchingStatement($triple);
         
         $this->assertEquals(
-            'ASK {'.
-            ' ?s1 <http://saft/test/p1> <http://saft/test/o1> . }',
+            'ASK { ?s1 <http://saft/test/p1> <http://saft/test/o1> . }',
             $query
         );
 
@@ -179,9 +178,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $query = $this->fixture->hasMatchingStatement($statement);
         
         $this->assertEquals(
-            'ASK {'.
-            'Graph ?g1 {'.
-            ' ?s1 <http://saft/test/p1> <http://saft/test/o1> . } }',
+            'ASK { Graph ?g1 {?s1 <http://saft/test/p1> <http://saft/test/o1>} }',
             $query
         );
     }

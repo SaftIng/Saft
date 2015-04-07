@@ -28,11 +28,11 @@ class StatementImpl extends AbstractStatement
      * @param NamedNode|BlankNode|Variable $subject
      * @param NamedNode|Variable           $predicate
      * @param Node                         $object
-     * @param NodeNode                     $graph
+     * @param NodeNode|Variable            $graph
      * @return
      * @throw
      */
-    public function __construct(Node $subject, Node $predicate, Node $object, NamedNode $graph = null)
+    public function __construct(Node $subject, Node $predicate, Node $object, Node $graph = null)
     {
         $this->subject = $subject;
         $this->predicate = $predicate;

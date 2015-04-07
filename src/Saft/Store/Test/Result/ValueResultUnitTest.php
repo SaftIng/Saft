@@ -1,9 +1,9 @@
 <?php
-namespace Saft\Sparql\Test\Result;
+namespace Saft\Store\Test\Result;
 
-use Saft\Sparql\Result\ExceptionResult;
+use Saft\Store\Result\ValueResult;
 
-class ExceptionResultUnitTest extends \PHPUnit_Framework_TestCase
+class ValueResultUnitTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * Contains an instance of the class to test.
@@ -17,7 +17,7 @@ class ExceptionResultUnitTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->fixture = new ExceptionResult(new \Exception(''));
+        $this->fixture = new ValueResult(0);
     }
     
     /**
@@ -26,7 +26,14 @@ class ExceptionResultUnitTest extends \PHPUnit_Framework_TestCase
     
     public function testConstructor()
     {
-        $this->fixture = new ExceptionResult(new \Exception(''));
+        $this->fixture = new ValueResult(0);
+    }
+    
+    public function testConstructorNonScalarParameter()
+    {
+        $this->setExpectedException('Exception');
+        
+        $this->fixture = new ValueResult(array());
     }
     
     /**
@@ -34,16 +41,16 @@ class ExceptionResultUnitTest extends \PHPUnit_Framework_TestCase
      */
     public function testExistense()
     {
-        $this->assertTrue(class_exists('\Saft\Store\Result\ExceptionResult'));
+        $this->assertTrue(class_exists('\Saft\Store\Result\ValueResult'));
     }
     
     /**
-     * Tests isExceptionResult
+     * Tests isErrorResult
      */
     
     public function testIsExceptionResult()
     {
-        $this->assertTrue($this->fixture->isExceptionResult());
+        $this->assertFalse($this->fixture->isExceptionResult());
     }
     
     /**
@@ -70,6 +77,6 @@ class ExceptionResultUnitTest extends \PHPUnit_Framework_TestCase
     
     public function testIsValueResult()
     {
-        $this->assertFalse($this->fixture->isValueResult());
+        $this->assertTrue($this->fixture->isValueResult());
     }
 }

@@ -2,9 +2,10 @@
 
 namespace Saft\Cache\Test;
 
+use Saft\Cache\Cache;
 use Symfony\Component\Yaml\Parser;
 
-abstract class CacheTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -97,12 +98,20 @@ abstract class CacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $this->fixture->get('foo'));
     }
 
+    /**
+     * tests getCompleteEntry
+     */
+
     public function testGetCompleteEntry()
     {
         $this->fixture->set('foo', 'bar');
         
         $this->assertEquals(
-            array('access_count' => 0, 'value' => 'bar'),
+            array(
+                'get_count' => 1,
+                'set_count' => 1,
+                'value' => 'bar'
+            ),
             $this->fixture->getCompleteEntry('foo')
         );
     }
@@ -110,6 +119,30 @@ abstract class CacheTest extends \PHPUnit_Framework_TestCase
     public function testGetCompleteEntryNoEntry()
     {
         $this->assertNull($this->fixture->getCompleteEntry('foo'));
+    }
+
+    public function testGetCompleteEntryCallMultipleTimes()
+    {
+        $value = array(
+            'foo' => new Cache(array('type' => 'phparray'))
+        );
+        
+        $this->fixture->set('foo', $value);
+        
+        $this->assertEquals(
+            array('get_count' => 1, 'set_count' => 1, 'value' => $value),
+            $this->fixture->getCompleteEntry('foo')
+        );
+        
+        $this->assertEquals(
+            array('get_count' => 2, 'set_count' => 1, 'value' => $value),
+            $this->fixture->getCompleteEntry('foo')
+        );
+        
+        $this->assertEquals(
+            array('get_count' => 3, 'set_count' => 1, 'value' => $value),
+            $this->fixture->getCompleteEntry('foo')
+        );
     }
 
     public function testGetCompleteEntryMultipleAccessesBefore()
@@ -122,7 +155,11 @@ abstract class CacheTest extends \PHPUnit_Framework_TestCase
         $this->fixture->get('foo');
         
         $this->assertEquals(
-            array('access_count' => 3, 'value' => 'bar'),
+            array(
+                'get_count' => 4,
+                'set_count' => 1,
+                'value' => 'bar'
+            ),
             $this->fixture->getCompleteEntry('foo')
         );
     }
@@ -158,16 +195,27 @@ abstract class CacheTest extends \PHPUnit_Framework_TestCase
 
     public function testSet()
     {
-        $this->fixture->set('foo', 1);
-        $this->assertEquals(1, $this->fixture->get('foo'));
+        // int
+        $this->fixture->set('testSet_int', 1);
+        $this->assertEquals(1, $this->fixture->get('testSet_int'));
 
-        $this->fixture->set('foo', array(1));
-        $this->assertEquals(array(1), $this->fixture->get('foo'));
+        // one dimensional array
+        $this->fixture->set('testSet_1dimarray', array(1));
+        $this->assertEquals(array(1), $this->fixture->get('testSet_1dimarray'));
 
-        $this->fixture->set('foo', array(array(1)));
-        $this->assertEquals(array(array(1)), $this->fixture->get('foo'));
+        // multi dimensional array
+        $this->fixture->set('testSet_multidimarray', array(array('foo')));
+        $this->assertEquals(array(array('foo')), $this->fixture->get('testSet_multidimarray'));
 
-        $this->fixture->set('foo', array(array('foo')));
-        $this->assertEquals(array(array('foo')), $this->fixture->get('foo'));
+        // object instance
+        $this->fixture->set('testSet_object', new Cache(array('type' => 'phparray')));
+        $this->assertEquals(new Cache(array('type' => 'phparray')), $this->fixture->get('testSet_object'));
+
+        // object instance in array
+        $this->fixture->set('testSet_object', array('foo' => new Cache(array('type' => 'phparray'))));
+        $this->assertEquals(
+            array('foo' => new Cache(array('type' => 'phparray'))),
+            $this->fixture->get('testSet_object')
+        );
     }
 }

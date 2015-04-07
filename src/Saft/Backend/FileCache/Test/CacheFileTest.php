@@ -1,13 +1,11 @@
 <?php
-
 namespace Saft\Backend\FileCache\Test;
 
-use Saft\Cache\Test\CacheTest;
+use Saft\Cache\Test\AbstractCacheTest;
 use Saft\Cache\Cache;
 
-class CacheFileIntegrationTest extends CacheTest
+class CacheFileIntegrationTest extends AbstractCacheTest
 {
-
     /**
      *
      */

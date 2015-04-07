@@ -1,5 +1,5 @@
 <?php
-namespace Saft\Sparql\Result;
+namespace Saft\Store\Result;
 
 use Saft\Rdf\Statement;
 
@@ -19,6 +19,14 @@ class StatementResult extends SetResult
         } else {
             throw new \Exception('Its not allowed to append non-Statement instances.');
         }
+    }
+    
+    /**
+     * @return boolean True
+     */
+    public function isEmptyResult()
+    {
+        return false;
     }
     
     /**

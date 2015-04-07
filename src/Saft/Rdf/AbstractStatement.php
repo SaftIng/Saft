@@ -67,7 +67,7 @@ abstract class AbstractStatement implements Statement
     /**
      * {@inheritdoc}
      */
-    final public function matches(Statement $pattern)
+    public function matches(Statement $pattern)
     {
         if ($this->isPattern()) {
             throw new \LogicException('This must be concrete');
@@ -86,9 +86,6 @@ abstract class AbstractStatement implements Statement
             $graphsMatch = true;
         }
 
-        return $subjectsMatch
-            && $predicatesMatch
-            && $objectsMatch
-            && $graphsMatch;
+        return $subjectsMatch && $predicatesMatch && $objectsMatch && $graphsMatch;
     }
 }

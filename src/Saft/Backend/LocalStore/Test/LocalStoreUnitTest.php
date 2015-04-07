@@ -7,8 +7,17 @@ use Saft\Rdf\VariableImpl;
 
 class LocalStoreUnitTest extends \PHPUnit_Framework_TestCase
 {
+    const STORE_FILE_CONTENT = <<<EOD
+{
+    "mapping": {
+        "http://localhost:8890/foo": "/foaf.nt",
+        "http://dbpedia.org/data/ireland": "/ireland.nt"
+    }
+}
+EOD;
+    
     // Used for temporary base dirs
-    private $tempDirectory = null;
+    protected $tempDirectory = null;
 
     public function tearDown()
     {
@@ -80,15 +89,6 @@ class LocalStoreUnitTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($graphs);
     }
 
-    const STORE_FILE_CONTENT = <<<EOD
-{
-    "mapping": {
-        "http://localhost:8890/foo": "/foaf.nt",
-        "http://dbpedia.org/data/ireland": "/ireland.nt"
-    }
-}
-EOD;
-
     public function testGetAvailableGraphs()
     {
         $this->tempDirectory = TestUtil::createTempDirectory();
@@ -135,7 +135,7 @@ EOD;
         $store->hasMatchingStatement($statement);
     }
 
-    private static function writeStoreFile($dir, $content)
+    protected static function writeStoreFile($dir, $content)
     {
         $fileName = $dir . DIRECTORY_SEPARATOR . '.store';
         $file = fopen($fileName, 'w');
@@ -146,7 +146,7 @@ EOD;
         fclose($file);
     }
 
-    private static function createAllPattern()
+    protected static function createAllPattern()
     {
         $pattern = new StatementImpl(
             new VariableImpl('?s'),

@@ -1,10 +1,10 @@
 <?php
 namespace Saft\Backend\HttpStore\Test;
 
-use Saft\Store\Test\SparqlStoreIntegrationTest;
+use Saft\Store\Test\AbstractSparqlStoreIntegrationTest;
 use Saft\Backend\HttpStore\Store\Http;
 
-class HttpIntegrationTest extends SparqlStoreIntegrationTest
+class HttpIntegrationTest extends AbstractSparqlStoreIntegrationTest
 {
     public function setUp()
     {

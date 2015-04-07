@@ -32,6 +32,14 @@ interface CacheInterface
     public function get($key);
     
     /**
+     * Returns the complete cache entry, which contains additional meta data besides stored value.
+     *
+     * @param string $key ID of the entry to return the value from.
+     * @return array Complete cache entry
+     */
+    public function getCompleteEntry($key);
+    
+    /**
      * Returns the type of the cache adapter.
      *
      * @return string Type of the cache adapter.

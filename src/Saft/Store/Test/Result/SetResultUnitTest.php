@@ -1,8 +1,8 @@
 <?php
-namespace Saft\Sparql\Test\Result;
+namespace Saft\Store\Test\Result;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Sparql\Result\SetResult;
+use Saft\Store\Result\SetResult;
 
 class SetResultUnitTest extends \PHPUnit_Framework_TestCase
 {

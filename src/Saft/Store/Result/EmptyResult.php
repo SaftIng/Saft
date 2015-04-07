@@ -1,14 +1,23 @@
 <?php
-namespace Saft\Sparql\Result;
+namespace Saft\Store\Result;
 
-class ExceptionResult extends Result
+/**
+ * Represents an empty result, usually after an INSERT or UPDATE SPARQL query.
+ */
+class EmptyResult extends Result
 {
     /**
-     * @param \Exception $exception
      */
-    public function __construct(\Exception $exception)
+    public function __construct()
     {
-        parent::__construct($exception);
+    }
+    
+    /**
+     * @return boolean True
+     */
+    public function isEmptyResult()
+    {
+        return true;
     }
     
     /**
@@ -16,7 +25,7 @@ class ExceptionResult extends Result
      */
     public function isExceptionResult()
     {
-        return true;
+        return false;
     }
     
     /**
