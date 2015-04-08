@@ -62,7 +62,7 @@ class LocalStore extends AbstractTriplePatternStore
         $this->ensureInitialized();
         return array_key_exists($uri, $this->graphUriFileMapping);
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -70,13 +70,13 @@ class LocalStore extends AbstractTriplePatternStore
     {
         throw new \Exception('Unsupported Operation');
     }
-    
+
     /**
      * {@inheritdoc}
      */
-    public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
+    public function deleteMatchingStatements(Statement $pattern, $graphUri = null, array $options = array())
     {
-        $graphUri = $this->resolveGraphUri($graphUri, $statement);
+        $graphUri = $this->resolveGraphUri($graphUri, $pattern);
         $graphFile = $this->getGraphFile($graphUri);
 
         throw new \Exception('Unsupported Operation');
@@ -85,9 +85,9 @@ class LocalStore extends AbstractTriplePatternStore
     /**
      * {@inheritdoc}
      */
-    public function getMatchingStatements(Statement $Statement, $graphUri = null, array $options = array())
+    public function getMatchingStatements(Statement $pattern, $graphUri = null, array $options = array())
     {
-        $graphUri = $this->resolveGraphUri($graphUri, $statement);
+        $graphUri = $this->resolveGraphUri($graphUri, $pattern);
         $graphFile = $this->getGraphFile($graphUri);
 
         throw new \Exception('Unsupported Operation');
@@ -98,7 +98,7 @@ class LocalStore extends AbstractTriplePatternStore
      */
     public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
     {
-        $graphUri = $this->resolveGraphUri($graphUri, $statement);
+        $graphUri = $this->resolveGraphUri($graphUri, $pattern);
         $graphFile = $this->getGraphFile($graphUri);
 
         throw new \Exception('Unsupported Operation');
@@ -112,8 +112,9 @@ class LocalStore extends AbstractTriplePatternStore
                     'Graph URI is not specified. '
                     . '$graphUri is null and $statement is not a quad.'
                 );
+            } elseif (!$statement->getGraph()->isConcrete()) {
+                throw new \InvalidArgumentException('Graph is not concrete');
             }
-            $graphUri = $statement->getGraph()->getValue();
         }
         return $graphUri;
     }
