@@ -7,6 +7,9 @@ use Saft\Rdf\VariableImpl;
 use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\BlankNode;
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\LiteralImpl;
+use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\Statement;
 
 class LocalStoreUnitTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,7 +21,7 @@ class LocalStoreUnitTest extends \PHPUnit_Framework_TestCase
     }
 }
 EOD;
-    
+
     // Used for temporary base dirs
     protected $tempDirectory = null;
 
@@ -172,7 +175,41 @@ EOD;
         $store->initialize();
         $pattern = self::createAllPattern();
         assert(!$pattern->isQuad());
-        $store->getMatchingStatements($pattern);
+        $store->getMatchingStatements($pattern, null);
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testAddStatementsChecksIfInitialized()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        $statement = new StatementImpl(
+            new BlankNodeImpl('foo'),
+            new NamedNodeImpl('http://bar'),
+            new LiteralImpl('baz')
+        );
+        $statements = new ArrayStatementIteratorImpl([$statement]);
+        $store->addStatements($statements, 'http://localhost:8890/foaf');
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testAddStatementsChecksIfGraphIsSpecified()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        $store->initialize();
+        $statement = new StatementImpl(
+            new BlankNodeImpl('foo'),
+            new NamedNodeImpl('http://bar'),
+            new LiteralImpl('baz')
+        );
+        assert(!$statement->isQuad());
+        $statements = new ArrayStatementIteratorImpl([$statement]);
+        $store->addStatements($statements, null);
     }
 
     public function testAddGraph()
@@ -255,6 +292,65 @@ EOD;
             $pattern,
             'http://localhost:8890/foaf'
         ));
+    }
+
+    public function testAddStatements()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $srcDir = $this->getFixtureDir();
+        $dstDir = $this->tempDirectory;
+        TestUtil::copyDirectory($srcDir, $dstDir);
+
+        $store = new LocalStore($this->tempDirectory);
+        $store->initialize();
+
+        $preCount = $this->countStatements($store, 'http://localhost:8890/foaf');
+        $statement = new StatementImpl(
+            new BlankNodeImpl('genid1'),
+            new NamedNodeImpl('http://example.net'),
+            new BlankNodeImpl('genid2')
+        );
+        $statements = new ArrayStatementIteratorImpl([$statement]);
+        $store->addStatements($statements, 'http://localhost:8890/foaf');
+        $postCount = $this->countStatements($store, 'http://localhost:8890/foaf');
+        $this->assertEquals($preCount + 1, $postCount);
+
+        $this->assertFalse($store->isGraphAvailable('http://localhost:8890/baz'));
+        $statement = new StatementImpl(
+            new BlankNodeImpl('genid1'),
+            new NamedNodeImpl('http://example.net'),
+            new BlankNodeImpl('genid2'),
+            new NamedNodeImpl('http://localhost:8890/baz')
+        );
+        $statements = new ArrayStatementIteratorImpl([$statement]);
+        $store->addStatements($statements);
+        $this->assertTrue($store->isGraphAvailable('http://localhost:8890/baz'));
+
+        $it = $store->getMatchingStatements(
+            self::createAllPattern(),
+            'http://localhost:8890/baz'
+        );
+        $it->rewind();
+        $this->assertTrue($it->valid());
+        $match = $it->current();
+        $it->close();
+        $this->assertTrue($statement->matches($match));
+    }
+
+    protected function countStatements(LocalStore $store, $uri = null)
+    {
+        $it = $store->getMatchingStatements(self::createAllPattern(), $uri);
+        try {
+            $count = 0;
+            foreach ($it as $statement) {
+                $count++;
+            }
+            $it->close();
+            return $count;
+        } catch (\Exception $e) {
+            $it->close();
+            throw $e;
+        }
     }
 
     protected static function writeStoreFile($dir, $content)

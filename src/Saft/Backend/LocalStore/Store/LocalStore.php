@@ -79,6 +79,7 @@ class LocalStore extends AbstractTriplePatternStore
             $this->fileSystem->getFile($path);
         $this->graphUriFileMapping[$uri]->createFile();
         $this->saveStoreInfo();
+        $this->log->addInfo('Graph <' . $uri . '> added');
     }
 
     /**
@@ -86,7 +87,45 @@ class LocalStore extends AbstractTriplePatternStore
      */
     public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
     {
-        throw new \Exception('Unsupported Operation');
+        // This method have to handle multiple graphs.
+        // Keep graph file open until the graph uri changes.
+        $prevGraphUri = null;
+        $pointer = null;
+        foreach ($statements as $statement) {
+            self::ensureStatementIsConcrete($statement);
+            $resolvedUri = $this->resolveGraphUri($graphUri, $statement);
+            // If graph uri changed, close the old graph file and open the new file.
+            if ($resolvedUri != $prevGraphUri) {
+                if (!is_null($pointer)) {
+                    fclose($pointer);
+                }
+                $this->createGraphIfNotExists($resolvedUri);
+                $graphFile = $this->getGraphFile($resolvedUri);
+                $filename = Util::getAbsolutePath($this->baseDir, $graphFile->getPathname());
+                $pointer = fopen($filename, 'a');
+            }
+            $line = "\n" . NtriplesSerializer::serializeStatement($statement);
+            fwrite($pointer, $line);
+        }
+        if (is_null($pointer)) {
+            fclose($pointer);
+        }
+    }
+
+    private static function ensureStatementIsConcrete(Statement $statement)
+    {
+        if (!$statement->isConcrete()) {
+            throw new \InvalidArgumentException('Statement that is not concrete');
+        }
+    }
+
+    private function createGraphIfNotExists($uri)
+    {
+        if (!$this->isGraphAvailable($uri)) {
+            // TODO Replace with filename factory
+            $path = basename($uri) . '.nt';
+            $this->addGraph($uri, $path);
+        }
     }
 
     /**
@@ -134,6 +173,7 @@ class LocalStore extends AbstractTriplePatternStore
             } elseif (!$statement->getGraph()->isConcrete()) {
                 throw new \InvalidArgumentException('Graph is not concrete');
             }
+            return $statement->getGraph()->getValue();
         }
         return $graphUri;
     }
