@@ -102,9 +102,14 @@ class LocalStore extends AbstractTriplePatternStore
                 $this->createGraphIfNotExists($resolvedUri);
                 $graphFile = $this->getGraphFile($resolvedUri);
                 $filename = Util::getAbsolutePath($this->baseDir, $graphFile->getPathname());
+                $size = filesize($filename);
                 $pointer = fopen($filename, 'a');
+                // ftell returns always 0, whetever the file is opened in 'a' and is not empty
+                $wasEmpty = ($size == 0);
             }
-            $line = "\n" . NtriplesSerializer::serializeStatement($statement);
+            // Don't add newline before, if the was empty
+            // (If there was a newline at the end, it will be overriden)
+            $line = ($wasEmpty ? "" : "\n") . NtriplesSerializer::serializeStatement($statement);
             fwrite($pointer, $line);
         }
         if (is_null($pointer)) {
