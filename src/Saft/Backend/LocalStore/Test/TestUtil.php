@@ -69,12 +69,12 @@ class TestUtil
         }
         foreach ($files as $file) {
             if ($file->isDir()) {
-                $success = mkdir($dstDir . DIRECTORY_SEPARATOR . $files->getSubPathName());
+                $success = @mkdir($dstDir . DIRECTORY_SEPARATOR . $files->getSubPathName());
                 if ($success === false) {
                     throw new \Exception('Unable to create directory ' . $files->getSubPathName());
                 }
             } elseif ($file->isFile()) {
-                $success = copy($file, $dstDir . DIRECTORY_SEPARATOR . $files->getSubPathName());
+                $success = @copy($file, $dstDir . DIRECTORY_SEPARATOR . $files->getSubPathName());
                 if ($success === false) {
                     throw new \Exception('Unable to copy file ' . $files->getSubPathName());
                 }
