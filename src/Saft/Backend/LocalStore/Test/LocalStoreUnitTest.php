@@ -135,6 +135,23 @@ EOD;
         $store->hasMatchingStatement($statement);
     }
 
+    public function testAddGraph()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $srcDir = $this->getFixtureDir();
+        $dstDir = $this->tempDirectory;
+        TestUtil::copyDirectory($srcDir, $dstDir);
+
+        $store = new LocalStore($this->tempDirectory);
+        $store->initialize();
+        $uri = 'http://localhost:8890/bar';
+        $path = 'bar.nt';
+        $this->assertFalse($store->isGraphAvailable($uri));
+        $store->addGraph($uri, $path);
+        $this->assertTrue($store->isGraphAvailable($uri));
+        $this->assertFileExists($this->tempDirectory . DIRECTORY_SEPARATOR . $path);
+    }
+
     protected static function writeStoreFile($dir, $content)
     {
         $fileName = $dir . DIRECTORY_SEPARATOR . '.store';
@@ -154,5 +171,11 @@ EOD;
             new VariableImpl('?o')
         );
         return $pattern;
+    }
+
+    private function getFixtureDir()
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR
+        . 'Fixture' . DIRECTORY_SEPARATOR . 'Store';
     }
 }

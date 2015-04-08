@@ -64,6 +64,24 @@ class LocalStore extends AbstractTriplePatternStore
     }
 
     /**
+     * Adds an empty graph with the given URI to store. This graph
+     * is available after.
+     * @param string $uri URI of the graph
+     * @param string $filename filename relative to the base directory
+     */
+    public function addGraph($uri, $path)
+    {
+        if ($this->isGraphAvailable($uri)) {
+            return;
+        }
+    
+        $this->graphUriFileMapping[$uri] =
+        $this->fileSystem->getFile($path);
+        $this->graphUriFileMapping[$uri]->createFile();
+        $this->saveStoreInfo();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
@@ -96,7 +114,7 @@ class LocalStore extends AbstractTriplePatternStore
     /**
      * {@inheritdoc}
      */
-    public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
+    public function hasMatchingStatement(Statement $pattern, $graphUri = null, array $options = array())
     {
         $graphUri = $this->resolveGraphUri($graphUri, $pattern);
         $graphFile = $this->getGraphFile($graphUri);
