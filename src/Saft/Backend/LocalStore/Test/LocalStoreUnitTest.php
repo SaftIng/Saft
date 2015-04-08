@@ -212,6 +212,30 @@ EOD;
         $store->addStatements($statements, null);
     }
 
+    /**
+     * @expectedException \LogicException
+     */
+    public function testDeleteMatchingStatementsChecksIfInitialized()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        $pattern = self::createAllPattern();
+        $store->deleteMatchingStatements($pattern, 'http://localhost:8890/foaf');
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testDeleteMatchingStatementsChecksIfGraphIsSpecified()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        $store->initialize();
+        $pattern = self::createAllPattern();
+        assert(!$pattern->isQuad());
+        $store->deleteMatchingStatements($pattern, null);
+    }
+
     public function testAddGraph()
     {
         $this->tempDirectory = TestUtil::createTempDirectory();
@@ -335,6 +359,26 @@ EOD;
         $match = $it->current();
         $it->close();
         $this->assertTrue($statement->matches($match));
+    }
+
+    public function testDeleteMatchingStatements()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $srcDir = $this->getFixtureDir();
+        $dstDir = $this->tempDirectory;
+        TestUtil::copyDirectory($srcDir, $dstDir);
+
+        $store = new LocalStore($this->tempDirectory);
+        $store->initialize();
+        $preCount = $this->countStatements($store, 'http://localhost:8890/foaf');
+        $pattern = new StatementImpl(
+            new BlankNodeImpl('genid1'),
+            new VariableImpl('?p'),
+            new VariableImpl('?o')
+        );
+        $store->deleteMatchingStatements($pattern, 'http://localhost:8890/foaf');
+        $postCount = $this->countStatements($store, 'http://localhost:8890/foaf');
+        $this->assertEquals($preCount - 3, $postCount);
     }
 
     protected function countStatements(LocalStore $store, $uri = null)

@@ -150,7 +150,80 @@ class LocalStore extends AbstractTriplePatternStore
         $graphUri = $this->resolveGraphUri($graphUri, $pattern);
         $graphFile = $this->getGraphFile($graphUri);
 
-        throw new \Exception('Unsupported Operation');
+        // Collect the line numbers to delete
+        $linesToDelete = [];
+        $it = new MatchingStatementIterator($graphFile, $pattern);
+        try {
+            foreach ($it as $lineNum => $statement) {
+                array_push($linesToDelete, $lineNum);
+            }
+            $it->close();
+        } catch (\Exception $e) {
+            $it->close();
+            throw $e;
+        }
+
+        $filename = Util::getAbsolutePath($this->baseDir, $graphFile->getPathname());
+        $this->removeDeletedLines($filename, $linesToDelete);
+        $this->log->addInfo('Deleted ' . count($linesToDelete) . " triples");
+    }
+
+    protected function removeDeletedLines($filename, array $linesToDelete)
+    {
+        // Open new temp file
+        $tempDir = ini_get('upload_tmp_dir');
+        // 'C:/Users/Oliver/Desktop/triple-store/' . microtime() . '.nt';
+        $tempFile = tempnam($tempDir, '');
+        $dst = @fopen($tempFile, 'w');
+        if ($dst === false) {
+            throw new \Exception('Unable to write temp file ' . $tempFile);
+        }
+
+        $src = @fopen($filename, 'r');
+        if ($src === false) {
+            @fclose($dst);
+            throw new \Exception('Unable to read file ' . $filename);
+        }
+
+        // Copy undeleted lines into temp file
+        try {
+            $lineNum = 0;
+            while (!@feof($src)) {
+                $line = @fgets($src);
+                if ($line === false) {
+                    throw new \Exception('Unable to read line');
+                }
+                $deleted = in_array($lineNum, $linesToDelete);
+                if (!$deleted) {
+                    $success = @fwrite($dst, $line);
+                    if ($success === false) {
+                        throw new \Exception('Unable to write line');
+                    }
+                }
+                $lineNum++;
+            }
+            @fclose($src);
+            @fclose($dst);
+        } catch (\Exception $e) {
+            @flose($src);
+            @flose($dst);
+            throw $e;
+        }
+
+        // Delete old file
+        $success = @unlink($filename);
+        if ($success === false) {
+            throw new \Exception('Unable to delete ' . $filename);
+        }
+
+        // Replace it by the new temp file
+        $success = @copy($tempFile, $filename);
+        if ($success === false) {
+            throw new \Exception('Unable to copy ' . $tempFile . ' to ' . $filename);
+        }
+
+        // Delete temp file
+        @unlink($tempFile);
     }
 
     /**
