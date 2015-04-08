@@ -26,13 +26,13 @@ class NtriplesParserUnitTest extends \PHPUnit_Framework_TestCase
         $this->checkSyntaxError('_:foo <http://example.net> _ .', 27);
     }
 
-    public function checkSyntaxError($line, $colum = SyntaxException::UNDEFINED)
+    public function checkSyntaxError($line, $column = SyntaxException::UNDEFINED)
     {
         try {
             NtriplesParser::parseStatment($line);
             $this->fail('Expected syntax error for "' . $line . '"');
         } catch (SyntaxException $e) {
-            $this->assertEquals($colum, $e->getColum());
+            $this->assertEquals($column, $e->getColumn());
         }
     }
 

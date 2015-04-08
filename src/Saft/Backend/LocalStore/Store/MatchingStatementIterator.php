@@ -91,7 +91,7 @@ final class MatchingStatementIterator extends \Saft\Rdf\AbstractStatementIterato
                 throw new SyntaxException(
                     $e->getMessage(),
                     $this->lineIterator->key(),
-                    $e->getColum()
+                    $e->getColumn()
                 );
             }
             if ($statement->matches($this->pattern)) {

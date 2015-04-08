@@ -6,15 +6,15 @@ final class SyntaxException extends \Exception
     const UNDEFINED = -1;
     
     private $row;
-    private $colum;
+    private $column;
     
     public function __construct(
         $message,
         $row = self::UNDEFINED,
-        $colum = self::UNDEFINED
+        $column = self::UNDEFINED
     ) {
         $this->row = $row;
-        $this->colum = $colum;
+        $this->column = $column;
         parent::__construct($message);
     }
 
@@ -28,36 +28,36 @@ final class SyntaxException extends \Exception
         return $this->row != self::UNDEFINED;
     }
     
-    public function isColumDefined()
+    public function isColumnDefined()
     {
-        return $this->colum != self::UNDEFINED;
+        return $this->column != self::UNDEFINED;
     }
     
-    public function getColum()
+    public function getColumn()
     {
-        return $this->colum;
+        return $this->column;
     }
 
     public function __toString()
     {
-        if ($this->isRowDefined() && $this->isColumDefined()) {
+        if ($this->isRowDefined() && $this->isColumnDefined()) {
             return sprintf(
-                '%s (at line %, colum %d)',
+                '%s (at line %, column %d)',
                 $this->getMessage(),
                 $this->getRow(),
-                $this->getColum()
+                $this->getColumn()
             );
         } elseif ($this->isRowDefined()) {
             return sprintf(
                 '%s (at row %d)',
                 $this->getMessage(),
-                $this->getColum()
+                $this->getColumn()
             );
-        } elseif ($this->isColumDefined()) {
+        } elseif ($this->isColumnDefined()) {
             return sprintf(
-                '%s (at colum %d)',
+                '%s (at column %d)',
                 $this->getMessage(),
-                $this->getColum()
+                $this->getColumn()
             );
         } else {
             return $this->getMessage();
