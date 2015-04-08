@@ -74,9 +74,9 @@ class LocalStore extends AbstractTriplePatternStore
         if ($this->isGraphAvailable($uri)) {
             return;
         }
-    
+
         $this->graphUriFileMapping[$uri] =
-        $this->fileSystem->getFile($path);
+            $this->fileSystem->getFile($path);
         $this->graphUriFileMapping[$uri]->createFile();
         $this->saveStoreInfo();
     }
@@ -102,13 +102,13 @@ class LocalStore extends AbstractTriplePatternStore
 
     /**
      * {@inheritdoc}
+     * @return MatchingStatementIterator
      */
     public function getMatchingStatements(Statement $pattern, $graphUri = null, array $options = array())
     {
         $graphUri = $this->resolveGraphUri($graphUri, $pattern);
         $graphFile = $this->getGraphFile($graphUri);
-
-        throw new \Exception('Unsupported Operation');
+        return new MatchingStatementIterator($graphFile, $pattern);
     }
 
     /**
@@ -116,10 +116,11 @@ class LocalStore extends AbstractTriplePatternStore
      */
     public function hasMatchingStatement(Statement $pattern, $graphUri = null, array $options = array())
     {
-        $graphUri = $this->resolveGraphUri($graphUri, $pattern);
-        $graphFile = $this->getGraphFile($graphUri);
-
-        throw new \Exception('Unsupported Operation');
+        $it = $this->getMatchingStatements($pattern, $graphUri);
+        $it->rewind();
+        $found = $it->valid();
+        $it->close();
+        return $found;
     }
 
     protected function resolveGraphUri($graphUri, Statement $statement)

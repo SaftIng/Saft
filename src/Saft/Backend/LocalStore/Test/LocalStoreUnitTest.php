@@ -4,6 +4,9 @@ namespace Saft\Backend\LocalStore\Test;
 use Saft\Backend\LocalStore\Store\LocalStore;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\VariableImpl;
+use Saft\Rdf\BlankNodeImpl;
+use Saft\Rdf\BlankNode;
+use Saft\Rdf\NamedNodeImpl;
 
 class LocalStoreUnitTest extends \PHPUnit_Framework_TestCase
 {
@@ -111,12 +114,12 @@ EOD;
         // Must intiailized before
         $store->isGraphAvailable('foo');
     }
-    
+
     public function testIsGraphAvailable()
     {
         $this->tempDirectory = TestUtil::createTempDirectory();
         $this->writeStoreFile($this->tempDirectory, self::STORE_FILE_CONTENT);
-    
+
         $store = new LocalStore($this->tempDirectory);
         $store->initialize();
         $this->assertTrue($store->isGraphAvailable('http://localhost:8890/foo'));
@@ -131,8 +134,45 @@ EOD;
     {
         $this->tempDirectory = TestUtil::createTempDirectory();
         $store = new LocalStore($this->tempDirectory);
-        $statement = self::createAllPattern();
-        $store->hasMatchingStatement($statement);
+        $pattern = self::createAllPattern();
+        $store->hasMatchingStatement($pattern, 'http://localhost:8890/foaf');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testHasMatchingStatementChecksIfGraphIsSpecified()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        $store->initialize();
+        $pattern = self::createAllPattern();
+        assert(!$pattern->isQuad());
+        $store->hasMatchingStatement($pattern);
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testGetMatchingStatementsChecksIfInitialized()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        $pattern = self::createAllPattern();
+        $store->getMatchingStatements($pattern);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetMatchingStatementsChecksIfGraphIsSpecified()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        $store->initialize();
+        $pattern = self::createAllPattern();
+        assert(!$pattern->isQuad());
+        $store->getMatchingStatements($pattern);
     }
 
     public function testAddGraph()
@@ -150,6 +190,71 @@ EOD;
         $store->addGraph($uri, $path);
         $this->assertTrue($store->isGraphAvailable($uri));
         $this->assertFileExists($this->tempDirectory . DIRECTORY_SEPARATOR . $path);
+    }
+
+    public function testGetMatchingStatements()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $srcDir = $this->getFixtureDir();
+        $dstDir = $this->tempDirectory;
+        TestUtil::copyDirectory($srcDir, $dstDir);
+
+        $store = new LocalStore($this->tempDirectory);
+        $store->initialize();
+        $pattern = new StatementImpl(
+            new BlankNodeImpl('genid1'),
+            new VariableImpl('?p'),
+            new VariableImpl('?o')
+        );
+        $it = $store->getMatchingStatements($pattern, 'http://localhost:8890/foaf');
+        $matches = [];
+        foreach ($it as $statement) {
+            $this->assertTrue($statement->isConcrete());
+            $this->assertTrue($statement->getSubject() instanceof BlankNode);
+            $this->assertEquals('genid1', $statement->getSubject()->getBlankId());
+            array_push($matches, $statement);
+        }
+        $it->close();
+        $this->assertEquals(3, count($matches));
+
+        $pattern = new StatementImpl(
+            new NamedNodeImpl('http://notexist/'),
+            new VariableImpl('?p'),
+            new VariableImpl('?o')
+        );
+        $it = $store->getMatchingStatements($pattern, 'http://localhost:8890/foaf');
+        $this->assertFalse($it->valid());
+        $it->close();
+    }
+
+    public function testHasMatchingStatements()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $srcDir = $this->getFixtureDir();
+        $dstDir = $this->tempDirectory;
+        TestUtil::copyDirectory($srcDir, $dstDir);
+
+        $store = new LocalStore($this->tempDirectory);
+        $store->initialize();
+        $pattern = new StatementImpl(
+            new BlankNodeImpl('genid1'),
+            new VariableImpl('?p'),
+            new VariableImpl('?o')
+        );
+        $this->assertTrue($store->hasMatchingStatement(
+            $pattern,
+            'http://localhost:8890/foaf'
+        ));
+
+        $pattern = new StatementImpl(
+            new NamedNodeImpl('http://notexist/'),
+            new VariableImpl('?p'),
+            new VariableImpl('?o')
+        );
+        $this->assertFalse($store->hasMatchingStatement(
+            $pattern,
+            'http://localhost:8890/foaf'
+        ));
     }
 
     protected static function writeStoreFile($dir, $content)
