@@ -370,15 +370,35 @@ EOD;
 
         $store = new LocalStore($this->tempDirectory);
         $store->initialize();
-        $preCount = $this->countStatements($store, 'http://localhost:8890/foaf');
         $pattern = new StatementImpl(
             new BlankNodeImpl('genid1'),
             new VariableImpl('?p'),
             new VariableImpl('?o')
         );
+
+        // Count how many statements matches the pattern
+        $it = $store->getMatchingStatements($pattern, 'http://localhost:8890/foaf');
+        $numMatches = 0;
+        foreach ($it as $statement) {
+            $numMatches++;
+        }
+        $it->close();
+        $this->assertEquals(3, $numMatches);
+        
+        // Delete matching statements
+        $preCount = $this->countStatements($store, 'http://localhost:8890/foaf');
         $store->deleteMatchingStatements($pattern, 'http://localhost:8890/foaf');
         $postCount = $this->countStatements($store, 'http://localhost:8890/foaf');
-        $this->assertEquals($preCount - 3, $postCount);
+        $this->assertEquals(3, $preCount - $postCount);
+
+        // Check, that all matches has been deleted
+        $it = $store->getMatchingStatements($pattern, 'http://localhost:8890/foaf');
+        $numMatches = 0;
+        foreach ($it as $statement) {
+            $numMatches++;
+        }
+        $it->close();
+        $this->assertEquals(0, $numMatches);
     }
 
     protected function countStatements(LocalStore $store, $uri = null)
