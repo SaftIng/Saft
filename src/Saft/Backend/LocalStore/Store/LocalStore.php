@@ -91,30 +91,39 @@ class LocalStore extends AbstractTriplePatternStore
         // Keep graph file open until the graph uri changes.
         $prevGraphUri = null;
         $pointer = null;
+        $count = 0;
         foreach ($statements as $statement) {
             self::ensureStatementIsConcrete($statement);
             $resolvedUri = $this->resolveGraphUri($graphUri, $statement);
             // If graph uri changed, close the old graph file and open the new file.
             if ($resolvedUri != $prevGraphUri) {
                 if (!is_null($pointer)) {
-                    fclose($pointer);
+                    @fclose($pointer);
                 }
                 $this->createGraphIfNotExists($resolvedUri);
                 $graphFile = $this->getGraphFile($resolvedUri);
                 $filename = Util::getAbsolutePath($this->baseDir, $graphFile->getPathname());
-                $size = filesize($filename);
-                $pointer = fopen($filename, 'a');
+                $size = @filesize($filename);
+                if ($size === false) {
+                    throw new \Exception('Unable to get filesize of ' . $filename);
+                }
+                $pointer = @fopen($filename, 'a');
+                if ($pointer === false) {
+                    throw new \Exception('Unable to open ' . $filename);
+                }
                 // ftell returns always 0, whetever the file is opened in 'a' and is not empty
                 $wasEmpty = ($size == 0);
             }
-            // Don't add newline before, if the was empty
+            // Don't add newline before, if the graph file was empty
             // (If there was a newline at the end, it will be overriden)
             $line = ($wasEmpty ? "" : "\n") . NtriplesSerializer::serializeStatement($statement);
-            fwrite($pointer, $line);
+            @fwrite($pointer, $line);
+            $count++;
         }
         if (is_null($pointer)) {
-            fclose($pointer);
+            @fclose($pointer);
         }
+        $this->log->addInfo('Added ' . $count . " triples");
     }
 
     private static function ensureStatementIsConcrete(Statement $statement)
