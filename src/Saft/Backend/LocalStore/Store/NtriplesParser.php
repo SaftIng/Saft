@@ -16,7 +16,7 @@ final class NtriplesParser
     const LITERAL_LANG_REGEX = '/^"(.+)"@([\w\-]+)$/';
     const LITERAL_REGEX = '/^"(.*)"$/';
 
-    public static function parseStatment($line)
+    public static function parseStatement($line)
     {
         $matches=[];
         if (preg_match(self::STATEMENT_REGEX, $line, $matches, PREG_OFFSET_CAPTURE)) {

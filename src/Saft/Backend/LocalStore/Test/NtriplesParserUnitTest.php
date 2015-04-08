@@ -29,7 +29,7 @@ class NtriplesParserUnitTest extends \PHPUnit_Framework_TestCase
     public function checkSyntaxError($line, $column = SyntaxException::UNDEFINED)
     {
         try {
-            NtriplesParser::parseStatment($line);
+            NtriplesParser::parseStatement($line);
             $this->fail('Expected syntax error for "' . $line . '"');
         } catch (SyntaxException $e) {
             $this->assertEquals($column, $e->getColumn());
@@ -43,7 +43,7 @@ class NtriplesParserUnitTest extends \PHPUnit_Framework_TestCase
             new NamedNodeImpl('http://example.net/bar'),
             new LiteralImpl('Welcome', 'en-US')
         );
-        $actual = NtriplesParser::parseStatment(
+        $actual = NtriplesParser::parseStatement(
             '<http://example.net/foo> '
             . '<http://example.net/bar> '
             . '"Welcome"@en-US .'
