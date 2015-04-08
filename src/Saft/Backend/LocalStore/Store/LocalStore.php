@@ -172,7 +172,6 @@ class LocalStore extends AbstractTriplePatternStore
     {
         // Open new temp file
         $tempDir = ini_get('upload_tmp_dir');
-        // 'C:/Users/Oliver/Desktop/triple-store/' . microtime() . '.nt';
         $tempFile = tempnam($tempDir, '');
         $dst = @fopen($tempFile, 'w');
         if ($dst === false) {
@@ -297,7 +296,6 @@ class LocalStore extends AbstractTriplePatternStore
         return $this->initialized;
     }
 
-    
     protected function ensureInitialized()
     {
         if (!$this->initialized) {
