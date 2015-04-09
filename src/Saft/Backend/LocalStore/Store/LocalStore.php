@@ -23,6 +23,7 @@ class LocalStore extends AbstractTriplePatternStore
     protected $baseDir;
     protected $fileSystem;
     private $graphUriFileMapping;
+    protected $filenameFactory;
 
     public function __construct($baseDir)
     {
@@ -41,6 +42,7 @@ class LocalStore extends AbstractTriplePatternStore
         $this->log->info('Using base dir: ' . $baseDir);
 
         $this->graphUriFileMapping = array();
+        $this->filenameFactory = new DefaultFilenameFactory();
     }
 
     /**
@@ -61,6 +63,16 @@ class LocalStore extends AbstractTriplePatternStore
         }
         $this->ensureInitialized();
         return array_key_exists($uri, $this->graphUriFileMapping);
+    }
+
+    public function setFilenameFactory(FilenameFactory $factory)
+    {
+        $this->filenameFactory = $factory;
+    }
+
+    public function getFilenameFactory()
+    {
+        return $this->filenameFactory;
     }
 
     /**
@@ -136,9 +148,9 @@ class LocalStore extends AbstractTriplePatternStore
     private function createGraphIfNotExists($uri)
     {
         if (!$this->isGraphAvailable($uri)) {
-            // TODO Replace with filename factory
-            $path = basename($uri) . '.nt';
-            $this->addGraph($uri, $path);
+            $absoluteBaseDir = realpath($this->baseDir);
+            $filename = $this->filenameFactory->generateFilename($uri, $absoluteBaseDir);
+            $this->addGraph($uri, $filename);
         }
     }
 
