@@ -2,34 +2,86 @@
 
 namespace Saft\Store;
 
+use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\StatementImpl;
+use Saft\Rdf\NamedNodeImpl;
+use \Saft\Sparql\Query;
+
 /**
  * Predefined Pattern-statement Store. The Triple-methods need to be implemented in the specific statement-store.
  * The query method is defined in the abstract class and reroute to the triple-methods.
  */
 abstract class AbstractTriplePatternStore implements StoreInterface
 {
+
     /**
-     * @param string $query SPARQL query string.
-     * @return ?
-     * @throws ?
+     * redirect to deleteMatchingStatement-methode
+     * @param  string $query
+     * @return answer from deleteMatchingStatement
      */
     public function delete($query)
     {
-        return $query;
+        //TODO
+        $this->fixture = new Query();
+        $this->fixture->init($query);
+        /*$queryParts = $this->fixture->getQueryParts();
+        print_r($queryParts);*/
+        $queryParts = $this->fixture->getTriplePatterns();
+
+        $statement = $this->getStatement($queryParts[0]);
+        
+        return $this->deleteMatchingStatements($statement);
+    }
+
+    /**
+     * redirect to addStatements-methode
+     * @param  string $query
+     * @return answer from addStatements
+     */
+    public function add($query)
+    {
+        //TODO
+        $this->fixture = new Query();
+        $this->fixture->init($query);
+        $queryParts = $this->fixture->getTriplePatterns();
+        print_r($queryParts);
+        return $this->addStatements($this->getStatements($queryParts));
     }
     
     /**
-     * @param string $query SPARQL query string.
-     * @return ?
-     * @throws ?
+     * redirect to getMatchingStatements-methode
+     * @param  string $query
+     * @return answer from getMatchingStatements
      */
     public function get($query)
     {
-        return $query;
+        //TODO
+        $this->fixture = new Query();
+        $this->fixture->init($query);
+        $queryParts = $this->fixture->getTriplePatterns();
+
+        $statement = $this->getStatement($queryParts[0]);
+        return $this->getMatchingStatements($statement);
+    }
+
+    /**
+     * redirect to hasMatchingStatement-methode
+     * @param  string $query
+     * @return answer from hasMatchingStatement
+     */
+    public function has($query)
+    {
+        //TODO
+        $this->fixture = new Query();
+        $this->fixture->init($query);
+        $queryParts = $this->fixture->getTriplePatterns();
+
+        $statement = $this->getStatement($queryParts[0]);
+        return $this->hasMatchingStatement($statement);
     }
     
     /**
-     * @param string $query            SPARQL query string.
+     * @param string $query   SPARQL query string.
      * @param string $options optional Further configurations.
      * @throws ?
      */
@@ -38,10 +90,39 @@ abstract class AbstractTriplePatternStore implements StoreInterface
         //@TODO
         if (stristr($query, 'select') || stristr($query, 'construct')) {
             $this->get($query);
-        } elseif (stristr($query, 'delete')) {
+        } elseif (strpos($query, 'delete')) {
             $this->delete($query);
         } elseif (stristr($query, 'insert')) {
-            $this->delete($query);
+            $this->add($query);
         }
+    }
+
+    /**
+     * create Statement from query.
+     * @param array $queryParts the part of the query with the description of the statement.
+     * @return Statement           Statement-object
+     */
+    protected function getStatement(array $queryParts)
+    {
+        $subject = new NamedNodeImpl($queryParts['s']);
+        $predicate = new NamedNodeImpl($queryParts['p']);
+        $object = new NamedNodeImpl($queryParts['o']);
+        $statement = new StatementImpl($subject, $predicate, $object);
+
+        return $statement;
+    }
+
+    /**
+     * create statements from query
+     * @param  array $queryParts the part of the query with the description of the statements.
+     * @return StatementIterator             Statements
+     */
+    protected function getStatements(array $queryParts)
+    {
+        $statements = new ArrayStatementIteratorImpl(array());
+        foreach ($queryParts as $st) {
+            $statements->append($this->getStatement($st));
+        }
+        return $statements;
     }
 }
