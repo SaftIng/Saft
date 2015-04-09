@@ -142,7 +142,7 @@ abstract class AbstractTriplePatternStore implements StoreInterface
             return new NamedNodeImpl($value);
         } elseif ('var' == $type) {
             return new VariableImpl('?' . $value);
-        } elseif ('typed-literal' == $type) {
+        } elseif ('typed-literal' == $type || 'literal' == $type) {
             return new LiteralImpl($value);
         }
     }
