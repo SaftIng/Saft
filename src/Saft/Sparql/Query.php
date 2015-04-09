@@ -2,6 +2,8 @@
 
 namespace Saft\Sparql;
 
+use Saft\Rdf\AbstractNamedNode;
+
 /**
  * This file WAS part of the {@link http://erfurt-framework.org Erfurt} project.
  *
@@ -188,7 +190,7 @@ class Query
     public function determineEntityType($entity)
     {
         // checks if $entity is an URL
-        if (true === \Saft\Rdf\NamedNodeImpl::check($entity)) {
+        if (true === AbstractNamedNode::check($entity)) {
             return 'uri';
         
         // checks if ^^< is in $entity OR if $entity is surrounded by quotation marks

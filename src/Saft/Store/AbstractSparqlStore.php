@@ -4,7 +4,7 @@ namespace Saft\Store;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Statement;
-use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\AbstractNamedNode;
 use Saft\Rdf\Node;
 use Saft\Rdf\StatementIterator;
 
@@ -244,7 +244,7 @@ abstract class AbstractSparqlStore implements StoreInterface
     protected function parseGraphUri($graphUri)
     {
         // check if its a valid URI
-        if (true === NamedNodeImpl::check($graphUri)) {
+        if (true === AbstractNamedNode::check($graphUri)) {
             return '<'. $graphUri .'>';
             // check for variable, which has a ? as first char
         } elseif ('?' == substr($graphUri, 0, 1)) {
