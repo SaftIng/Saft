@@ -3,8 +3,11 @@
 namespace Saft\Store;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\AbstractNamedNode;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\LiteralImpl;
+use Saft\Rdf\VariableImpl;
 use \Saft\Sparql\Query;
 
 /**
@@ -44,7 +47,7 @@ abstract class AbstractTriplePatternStore implements StoreInterface
         $this->fixture = new Query();
         $this->fixture->init($query);
         $queryParts = $this->fixture->getTriplePatterns();
-        print_r($queryParts);
+        //print_r($queryParts);
         return $this->addStatements($this->getStatements($queryParts));
     }
     
@@ -104,9 +107,10 @@ abstract class AbstractTriplePatternStore implements StoreInterface
      */
     protected function getStatement(array $queryParts)
     {
-        $subject = new NamedNodeImpl($queryParts['s']);
-        $predicate = new NamedNodeImpl($queryParts['p']);
-        $object = new NamedNodeImpl($queryParts['o']);
+        //print_r($queryParts);
+        $subject = $this->createNode($queryParts['s'], $queryParts['s_type']);
+        $predicate = $this->createNode($queryParts['p'], $queryParts['p_type']);
+        $object = $this->createNode($queryParts['o'], $queryParts['o_type']);
         $statement = new StatementImpl($subject, $predicate, $object);
 
         return $statement;
@@ -124,5 +128,22 @@ abstract class AbstractTriplePatternStore implements StoreInterface
             $statements->append($this->getStatement($st));
         }
         return $statements;
+    }
+
+    /**
+     * Create a Node from string.
+     *
+     * @param  string $value value of Node
+     * @return Node   Returns NamedNode, Variable or Literal
+     */
+    private function createNode($value, $type)
+    {
+        if ('uri' == $type) {
+            return new NamedNodeImpl($value);
+        } elseif ('var' == $type) {
+            return new VariableImpl('?' . $value);
+        } elseif ('typed-literal' == $type) {
+            return new LiteralImpl($value);
+        }
     }
 }

@@ -39,6 +39,26 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
         return $triple;
     }
 
+    public function getTestPatternStatement()
+    {
+        $subject1 = new VariableImpl('?s1');
+        $predicate1 = new NamedNodeImpl('http://saft/test/p2');
+        $object1 = new LiteralImpl("John");
+        $triple = new StatementImpl($subject1, $predicate1, $object1);
+
+        return $triple;
+    }
+
+    public function getTestStatementWithLiteral()
+    {
+        $subject2 = new NamedNodeImpl('http://saft/test/s1');
+        $predicate2 = new NamedNodeImpl('http://saft/test/p2');
+        $object2 = new LiteralImpl("John");
+        $triple = new StatementImpl($subject2, $predicate2, $object2);
+
+        return $triple;
+    }
+
     public function testAddStatements()
     {
         $triple = $this->getTestTriple();
@@ -67,10 +87,9 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
         $this->fixture->query($query);
     }
 
-    public function testDeleteMatchingStatements()
+    public function testTripleRecognition()
     {
-        $triple = $this->getTestTriple();
-        $query = 'INSERT DATA { '.$triple->toSparqlFormat().'}';
+        $query = 'INSERT DATA { '.$this->getTestTriple()->toSparqlFormat().'}';
         
         $this->fixture
             ->expects($this->once())
@@ -81,6 +100,66 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
                         \PHPUnit_Framework_Assert::assertEquals(
                             $statement->toSparqlFormat(),
                             $this->getTestTriple()->toSparqlFormat()
+                        );
+                    }
+                )
+            );
+        $this->fixture->delete($query);
+    }
+
+    public function testQuadRecognition()
+    {
+        $query = 'INSERT DATA { '.$this->getTestQuad()->toSparqlFormat().'}';
+        
+        $this->fixture
+            ->expects($this->once())
+            ->method('deleteMatchingStatements')
+            ->will(
+                $this->returnCallback(
+                    function (Statement $statement, $graphUri = null, array $options = array()) {
+                        \PHPUnit_Framework_Assert::assertEquals(
+                            $statement->toSparqlFormat(),
+                            $this->getTestQuad()->toSparqlFormat()
+                        );
+                    }
+                )
+            );
+        $this->fixture->delete($query);
+    }
+
+    public function testVariablePatterns()
+    {
+        $query = 'INSERT DATA { '.$this->getTestPatternStatement()->toSparqlFormat().'}';
+        
+        $this->fixture
+            ->expects($this->once())
+            ->method('deleteMatchingStatements')
+            ->will(
+                $this->returnCallback(
+                    function (Statement $statement, $graphUri = null, array $options = array()) {
+                        \PHPUnit_Framework_Assert::assertEquals(
+                            $statement->toSparqlFormat(),
+                            $this->getTestPatternStatement()->toSparqlFormat()
+                        );
+                    }
+                )
+            );
+        $this->fixture->delete($query);
+    }
+
+    public function testStatementsWithLiteral()
+    {
+        $query = 'INSERT DATA { '.$this->getTestStatementWithLiteral()->toSparqlFormat().'}';
+        
+        $this->fixture
+            ->expects($this->once())
+            ->method('deleteMatchingStatements')
+            ->will(
+                $this->returnCallback(
+                    function (Statement $statement, $graphUri = null, array $options = array()) {
+                        \PHPUnit_Framework_Assert::assertEquals(
+                            $statement->toSparqlFormat(),
+                            $this->getTestStatementWithLiteral()->toSparqlFormat()
                         );
                     }
                 )
