@@ -189,6 +189,9 @@ class Query
      */
     public function determineEntityType($entity)
     {
+        if ('<' == substr($entity, 0, 1)) {
+            $entity = str_replace(array('>', '<'), '', $entity);
+        }
         // checks if $entity is an URL
         if (true === AbstractNamedNode::check($entity)) {
             return 'uri';
@@ -487,6 +490,11 @@ class Query
             $s = str_replace(array('?', '>', '<'), '', $matches[1][$lineIndex]);
             $p = str_replace(array('?', '>', '<'), '', $matches[2][$lineIndex]);
             $o = $matches[3][$lineIndex];
+            $oIsUri = false;
+            if ('<' == substr($o, 0, 1)) {
+                $o = str_replace(array('>', '<'), '', $o);
+                $oIsUri = true;
+            }
             
             /**
              * Determine types of subject, predicate and object
@@ -501,6 +509,9 @@ class Query
             $oDatatype = $this->determineObjectDatatype($o);
             $oLang = $this->determineObjectLanguage($o);
             $oValue = $this->determineObjectValue($o);
+            if ($oIsUri === true) {
+                $oValue = $o;
+            }
 
             // set pattern array
             $pattern[] = array(
