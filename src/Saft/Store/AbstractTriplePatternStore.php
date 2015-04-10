@@ -24,25 +24,31 @@ abstract class AbstractTriplePatternStore implements StoreInterface
      */
     public function query($query, array $options = array())
     {
-        //@TODO
         $queryParser = new Query();
         $queryParser->init($query);
-        //$queryParts = $queryParser->getQueryParts();
+        //@TODO does not recognize quads.
         $queryStatements = $queryParser->getTriplePatterns();
+        //$queryParts = $queryParser->getQueryParts();
         $statement = $this->getStatement($queryStatements[0]);
 
-        if (stristr($query, 'select')) {
-            //redirect to getMatchingStatements-methode
-            return $this->getMatchingStatements($statement);
-        } elseif (stristr($query, 'delete')) {
-            //redirect to deleteMatchingStatement-methode
-            return $this->deleteMatchingStatements($statement);
-        } elseif (stristr($query, 'insert')) {
+        //@TODO parse return-value in sparql-format
+        if (stristr($query, 'insert')) {
             //redirect to addStatements-methode
             return $this->addStatements($this->getStatements($queryStatements));
-        } elseif (stristr($query, 'ask')) {
-            //redirect to hasMatchingStatement-methode
-            return $this->hasMatchingStatement($statement);
+        } elseif (stristr($query, 'delete') || stristr($query, 'ask') || stristr($query, 'select')) {
+            if (sizeof($queryStatements) != 1) {
+                throw new \Exception('one Statement expected');
+            }
+            if (stristr($query, 'delete')) {
+                //redirect to deleteMatchingStatement-methode
+                return $this->deleteMatchingStatements($statement);
+            } elseif (stristr($query, 'ask')) {
+                //redirect to hasMatchingStatement-methode
+                return $this->hasMatchingStatement($statement);
+            } elseif (stristr($query, 'select')) {
+                //redirect to getMatchingStatements-methode
+                return $this->getMatchingStatements($statement);
+            }
         }
     }
 
@@ -82,7 +88,7 @@ abstract class AbstractTriplePatternStore implements StoreInterface
      * @param  string $type type of Node, can be uri, var or literal
      * @return Node   Returns NamedNode, Variable or Literal
      */
-    private function createNode($value, $type)
+    protected function createNode($value, $type)
     {
         if ('uri' == $type) {
             return new NamedNodeImpl($value);

@@ -74,23 +74,32 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
             ->will(
                 $this->returnCallback(
                     function (StatementIterator $fStatements, $fGraphUri = null, array $fOptions = array()) use ($triple, $quad, $st) {
-                        \PHPUnit_Framework_Assert::assertEquals(
+                        TestCase::assertEquals(
                             $fStatements->current()->toSparqlFormat(),
                             $st->toSparqlFormat()
                         );
                         $fStatements->next();
-                        \PHPUnit_Framework_Assert::assertEquals(
+                        TestCase::assertEquals(
                             $fStatements->current()->toSparqlFormat(),
                             $triple->toSparqlFormat()
                         );
                         $fStatements->next();
-                        \PHPUnit_Framework_Assert::assertEquals(
+                        TestCase::assertEquals(
                             $fStatements->current()->toSparqlFormat(),
                             $quad->toSparqlFormat()
                         );
                     }
                 )
             );
+        $this->fixture->query($query);
+    }
+
+    public function testDeleteMultipleStatements()
+    {
+        $st = $this->getTestStatementWithLiteral();
+        $triple = $this->getTestTriple();
+        $query = 'DELETE DATA { '. $st->toSparqlFormat(). $triple->toSparqlFormat(). '}';
+        $this->setExpectedException('\Exception');
         $this->fixture->query($query);
     }
 
@@ -144,7 +153,7 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
             ->will(
                 $this->returnCallback(
                     function (Statement $fStatement, $fGraphUri = null, array $fOptions = array()) use ($statement, $graphUri, $options) {
-                        \PHPUnit_Framework_Assert::assertEquals(
+                        TestCase::assertEquals(
                             $fStatement->toSparqlFormat(),
                             $statement->toSparqlFormat()
                         );
