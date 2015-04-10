@@ -52,12 +52,13 @@ class MatchingStatementIteratorUnitTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
             in_array(
                 NtriplesParser::parseStatment(
-                    '_:genid1 <http://xmlns.com/foaf/0.1/name> "Joe\'s Current Project" .',
+                    '_:genid1 <http://xmlns.com/foaf/0.1/name> "Joe\'s Current Project" .'
                 ),
                 $matches
             )
         );
-            $it->close();
+        
+        $it->close();
     }
 
     public function testMatchingWithConcreteLiteral()
