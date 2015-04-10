@@ -462,9 +462,9 @@ class Http extends AbstractSparqlStore
     }
     
     /**
-     * Returns true or false depending on whether or not the statements pattern has any matches in the given 
+     * Returns true or false depending on whether or not the statements pattern has any matches in the given
      * graph. It overrides AbstractSparqlStore's hasMatchingStatement in case the target store needs a different
-     * query structure, such as Virtuoso. 
+     * query structure, such as Virtuoso.
      *
      * @param  Statement $Statement          It can be either a concrete or pattern-statement.
      * @param  string    $graphUri  optional Overrides target graph.
@@ -495,7 +495,7 @@ class Http extends AbstractSparqlStore
             
             $statementIterator = new ArrayStatementIteratorImpl(array($Statement));
             $result = $this->query(
-                'ASK FROM <'. $graphUri .'> { '. $this->sparqlFormat($statementIterator) .'}', 
+                'ASK FROM <'. $graphUri .'> { '. $this->sparqlFormat($statementIterator) .'}',
                 $options
             );
             
@@ -661,7 +661,7 @@ class Http extends AbstractSparqlStore
                 if (true === isset($askResult['boolean'])) {
                     $return = new ValueResult($askResult['boolean']);
                 
-                } elseif('Virtuoso' === substr($result, 0, 8)) {
+                } elseif ('Virtuoso' === substr($result, 0, 8)) {
                     $return = new ExceptionResult(new \Exception($result));
                     
                 } else {
@@ -694,7 +694,7 @@ class Http extends AbstractSparqlStore
      * because Virtuoso does not support Graph in condition, so $graphUri will be ignored.
      *
      * @param StatementIterator $statements   List of statements to format as SPARQL string.
-     * @param string            $graphUri     Will be ignored, because Virtuoso does not support Graph in 
+     * @param string            $graphUri     Will be ignored, because Virtuoso does not support Graph in
      *                                        condition.
      * @return string, part of query
      */

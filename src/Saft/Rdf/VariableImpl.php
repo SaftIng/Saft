@@ -10,7 +10,7 @@ class VariableImpl implements Variable
     protected $value;
 
     /**
-     * @param  mixed      $value optional The Name of the variable. If not given, a random hash will be used 
+     * @param  mixed      $value optional The Name of the variable. If not given, a random hash will be used
      *                                    later on.
      * @param  string     $lang  optional Will be ignore because a Variable has no language.
      * @throws \Exception                 If parameter $value is not a valid URI.

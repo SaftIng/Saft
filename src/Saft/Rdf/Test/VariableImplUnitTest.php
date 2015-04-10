@@ -8,7 +8,7 @@ class VariableImplUnitTest extends VariableAbstractTest
 {
     /**
      * Return a new instance of VariableImpl
-     * 
+     *
      * @param $name optional Name of the variable
      * @return VariableImpl Instance of VariableImpl
      */

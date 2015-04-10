@@ -407,8 +407,8 @@ class Virtuoso extends AbstractSparqlStore
     }
     
     /**
-     * Returns true or false depending on whether or not the statements pattern has any matches in the given 
-     * graph. It overrides AbstractSparqlStore's hasMatchingStatement, because Virtuoso needs the graph URI 
+     * Returns true or false depending on whether or not the statements pattern has any matches in the given
+     * graph. It overrides AbstractSparqlStore's hasMatchingStatement, because Virtuoso needs the graph URI
      * outside the braces and not within the condition, such as ASK Graph <http://foo/> { ... }
      *
      * @param  Statement $Statement          It can be either a concrete or pattern-statement.
@@ -436,7 +436,7 @@ class Virtuoso extends AbstractSparqlStore
         
         $statementIterator = new ArrayStatementIteratorImpl(array($Statement));
         $result = $this->query(
-            'ASK FROM <'. $graphUri .'> { '. $this->sparqlFormat($statementIterator) .'}', 
+            'ASK FROM <'. $graphUri .'> { '. $this->sparqlFormat($statementIterator) .'}',
             $options
         );
         
@@ -672,7 +672,7 @@ class Virtuoso extends AbstractSparqlStore
      * because Virtuoso does not support Graph in condition, so $graphUri will be ignored.
      *
      * @param StatementIterator $statements   List of statements to format as SPARQL string.
-     * @param string            $graphUri     Will be ignored, because Virtuoso does not support Graph in 
+     * @param string            $graphUri     Will be ignored, because Virtuoso does not support Graph in
      *                                        condition.
      * @return string, part of query
      */

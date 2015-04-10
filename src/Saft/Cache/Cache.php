@@ -186,17 +186,26 @@ class Cache
         $length = strlen($value);
         $end = '';
 
+        /**
+         * check first character
+         */
         switch ($value[0]) {
+            // string
             case 's':
                 if ('"' !== $value[$length - 2]) {
                     return false;
                 }
+            // boolean
             case 'b':
+            // integer
             case 'i':
+            // ?
             case 'd':
                 // This looks odd but it is quicker than isset()ing
                 $end .= ';';
+            // array
             case 'a':
+            // object
             case 'O':
                 $end .= '}';
 
@@ -220,6 +229,7 @@ class Cache
                     default:
                         return false;
                 }
+            // ?
             case 'N':
                 $end .= ';';
 

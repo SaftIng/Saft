@@ -249,7 +249,7 @@ abstract class AbstractSparqlStore implements StoreInterface
 
     /**
      * Returns given Node instance in SPARQL format.
-     * 
+     *
      * @param  Node   $node Node instance to format.
      * @return string       Either NQuad notation (if node is concrete) or string representation of given node.
      */

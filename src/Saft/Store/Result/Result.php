@@ -2,7 +2,7 @@
 namespace Saft\Store\Result;
 
 /**
- * This class represents the result of store operation, usually a SPARQL query.
+ * This class represents the result of a store operation, usually a SPARQL query.
  */
 abstract class Result
 {
@@ -51,7 +51,7 @@ abstract class Result
     abstract public function isValueResult();
     
     /**
-     * @param mixed
+     * @param mixed $resultObject
      */
     public function setResultObject($resultObject)
     {

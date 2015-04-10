@@ -184,18 +184,11 @@ class QueryCache implements StoreInterface
     {
         // if successor is set, ask it first before run the command yourself.
         if ($this->successor instanceof StoreInterface) {
-            // if successor has this function and it is callable
-            if (true === is_callable(array($this->successor, 'dropGraph'), true)) {
-                // delete according query cache entries
-                $this->invalidateByGraphUri($graphUri);
-                
-                // call dropGraph on successor
-                return $this->successor->dropGraph($graphUri, $options);
+            // delete according query cache entries
+            $this->invalidateByGraphUri($graphUri);
             
-            // otherwise throw exception
-            } else {
-                throw new \Exception('Successor does not have a callable dropGraph method.');
-            }
+            // call dropGraph on successor
+            return $this->successor->dropGraph($graphUri, $options);
             
         // dont run command by myself
         } else {
