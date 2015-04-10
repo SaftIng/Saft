@@ -15,7 +15,6 @@ class AbstractSparqlStoreUnitTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        
         $this->fixture = $this->getMockForAbstractClass('\Saft\Store\AbstractSparqlStore');
         
         // Override query method: it will always return the given query.
@@ -33,9 +32,6 @@ class AbstractSparqlStoreUnitTest extends TestCase
         return $triple1;
     }
 
-    /**
-     *
-     */
     public function getFilledTestArrayStatementIterator()
     {
         $subject2 = new NamedNodeImpl('http://saft/test/s2');
@@ -49,9 +45,6 @@ class AbstractSparqlStoreUnitTest extends TestCase
         return $statements;
     }
 
-    /**
-     *
-     */
     public function testGetMatchingStatements()
     {
         $query = $this->fixture->getMatchingStatements($this->getTestStatement());
@@ -63,9 +56,6 @@ class AbstractSparqlStoreUnitTest extends TestCase
         );
     }
 
-    /**
-     *
-     */
     public function testAddStatements()
     {
         $query = $this->fixture->addStatements($this->getFilledTestArrayStatementIterator());
@@ -89,9 +79,6 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $this->fixture->addStatements($statements);
     }
 
-    /**
-     *
-     */
     public function testDeleteMatchingStatements()
     {
         $query = $this->fixture->deleteMatchingStatements($this->getTestStatement());
@@ -103,9 +90,6 @@ class AbstractSparqlStoreUnitTest extends TestCase
         );
     }
 
-    /**
-     *
-     */
     public function testhasMatchingStatement()
     {
         $query = $this->fixture->hasMatchingStatement($this->getTestStatement());

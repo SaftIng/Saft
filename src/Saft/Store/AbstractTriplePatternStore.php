@@ -16,7 +16,7 @@ use \Saft\Sparql\Query;
  */
 abstract class AbstractTriplePatternStore implements StoreInterface
 {
-
+    
     /**
      * @param string $query   SPARQL query string.
      * @param string $options optional Further configurations.
@@ -31,7 +31,7 @@ abstract class AbstractTriplePatternStore implements StoreInterface
         //$queryParts = $queryParser->getQueryParts();
         $statement = $this->getStatement($queryStatements[0]);
 
-        //@TODO parse return-value in sparql-format
+        //@TODO parse return-value in sparql-format(?)
         if (stristr($query, 'insert')) {
             //redirect to addStatements-methode
             return $this->addStatements($this->getStatements($queryStatements));
@@ -40,15 +40,18 @@ abstract class AbstractTriplePatternStore implements StoreInterface
                 throw new \Exception('one Statement expected');
             }
             if (stristr($query, 'delete')) {
-                //redirect to deleteMatchingStatement-methode
+                //redirect to deleteMatchingStatement-method
                 return $this->deleteMatchingStatements($statement);
             } elseif (stristr($query, 'ask')) {
-                //redirect to hasMatchingStatement-methode
+                //redirect to hasMatchingStatement-method
                 return $this->hasMatchingStatement($statement);
             } elseif (stristr($query, 'select')) {
-                //redirect to getMatchingStatements-methode
+                //redirect to getMatchingStatements-method
                 return $this->getMatchingStatements($statement);
             }
+        } elseif (true) {
+            //@TODO reroute to getAvailableGraphs()
+            //return $this->getAvailableGraphs();
         }
     }
 

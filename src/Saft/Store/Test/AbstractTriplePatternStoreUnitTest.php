@@ -111,6 +111,7 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
         $this->fixture->query($query);
     }
 
+    //@TODO does not recognize quads.
     public function testQuadRecognition()
     {
         $quad = $this->getTestQuad();
@@ -119,6 +120,7 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
         $this->fixture->query($query);
     }
 
+    //@TODO does not recognize quads.
     public function testVariablePatterns()
     {
         $statement = $this->getTestPatternStatement();

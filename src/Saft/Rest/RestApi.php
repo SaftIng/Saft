@@ -10,6 +10,8 @@ use Saft\Rdf\VariableImpl;
 use Saft\Rdf\StatementImpl;
 
 /**
+ * treated REST requests. expected graphUri in _POST['graphUri'] and
+ *  statements in _POST['statementsarray'].
  * @todo  hasMatchingStatement missing
  */
 class RestApi extends AbstractRest
@@ -20,13 +22,13 @@ class RestApi extends AbstractRest
     }
 
     /**
-     * Rest-Endpoint
-     * servername/store/statements
-     * * POST for add statements
-     * * DELETE for delete matching statement
-     * * GET for get matching statement
-     * servername/store/graph
-     * * GET for get available Graphs
+     * Rest-Endpoints. handled:
+     * for servername/store/statements
+     * - POST for add statements
+     * - DELETE for delete matching statement
+     * - GET for get matching statement
+     * for servername/store/graph
+     * - GET for get available Graphs
      * @return mixed
      */
     protected function store()
@@ -37,6 +39,7 @@ class RestApi extends AbstractRest
                 throw new \Exception('no statements passed.');
             }
             $statements = $_POST['statementsarray'];
+            //check statement-format
             foreach ($statements as $st) {
                 if (!is_array($st)) {
                     if (sizeof($statements) == 3) {
@@ -61,6 +64,7 @@ class RestApi extends AbstractRest
                 $array = array();
                 $i = 0;
                 foreach ($statements as $st) {
+                    //check statements-format
                     if (sizeof($st) == 3) {
                         $statement = $this->createStatement($st[0], $st[1], $st[2]);
                     } elseif (sizeof($st) == 4) {
@@ -122,7 +126,7 @@ class RestApi extends AbstractRest
      * @param  string $gr
      * @return Statement
      */
-    private function createStatement($sub, $pred, $obj, $gr = null)
+    protected function createStatement($sub, $pred, $obj, $gr = null)
     {
         $subject = $this->createNode($sub);
         $predicate = $this->createNode($pred);
@@ -139,9 +143,8 @@ class RestApi extends AbstractRest
      * @param  string $value value of Node
      * @return Node   Returns NamedNode, Variable or Literal
      */
-    private function createNode($value)
+    protected function createNode($value)
     {
-        //TODO triple-pattern
         if (true === AbstractNamedNode::check($value) || null === $value) {
             return new NamedNodeImpl($value);
         } elseif ('?' == substr($value, 0, 1)) {

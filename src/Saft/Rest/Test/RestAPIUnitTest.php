@@ -193,6 +193,11 @@ class RestAPIUnitTest extends TestCase
         //$this->callRestApi('');
     }
 
+    /**
+     * Call rest-Api and check if return query is quivalent to
+     * given $value.
+     * @param  string $value
+     */
     protected function callRestApi($value)
     {
         try {
