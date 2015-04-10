@@ -42,8 +42,8 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
     public function getTestPatternStatement()
     {
         $subject1 = new VariableImpl('?s1');
-        $predicate1 = new NamedNodeImpl('http://saft/test/p2');
-        $object1 = new LiteralImpl("John");
+        $predicate1 = new VariableImpl('?p1');
+        $object1 = new VariableImpl('?o1');
         $triple = new StatementImpl($subject1, $predicate1, $object1);
 
         return $triple;
@@ -89,7 +89,7 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
 
     public function testTripleRecognition()
     {
-        $query = 'INSERT DATA { '.$this->getTestTriple()->toSparqlFormat().'}';
+        $query = 'DELETE DATA { '.$this->getTestTriple()->toSparqlFormat().'}';
         
         $this->fixture
             ->expects($this->once())
@@ -104,12 +104,12 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
                     }
                 )
             );
-        $this->fixture->delete($query);
+        $this->fixture->query($query);
     }
 
     public function testQuadRecognition()
     {
-        $query = 'INSERT DATA { '.$this->getTestQuad()->toSparqlFormat().'}';
+        $query = 'DELETE DATA { '.$this->getTestQuad()->toSparqlFormat().'}';
         
         $this->fixture
             ->expects($this->once())
@@ -124,12 +124,12 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
                     }
                 )
             );
-        $this->fixture->delete($query);
+        $this->fixture->query($query);
     }
 
     public function testVariablePatterns()
     {
-        $query = 'INSERT DATA { '.$this->getTestPatternStatement()->toSparqlFormat().'}';
+        $query = 'DELETE DATA { '.$this->getTestPatternStatement()->toSparqlFormat().'}';
         
         $this->fixture
             ->expects($this->once())
@@ -144,12 +144,12 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
                     }
                 )
             );
-        $this->fixture->delete($query);
+        $this->fixture->query($query);
     }
 
     public function testStatementsWithLiteral()
     {
-        $query = 'INSERT DATA { '.$this->getTestStatementWithLiteral()->toSparqlFormat().'}';
+        $query = 'DELETE DATA { '.$this->getTestStatementWithLiteral()->toSparqlFormat().'}';
         
         $this->fixture
             ->expects($this->once())
@@ -164,6 +164,6 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
                     }
                 )
             );
-        $this->fixture->delete($query);
+        $this->fixture->query($query);
     }
 }

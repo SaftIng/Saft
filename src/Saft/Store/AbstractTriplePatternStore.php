@@ -18,72 +18,6 @@ abstract class AbstractTriplePatternStore implements StoreInterface
 {
 
     /**
-     * redirect to deleteMatchingStatement-methode
-     * @param  string $query
-     * @return answer from deleteMatchingStatement
-     */
-    public function delete($query)
-    {
-        //TODO
-        $this->fixture = new Query();
-        $this->fixture->init($query);
-        /*$queryParts = $this->fixture->getQueryParts();
-        print_r($queryParts);*/
-        $queryParts = $this->fixture->getTriplePatterns();
-
-        $statement = $this->getStatement($queryParts[0]);
-        
-        return $this->deleteMatchingStatements($statement);
-    }
-
-    /**
-     * redirect to addStatements-methode
-     * @param  string $query
-     * @return answer from addStatements
-     */
-    public function add($query)
-    {
-        //TODO
-        $this->fixture = new Query();
-        $this->fixture->init($query);
-        $queryParts = $this->fixture->getTriplePatterns();
-        //print_r($queryParts);
-        return $this->addStatements($this->getStatements($queryParts));
-    }
-    
-    /**
-     * redirect to getMatchingStatements-methode
-     * @param  string $query
-     * @return answer from getMatchingStatements
-     */
-    public function get($query)
-    {
-        //TODO
-        $this->fixture = new Query();
-        $this->fixture->init($query);
-        $queryParts = $this->fixture->getTriplePatterns();
-
-        $statement = $this->getStatement($queryParts[0]);
-        return $this->getMatchingStatements($statement);
-    }
-
-    /**
-     * redirect to hasMatchingStatement-methode
-     * @param  string $query
-     * @return answer from hasMatchingStatement
-     */
-    public function has($query)
-    {
-        //TODO
-        $this->fixture = new Query();
-        $this->fixture->init($query);
-        $queryParts = $this->fixture->getTriplePatterns();
-
-        $statement = $this->getStatement($queryParts[0]);
-        return $this->hasMatchingStatement($statement);
-    }
-    
-    /**
      * @param string $query   SPARQL query string.
      * @param string $options optional Further configurations.
      * @throws ?
@@ -91,12 +25,24 @@ abstract class AbstractTriplePatternStore implements StoreInterface
     public function query($query, array $options = array())
     {
         //@TODO
-        if (stristr($query, 'select') || stristr($query, 'construct')) {
-            $this->get($query);
-        } elseif (strpos($query, 'delete')) {
-            $this->delete($query);
+        $queryParser = new Query();
+        $queryParser->init($query);
+        //$queryParts = $queryParser->getQueryParts();
+        $queryStatements = $queryParser->getTriplePatterns();
+        $statement = $this->getStatement($queryStatements[0]);
+
+        if (stristr($query, 'select')) {
+            //redirect to getMatchingStatements-methode
+            return $this->getMatchingStatements($statement);
+        } elseif (stristr($query, 'delete')) {
+            //redirect to deleteMatchingStatement-methode
+            return $this->deleteMatchingStatements($statement);
         } elseif (stristr($query, 'insert')) {
-            $this->add($query);
+            //redirect to addStatements-methode
+            return $this->addStatements($this->getStatements($queryStatements));
+        } elseif (stristr($query, 'ask')) {
+            //redirect to hasMatchingStatement-methode
+            return $this->hasMatchingStatement($statement);
         }
     }
 
@@ -107,7 +53,6 @@ abstract class AbstractTriplePatternStore implements StoreInterface
      */
     protected function getStatement(array $queryParts)
     {
-        //print_r($queryParts);
         $subject = $this->createNode($queryParts['s'], $queryParts['s_type']);
         $predicate = $this->createNode($queryParts['p'], $queryParts['p_type']);
         $object = $this->createNode($queryParts['o'], $queryParts['o_type']);
@@ -134,6 +79,7 @@ abstract class AbstractTriplePatternStore implements StoreInterface
      * Create a Node from string.
      *
      * @param  string $value value of Node
+     * @param  string $type type of Node, can be uri, var or literal
      * @return Node   Returns NamedNode, Variable or Literal
      */
     private function createNode($value, $type)
