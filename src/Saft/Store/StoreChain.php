@@ -10,7 +10,7 @@ use Saft\Rdf\StatementIterator;
 use Saft\Store\Result\Result;
 use Saft\Store\Result\EmptyResult;
 
-class StoreChain implements StoreInterface
+class StoreChain implements Store
 {
     /**
      * Contains the chain of store instances.
@@ -23,7 +23,7 @@ class StoreChain implements StoreInterface
      * If set, all statement- and query related operations have to be in close collaboration with the
      * successor.
      *
-     * @var StoreInterface
+     * @var Store
      */
     protected $successor;
     
@@ -43,7 +43,7 @@ class StoreChain implements StoreInterface
     public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
     {
         // if successor is set, ask it first before run the command yourself.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             // just forward command to successor and return its result.
             return $this->successor->addStatements($statements, $graphUri, $options);
             
@@ -73,7 +73,7 @@ class StoreChain implements StoreInterface
             return $this->chainEntries[0]->deleteMatchingStatements($statement, $graphUri, $options);
         
         // if successor is set, ask it first before run the command yourself.
-        } elseif ($this->successor instanceof StoreInterface) {
+        } elseif ($this->successor instanceof Store) {
             // just forward command to successor and return its result.
             return $this->successor->deleteMatchingStatements($statement, $graphUri, $options);
             
@@ -92,7 +92,7 @@ class StoreChain implements StoreInterface
         // TODO switch to only call successor if chainEntries return empty result
         
         // if successor is set, ask it first before run the command yourself.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             // just forward command to successor and return its result.
             return $this->successor->getAvailableGraphs();
             
@@ -138,7 +138,7 @@ class StoreChain implements StoreInterface
         }
         
         // if successor is set, ask it if chain entries returned empty result.
-        if (true === empty($result) && $this->successor instanceof StoreInterface) {
+        if (true === empty($result) && $this->successor instanceof Store) {
             // just forward command to successor and return its result.
             return $this->successor->getMatchingStatements($statement, $graphUri, $options);
             
@@ -154,7 +154,7 @@ class StoreChain implements StoreInterface
     public function getStoreDescription()
     {
         // if successor is set, ask it first before run the command yourself.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             // just forward command to successor and return its result.
             return $this->successor->getStoreDescription();
             
@@ -187,7 +187,7 @@ class StoreChain implements StoreInterface
         }
         
         // if successor is set, ask it if chain entries returned empty result.
-        if ((null === $result || true === empty($result)) && $this->successor instanceof StoreInterface) {
+        if ((null === $result || true === empty($result)) && $this->successor instanceof Store) {
             // just forward command to successor and return its result.
             return $this->successor->hasMatchingStatement($statement, $graphUri, $options);
             
@@ -215,7 +215,7 @@ class StoreChain implements StoreInterface
         if ($result instanceof Result && false === $result->isEmptyResult()) {
             return $result;
             
-        } elseif (true === empty($result) && $this->successor instanceof StoreInterface) {
+        } elseif (true === empty($result) && $this->successor instanceof Store) {
             // just forward command to successor and return its result.
             return $this->successor->query($query, $options);
         }
@@ -232,7 +232,7 @@ class StoreChain implements StoreInterface
      *
      * @return array Array which contains information about the store and its features.
      */
-    public function setChainSuccessor(StoreInterface $successor)
+    public function setChainSuccessor(Store $successor)
     {
         $this->successor = $successor;
     }

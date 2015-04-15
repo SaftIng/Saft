@@ -13,7 +13,7 @@ use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\Query;
 use Saft\Store\AbstractSparqlStore;
-use Saft\Store\StoreInterface;
+use Saft\Store\Store;
 use Saft\Store\Result\ExceptionResult;
 use Saft\Store\Result\EmptyResult;
 use Saft\Store\Result\StatementResult;
@@ -186,7 +186,7 @@ class Http extends AbstractSparqlStore
         }
         
         // if successor is set, ask it too.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             $this->successor->addStatements($statements, $graphUri, $options);
         }
         
@@ -272,7 +272,7 @@ class Http extends AbstractSparqlStore
             $this->query($query, $options);
             
             // if successor is set, ask it too.
-            if ($this->successor instanceof StoreInterface) {
+            if ($this->successor instanceof Store) {
                 $this->successor->deleteMatchingStatements($statement, $graphUri, $options);
             }
 
@@ -283,7 +283,7 @@ class Http extends AbstractSparqlStore
         }
         
         // if successor is set, ask it too.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             $this->successor->deleteMatchingStatements($statement, $graphUri, $options);
         }
         
@@ -370,7 +370,7 @@ class Http extends AbstractSparqlStore
     public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
         // if successor is set, ask it too.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             $this->successor->getMatchingStatements($statement, $graphUri, $options);
         }
         
@@ -475,7 +475,7 @@ class Http extends AbstractSparqlStore
     public function hasMatchingStatement(Statement $Statement, $graphUri = null, array $options = array())
     {
         // if successor is set, ask it too.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             $this->successor->hasMatchingStatement($Statement, $graphUri, $options);
         }
 
@@ -684,7 +684,7 @@ class Http extends AbstractSparqlStore
      *
      * @return array Array which contains information about the store and its features.
      */
-    public function setChainSuccessor(StoreInterface $successor)
+    public function setChainSuccessor(Store $successor)
     {
         $this->successor = $successor;
     }

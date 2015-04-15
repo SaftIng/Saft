@@ -13,7 +13,7 @@ use Saft\Rdf\StatementIterator;
 use Saft\Rdf\Triple;
 use Saft\Sparql\Query;
 use Saft\Store\AbstractSparqlStore;
-use Saft\Store\StoreInterface;
+use Saft\Store\Store;
 use Saft\Store\Result\EmptyResult;
 use Saft\Store\Result\ExceptionResult;
 use Saft\Store\Result\SetResult;
@@ -171,7 +171,7 @@ class Virtuoso extends AbstractSparqlStore
         }
         
         // if successor is set, ask it too.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             $this->successor->addStatements($statements, $graphUri, $options);
         }
         
@@ -261,7 +261,7 @@ class Virtuoso extends AbstractSparqlStore
         $this->query($query, $options);
         
         // if successor is set, ask it too.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             $this->successor->deleteMatchingStatements($statement, $graphUri, $options);
         }
 
@@ -320,7 +320,7 @@ class Virtuoso extends AbstractSparqlStore
     public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
         // if successor is set, ask it too.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             $this->successor->getMatchingStatements($statement, $graphUri, $options);
         }
         
@@ -420,7 +420,7 @@ class Virtuoso extends AbstractSparqlStore
     public function hasMatchingStatement(Statement $Statement, $graphUri = null, array $options = array())
     {
         // if successor is set, ask it too.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             $this->successor->hasMatchingStatement($Statement, $graphUri, $options);
         }
         
@@ -552,7 +552,7 @@ class Virtuoso extends AbstractSparqlStore
             }
             
             // if successor is set, ask it too.
-            if ($this->successor instanceof StoreInterface) {
+            if ($this->successor instanceof Store) {
                 $this->successor->query($query, $options);
             }
 

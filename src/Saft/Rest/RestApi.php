@@ -1,7 +1,7 @@
 <?php
 namespace Saft\Rest;
 
-use Saft\Store\StoreInterface;
+use Saft\Store\Store;
 use Saft\Rdf\AbstractNamedNode;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNodeImpl;
@@ -16,7 +16,7 @@ use Saft\Rdf\StatementImpl;
  */
 class RestApi extends AbstractRest
 {
-    public function __construct($request, $origin, StoreInterface $store)
+    public function __construct($request, $origin, Store $store)
     {
         parent::__construct($request, $store);
     }
