@@ -85,13 +85,13 @@ final class MatchingStatementIterator extends \Saft\Rdf\AbstractStatementIterato
         while ($this->lineIterator->valid()) {
             $line = $this->lineIterator->current();
             try {
-                $statement = NtriplesParser::parseStatment($line);
+                $statement = NtriplesParser::parseStatement($line);
             } catch (SyntaxException $e) {
                 // correct the row information
                 throw new SyntaxException(
                     $e->getMessage(),
                     $this->lineIterator->key(),
-                    $e->getColum()
+                    $e->getColumn()
                 );
             }
             if ($statement->matches($this->pattern)) {

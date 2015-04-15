@@ -16,30 +16,30 @@ final class NtriplesParser
     const LITERAL_LANG_REGEX = '/^"(.+)"@([\w\-]+)$/';
     const LITERAL_REGEX = '/^"(.*)"$/';
 
-    public static function parseStatment($line)
+    public static function parseStatement($line)
     {
         $matches=[];
         if (preg_match(self::STATEMENT_REGEX, $line, $matches, PREG_OFFSET_CAPTURE)) {
             try {
                 $subject = self::parseSubject($matches[1][0]);
             } catch (SyntaxException $e) {
-                $colum = ($e->isColumDefined() ? $e->getColum() : 0)
+                $column = ($e->isColumnDefined() ? $e->getColumn() : 0)
                     + $matches[1][1];
-                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $colum);
+                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $column);
             }
             try {
                 $predicate = self::parsePredicate($matches[2][0]);
             } catch (SyntaxException $e) {
-                $colum = ($e->isColumDefined() ? $e->getColum() : 0)
+                $column = ($e->isColumnDefined() ? $e->getColumn() : 0)
                     + $matches[2][1];
-                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $colum);
+                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $column);
             }
             try {
                 $object = self::parseObject($matches[3][0]);
             } catch (SyntaxException $e) {
-                $colum = ($e->isColumDefined() ? $e->getColum() : 0)
+                $column = ($e->isColumnDefined() ? $e->getColumn() : 0)
                     + $matches[3][1];
-                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $colum);
+                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $column);
             }
             return new StatementImpl($subject, $predicate, $object);
         } else {
@@ -55,8 +55,8 @@ final class NtriplesParser
                 $uri = Util::unescape($matches[1][0]);
                 return new NamedNodeImpl($uri);
             } catch (SyntaxException $e) {
-                $colum = $e->getColum() + $matches[1][1];
-                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $colum);
+                $column = $e->getColumn() + $matches[1][1];
+                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $column);
             }
         } elseif (preg_match(self::BLANK_NODE_REGEX, $str, $matches, PREG_OFFSET_CAPTURE)) {
             $id = Util::unescape($matches[1][0]);
@@ -74,8 +74,8 @@ final class NtriplesParser
                 $uri = Util::unescape($matches[1][0]);
                 return new NamedNodeImpl($uri);
             } catch (SyntaxException $e) {
-                $colum = $e->getColum() + $matches[1][1];
-                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $colum);
+                $column = $e->getColumn() + $matches[1][1];
+                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $column);
             }
         } else {
             throw new SyntaxException('Expected URI or blank node');
@@ -89,16 +89,16 @@ final class NtriplesParser
             try {
                 $value = Util::unescape($matches[1][0]);
             } catch (SyntaxException $e) {
-                $colum = ($e->isColumDefined() ? $e->getColum() : 0)
+                $column = ($e->isColumnDefined() ? $e->getColumn() : 0)
                     + $matches[1][1];
-                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $colum);
+                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $column);
             }
             try {
                 $datatype = Util::unescape($matches[2][0]);
             } catch (SyntaxException $e) {
-                $colum = ($e->isColumDefined() ? $e->getColum() : 0)
+                $column = ($e->isColumnDefined() ? $e->getColumn() : 0)
                     + $matches[2][1];
-                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $colum);
+                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $column);
             }
             // return new LiteralImpl($value, $datatype);
             // TODO Data Type
@@ -107,9 +107,9 @@ final class NtriplesParser
             try {
                 $value = Util::unescape($matches[1][0]);
             } catch (SyntaxException $e) {
-                $colum = ($e->isColumDefined() ? $e->getColum() : 0)
+                $column = ($e->isColumnDefined() ? $e->getColumn() : 0)
                     + $matches[1][1];
-                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $colum);
+                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $column);
             }
             $lang = $matches[2][0];
             return new LiteralImpl($value, $lang);
@@ -118,18 +118,18 @@ final class NtriplesParser
                 $value = Util::unescape($matches[1][0]);
                 return new LiteralImpl($value);
             } catch (SyntaxException $e) {
-                $colum = ($e->isColumDefined() ? $e->getColum() : 0)
+                $column = ($e->isColumnDefined() ? $e->getColumn() : 0)
                     + $matches[1][1];
-                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $colum);
+                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $column);
             }
         } elseif (preg_match(self::URI_REGEX, $str, $matches, PREG_OFFSET_CAPTURE)) {
             try {
                 $uri = Util::unescape($matches[1][0]);
                 return new NamedNodeImpl($uri);
             } catch (SyntaxException $e) {
-                $colum = ($e->isColumDefined() ? $e->getColum() : 0)
+                $column = ($e->isColumnDefined() ? $e->getColumn() : 0)
                     + $matches[1][1];
-                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $colum);
+                throw new SyntaxException($e->getMessage(), SyntaxException::UNDEFINED, $column);
             }
         } elseif (preg_match(self::BLANK_NODE_REGEX, $str, $matches, PREG_OFFSET_CAPTURE)) {
             $id = Util::unescape($matches[1][0]);

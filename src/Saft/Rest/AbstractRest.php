@@ -4,7 +4,6 @@ namespace Saft\Rest;
 use Saft\Store\StoreInterface;
 
 /**
- * @todo
  * http://coreymaynard.com/blog/creating-a-restful-api-with-php/
  */
 abstract class AbstractRest
@@ -93,10 +92,10 @@ abstract class AbstractRest
     }
 
     /**
-     * gives response back in json format.
+     * gives response.
      * @param  string  $data
      * @param  integer $status HTTP-Status
-     * @return Returns the JSON representation of $data.
+     * @return Returns $data.
      */
     protected function response($data, $status = 200)
     {

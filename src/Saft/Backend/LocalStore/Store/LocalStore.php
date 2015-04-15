@@ -23,6 +23,7 @@ class LocalStore extends AbstractTriplePatternStore
     protected $baseDir;
     protected $fileSystem;
     private $graphUriFileMapping;
+    protected $filenameFactory;
 
     public function __construct($baseDir)
     {
@@ -41,6 +42,7 @@ class LocalStore extends AbstractTriplePatternStore
         $this->log->info('Using base dir: ' . $baseDir);
 
         $this->graphUriFileMapping = array();
+        $this->filenameFactory = new DefaultFilenameFactory();
     }
 
     /**
@@ -62,46 +64,200 @@ class LocalStore extends AbstractTriplePatternStore
         $this->ensureInitialized();
         return array_key_exists($uri, $this->graphUriFileMapping);
     }
-    
+
+    public function setFilenameFactory(FilenameFactory $factory)
+    {
+        $this->filenameFactory = $factory;
+    }
+
+    public function getFilenameFactory()
+    {
+        return $this->filenameFactory;
+    }
+
+    /**
+     * Adds an empty graph with the given URI to store. This graph
+     * is available after.
+     * @param string $uri URI of the graph
+     * @param string $filename filename relative to the base directory
+     */
+    public function addGraph($uri, $path)
+    {
+        if ($this->isGraphAvailable($uri)) {
+            return;
+        }
+
+        $this->graphUriFileMapping[$uri] =
+            $this->fileSystem->getFile($path);
+        $this->graphUriFileMapping[$uri]->createFile();
+        $this->saveStoreInfo();
+        $this->log->addInfo('Graph <' . $uri . '> added');
+    }
+
     /**
      * {@inheritdoc}
      */
     public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
     {
-        throw new \Exception('Unsupported Operation');
+        // This method have to handle multiple graphs.
+        // Keep graph file open until the graph uri changes.
+        $prevGraphUri = null;
+        $pointer = null;
+        $count = 0;
+        foreach ($statements as $statement) {
+            self::ensureStatementIsConcrete($statement);
+            $resolvedUri = $this->resolveGraphUri($graphUri, $statement);
+            // If graph uri changed, close the old graph file and open the new file.
+            if ($resolvedUri != $prevGraphUri) {
+                if (!is_null($pointer)) {
+                    @fclose($pointer);
+                }
+                $this->createGraphIfNotExists($resolvedUri);
+                $graphFile = $this->getGraphFile($resolvedUri);
+                $filename = Util::getAbsolutePath($this->baseDir, $graphFile->getPathname());
+                $size = @filesize($filename);
+                if ($size === false) {
+                    throw new \Exception('Unable to get filesize of ' . $filename);
+                }
+                $pointer = @fopen($filename, 'a');
+                if ($pointer === false) {
+                    throw new \Exception('Unable to open ' . $filename);
+                }
+                // ftell returns always 0, whetever the file is opened in 'a' and is not empty
+                $wasEmpty = ($size == 0);
+            }
+            // Don't add newline before, if the graph file was empty
+            // (If there was a newline at the end, it will be overriden)
+            $line = ($wasEmpty ? "" : "\n") . NtriplesSerializer::serializeStatement($statement);
+            @fwrite($pointer, $line);
+            $count++;
+        }
+        if (is_null($pointer)) {
+            @fclose($pointer);
+        }
+        $this->log->addInfo('Added ' . $count . " triples");
     }
-    
+
+    private static function ensureStatementIsConcrete(Statement $statement)
+    {
+        if (!$statement->isConcrete()) {
+            throw new \InvalidArgumentException('Statement that is not concrete');
+        }
+    }
+
+    private function createGraphIfNotExists($uri)
+    {
+        if (!$this->isGraphAvailable($uri)) {
+            $absoluteBaseDir = realpath($this->baseDir);
+            $filename = $this->filenameFactory->generateFilename($uri, $absoluteBaseDir);
+            $this->addGraph($uri, $filename);
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
+    public function deleteMatchingStatements(Statement $pattern, $graphUri = null, array $options = array())
     {
-        $graphUri = $this->resolveGraphUri($graphUri, $statement);
+        $graphUri = $this->resolveGraphUri($graphUri, $pattern);
         $graphFile = $this->getGraphFile($graphUri);
 
-        throw new \Exception('Unsupported Operation');
+        // Collect the line numbers to delete
+        $linesToDelete = [];
+        $it = new MatchingStatementIterator($graphFile, $pattern);
+        try {
+            foreach ($it as $lineNum => $statement) {
+                array_push($linesToDelete, $lineNum);
+            }
+            $it->close();
+        } catch (\Exception $e) {
+            $it->close();
+            throw $e;
+        }
+
+        $filename = Util::getAbsolutePath($this->baseDir, $graphFile->getPathname());
+        $this->removeDeletedLines($filename, $linesToDelete);
+        $this->log->addInfo('Deleted ' . count($linesToDelete) . " triples");
+    }
+
+    protected function removeDeletedLines($filename, array $linesToDelete)
+    {
+        // Open new temp file
+        $tempDir = ini_get('upload_tmp_dir');
+        $tempFile = tempnam($tempDir, '');
+        $dst = @fopen($tempFile, 'w');
+        if ($dst === false) {
+            throw new \Exception('Unable to write temp file ' . $tempFile);
+        }
+
+        $src = @fopen($filename, 'r');
+        if ($src === false) {
+            @fclose($dst);
+            throw new \Exception('Unable to read file ' . $filename);
+        }
+
+        // Copy undeleted lines into temp file
+        try {
+            $lineNum = 0;
+            while (!@feof($src)) {
+                $line = @fgets($src);
+                if ($line === false) {
+                    throw new \Exception('Unable to read line');
+                }
+                $deleted = in_array($lineNum, $linesToDelete);
+                if (!$deleted) {
+                    $success = @fwrite($dst, $line);
+                    if ($success === false) {
+                        throw new \Exception('Unable to write line');
+                    }
+                }
+                $lineNum++;
+            }
+            @fclose($src);
+            @fclose($dst);
+        } catch (\Exception $e) {
+            @flose($src);
+            @flose($dst);
+            throw $e;
+        }
+
+        // Delete old file
+        $success = @unlink($filename);
+        if ($success === false) {
+            throw new \Exception('Unable to delete ' . $filename);
+        }
+
+        // Replace it by the new temp file
+        $success = @copy($tempFile, $filename);
+        if ($success === false) {
+            throw new \Exception('Unable to copy ' . $tempFile . ' to ' . $filename);
+        }
+
+        // Delete temp file
+        @unlink($tempFile);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @return MatchingStatementIterator
+     */
+    public function getMatchingStatements(Statement $pattern, $graphUri = null, array $options = array())
+    {
+        $graphUri = $this->resolveGraphUri($graphUri, $pattern);
+        $graphFile = $this->getGraphFile($graphUri);
+        return new MatchingStatementIterator($graphFile, $pattern);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getMatchingStatements(Statement $Statement, $graphUri = null, array $options = array())
+    public function hasMatchingStatement(Statement $pattern, $graphUri = null, array $options = array())
     {
-        $graphUri = $this->resolveGraphUri($graphUri, $statement);
-        $graphFile = $this->getGraphFile($graphUri);
-
-        throw new \Exception('Unsupported Operation');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
-    {
-        $graphUri = $this->resolveGraphUri($graphUri, $statement);
-        $graphFile = $this->getGraphFile($graphUri);
-
-        throw new \Exception('Unsupported Operation');
+        $it = $this->getMatchingStatements($pattern, $graphUri);
+        $it->rewind();
+        $found = $it->valid();
+        $it->close();
+        return $found;
     }
 
     protected function resolveGraphUri($graphUri, Statement $statement)
@@ -112,8 +268,10 @@ class LocalStore extends AbstractTriplePatternStore
                     'Graph URI is not specified. '
                     . '$graphUri is null and $statement is not a quad.'
                 );
+            } elseif (!$statement->getGraph()->isConcrete()) {
+                throw new \InvalidArgumentException('Graph is not concrete');
             }
-            $graphUri = $statement->getGraph()->getValue();
+            return $statement->getGraph()->getValue();
         }
         return $graphUri;
     }
@@ -150,7 +308,6 @@ class LocalStore extends AbstractTriplePatternStore
         return $this->initialized;
     }
 
-    
     protected function ensureInitialized()
     {
         if (!$this->initialized) {

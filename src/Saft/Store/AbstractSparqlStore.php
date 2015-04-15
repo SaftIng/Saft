@@ -4,7 +4,7 @@ namespace Saft\Store;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Statement;
-use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\AbstractNamedNode;
 use Saft\Rdf\Node;
 use Saft\Rdf\StatementIterator;
 
@@ -157,7 +157,6 @@ abstract class AbstractSparqlStore implements StoreInterface
      * @return StatementIterator It contains Statement instances  of all matching
      *                           statements of the given graph.
      * @todo FILTER select
-     * @todo check if graph URI is valid
      */
     public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
@@ -223,18 +222,7 @@ abstract class AbstractSparqlStore implements StoreInterface
                     $this->getNodeInSparqlFormat($statement->getObject());
 
                 if (null !== $graphUri && true === is_string($graphUri)) {
-                    // check if its a valid URI
-                    if (true === NamedNodeImpl::check($graphUri)) {
-                        $sparqlString = 'Graph <'. $graphUri .'> {' . $con .'}';
-                    
-                    // check for variable, which has a ? as first char
-                    } elseif ('?' == substr($graphUri, 0, 1)) {
-                        $sparqlString = 'Graph '. $graphUri .' {' . $con .'}';
-                        
-                    // invalid $graphUri
-                    } else {
-                        throw new \Exception('Parameter $graphUri is neither a valid URI nor variable.');
-                    }
+                    $sparqlString = 'Graph '. $this->parseGraphUri($graphUri) .' {' . $con .'}';
                 } else {
                     $sparqlString = $statement->toSparqlFormat();
                 }
@@ -245,6 +233,26 @@ abstract class AbstractSparqlStore implements StoreInterface
             }
         }
         return $query;
+    }
+
+    /**
+     * Check if $graphUri is a valid Uri or is a vairable and retrun $graphUri
+     * in valid sparql-Format
+     * @param  string $graphUri
+     * @return string           $graphUri in sparql-format
+     */
+    protected function parseGraphUri($graphUri)
+    {
+        // check if its a valid URI
+        if (true === AbstractNamedNode::check($graphUri)) {
+            return '<'. $graphUri .'>';
+            // check for variable, which has a ? as first char
+        } elseif ('?' == substr($graphUri, 0, 1)) {
+             return $graphUri;
+            // invalid $graphUri
+        } else {
+            throw new \Exception('Parameter $graphUri is neither a valid URI nor variable.');
+        }
     }
 
     /**

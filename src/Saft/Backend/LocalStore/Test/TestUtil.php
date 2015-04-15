@@ -11,11 +11,11 @@ class TestUtil
         $tempRoot = ini_get('upload_tmp_dir');
         $tempDirectory = tempnam($tempRoot, '');
         if (file_exists($tempDirectory)) {
-            if (unlink($tempDirectory) === false) {
+            if (@unlink($tempDirectory) === false) {
                 throw new \Exception('Unable to delete ' . $tempDirectory);
             }
         }
-        mkdir($tempDirectory);
+        @mkdir($tempDirectory);
         if (is_dir($tempDirectory)) {
             return $tempDirectory;
         } else {
@@ -40,15 +40,45 @@ class TestUtil
         );
         foreach ($files as $file) {
             if ($file->isDir()) {
-                if (rmdir($file->getRealPath()) === false) {
+                if (@rmdir($file->getRealPath()) === false) {
                     throw new \Exception('Unable to delete directory ' . $file);
                 }
             } else {
-                if (unlink($file->getRealPath()) === false) {
+                if (@unlink($file->getRealPath()) === false) {
                     throw new \Exception('Unable to delete file ' . $file);
                 }
             }
         }
-        rmdir($dir);
+        @rmdir($dir);
+    }
+
+    public static function copyDirectory($srcDir, $dstDir)
+    {
+        $it = new \RecursiveDirectoryIterator(
+            $srcDir,
+            \RecursiveDirectoryIterator::SKIP_DOTS
+        );
+        $files = new \RecursiveIteratorIterator(
+            $it,
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
+        if (!is_dir($dstDir)) {
+            if (@mkdir($dstDir) === false) {
+                throw new \Exception('Unable to create directory ' . $dstDir);
+            }
+        }
+        foreach ($files as $file) {
+            if ($file->isDir()) {
+                $success = @mkdir($dstDir . DIRECTORY_SEPARATOR . $files->getSubPathName());
+                if ($success === false) {
+                    throw new \Exception('Unable to create directory ' . $files->getSubPathName());
+                }
+            } elseif ($file->isFile()) {
+                $success = @copy($file, $dstDir . DIRECTORY_SEPARATOR . $files->getSubPathName());
+                if ($success === false) {
+                    throw new \Exception('Unable to copy file ' . $files->getSubPathName());
+                }
+            }
+        }
     }
 }

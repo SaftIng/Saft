@@ -13,13 +13,13 @@ class UtilUnitTest extends \PHPUnit_Framework_TestCase
         $this->checkSyntaxError('x\\yz', 1);
     }
     
-    public function checkSyntaxError($str, $colum = SyntaxException::UNDEFINED)
+    public function checkSyntaxError($str, $column = SyntaxException::UNDEFINED)
     {
         try {
             Util::unescape($str);
             $this->fail('Expected syntax error for "' . $str . '"');
         } catch (SyntaxException $e) {
-            $this->assertEquals($colum, $e->getColum());
+            $this->assertEquals($column, $e->getColumn());
         }
     }
 
