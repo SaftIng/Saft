@@ -725,6 +725,6 @@ class StoreChainIntegrationTest extends TestCase
 
     public function testSetChainSuccessor()
     {
-        $this->fixture->setChainSuccessor($this->getMockBuilder('Saft\Store\StoreInterface')->getMock());
+        $this->fixture->setChainSuccessor($this->getMockBuilder('Saft\Store\Store')->getMock());
     }
 }

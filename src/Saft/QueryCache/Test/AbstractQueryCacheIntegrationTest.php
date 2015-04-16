@@ -187,12 +187,12 @@ abstract class AbstractQueryCacheIntegrationTest extends \PHPUnit_Framework_Test
 
     public function testAddStatements()
     {
-        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
         // creates a subclass of the mock and adds a dummy function
         $class = 'queryCacheMock'. rand(0, 10000);
         $instance = null;
         // TODO simplify that eval call or get rid of it
-        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // Its purpose is to create a instanciable class which implements Store. It has a certain
         // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
@@ -226,12 +226,12 @@ abstract class AbstractQueryCacheIntegrationTest extends \PHPUnit_Framework_Test
     
     public function testDeleteMatchingStatements()
     {
-        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
         // creates a subclass of the mock and adds a dummy function
         $class = 'queryCacheMock'. rand(0, 10000);
         $instance = null;
         // TODO simplify that eval call or get rid of it
-        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // Its purpose is to create a instanciable class which implements Store. It has a certain
         // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
@@ -268,7 +268,7 @@ abstract class AbstractQueryCacheIntegrationTest extends \PHPUnit_Framework_Test
 
     public function testDropGraph()
     {
-        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
         // creates a subclass of the mock and adds a dummy dropGraph function
         if (false == class_exists('queryCacheMock')) {
             eval(
@@ -312,12 +312,12 @@ abstract class AbstractQueryCacheIntegrationTest extends \PHPUnit_Framework_Test
     
     public function testGetMatchingStatements()
     {
-        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
         // creates a subclass of the mock and adds a dummy function
         $class = 'queryCacheMock'. rand(0, 10000);
         $instance = null;
         // TODO simplify that eval call or get rid of it
-        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // Its purpose is to create a instanciable class which implements Store. It has a certain
         // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
@@ -344,12 +344,12 @@ abstract class AbstractQueryCacheIntegrationTest extends \PHPUnit_Framework_Test
     
     public function testGetMatchingStatementsUseCachedEntry1()
     {
-        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
         // creates a subclass of the mock and adds a dummy function
         $class = 'queryCacheMock'. rand(0, 10000);
         $instance = null;
         // TODO simplify that eval call or get rid of it
-        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // Its purpose is to create a instanciable class which implements Store. It has a certain
         // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
@@ -419,12 +419,12 @@ abstract class AbstractQueryCacheIntegrationTest extends \PHPUnit_Framework_Test
 
     public function tes1tHasMatchingStatement()
     {
-        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
         // creates a subclass of the mock and adds a dummy function
         $class = 'queryCache_testHasMatchingStatement' . rand(0, 10000);
         $instance = null;
         // TODO simplify that eval call or get rid of it
-        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // Its purpose is to create a instanciable class which implements Store. It has a certain
         // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
@@ -651,12 +651,12 @@ abstract class AbstractQueryCacheIntegrationTest extends \PHPUnit_Framework_Test
     
     public function testQuery()
     {
-        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
         // creates a subclass of the mock and adds a dummy function
         $class = 'queryCacheMock'. rand(0, 10000);
         $instance = null;
         // TODO simplify that eval call or get rid of it
-        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // Its purpose is to create a instanciable class which implements Store. It has a certain
         // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
@@ -731,7 +731,7 @@ abstract class AbstractQueryCacheIntegrationTest extends \PHPUnit_Framework_Test
 
     public function testSetChainSuccessor()
     {
-        $this->fixture->setChainSuccessor($this->getMockBuilder('Saft\Store\StoreInterface')->getMock());
+        $this->fixture->setChainSuccessor($this->getMockBuilder('Saft\Store\Store')->getMock());
     }
 
     /**
