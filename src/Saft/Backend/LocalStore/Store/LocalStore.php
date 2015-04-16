@@ -271,7 +271,7 @@ class LocalStore extends AbstractTriplePatternStore
             } elseif (!$statement->getGraph()->isConcrete()) {
                 throw new \InvalidArgumentException('Graph is not concrete');
             }
-            return $statement->getGraph()->getValue();
+            return $statement->getGraph()->getUri();
         }
         return $graphUri;
     }

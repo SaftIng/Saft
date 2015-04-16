@@ -348,12 +348,12 @@ class QueryCache implements Store
             
         // add filter, if subject is a named node or literal
         if (true === $s->isNamed() || true == $s->isLiteral()) {
-            $query .= 'FILTER (str(?s) = "'. $s->getValue() .'") ';
+            $query .= 'FILTER (str(?s) = "'. $s->getUri() .'") ';
         }
         
         // add filter, if predicate is a named node or literal
         if (true === $p->isNamed() || true == $p->isLiteral()) {
-            $query .= 'FILTER (str(?p) = "'. $p->getValue() .'") ';
+            $query .= 'FILTER (str(?p) = "'. $p->getUri() .'") ';
         }
         
         // add filter, if predicate is a named node or literal

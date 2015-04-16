@@ -128,7 +128,7 @@ class Virtuoso extends AbstractSparqlStore
              
             // use graphUri from statement
             } else {
-                $graphUriToUse = $statement->getGraph()->getValue();
+                $graphUriToUse = $statement->getGraph()->getUri();
             }
             
             if (false === isset($batchStatements[$graphUriToUse])) {
@@ -338,12 +338,12 @@ class Virtuoso extends AbstractSparqlStore
             
         // add filter, if subject is a named node or literal
         if (true === $s->isNamed() || true == $s->isLiteral()) {
-            $query .= 'FILTER (str(?s) = "'. $s->getValue() .'") ';
+            $query .= 'FILTER (str(?s) = "'. $s->getUri() .'") ';
         }
         
         // add filter, if predicate is a named node or literal
         if (true === $p->isNamed() || true == $p->isLiteral()) {
-            $query .= 'FILTER (str(?p) = "'. $p->getValue() .'") ';
+            $query .= 'FILTER (str(?p) = "'. $p->getUri() .'") ';
         }
         
         // add filter, if predicate is a named node or literal
@@ -427,7 +427,7 @@ class Virtuoso extends AbstractSparqlStore
         // set graphUri, use that from the statement if $graphUri is null
         if (null === $graphUri) {
             $graph = $Statement->getGraph();
-            $graphUri = $graph->getValue();
+            $graphUri = $graph->getUri();
         }
         
         if (false === AbstractNamedNode::check($graphUri)) {

@@ -64,7 +64,7 @@ class NtriplesSerializer
             throw \Exception('$node is null');
         }
 
-        $uri = $node->getValue();
+        $uri = $node->getUri();
         return sprintf('<%s>', self::escape($uri));
     }
 

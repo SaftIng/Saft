@@ -7,5 +7,5 @@ interface NamedNode extends Node
     /**
      * @return string URI of the node.
      */
-    public function getValue();
+    public function getUri();
 }

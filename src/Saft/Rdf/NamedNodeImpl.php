@@ -26,7 +26,7 @@ class NamedNodeImpl extends AbstractNamedNode
     /**
      * @return string URI of the node.
      */
-    public function getValue()
+    public function getUri()
     {
         return $this->uri;
     }

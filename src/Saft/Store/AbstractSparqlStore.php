@@ -71,7 +71,7 @@ abstract class AbstractSparqlStore implements Store
                  
                 // use graphUri from statement
                 } else {
-                    $graphUriToUse = $statement->getGraph()->getValue();
+                    $graphUriToUse = $statement->getGraph()->getUri();
                 }
                 
                 if (false === isset($batchStatements[$graphUriToUse])) {

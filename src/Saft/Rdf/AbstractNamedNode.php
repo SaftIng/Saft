@@ -9,7 +9,7 @@ abstract class AbstractNamedNode implements NamedNode
      */
     public function __toString()
     {
-        return $this->getValue();
+        return $this->getUri();
     }
 
     /**
@@ -33,7 +33,7 @@ abstract class AbstractNamedNode implements NamedNode
     {
         // It only compares URIs, everything will be quit with false.
         if (true === $toCompare->isNamed()) {
-            return $this->getValue() == $toCompare->getValue();
+            return $this->getUri() == $toCompare->getValue();
         }
 
         return false;
@@ -92,7 +92,7 @@ abstract class AbstractNamedNode implements NamedNode
      */
     public function toNQuads()
     {
-        return '<' . $this->getValue() . '>';
+        return '<' . $this->getUri() . '>';
     }
 
     /**
@@ -107,7 +107,7 @@ abstract class AbstractNamedNode implements NamedNode
 
         if ($pattern->isConcrete()) {
             if ($pattern instanceof NamedNode) {
-                return $this->getValue() === $pattern->getValue();
+                return $this->getUri() === $pattern->getUri();
             } else {
                 return false;
             }
