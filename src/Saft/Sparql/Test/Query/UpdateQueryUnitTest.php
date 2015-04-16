@@ -30,7 +30,42 @@ class UpdateQueryUnitTest extends TestCase
             $this->fixture->getQuery()
         );
     }
-    
+        
+    /**
+     * Tests extractGraphs
+     */
+
+    public function testExtractGraphsDeleteData()
+    {
+        $this->fixture = AbstractQuery::initByQueryString(
+            'PREFIX dc: <http://foo/bar/>
+            DELETE DATA { 
+                Graph <http://saft/test/g1> {<http://saft/test/s1> dc:p1 <http://saft/test/o1>}
+                Graph <http://saft/test/g2> {<http://saft/test/s1> dc:p1 <http://saft/test/o1>}
+            }'
+        );
+        
+        $queryParts = $this->fixture->getQueryParts();
+
+        $this->assertEquals(
+            array('http://saft/test/g1', 'http://saft/test/g2'), 
+            $queryParts['graphs']
+        );
+    }
+
+    public function testExtractGraphsInsertIntoGraph()
+    {
+        $this->fixture = AbstractQuery::initByQueryString(
+            'PREFIX dc: <http://foo/bar/>
+            INSERT DATA { Graph <http://saft/test/g1> {
+                <http://saft/test/s1> dc:p1 <http://saft/test/o1>}
+            }'
+        );
+        
+        $queryParts = $this->fixture->getQueryParts();
+
+        $this->assertEquals(array('http://saft/test/g1'), $queryParts['graphs']);
+    }
         
     /**
      * Tests extractNamespacesFromQuery
@@ -93,46 +128,50 @@ class UpdateQueryUnitTest extends TestCase
      * Tests getQueryParts
      */
 
-    public function testdetermineSubType()
+    public function testGetSubTypeDeleteData()
     {
-        $this->assertEquals(
-            'deleteData',
-            $this->fixture->determineSubType('
-                PREFIX dc: <http://foo/bar/>
-                DELETE DATA { GRAPH <http://> { ?s ?p ?o } }')
+        $this->fixture = new UpdateQuery('
+            PREFIX dc: <http://foo/bar/> DELETE DATA { GRAPH <http://> { ?s ?p ?o } }'
         );
         
-        $this->assertEquals(
-            'insertData',
-            $this->fixture->determineSubType(
-                'PREFIX dc: <http://foo/bar/>
-                INSERT DATA { GRAPH <http://> { ?s dc:foo "hi" } }'
-            )
+        $this->assertEquals('deleteData', $this->fixture->getSubType());
+    }
+
+    public function testGetSubTypeInsertData()
+    {
+        $this->fixture = new UpdateQuery(
+            'PREFIX dc: <http://foo/bar/> INSERT DATA { GRAPH <http://> { ?s dc:foo "hi" } }'
         );
         
-        $this->assertEquals(
-            'insertInto',
-            $this->fixture->determineSubType(
-                'PREFIX dc: <http://foo/bar/>
-                INSERT INTO GRAPH <http://> { ?s dc:foo "hi" }'
-            )
+        $this->assertEquals('insertData', $this->fixture->getSubType());
+    }
+
+    public function testGetSubTypeInsertInto()
+    {
+        $this->fixture = new UpdateQuery(
+            'PREFIX dc: <http://foo/bar/> INSERT INTO GRAPH <http://> { ?s dc:foo "hi" }'
         );
         
-        $this->assertEquals(
-            'withDeleteInsertWhere',
-            $this->fixture->determineSubType(
-                'PREFIX dc: <http://foo/bar/>
-                WITH <http://> DELETE { ?s dc:foo "hi" } INSERT { ?s dc:foo "ho" } WHERE { ?s dc:foo "hi" }'
-            )
+        $this->assertEquals('insertInto', $this->fixture->getSubType());
+    }
+
+    public function testGetSubTypeWithDeleteInsertWhere()
+    {
+        $this->fixture = new UpdateQuery(
+            'PREFIX dc: <http://foo/bar/>
+             WITH <http://> DELETE { ?s dc:foo "hi" } INSERT { ?s dc:foo "ho" } WHERE { ?s dc:foo "hi" }'
         );
         
-        $this->assertEquals(
-            'withDeleteWhere',
-            $this->fixture->determineSubType(
-                'PREFIX dc: <http://foo/bar/>
-                WITH <http://> DELETE { ?s dc:foo "hi" } WHERE { ?s dc:foo "hi" }'
-            )
+        $this->assertEquals('withDeleteInsertWhere', $this->fixture->getSubType());
+    }
+
+    public function testGetSubTypeWithDeleteWhere()
+    {
+        $this->fixture = new UpdateQuery(
+            'PREFIX dc: <http://foo/bar/> WITH <http://> DELETE { ?s dc:foo "hi" } WHERE { ?s dc:foo "hi" }'
         );
+        
+        $this->assertEquals('withDeleteWhere', $this->fixture->getSubType());
     }
     
     /**

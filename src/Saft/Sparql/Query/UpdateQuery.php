@@ -15,16 +15,38 @@ use Saft\Sparql\Query\AbstractQuery;
 class UpdateQuery extends AbstractQuery
 {
     /**
-     *
+     * 
      * @param string $query
+     * @return array
+     */
+    public function extractGraphs($query)
+    {
+        $graphs = array();
+        
+        /**
+         * Matches the following pattern: Graph <http://uri/>
+         */
+        $result = preg_match_all('/GRAPH\s*\<([a-z0-9\:\/]+)\>/si', $query, $matches);
+        
+        if (false !== $result && true === isset($matches[1])) {
+            foreach ($matches[1] as $graph) {
+                $graphs[] = $graph;
+            }
+        }
+        
+        return $graphs;
+    }
+    
+    /**
+     *
      * @return string|null
      */
-    public function determineSubType($query)
+    public function getSubType()
     {
         /**
          * First we get rid of all PREFIX information
          */
-        $adaptedQuery = preg_replace('/PREFIX\s+[a-z0-9]+\:\s*\<[a-z0-9\:\/\.\#\-]+\>/', '', $query);
+        $adaptedQuery = preg_replace('/PREFIX\s+[a-z0-9]+\:\s*\<[a-z0-9\:\/\.\#\-]+\>/', '', $this->getQuery());
         
         // remove trailing whitespaces
         $adaptedQuery = trim($adaptedQuery);
@@ -82,7 +104,7 @@ class UpdateQuery extends AbstractQuery
             'graphs' => $this->extractGraphs($this->getQuery()),
             'namespaces' => $this->extractNamespacesFromQuery($queryFromDelete),
             'prefixes' => $this->extractPrefixesFromQuery($this->getQuery()),
-            'sub_type' => $this->determineSubType($this->getQuery()),
+            'sub_type' => $this->getSubType(),
             'triple_pattern' => $this->extractTriplePattern($this->getQuery()),
             'variables' => $this->extractVariablesFromQuery($this->getQuery())
         );
@@ -91,7 +113,7 @@ class UpdateQuery extends AbstractQuery
          * Save parts for INSERT DATA
          */
         if ('insertData' === $this->queryParts['sub_type']) {
-            preg_match('/INSERT\s+DATA\s+\{(.*)\}/', $this->getQuery(), $matches);
+            preg_match('/INSERT\s+DATA\s+\{(.*)\}/si', $this->getQuery(), $matches);
             
             if (true === isset($matches[1])) {
                 $this->queryParts['insertData'] = trim($matches[1]);
@@ -109,7 +131,7 @@ class UpdateQuery extends AbstractQuery
          * Save parts for INSERT INTO GRAPH <> {}
          */
         } elseif ('insertInto' === $this->queryParts['sub_type']) {
-            preg_match('/INSERT\s+INTO\s+GRAPH\+\<(.*)\>\{(.*)\}/', $this->getQuery(), $matches);
+            preg_match('/INSERT\s+INTO\s+GRAPH\s*\<(.*)\>\s*\{(.*)\}/', $this->getQuery(), $matches);
             
             if (true === isset($matches[1]) && true === isset($matches[2])) {
                 // graph
@@ -126,7 +148,7 @@ class UpdateQuery extends AbstractQuery
          * Save parts for DELETE DATA {}
          */
         } elseif ('deleteData' === $this->queryParts['sub_type']) {
-            preg_match('/DELETE\s+DATA\s*\{(.*)\}/', $this->getQuery(), $matches);
+            preg_match('/DELETE\s+DATA\s*\{(.*)\}/s', $this->getQuery(), $matches);
             
             if (true === isset($matches[1])) {
                 // triples
@@ -198,16 +220,16 @@ class UpdateQuery extends AbstractQuery
      */
     public function init($query)
     {
-        $subType = $this->determineSubType($query);
+        $this->query = $query;
+        $subType = $this->getSubType();
         
         if (null !== $subType) {
-            $this->query = $query;
             
             /**
              * Save parts for INSERT DATA
              */
             if ('insertData' === $subType) {
-                preg_match('/INSERT\s+DATA\s+\{(.*)\}/', $query, $matches);
+                preg_match('/INSERT\s+DATA\s+\{(.*)\}/si', $query, $matches);
                 
                 if (false === isset($matches[1])) {
                     throw new \Exception('No triple part after INSERT DATA found.');
@@ -217,7 +239,7 @@ class UpdateQuery extends AbstractQuery
              * Save parts for INSERT INTO GRAPH <> {}
              */
             } elseif ('insertInto' === $subType) {
-                preg_match('/INSERT\s+INTO\s+GRAPH\s+\<(.*)\>\s*\{(.*)\}/', $query, $matches);
+                preg_match('/INSERT\s+INTO\s+GRAPH\s+\<(.*)\>\s*\{(.*)\}/si', $query, $matches);
                 
                 if (false === isset($matches[1]) || false === isset($matches[2])) {
                     throw new \Exception(
@@ -229,7 +251,7 @@ class UpdateQuery extends AbstractQuery
              * Save parts for DELETE DATA {}
              */
             } elseif ('deleteData' === $subType) {
-                preg_match('/DELETE\s+DATA\s*\{(.*)\}/', $query, $matches);
+                preg_match('/DELETE\s+DATA\s*\{(.*)\}/si', $query, $matches);
                 
                 if (false === isset($matches[1])) {
                     throw new \Exception('No triple part after DELETE DATA found.');
@@ -239,7 +261,7 @@ class UpdateQuery extends AbstractQuery
              * Save parts for WITH <> DELETE {} WHERE {}
              */
             } elseif ('withDeleteWhere' === $subType) {
-                preg_match('/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/', $query, $matches);
+                preg_match('/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/si', $query, $matches);
                 
                 if (false === isset($matches[1])) {
                     throw new \Exception(
@@ -252,7 +274,7 @@ class UpdateQuery extends AbstractQuery
              */
             } elseif ('withDeleteWhere' === $subType) {
                 preg_match(
-                    '/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*INSERT\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/',
+                    '/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*INSERT\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/si',
                     $query,
                     $matches
                 );

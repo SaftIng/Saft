@@ -21,7 +21,7 @@ class AskQuery extends AbstractQuery
         $prefixlessQuery = preg_replace(
             '/PREFIX\s+([a-z0-9]+)\:\s*\<([a-z0-9\:\/\.\#\-]+)\>/',
             '',
-            $this->query
+            $this->getQuery()
         );
         
         $this->queryParts['filter_pattern'] = $this->extractFilterPattern($this->queryParts['where']);

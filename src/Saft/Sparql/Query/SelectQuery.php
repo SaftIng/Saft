@@ -2,8 +2,6 @@
 
 namespace Saft\Sparql\Query;
 
-use Saft\Rdf\AbstractNamedNode;
-
 /**
  * Represents a SELECT query.
  */
