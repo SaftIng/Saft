@@ -8,7 +8,8 @@ use Saft\Rdf\StatementImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\VariableImpl;
-use \Saft\Sparql\Query;
+use Saft\Sparql\Query\AbstractQuery;
+use Saft\Sparql\Query\Query;
 
 /**
  * Predefined Pattern-statement Store. The Triple-methods need to be implemented in the specific statement-store.
@@ -16,66 +17,121 @@ use \Saft\Sparql\Query;
  */
 abstract class AbstractTriplePatternStore implements StoreInterface
 {
-    
     /**
-     * @param string $query   SPARQL query string.
-     * @param string $options optional Further configurations.
-     * @throws ?
+     * @param  string     $query            SPARQL query string.
+     * @param  string     $options optional Further configurations.
+     * @throws \Exception                   If unsupported query was given
+     * @throws \Exception                   If WITH-DELETE-WHERE and WITH-DELETE-INSERT-WHERE query was given.
      */
     public function query($query, array $options = array())
     {
-        $queryParser = new Query();
-        $queryParser->init($query);
-        //@TODO does not recognize quads.
-        $queryStatements = $queryParser->getTriplePatterns();
-        //$queryParts = $queryParser->getQueryParts();
-        $statement = $this->getStatement($queryStatements[0]);
-
-        //@TODO parse return-value in sparql-format(?)
-        if (stristr($query, 'insert')) {
-            //redirect to addStatements-methode
-            return $this->addStatements($this->getStatements($queryStatements));
-        } elseif (stristr($query, 'delete') || stristr($query, 'ask') || stristr($query, 'select')) {
-            if (sizeof($queryStatements) != 1) {
-                throw new \Exception('one Statement expected');
-            }
-            if (stristr($query, 'delete')) {
-                //redirect to deleteMatchingStatement-method
+        $queryObject = AbstractQuery::initByQueryString($query);
+        
+        /**
+         * INSERT or DELETE query
+         */
+        if ('updateQuery' == AbstractQuery::getQueryType($query)) {
+            
+            $firstPart = substr($queryObject->getSubType(), 0, 6);
+            
+            // DELETE DATA query
+            if ('delete' == $firstPart) {
+                $statement = $this->getStatement($queryObject);
                 return $this->deleteMatchingStatements($statement);
-            } elseif (stristr($query, 'ask')) {
-                //redirect to hasMatchingStatement-method
-                return $this->hasMatchingStatement($statement);
-            } elseif (stristr($query, 'select')) {
-                //redirect to getMatchingStatements-method
-                return $this->getMatchingStatements($statement);
+            
+            // INSERT DATA or INSERT INTO query
+            } elseif ('insert' == $firstPart) {
+                return $this->addStatements($this->getStatements($queryObject));
+                
+            // TODO Support 
+            // WITH ... DELETE ... WHERE queries
+            // WITH ... DELETE ... INSERT ... WHERE queries
+            } else {
+                throw new \Exception(
+                    'WITH-DELETE-WHERE and WITH-DELETE-INSERT-WHERE queries are not supported yet.'
+                );
             }
-        } elseif (true) {
-            //@TODO reroute to getAvailableGraphs()
-            //return $this->getAvailableGraphs();
+            
+        /**
+         * ASK query
+         */
+        } elseif ('askQuery' == AbstractQuery::getQueryType($query)) {
+            $statement = $this->getStatement($queryObject);
+            return $this->hasMatchingStatement($statement);
+            
+        /**
+         * SELECT query
+         */
+        } elseif ('selectQuery' == AbstractQuery::getQueryType($query)) {
+            $statement = $this->getStatement($queryObject);
+            return $this->getMatchingStatements($statement);
+            
+        /**
+         * Unsupported query
+         */
+        } else {
+            throw new \Exception('Unsupported query was given: '. $query);
         }
     }
 
     /**
-     * create Statement from query.
-     * @param array $queryParts the part of the query with the description of the statement.
-     * @return Statement           Statement-object
+     * Create Statement instance based on a given Query instance.
+     * 
+     * @param  Query     $queryObject Query object which represents a SPARQL query.
+     * @return Statement              Statement object
+     * @throws \Exception             If query contains more than one triple pattern.
+     * @throws \Exception             If more than one graph was found.
      */
-    protected function getStatement(array $queryParts)
+    protected function getStatement(Query $queryObject)
     {
-        $subject = $this->createNode($queryParts['s'], $queryParts['s_type']);
-        $predicate = $this->createNode($queryParts['p'], $queryParts['p_type']);
-        $object = $this->createNode($queryParts['o'], $queryParts['o_type']);
-        $statement = new StatementImpl($subject, $predicate, $object);
-
-        return $statement;
+        $queryParts = $queryObject->getQueryParts();
+        $triplePattern = $queryParts['triple_pattern'];
+        
+        if (1 == count($triplePattern)) {
+            
+            /**
+             * Triple
+             */
+            if (false === isset($queryParts['graphs'])) {
+                $subject = $this->createNode($triplePattern[0]['s'], $triplePattern[0]['s_type']);
+                $predicate = $this->createNode($triplePattern[0]['p'], $triplePattern[0]['p_type']);
+                $object = $this->createNode($triplePattern[0]['o'], $triplePattern[0]['o_type']);
+                $graph = null;
+                
+            /**
+             * Quad
+             * FYI: enter this case only if there is exactly one graph.
+             */
+            } elseif (true === isset($queryParts['graphs']) 
+                && 1 == count($queryParts['graphs'])) {
+                $subject = $this->createNode($triplePattern[0]['s'], $triplePattern[0]['s_type']);
+                $predicate = $this->createNode($triplePattern[0]['p'], $triplePattern[0]['p_type']);
+                $object = $this->createNode($triplePattern[0]['o'], $triplePattern[0]['o_type']);
+                $graph = new NamedNodeImpl($queryParts['graphs'][0]);
+            
+            /**
+             * It is not possible that there is graphs set and empty, because it would be ereased before.
+             * So if we enter this case there can only be more than one graph which is a problem, because
+             * we have a quad or triple.
+             */
+            } else {
+                throw new \Exception('More than one graph was found.');
+            }
+            
+            return new StatementImpl($subject, $predicate, $object, $graph);
+            
+        } else {
+            throw new \Exception('Query contains more than one triple pattern.');
+        }
     }
 
     /**
-     * create statements from query
-     * @param  array $queryParts the part of the query with the description of the statements.
-     * @return StatementIterator             Statements
+     * Create statements from query.
+     * 
+     * @param  Query             $queryObject Query object which represents a SPARQL query.
+     * @return StatementIterator StatementIterator object
      */
-    protected function getStatements(array $queryParts)
+    protected function getStatements(Query $queryObject)
     {
         $statements = new ArrayStatementIteratorImpl(array());
         foreach ($queryParts as $st) {

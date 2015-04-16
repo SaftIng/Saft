@@ -15,31 +15,30 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
+        
         $this->fixture = $this->getMockForAbstractClass('\Saft\Store\AbstractTriplePatternStore');
     }
 
-    public function getTestQuad()
+    protected function getTestQuad()
     {
         $subject1 = new NamedNodeImpl('http://saft/test/s1');
         $predicate1 = new NamedNodeImpl('http://saft/test/p1');
         $object1 = new NamedNodeImpl('http://saft/test/o1');
         $graph1 = new NamedNodeImpl('http://saft/test/g1');
-        $quad = new StatementImpl($subject1, $predicate1, $object1, $graph1);
 
-        return $quad;
+        return new StatementImpl($subject1, $predicate1, $object1, $graph1);;
     }
 
-    public function getTestTriple()
+    protected function getTestTriple()
     {
         $subject2 = new NamedNodeImpl('http://saft/test/s2');
         $predicate2 = new NamedNodeImpl('http://saft/test/p2');
         $object2 = new NamedNodeImpl('http://saft/test/o2');
-        $triple = new StatementImpl($subject2, $predicate2, $object2);
 
-        return $triple;
+        return new StatementImpl($subject2, $predicate2, $object2);
     }
 
-    public function getTestPatternStatement()
+    protected function getTestPatternStatement()
     {
         $subject1 = new VariableImpl('?s1');
         $predicate1 = new VariableImpl('?p1');
@@ -49,14 +48,41 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
         return $triple;
     }
 
-    public function getTestStatementWithLiteral()
+    protected function getTestStatementWithLiteral()
     {
         $subject2 = new NamedNodeImpl('http://saft/test/s1');
         $predicate2 = new NamedNodeImpl('http://saft/test/p2');
-        $object2 = new LiteralImpl("John");
+        $object2 = new LiteralImpl('John');
         $triple = new StatementImpl($subject2, $predicate2, $object2);
 
         return $triple;
+    }
+    
+    /**
+     * Overrides method given by $method with an assertion about equivalence
+     *  - $statement and the Statement of the called method.
+     *  - @TODO $graphUri and GraphUri of the called method.
+     *  - @TODO $options and the Options of the called method.
+     * 
+     * @param  string    $method    method in AbstractTriplePatternStore to override
+     * @param  Statement $statement
+     * @param  string    $graphUri
+     * @param  array     $options
+     */
+    protected function overideMethodeWithAssertion($method, Statement $statement, $graphUri = null, 
+        array $options = array())
+    {
+        $this->fixture
+            ->expects($this->once())
+            ->method($method)
+            ->will(
+                $this->returnCallback(
+                    function (Statement $fStatement, $fGraphUri = null, array $fOptions = array()) 
+                        use ($statement, $graphUri, $options) {
+                        TestCase::assertEquals($fStatement->toSparqlFormat(), $statement->toSparqlFormat());
+                    }
+                )
+            );
     }
 
     public function testAddStatements()
@@ -111,7 +137,9 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
         $this->fixture->query($query);
     }
 
-    //@TODO does not recognize quads.
+    /**
+     * Tests deleteMatchingStatements: quad recognition
+     */
     public function testQuadRecognition()
     {
         $quad = $this->getTestQuad();
@@ -120,7 +148,9 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
         $this->fixture->query($query);
     }
 
-    //@TODO does not recognize quads.
+    /**
+     * Tests deleteMatchingStatements: variable patterns
+     */
     public function testVariablePatterns()
     {
         $statement = $this->getTestPatternStatement();
@@ -135,32 +165,5 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
         $query = 'DELETE DATA { '.$statement->toSparqlFormat().'}';
         $this->overideMethodeWithAssertion('deleteMatchingStatements', $statement);
         $this->fixture->query($query);
-    }
-
-    /**
-     * Overrides method given by $method with an assertion about equivalence
-     *  - $statement and the Statement of the called method.
-     *  - @TODO $graphUri and GraphUri of the called method.
-     *  - @TODO $options and the Options of the called method.
-     * @param  string    $method    method in AbstractTriplePatternStore to override
-     * @param  Statement $statement
-     * @param  string    $graphUri
-     * @param  array     $options
-     */
-    private function overideMethodeWithAssertion($method, Statement $statement, $graphUri = null, array $options = array())
-    {
-        $this->fixture
-            ->expects($this->once())
-            ->method($method)
-            ->will(
-                $this->returnCallback(
-                    function (Statement $fStatement, $fGraphUri = null, array $fOptions = array()) use ($statement, $graphUri, $options) {
-                        TestCase::assertEquals(
-                            $fStatement->toSparqlFormat(),
-                            $statement->toSparqlFormat()
-                        );
-                    }
-                )
-            );
     }
 }
