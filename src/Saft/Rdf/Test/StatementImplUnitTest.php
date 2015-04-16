@@ -32,6 +32,6 @@ class StatementImplUnitTest extends StatementAbstractTest
 
     public function newInstance($subject, $predicate, $object, $graph = null)
     {
-        return new StatementImpl($subject, $predicate, $object);
+        return new StatementImpl($subject, $predicate, $object, $graph);
     }
 }
