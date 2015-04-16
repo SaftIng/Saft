@@ -125,6 +125,49 @@ class UpdateQueryUnitTest extends TestCase
     }
     
     /**
+     * Tests extractQuads
+     */
+    
+    public function testExtractQuads()
+    {
+        // assumption here is that fixture is of type
+        $this->fixture = AbstractQuery::initByQueryString(
+            'PREFIX dc: <http://foo/bar/>
+            INSERT DATA { 
+                Graph <http://saft/test/g1> { <http://saft/test/s1> dc:p1 <http://saft/test/o1>}
+                Graph <http://saft/test/g1> {<http://saft/test/s2> <http://test/p2> <http://saft/test/o2>.}
+                Graph <http://saft/test/g2> {<http://saft/test/s3> dc:p3 <http://saft/test/o3> }
+            }'
+        );
+        
+        $queryParts = $this->fixture->getQueryParts();
+        
+        $this->assertEqualsArrays(
+            array(
+                array(
+                    's' => 'http://saft/test/s1',
+                    'p' => 'http://foo/bar/p1',
+                    'o' => 'http://saft/test/o1',
+                    'g' => 'http://saft/test/g1',
+                ),
+                array(
+                    's' => 'http://saft/test/s2',
+                    'p' => 'http://test/p2',
+                    'o' => 'http://saft/test/o2',
+                    'g' => 'http://saft/test/g1',
+                ),
+                array(
+                    's' => 'http://saft/test/s3',
+                    'p' => 'http://foo/bar/p3',
+                    'o' => 'http://saft/test/o3',
+                    'g' => 'http://saft/test/g2',
+                )
+            ),
+            $queryParts['quad_pattern']
+        );
+    }
+    
+    /**
      * Tests getQueryParts
      */
 

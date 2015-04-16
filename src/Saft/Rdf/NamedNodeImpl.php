@@ -19,7 +19,7 @@ class NamedNodeImpl extends AbstractNamedNode
         if (true === self::check($uri) || null === $uri) {
             $this->uri = $uri;
         } else {
-            throw new \Exception('First parameter ($uri) is not a valid URI.');
+            throw new \Exception('Parameter $uri is not a valid URI: '. $uri);
         }
     }
 

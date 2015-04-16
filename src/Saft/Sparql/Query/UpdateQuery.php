@@ -46,7 +46,7 @@ class UpdateQuery extends AbstractQuery
         /**
          * First we get rid of all PREFIX information
          */
-        $adaptedQuery = preg_replace('/PREFIX\s+[a-z0-9]+\:\s*\<[a-z0-9\:\/\.\#\-]+\>/', '', $this->getQuery());
+        $adaptedQuery = preg_replace('/PREFIX\s+[a-z0-9]+\:\s*\<[a-z0-9\:\/\.\#\-]+\>/si', '', $this->getQuery());
         
         // remove trailing whitespaces
         $adaptedQuery = trim($adaptedQuery);
@@ -104,6 +104,7 @@ class UpdateQuery extends AbstractQuery
             'graphs' => $this->extractGraphs($this->getQuery()),
             'namespaces' => $this->extractNamespacesFromQuery($queryFromDelete),
             'prefixes' => $this->extractPrefixesFromQuery($this->getQuery()),
+            'quad_pattern' => $this->extractQuads($this->getQuery()),
             'sub_type' => $this->getSubType(),
             'triple_pattern' => $this->extractTriplePattern($this->getQuery()),
             'variables' => $this->extractVariablesFromQuery($this->getQuery())

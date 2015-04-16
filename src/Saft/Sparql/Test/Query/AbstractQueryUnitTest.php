@@ -281,6 +281,54 @@ class AbstractQueryUnitTest extends TestCase
         );
     }
      
+    public function testExtractTriplePatternPrefix()
+    {
+        $this->assertEquals(
+            array(
+                array(
+                    's' => 's',
+                    'p' => 'rdfs:label',
+                    'o' => 'Foo',
+                    's_type' => 'var',
+                    'p_type' => 'uri',
+                    'o_type' => 'literal',
+                    'o_datatype' => null,
+                    'o_lang' => 'en'
+                )
+            ),
+            $this->fixture->extractTriplePattern(
+                'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema>
+                SELECT ?s FROM <> WHERE {
+                    ?s rdfs:label "Foo"@en
+                }'
+            )
+        );
+    }
+     
+    public function testExtractTriplePatternPrefixNotFound()
+    {
+        $this->assertEquals(
+            array(
+                array(
+                    's' => 's',
+                    'p' => 'rdfs:label',
+                    'o' => 'Foo',
+                    's_type' => 'var',
+                    'p_type' => 'uri',
+                    'o_type' => 'literal',
+                    'o_datatype' => null,
+                    'o_lang' => 'en'
+                )
+            ),
+            $this->fixture->extractTriplePattern(
+                'PREFIX foaf: <http://whatelse/>
+                SELECT ?s FROM <> WHERE {
+                    ?s rdfs:label "Foo"@en
+                }'
+            )
+        );
+    }
+     
     public function testExtractTriplePatternTypedLiteral()
     {
         $this->assertEquals(

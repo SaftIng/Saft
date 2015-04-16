@@ -246,10 +246,12 @@ abstract class AbstractSparqlStore implements StoreInterface
         // check if its a valid URI
         if (true === AbstractNamedNode::check($graphUri)) {
             return '<'. $graphUri .'>';
-            // check for variable, which has a ? as first char
+        
+        // check for variable, which has a ? as first char
         } elseif ('?' == substr($graphUri, 0, 1)) {
              return $graphUri;
-            // invalid $graphUri
+        
+        // invalid $graphUri
         } else {
             throw new \Exception('Parameter $graphUri is neither a valid URI nor variable.');
         }
