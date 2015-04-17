@@ -29,8 +29,9 @@ abstract class NamedNodeAbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function testInstanciationNull()
     {
-        $fixture = $this->newInstance(null);
-        $this->assertEquals(null, $fixture->getUri());
+        $this->setExpectedException('\Exception');
+
+        $this->newInstance(null);
     }
 
     public function testInstanciationValidUri()
