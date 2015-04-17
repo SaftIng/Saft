@@ -261,79 +261,60 @@ class QueryCache implements Store
     }
     
     /**
-     * Invalidates according graphId entry, the result and all triple pattern.
+     * Invalidates according graph Uri entries, the result and all triple pattern.
      *
-     * @param  string  $query                                       All data according to this query will be
-     *                                                              invalidated.
-     * @param  boolean $checkTransaction optionally                 True, if you wanna check for active transactions.
-     *                                                              False if you just want to execute regardless of
-     *                                                              active transactions.
-     * @param  boolean $checkForRelatedQueryCacheEntries optionally True, if you wanna check, if there are
-     *                                                              related QueryCache entries and if so, invalidate
-     *                                                              them.
-     * @throw \Exception
+     * @param  Query $queryObject All data according to this query will be invalidated.
      */
-    public function invalidateByQuery($query, $checkTransaction = true, $checkForRelatedQueryCacheEntries = true)
+    public function invalidateByQuery(Query $queryObject)
     {
-        // if a transaction is active, stop further execution and save this function
-        // call under 'placed operations' of the according active transaction
-        if (true === $checkTransaction && true === $this->isATransactionActive()) {
-            // save function call + parameter
-            $this->addPlacedOperation(
-                // function name
-                'invalidateByQuery',
-                // parameter
-                array(
-                    'query' => $query,
-                    'checkTransaction' => false
-                )
-            );
-            return;
-        }
-        $queryId = $this->generateShortId($query);
-        // get according cache entry
-        $queryContainer = $this->cache->get($queryId);
-        // remove queryId in each according graphId entry
-        if (true === is_array($queryContainer['graphIds'])) {
-            foreach ($queryContainer['graphIds'] as $graphId) {
-                $graphCacheEntry = $this->cache->get($graphId);
-                unset($graphCacheEntry[$queryId]);
-                // if graphId entry is empty after the operation, remove it from the cache
-                if (0 == count($graphCacheEntry)) {
-                    $this->cache->delete($graphId);
-                    // otherwise save updated entry
-                } else {
-                    $this->cache->set($graphId, $graphCacheEntry);
-                }
-            }
-        }
-        // check for according triple pattern
-        if (true === is_array($queryContainer['triplePattern'])) {
-            foreach ($queryContainer['triplePattern'] as $graphId => $triplePattern) {
-                foreach ($triplePattern as $patternId) {
-                    $this->cache->delete($patternId);
-                }
-            }
-        }
-        // if activate and if there are related QueryCache entries, invalidate them
-        if (true === $checkForRelatedQueryCacheEntries && '' != $queryContainer['relatedQueryCacheEntries']) {
-            // get entries
-            $relatedQueryCacheEntries = $this->cache->get($queryContainer['relatedQueryCacheEntries']);
-            // invalidate entries by their query
-            foreach ($relatedQueryCacheEntries as $queryCacheEntryId) {
-                $queryContainer = $this->cache->get($queryCacheEntryId);
-                if (true === isset($queryContainer['query'])) {
-                    $this->invalidateByQuery($queryContainer['query'], false, false);
-                }
-            }
-        }
-        if (true === $this->isATransactionActive()) {
-            $this->invalidatedEntriesDuringTransaction[$queryId] = $queryId;
-        }
+        $query = $queryObject->getQuery();
+        
+        // load query cache container by given query
+        $queryCacheContainer = $this->cache->get($query);
+        
         /**
-         * Unset query part of the cache
+         * remove according query from the query list which belongs to one of the graph URI's in the query
+         * cache container.
          */
-        $this->cache->delete($queryId);
+        if (true === is_array($queryCacheContainer['graph_uris'])) {
+            foreach ($queryCacheContainer['graph_uris'] as $graphUri) {
+                $queryList = $this->cache->get($graphUri);
+                
+                unset($queryList[$query]);
+                
+                // if graphUri entry is empty after the operation, remove it from the cache
+                if (0 == count($queryList)) {
+                    $this->cache->delete($graphUri);
+                
+                // otherwise save updated entry
+                } else {
+                    $this->cache->set($graphUri, $queryList);
+                }
+            }
+        }
+        
+        // check for according triple pattern
+        if (true === is_array($queryCacheContainer['triple_pattern'])) {
+            foreach ($queryCacheContainer['triple_pattern'] as $patternKey) {
+                $queryList = $this->cache->get($patternKey);
+                
+                unset($queryList[$query]);
+                
+                // if patternKey entry is empty after the operation, remove it from the cache
+                if (0 == count($queryList)) {
+                    $this->cache->delete($patternKey);
+                
+                // otherwise save updated entry
+                } else {
+                    $this->cache->set($patternKey, $queryList);
+                }
+            }
+        }
+        
+        /**
+         * Remove query cache container
+         */
+        $this->cache->delete($query);
     }
     
     /**
@@ -408,12 +389,12 @@ class QueryCache implements Store
                     $queryList = array();
                 }
                 
-                $queryList[] = $query;
+                $queryList[$query] = $query;
                 
                 $this->cache->set($graphUri, $queryList);
                 
                 // save reference to this graph URI in later query cache container
-                $queryCacheContainer['graph_uris'][] = $graphUri;
+                $queryCacheContainer['graph_uris'][$graphUri] = $graphUri;
             }
         }
         
@@ -451,12 +432,12 @@ class QueryCache implements Store
                     $queryList = array();
                 }
                 
-                $queryList[] = $query;
+                $queryList[$query] = $query;
                 
                 $this->cache->set($patternKey, $queryList);
                 
                 // save reference to this pattern in later query cache container
-                $queryCacheContainer['triple_pattern'][] = $patternKey;
+                $queryCacheContainer['triple_pattern'][$patternKey] = $patternKey;
             }
         }
         

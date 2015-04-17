@@ -39,6 +39,44 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     }
     
     /**
+     * Tests invalidateByQuery
+     */
+    public function testInvalidateByQuery()
+    {
+        /**
+         * First create test data and save it via saveResult
+         */
+        $queryObject = AbstractQuery::initByQueryString(
+            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }'
+        );
+        
+        $result = array(1, 2, 3);
+        
+        $this->fixture->saveResult($queryObject, $result);
+        
+        /**
+         * Invalidate everything via a invalidateByQuery call
+         */
+        $this->fixture->invalidateByQuery($queryObject);
+        
+        /**
+         * Check that everything was invalidated:
+         * - graph URI entry
+         * - pattern key entry
+         * - query cache container itself
+         */
+         
+        // graph URI entry
+        $this->assertNull($this->fixture->getCache()->get($this->testGraphUri));
+        
+        // pattern key entry
+        $this->assertNull($this->fixture->getCache()->get($this->testGraphUri . '_*_*_*'));
+        
+        // query cache container
+        $this->assertNull($this->fixture->getCache()->get($queryObject->getQuery()));
+    }
+    
+    /**
      * Tests saveResult
      */
     public function testSaveResultCacheEntries()
@@ -55,7 +93,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          * check saved references between graph URIs (from query) and a array of query strings
          */
         $this->assertEquals(
-            array($queryObject->getQuery()), 
+            array($queryObject->getQuery() => $queryObject->getQuery()), 
             $this->fixture->getCache()->get($this->testGraphUri)
         );
         
@@ -63,7 +101,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          * check saved references between triple pattern (from query) and a array of query strings
          */
         $this->assertEquals(
-            array($queryObject->getQuery()), 
+            array($queryObject->getQuery() => $queryObject->getQuery()), 
             $this->fixture->getCache()->get($this->testGraphUri . '_*_*_*')
         );
         
@@ -73,10 +111,10 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->assertEquals(
             array(
                 'graph_uris' => array(
-                    $this->testGraphUri
+                    $this->testGraphUri => $this->testGraphUri
                 ),
                 'triple_pattern' => array(
-                    $this->testGraphUri .'_*_*_*'
+                    $this->testGraphUri .'_*_*_*' => $this->testGraphUri .'_*_*_*'
                 ),
                 'result' => $result,
                 'query' => $queryObject->getQuery(),
@@ -91,10 +129,10 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
             array(
                 array(
                     'graph_uris' => array(
-                        $this->testGraphUri
+                        $this->testGraphUri => $this->testGraphUri
                     ),
                     'triple_pattern' => array(
-                        $this->testGraphUri .'_*_*_*'
+                        $this->testGraphUri .'_*_*_*' => $this->testGraphUri .'_*_*_*'
                     ),
                     'result' => $result,
                     'query' => $queryObject->getQuery(),
