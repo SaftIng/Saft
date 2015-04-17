@@ -7,7 +7,7 @@ use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\VariableImpl;
-use Saft\Sparql\Query;
+use Saft\Sparql\Query\AbstractQuery;
 use Saft\Store\Result\SetResult;
 use Saft\Store\Result\StatementResult;
 use Symfony\Component\Yaml\Parser;
@@ -85,7 +85,7 @@ abstract class AbstractQueryCacheIntegrationTest extends \PHPUnit_Framework_Test
          * graph container
          */
         $graphUris = array(
-            $this->testGraphUri, $this->testGraphUri.'2'
+            $this->testGraphUri, $this->testGraphUri . '2'
         );
         $graphIds = array();
 
@@ -611,7 +611,7 @@ abstract class AbstractQueryCacheIntegrationTest extends \PHPUnit_Framework_Test
     {
         $testData = $this->generateTestCacheEntries();
         
-        $queryObject = new Query($testData['query']);
+        $queryObject = AbstractQuery::initByQueryString($testData['query']);
 
         // put test data into the QueryCache
         $this->fixture->rememberQueryResult($testData['query'], $testData['result']);
@@ -670,7 +670,7 @@ abstract class AbstractQueryCacheIntegrationTest extends \PHPUnit_Framework_Test
         
         $this->fixture->setChainSuccessor($instance);
 
-        $this->assertEquals('foo', $this->fixture->query('foo'));
+        $this->assertEquals('ASK { ?s ?p ?o }', $this->fixture->query('ASK { ?s ?p ?o }'));
     }
     
     public function testQueryNoSuccessor()
@@ -699,16 +699,14 @@ abstract class AbstractQueryCacheIntegrationTest extends \PHPUnit_Framework_Test
         $this->fixture->rememberQueryResult($testData['query'], $testData['result']);
         /* ---------------------------------------------------------------- **/
 
-
         /**
          * graph container
          */
-        foreach ($testData['graphIds'] as $graphId) {
-            $this->assertEquals(
-                array($testData['queryId'] => $testData['queryId']),
-                $this->fixture->getCache()->get($graphId)
-            );
-        }
+        $this->assertEquals(
+            array($testData['queryId'] => $testData['queryId']),
+            $this->fixture->getCache()->get($testData['graphIds'][0])
+        );
+        $this->assertNull($this->fixture->getCache()->get($testData['graphIds'][1]));
 
         /**
          * triple pattern

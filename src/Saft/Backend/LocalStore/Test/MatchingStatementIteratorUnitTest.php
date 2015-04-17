@@ -43,7 +43,7 @@ class MatchingStatementIteratorUnitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(7, count($matches));
         $this->assertTrue(
             in_array(
-                NtriplesParser::parseStatment(
+                NtriplesParser::parseStatement(
                     '<http://www.example.com/joe#me> <http://xmlns.com/foaf/0.1/name> "Joe Bloggs"@en .'
                 ),
                 $matches
@@ -51,7 +51,7 @@ class MatchingStatementIteratorUnitTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertFalse(
             in_array(
-                NtriplesParser::parseStatment(
+                NtriplesParser::parseStatement(
                     '_:genid1 <http://xmlns.com/foaf/0.1/name> "Joe\'s Current Project" .'
                 ),
                 $matches
@@ -78,7 +78,7 @@ class MatchingStatementIteratorUnitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($matches));
         $this->assertTrue(
             in_array(
-                NtriplesParser::parseStatment(
+                NtriplesParser::parseStatement(
                     '<http://www.example.com/joe#me> <http://xmlns.com/foaf/0.1/firstName> "Joe" .'
                 ),
                 $matches
@@ -86,7 +86,7 @@ class MatchingStatementIteratorUnitTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertFalse(
             in_array(
-                NtriplesParser::parseStatment(
+                NtriplesParser::parseStatement(
                     '<http://www.example.com/joe#me> <http://xmlns.com/foaf/0.1/family_name> "Bloggs" .'
                 ),
                 $matches

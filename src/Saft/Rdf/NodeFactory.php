@@ -5,7 +5,7 @@ namespace Saft\Rdf;
 class NodeFactory
 {
     /**
-     * 
+     *
      * @param
      * @return
      * @throws

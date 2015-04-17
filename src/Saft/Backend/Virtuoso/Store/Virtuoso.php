@@ -11,7 +11,7 @@ use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\Triple;
-use Saft\Sparql\Query;
+use Saft\Sparql\Query\AbstractQuery;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\StoreInterface;
 use Saft\Store\Result\EmptyResult;
@@ -521,12 +521,13 @@ class Virtuoso extends AbstractSparqlStore
      */
     public function query($query, array $options = array())
     {
-        $queryObject = new Query($query);
+        $queryObject = AbstractQuery::initByQueryString($query);
+        $queryParts = $queryObject->getQueryParts();
         
         /**
          * SPARQL query (usually to fetch data)
          */
-        if ('select' === $queryObject->getType()) {
+        if ('selectQuery' === AbstractQuery::getQueryType($query)) {
             // force extended result to have detailed information about given result entries, such as datatype and
             // language information.
             $sparqlQuery = 'define output:format "JSON"' . PHP_EOL . $query;
@@ -567,7 +568,7 @@ class Virtuoso extends AbstractSparqlStore
                 // in case the result was empty, Virtuoso does not return a list of variables, which are
                 // usually located in the SELECT part. so we try to extract the variables by ourselves.
                 if (0 == count($variables)) {
-                    $variables = $queryObject->extractVariablesFromQuery($query);
+                    $variables = $queryParts['variables'];
                 }
                 
                 $setResult->setVariables($variables);
@@ -658,7 +659,7 @@ class Virtuoso extends AbstractSparqlStore
             }
             
             // ask result
-            if ('ask' === $queryObject->getType()) {
+            if ('askQuery' === AbstractQuery::getQueryType($query)) {
                 $pdoResult = $pdoQuery->fetchAll(\PDO::FETCH_ASSOC);
                 return new ValueResult(true !== empty($pdoResult));
             } else {

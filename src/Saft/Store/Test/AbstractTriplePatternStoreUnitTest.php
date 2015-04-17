@@ -27,7 +27,7 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
         $object1 = new NamedNodeImpl('http://saft/test/o1');
         $graph1 = new NamedNodeImpl('http://saft/test/g1');
 
-        return new StatementImpl($subject1, $predicate1, $object1, $graph1);;
+        return new StatementImpl($subject1, $predicate1, $object1, $graph1);
     }
 
     protected function getTestTriple()

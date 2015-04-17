@@ -48,7 +48,7 @@ class UpdateQueryUnitTest extends TestCase
         $queryParts = $this->fixture->getQueryParts();
 
         $this->assertEquals(
-            array('http://saft/test/g1', 'http://saft/test/g2'), 
+            array('http://saft/test/g1', 'http://saft/test/g2'),
             $queryParts['graphs']
         );
     }
@@ -125,57 +125,13 @@ class UpdateQueryUnitTest extends TestCase
     }
     
     /**
-     * Tests extractQuads
-     */
-    
-    public function testExtractQuads()
-    {
-        // assumption here is that fixture is of type
-        $this->fixture = AbstractQuery::initByQueryString(
-            'PREFIX dc: <http://foo/bar/>
-            INSERT DATA { 
-                Graph <http://saft/test/g1> { <http://saft/test/s1> dc:p1 <http://saft/test/o1>}
-                Graph <http://saft/test/g1> {<http://saft/test/s2> <http://test/p2> <http://saft/test/o2>.}
-                Graph <http://saft/test/g2> {<http://saft/test/s3> dc:p3 <http://saft/test/o3> }
-            }'
-        );
-        
-        $queryParts = $this->fixture->getQueryParts();
-        
-        $this->assertEqualsArrays(
-            array(
-                array(
-                    's' => 'http://saft/test/s1',
-                    'p' => 'http://foo/bar/p1',
-                    'o' => 'http://saft/test/o1',
-                    'g' => 'http://saft/test/g1',
-                ),
-                array(
-                    's' => 'http://saft/test/s2',
-                    'p' => 'http://test/p2',
-                    'o' => 'http://saft/test/o2',
-                    'g' => 'http://saft/test/g1',
-                ),
-                array(
-                    's' => 'http://saft/test/s3',
-                    'p' => 'http://foo/bar/p3',
-                    'o' => 'http://saft/test/o3',
-                    'g' => 'http://saft/test/g2',
-                )
-            ),
-            $queryParts['quad_pattern']
-        );
-    }
-    
-    /**
      * Tests getQueryParts
      */
 
     public function testGetSubTypeDeleteData()
     {
         $this->fixture = new UpdateQuery('
-            PREFIX dc: <http://foo/bar/> DELETE DATA { GRAPH <http://> { ?s ?p ?o } }'
-        );
+            PREFIX dc: <http://foo/bar/> DELETE DATA { GRAPH <http://> { ?s ?p ?o } }');
         
         $this->assertEquals('deleteData', $this->fixture->getSubType());
     }
@@ -226,7 +182,7 @@ class UpdateQueryUnitTest extends TestCase
         $this->fixture->init(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             WITH <http://graph/> 
-            DELETE { ?x foaf:name "Alice". ?x <http://namespace/aa> ?y } 
+            DELETE { ?x foaf:name "Alice"^^<http://www.w3.org/2001/XMLSchema#string>. ?x <http://namespace/aa> ?y } 
             WHERE { ?s ?p ?o. FILTER(?o < 40) }'
         );
         
@@ -234,7 +190,10 @@ class UpdateQueryUnitTest extends TestCase
         
         $this->assertEquals(9, count($queryParts));
         
-        $this->assertEquals('?x foaf:name "Alice". ?x <http://namespace/aa> ?y', $queryParts['deleteData']);
+        $this->assertEquals(
+            '?x foaf:name "Alice"^^<http://www.w3.org/2001/XMLSchema#string>. ?x <http://namespace/aa> ?y',
+            $queryParts['deleteData']
+        );
         $this->assertEquals('?s ?p ?o. FILTER(?o < 40)', $queryParts['deleteWhere']);
         $this->assertEquals(
             array(
@@ -260,11 +219,24 @@ class UpdateQueryUnitTest extends TestCase
             $queryParts['filter_pattern']
         );
         $this->assertEquals(array('http://graph/'), $queryParts['graphs']);
-        $this->assertEquals(array('ns-0' => 'http://namespace/'), $queryParts['namespaces']);
+        $this->assertEquals(
+            array('ns-0' => 'http://namespace/', 'xsd' => 'http://www.w3.org/2001/XMLSchema#'),
+            $queryParts['namespaces']
+        );
         $this->assertEquals(array('foaf' => 'http://xmlns.com/foaf/0.1/'), $queryParts['prefixes']);
         $this->assertEquals('withDeleteWhere', $queryParts['sub_type']);
         $this->assertEquals(
             array(
+                array(
+                    's' => 'x',
+                    'p' => 'http://xmlns.com/foaf/0.1/name',
+                    'o' => 'Alice',
+                    's_type' => 'var',
+                    'p_type' => 'uri',
+                    'o_type' => 'typed-literal',
+                    'o_datatype' => 'http://www.w3.org/2001/XMLSchema#string',
+                    'o_lang' => null
+                ),
                 array(
                     's' => 'x',
                     'p' => 'http://namespace/aa',
@@ -284,7 +256,7 @@ class UpdateQueryUnitTest extends TestCase
                     'o_type' => 'var',
                     'o_datatype' => null,
                     'o_lang' => null
-                )
+                ),
             ),
             $queryParts['triple_pattern']
         );

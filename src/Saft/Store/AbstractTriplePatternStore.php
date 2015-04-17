@@ -19,7 +19,8 @@ use Saft\Sparql\Query\Query;
  * The query method is defined in the abstract class and reroute to the triple-methods.
  */
 abstract class AbstractTriplePatternStore implements StoreInterface
-{    
+{
+
     /**
      * Adds multiple Statements to (default-) graph.
      *
@@ -30,15 +31,15 @@ abstract class AbstractTriplePatternStore implements StoreInterface
      * @param  array             $options    optional It contains key-value pairs and should provide additional
      *                                                introductions for the store and/or its adapter(s).
      * @return array Array containing all given arguments.
-     * 
+     *
      * @todo implement usage of graph inside the statement(s). create groups for each graph
      */
     public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
     {
         /**
-         * This basic implementation only returns what was given. It is basically for test purposes and 
+         * This basic implementation only returns what was given. It is basically for test purposes and
          * later real implementations will rather override this function.
-         */        
+         */
         return array($statements, $graphUri, $options);
     }
     
@@ -55,9 +56,9 @@ abstract class AbstractTriplePatternStore implements StoreInterface
     public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
         /**
-         * This basic implementation only returns what was given. It is basically for test purposes and 
+         * This basic implementation only returns what was given. It is basically for test purposes and
          * later real implementations will rather override this function.
-         */ 
+         */
         return array($statement, $graphUri, $options);
     }
     
@@ -77,15 +78,15 @@ abstract class AbstractTriplePatternStore implements StoreInterface
     public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
         /**
-         * This basic implementation only returns what was given. It is basically for test purposes and 
+         * This basic implementation only returns what was given. It is basically for test purposes and
          * later real implementations will rather override this function.
-         */ 
+         */
         return array($statement, $graphUri, $options);
     }
 
     /**
      * Create Statement instance based on a given Query instance.
-     * 
+     *
      * @param  Query     $queryObject Query object which represents a SPARQL query.
      * @return Statement Statement object
      * @throws \Exception             If query contains more than one triple pattern.
@@ -104,7 +105,7 @@ abstract class AbstractTriplePatternStore implements StoreInterface
          */
         if (true === isset($queryParts['triple_pattern'])) {
             $tupleInformation = $queryParts['triple_pattern'];
-            $tupleType = 'triple'; 
+            $tupleType = 'triple';
             
         /**
          * Use quad pattern
@@ -123,7 +124,6 @@ abstract class AbstractTriplePatternStore implements StoreInterface
         }
         
         if (1 == count($tupleInformation)) {
-            
             /**
              * Triple
              */
@@ -155,7 +155,7 @@ abstract class AbstractTriplePatternStore implements StoreInterface
 
     /**
      * Create statements from query.
-     * 
+     *
      * @param  Query             $queryObject Query object which represents a SPARQL query.
      * @return StatementIterator StatementIterator object
      */
@@ -167,9 +167,9 @@ abstract class AbstractTriplePatternStore implements StoreInterface
         $statements = new ArrayStatementIteratorImpl(array());
         
         // if only triples, but no quads
-        if (true === isset($queryParts['triple_pattern']) 
+        if (true === isset($queryParts['triple_pattern'])
             && false === isset($queryParts['quad_pattern'])) {
-            foreach ($queryParts['triple_pattern'] as $pattern) {                
+            foreach ($queryParts['triple_pattern'] as $pattern) {
                 /**
                  * Create Node instances for S, P and O to build a StatementImpl instance later on
                  */
@@ -182,7 +182,7 @@ abstract class AbstractTriplePatternStore implements StoreInterface
             }
             
         // if only quads, but not triples
-        } elseif (false === isset($queryParts['triple_pattern']) 
+        } elseif (false === isset($queryParts['triple_pattern'])
             && true === isset($queryParts['quad_pattern'])) {
             foreach ($queryParts['quad_pattern'] as $pattern) {
                 /**
@@ -197,7 +197,7 @@ abstract class AbstractTriplePatternStore implements StoreInterface
             }
         
         // found quads and triples
-        } elseif (true === isset($queryParts['triple_pattern']) 
+        } elseif (true === isset($queryParts['triple_pattern'])
             && true === isset($queryParts['quad_pattern'])) {
             throw new \Exception('Query contains quads and triples. That is not supported yet.');
         
@@ -210,7 +210,7 @@ abstract class AbstractTriplePatternStore implements StoreInterface
     }
     
     /**
-     * Returns true or false depending on whether or not the statements pattern has any matches in the given 
+     * Returns true or false depending on whether or not the statements pattern has any matches in the given
      * graph.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
@@ -222,9 +222,9 @@ abstract class AbstractTriplePatternStore implements StoreInterface
     public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
     {
         /**
-         * This basic implementation only returns what was given. It is basically for test purposes and 
+         * This basic implementation only returns what was given. It is basically for test purposes and
          * later real implementations will rather override this function.
-         */ 
+         */
         return array($statement, $graphUri, $options);
     }
     
@@ -242,7 +242,6 @@ abstract class AbstractTriplePatternStore implements StoreInterface
          * INSERT or DELETE query
          */
         if ('updateQuery' == AbstractQuery::getQueryType($query)) {
-            
             $firstPart = substr($queryObject->getSubType(), 0, 6);
             
             // DELETE DATA query
@@ -254,7 +253,7 @@ abstract class AbstractTriplePatternStore implements StoreInterface
             } elseif ('insert' == $firstPart) {
                 return $this->addStatements($this->getStatements($queryObject));
                 
-            // TODO Support 
+            // TODO Support
             // WITH ... DELETE ... WHERE queries
             // WITH ... DELETE ... INSERT ... WHERE queries
             } else {

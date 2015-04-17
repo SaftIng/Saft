@@ -11,7 +11,7 @@ use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
-use Saft\Sparql\Query;
+use Saft\Sparql\Query\AbstractQuery;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\StoreInterface;
 use Saft\Store\Result\ExceptionResult;
@@ -576,12 +576,12 @@ class Http extends AbstractSparqlStore
      */
     public function query($query, array $options = array())
     {
-        $queryObject = new Query($query);
+        $queryObject = AbstractQuery::initByQueryString($query);
 
         /**
          * SPARQL query (usually to fetch data)
          */
-        if ('select' == $queryObject->getType()) {
+        if ('selectQuery' == AbstractQuery::getQueryType($query)) {
             $resultArray = json_decode($this->client->sendSparqlSelectQuery($query), true);
             
             $setResult = new SetResult();
@@ -655,7 +655,7 @@ class Http extends AbstractSparqlStore
         } else {
             $result = $this->client->sendSparqlUpdateQuery($query);
             
-            if ('ask' === $queryObject->getType()) {
+            if ('askQuery' === AbstractQuery::getQueryType($query)) {
                 $askResult = json_decode($result, true);
                 
                 if (true === isset($askResult['boolean'])) {

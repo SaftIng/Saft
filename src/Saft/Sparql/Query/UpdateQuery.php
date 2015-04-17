@@ -15,7 +15,7 @@ use Saft\Sparql\Query\AbstractQuery;
 class UpdateQuery extends AbstractQuery
 {
     /**
-     * 
+     *
      * @param string $query
      * @return array
      */
@@ -225,7 +225,6 @@ class UpdateQuery extends AbstractQuery
         $subType = $this->getSubType();
         
         if (null !== $subType) {
-            
             /**
              * Save parts for INSERT DATA
              */

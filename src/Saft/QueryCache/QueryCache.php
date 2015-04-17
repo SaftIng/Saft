@@ -6,7 +6,7 @@ use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
 use Saft\Store\StoreInterface;
 use Saft\Cache\Cache;
-use Saft\Sparql\Query;
+use Saft\Sparql\Query\AbstractQuery;
 
 /**
  * This class implements a SPARQL query cache, which was described in the following paper:
@@ -774,7 +774,8 @@ class QueryCache implements StoreInterface
         /**
          * init query
          */
-        $queryObject = new Query($query);
+        $queryObject = AbstractQuery::initByQueryString($query);
+        $queryParts = $queryObject->getQueryParts();
         $queryId = $this->generateShortId($query);
 
 
@@ -786,16 +787,14 @@ class QueryCache implements StoreInterface
          */
         $queryCacheEntry = $this->cache->get($queryId);
         if (null !== $queryCacheEntry) {
-            // check, if a cache entry with the $queryId already exists; thats
-            // usually not possible, but in case it happens, invalidate all cache
-            // entries using given $query
+            // check, if a cache entry with the $queryId already exists; thats usually not possible, but in
+            // case it happens, invalidate all cache entries using given $query
             $this->invalidateByQuery($query);
         }
 
         $queryCacheEntry = array(
-            // this field will be handled by transaction related functions
-            // its value is an unique ID to a QueryCache entry which contains
-            // a list of according QueryCache entries
+            // this field will be handled by transaction related functions. its value is an unique ID to a
+            // QueryCache entry which contains a list of according QueryCache entries.
             'relatedQueryCacheEntries' => '',
             'graphIds' => array()
         );
@@ -805,7 +804,14 @@ class QueryCache implements StoreInterface
          * hash id of the given SPARQL query.
          */
         $graphIds = array();
-        foreach ($queryObject->getFrom() as $graphUri) {
+        
+        // TODO add support for named graphs
+        
+        if (false === isset($queryParts['graphs'])) {
+            $queryParts['graphs'] = array();
+        }
+        
+        foreach ($queryParts['graphs'] as $graphUri) {
             // generate short hash based on the URI of the graph
             $graphId = $this->generateShortId($graphUri);
 
@@ -813,7 +819,7 @@ class QueryCache implements StoreInterface
 
             // get cache entry
             $graphContainer = $this->cache->get($graphId);
-            if (false === $graphContainer) {
+            if (null === $graphContainer) {
                 $graphContainer = array();
             }
 
@@ -841,7 +847,7 @@ class QueryCache implements StoreInterface
          * if available. In case we found a match, all according data will be deleted
          * from the cache to avoid having outdated data in the cache.
          */
-        $triplePatterns = $queryObject->getTriplePatterns();
+        $triplePatterns = $queryParts['triple_pattern'];
         $hashedTriplePattern = array();
 
         foreach ($graphIds as $graphId) {

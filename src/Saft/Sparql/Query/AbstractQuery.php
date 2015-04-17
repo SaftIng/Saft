@@ -91,7 +91,7 @@ abstract class AbstractQuery implements Query
      *                        determined.
      */
     public function determineEntityType($entity)
-    {        
+    {
         // remove braces at the beginning (only if $entity looks like <http://...>)
         if ('<' == substr($entity, 0, 1)) {
             $entity = str_replace(array('>', '<'), '', $entity);
@@ -454,7 +454,7 @@ abstract class AbstractQuery implements Query
     
     /**
      * Extracts quads from query, if available.
-     * 
+     *
      * @param string $query
      * @return array
      */
@@ -464,16 +464,16 @@ abstract class AbstractQuery implements Query
         
         /**
          * Matches the following pattern: Graph <http://uri/> { ?s ?p ?o }
-         * Whereas ?s ?p ?o stands for any triple, so also for an URI.
+         * Whereas ?s ?p ?o stands for any triple, so also for an URI. It also matches multi line strings
+         * which have { and triple on different lines.
          */
-        $result = preg_match_all('/GRAPH\s*\<(.*)\>\s*\{(.*)\}/mi', $query, $matches);
+        $result = preg_match_all('/GRAPH\s*\<(.*)\>\s*\{\n*(.*)\s*\n*\}/mi', $query, $matches);
         
         // if no errors occour and graphs and triple where found
-        if (false !== $result 
+        if (false !== $result
             && true === isset($matches[1])
             && true === isset($matches[2])) {
             foreach ($matches[1] as $key => $graph) {
-                
                 // parse according triple string, for instance: <http://saft/test/s1> dc:p1 <http://saft/test/o1>
                 // and extract S, P and O.
                 $triplePattern = $this->extractTriplePattern($matches[2][$key]);
@@ -500,7 +500,7 @@ abstract class AbstractQuery implements Query
     public function extractTriplePattern($where)
     {
         /**
-         * Because quads also consists of triple pattern, we first check if there are quads. In case there 
+         * Because quads also consists of triple pattern, we first check if there are quads. In case there
          * are, return empty.
          */
         $quads = $this->extractQuads($where);
@@ -520,30 +520,28 @@ abstract class AbstractQuery implements Query
              * Subject part
              */
             '(' .
-            '\<[a-zA-Z0-9\.\/\:#\-]+\>|' .  // e.g. <http://foobar/a>
-            '\?[a-zA-Z0-9\_]+|' .           // e.g. ?s
-            '[a-z0-9]+\:[a-z0-9]+' .        // e.g. rdfs:label
+            '\<[a-z0-9\.\/\:#\-]+\>|' . // e.g. <http://foobar/a>
+            '\?[a-z0-9\_]+|' .          // e.g. ?s
+            '[a-z0-9]+\:[a-z0-9]+' .    // e.g. rdfs:label
             ')\s*' .
-            
             /**
              * Predicate part
              */
             '(' .
-            '\<[a-zA-Z0-9\.\/\:#\-]+\>|' .  // e.g. <http://foobar/a>
-            '\?[a-zA-Z0-9\_]+|' .           // e.g. ?s
-            '[a-z0-9]+\:[a-z0-9]+' .        // e.g. rdfs:label
+            '\<[a-z0-9\.\/\:#\-]+\>|' . // e.g. <http://foobar/a>
+            '\?[a-z0-9\_]+|' .          // e.g. ?s
+            '[a-z0-9]+\:[a-z0-9]+' .    // e.g. rdfs:label
             ')\s*' .
-            
             /**
              * Object part
              */
             '(' .
-            '\<[a-zA-Z0-9\.\/\:#\-]+\>|' .          // e.g. <http://foobar/a>
-            '[a-z0-9]+\:[a-z0-9]+|' .               // e.g. rdfs:label
-            '\?[a-zA-Z0-9\_]+|' .                   // e.g. ?s
-            '\".*\"[\s|\.|\}]|' .                   // e.g. "Foo"
-            '\".*\"\^\^\<[a-zA-Z0-9\.\/\:#]+\>|' .  // e.g. "Foo"^^<http://www.w3.org/2001/XMLSchema#string>
-            '\".*\"\@[a-zA-Z\-]{2,}' .              // e.g. "Foo"@en
+            '\<[a-zA-Z0-9\.\/\:#\-]+\>|' .      // e.g. <http://foobar/a>
+            '[a-z0-9]+\:[a-z0-9]+|' .           // e.g. rdfs:label
+            '\?[a-z0-9\_]+|' .                  // e.g. ?s
+            '\".*\"[\s|\.|\}]|' .               // e.g. "Foo"
+            '\".*\"\^\^\<[a-z0-9\.\/\:#]+\>|' . // e.g. "Foo"^^<http://www.w3.org/2001/XMLSchema#string>
+            '\".*\"\@[a-z\-]{2,}' .             // e.g. "Foo"@en
             ')' .
             '/im',
             $where,
@@ -583,11 +581,23 @@ abstract class AbstractQuery implements Query
             $o = $this->replacePrefixWithUri($o, $prefixes);
             
             /**
+             * If S or P are starting with a ?, remove it
+             */
+            if ('?' == substr($s, 0, 1)) {
+                $s = substr($s, 1);
+            }
+            
+            if ('?' == substr($p, 0, 1)) {
+                $p = substr($p, 1);
+            }
+            
+            /**
              * Determine all aspects of the object
              */
             $oDatatype = $this->determineObjectDatatype($o);
             $oLang = $this->determineObjectLanguage($o);
             $oValue = $this->determineObjectValue($o);
+            
             if ($oIsUri === true) {
                 $oValue = $o;
             }
@@ -762,7 +772,7 @@ abstract class AbstractQuery implements Query
     
     /**
      * Replaces the prefix in a string with the original URI
-     * 
+     *
      * @param  string $prefixedString String to adapt.
      * @param  array  $prefixes       Array containing prefixes as keys and according URI as value.
      * @return string
@@ -770,7 +780,7 @@ abstract class AbstractQuery implements Query
     public function replacePrefixWithUri($prefixedString, $prefixes)
     {
         // check for qname. a qname was given if a : was found, but no < and >
-        if (false !== strpos($prefixedString, ':') && 
+        if (false !== strpos($prefixedString, ':') &&
             false === strpos($prefixedString, '<') && false === strpos($prefixedString, '>')) {
             // prefix is the part before the :
             $prefix = substr($prefixedString, 0, strpos($prefixedString, ':'));

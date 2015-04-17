@@ -231,6 +231,18 @@ class AbstractQueryUnitTest extends TestCase
     /**
      * Tests extractProloguePrefixesFromQuery
      */
+     
+    public function testExtractPrefixesFromQueryNoPrefixes()
+    {
+        // assumption here is that fixture is of type
+        $this->fixture = AbstractQuery::initByQueryString(
+            'SELECT ?s FROM <http://foo> WHERE { ?s ?p ?o }'
+        );
+        
+        $queryParts = $this->fixture->getQueryParts();
+        
+        $this->assertFalse(isset($queryParts['prefixes']));
+    }
 
     public function testExtractProloguePrefixesFromQuery()
     {
@@ -243,17 +255,68 @@ class AbstractQueryUnitTest extends TestCase
         
         $this->assertEquals(array('foo' => 'http://bar.de'), $queryParts['prefixes']);
     }
-
-    public function testExtractPrefixesFromQueryNoPrefixes()
+    
+    /**
+     * Tests extractQuads
+     */
+    
+    public function testExtractQuads()
     {
         // assumption here is that fixture is of type
         $this->fixture = AbstractQuery::initByQueryString(
-            'SELECT ?s FROM <http://foo> WHERE { ?s ?p ?o }'
+            'PREFIX dc: <http://foo/bar/>
+            INSERT DATA { 
+                Graph <http://saft/test/g1> { <http://saft/test/s1> dc:p1 <http://saft/test/o1>}
+                Graph <http://saft/test/g1> {<http://saft/test/s2> <http://test/p2> <http://saft/test/o2>.}
+                Graph <http://saft/test/g2> {
+                    <http://saft/test/s3> dc:p3 "abc"^^<http://www.w3.org/2001/XMLSchema#string>
+                }
+            }'
         );
         
         $queryParts = $this->fixture->getQueryParts();
         
-        $this->assertFalse(isset($queryParts['prefixes']));
+        $this->assertEqualsArrays(
+            array(
+                array(
+                    's' => 'http://saft/test/s1',
+                    'p' => 'http://foo/bar/p1',
+                    'o' => 'http://saft/test/o1',
+                    's_type' => 'uri',
+                    'p_type' => 'uri',
+                    'o_type' => 'uri',
+                    'o_datatype' => null,
+                    'o_lang' => null,
+                    'g' => 'http://saft/test/g1',
+                    'g_type' => 'uri',
+                ),
+                array(
+                    's' => 'http://saft/test/s2',
+                    'p' => 'http://test/p2',
+                    'o' => 'http://saft/test/o2',
+                    's_type' => 'uri',
+                    'p_type' => 'uri',
+                    'o_type' => 'uri',
+                    'o_datatype' => null,
+                    'o_lang' => null,
+                    'g' => 'http://saft/test/g1',
+                    'g_type' => 'uri',
+                ),
+                array(
+                    's' => 'http://saft/test/s3',
+                    'p' => 'http://foo/bar/p3',
+                    'o' => 'abc',
+                    's_type' => 'uri',
+                    'p_type' => 'uri',
+                    'o_type' => 'typed-literal',
+                    'o_datatype' => 'http://www.w3.org/2001/XMLSchema#string',
+                    'o_lang' => null,
+                    'g' => 'http://saft/test/g2',
+                    'g_type' => 'uri',
+                ),
+            ),
+            $queryParts['quad_pattern']
+        );
     }
     
     /**
