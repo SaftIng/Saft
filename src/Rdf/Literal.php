@@ -12,6 +12,9 @@ class Literal extends AbstractLiteral
 
     public function __construct($value, $lang = null, $datatype = null)
     {
+        if ($value === null) {
+            throw new \Exception("Can't initialize literal with null as value.");
+        }
         if (gettype($value) == "resource" && get_resource_type($value) == "_p_librdf_node_s") {
             $this->redlandNode = $value;
         } else {
@@ -42,8 +45,10 @@ class Literal extends AbstractLiteral
         $datatype = librdf_node_get_literal_value_datatype_uri($this->redlandNode);
         if ($datatype !== null) {
             return librdf_uri_to_string($datatype);
+        } elseif ($this->getLanguage() !== null) {
+            return "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString";
         } else {
-            return null;
+            return "http://www.w3.org/2001/XMLSchema#string";
         }
     }
 

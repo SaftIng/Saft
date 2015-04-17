@@ -18,6 +18,7 @@ class NamedNode extends AbstractNamedNode
         if (gettype($value) == "resource" && get_resource_type($value) == "_p_librdf_node_s") {
             $this->redlandNode = $value;
         } else {
+            // TODO catch invalid URIs
             $world = librdf_new_world();
             $uri = librdf_new_uri($world, $value);
             $this->redlandNode = librdf_new_node_from_uri($world, $uri);
@@ -27,7 +28,7 @@ class NamedNode extends AbstractNamedNode
     /**
      * @return string
      */
-    public function getValue()
+    public function getUri()
     {
         return librdf_uri_to_string(librdf_node_get_uri($this->redlandNode));
     }
