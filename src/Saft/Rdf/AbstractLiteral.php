@@ -315,15 +315,14 @@ abstract class AbstractLiteral implements Literal
      */
     public function toNQuads()
     {
-        // TODO how to handle boolean values when to transformed as n-tuple?
+        // TODO how to handle boolean values when transformed as n-triples?
+        // TODO maybe we should just check if the php datatype is boolen, but shouldn't interprete the rdf datatype
         if ('http://www.w3.org/2001/XMLSchema#boolean' == $this->getDatatype()) {
             if (true === $this->getValue()) {
                 $string = '"true"';
             } else {
                 $string = '"false"';
             }
-        } elseif ('http://www.w3.org/2001/XMLSchema#string' == $this->getDatatype()) {
-            $string = $this->getValue();
         } else {
             $string = '"' . $this->getValue() . '"';
         }
