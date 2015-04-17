@@ -14,7 +14,7 @@ use Symfony\Component\Yaml\Parser;
 abstract class AbstractSparqlStoreIntegrationTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Saft\Cache
+     * @var \Saft\Cache\Cache
      */
     protected $cache;
 
@@ -143,12 +143,12 @@ abstract class AbstractSparqlStoreIntegrationTest extends \PHPUnit_Framework_Tes
     
     public function testAddStatementsWithSuccessor()
     {
-        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
         // creates a subclass of the mock and adds a dummy function
         $class = $this->className . '_testAddStatementsWithSuccessor';
         $instance = null;
         // TODO simplify that eval call or get rid of it
-        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // Its purpose is to create a instanciable class which implements Store. It has a certain
         // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
@@ -213,12 +213,12 @@ abstract class AbstractSparqlStoreIntegrationTest extends \PHPUnit_Framework_Tes
     
     public function testDeleteMatchingStatementsWithSuccessor()
     {
-        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
         // creates a subclass of the mock and adds a dummy function
         $class = $this->className . '_testDeleteMatchingStatementsWithSuccessor';
         $instance = null;
         // TODO simplify that eval call or get rid of it
-        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // Its purpose is to create a instanciable class which implements Store. It has a certain
         // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
@@ -345,12 +345,12 @@ abstract class AbstractSparqlStoreIntegrationTest extends \PHPUnit_Framework_Tes
     
     public function testGetMatchingStatementsWithSuccessor()
     {
-        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
         // creates a subclass of the mock and adds a dummy function
         $class = $this->className . '_testGetMatchingStatementsWithSuccessor';
         $instance = null;
         // TODO simplify that eval call or get rid of it
-        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // Its purpose is to create a instanciable class which implements Store. It has a certain
         // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
@@ -435,12 +435,12 @@ abstract class AbstractSparqlStoreIntegrationTest extends \PHPUnit_Framework_Tes
         /**
          * Mock
          */
-        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
         // creates a subclass of the mock and adds a dummy function
         $class = $this->className . '_testHasMatchingStatementWithSuccessor';
         $instance = null;
         // TODO simplify that eval call or get rid of it
-        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // Its purpose is to create a instanciable class which implements Store. It has a certain
         // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(
@@ -554,12 +554,12 @@ abstract class AbstractSparqlStoreIntegrationTest extends \PHPUnit_Framework_Tes
     
     public function testQueryWithSuccessor()
     {
-        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\StoreInterface')->getMock();
+        $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
         // creates a subclass of the mock and adds a dummy function
         $class = $this->className . '_testQueryWithSuccessor';
         $instance = null;
         // TODO simplify that eval call or get rid of it
-        // Its purpose is to create a instanciable class which implements StoreInterface. It has a certain
+        // Its purpose is to create a instanciable class which implements Store. It has a certain
         // function which just return what was given. That was done to avoid working with concrete store
         // backend implementations like Virtuoso.
         eval(

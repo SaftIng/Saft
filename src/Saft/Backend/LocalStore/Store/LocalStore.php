@@ -2,7 +2,7 @@
 
 namespace Saft\Backend\LocalStore\Store;
 
-use Saft\Store\StoreInterface;
+use Saft\Store\Store;
 use Saft\Store\AbstractTriplePatternStore;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\Statement;
@@ -271,7 +271,7 @@ class LocalStore extends AbstractTriplePatternStore
             } elseif (!$statement->getGraph()->isConcrete()) {
                 throw new \InvalidArgumentException('Graph is not concrete');
             }
-            return $statement->getGraph()->getValue();
+            return $statement->getGraph()->getUri();
         }
         return $graphUri;
     }
@@ -298,7 +298,7 @@ class LocalStore extends AbstractTriplePatternStore
     /**
      * {@inheritdoc}
      */
-    public function setChainSuccessor(StoreInterface $successor)
+    public function setChainSuccessor(Store $successor)
     {
         throw new \Exception('Unsupported Operation');
     }

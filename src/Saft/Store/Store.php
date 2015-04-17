@@ -12,12 +12,13 @@ use Saft\Sparql\Result\Result;
  * Declaration of methods that any Store implementation must have, whether its
  * for a Triple- or Quad store.
  */
-interface StoreInterface
+interface Store
 {
     /**
-     * Returns array with graphUri's which are available.
+     * Returns a list of all available graph URIs of the store.
+     * It can also respect access control, to only returned available graphs in the current context.
      *
-     * @return array Array which contains graph URI's as values and keys.
+     * @return array Simple array of graph URIs.
      */
     public function getAvailableGraphs();
 
@@ -94,15 +95,4 @@ interface StoreInterface
      * @throws \Exception If query is malformed.
      */
     public function query($query, array $options = array());
-    
-    /**
-     * Set successor instance. This method is useful, if you wanna build chain of instances which implement
-     * StoreInterface. It sets another instance which will be later called, if a statement- or query-related
-     * function gets called.
-     * E.g. you chain a query cache and a virtuoso instance. In this example all queries will be handled by
-     * the query cache first, but if no cache entry was found, the virtuoso instance gets called.
-     *
-     * @return array Array which contains information about the store and its features.
-     */
-    public function setChainSuccessor(StoreInterface $successor);
 }

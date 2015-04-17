@@ -16,7 +16,7 @@ interface ParserInterface
      * @param $baseUri string the base URI of the parsed content. If this URI is null the inputStreams URL is taken as
      *                        base URI. (If the base URI is no valid URI an Exception will be thrown.)
      * @param $serialization string the serialization of the inputStream. If null is given the parser will either apply
-     *                              some standard serialization, or the only one it is supporting, or will try to guess
+     *                              some standard serialization, orw the only one it is supporting, or will try to guess
      *                              the correct serialization, or will throw an Exception.
      * @return \Saft\Rdf\StatementIterator a StatementIterator containing all the Statements parsed by the parser to far
      */

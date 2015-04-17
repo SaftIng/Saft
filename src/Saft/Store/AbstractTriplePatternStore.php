@@ -18,7 +18,7 @@ use Saft\Sparql\Query\Query;
  * Predefined Pattern-statement Store. The Triple-methods need to be implemented in the specific statement-store.
  * The query method is defined in the abstract class and reroute to the triple-methods.
  */
-abstract class AbstractTriplePatternStore implements StoreInterface
+abstract class AbstractTriplePatternStore implements Store
 {
 
     /**

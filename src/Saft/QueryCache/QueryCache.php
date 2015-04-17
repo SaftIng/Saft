@@ -4,7 +4,7 @@ namespace Saft\QueryCache;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
-use Saft\Store\StoreInterface;
+use Saft\Store\Store;
 use Saft\Cache\Cache;
 use Saft\Sparql\Query\AbstractQuery;
 
@@ -24,7 +24,7 @@ use Saft\Sparql\Query\AbstractQuery;
  * The implementation here uses a key-value-pair based cache mechanism. The original approach was using a
  * relation database to store and manage query cache related entities.
  */
-class QueryCache implements StoreInterface
+class QueryCache implements Store
 {
     /**
      * @var string
@@ -135,7 +135,7 @@ class QueryCache implements StoreInterface
     public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
     {
         // if successor is set, ask it first before run the command yourself.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             $this->invalidateBySubjectResources($statements, $graphUri);
             
             return $this->successor->addStatements($statements, $graphUri, $options);
@@ -160,7 +160,7 @@ class QueryCache implements StoreInterface
     public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
         // if successor is set, ask it first before run the command yourself.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             $this->invalidateBySubjectResources(new ArrayStatementIteratorImpl(array($statement)), $graphUri);
             
             return $this->successor->deleteMatchingStatements($statement, $graphUri, $options);
@@ -183,9 +183,15 @@ class QueryCache implements StoreInterface
     public function dropGraph($graphUri, array $options = array())
     {
         // if successor is set, ask it first before run the command yourself.
-        if ($this->successor instanceof StoreInterface) {
-            // delete according query cache entries
-            $this->invalidateByGraphUri($graphUri);
+        if ($this->successor instanceof Store) {
+            // if successor has this function and it is callable
+            if (true === is_callable(array($this->successor, 'dropGraph'), true)) {
+                // delete according query cache entries
+                $this->invalidateByGraphUri($graphUri);
+                
+                // call dropGraph on successor
+                return $this->successor->dropGraph($graphUri, $options);
+            }
             
             // call dropGraph on successor
             return $this->successor->dropGraph($graphUri, $options);
@@ -267,7 +273,7 @@ class QueryCache implements StoreInterface
     public function getAvailableGraphs()
     {
         // if successor is set, ask it first before run the command yourself.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             return $this->successor->getAvailableGraphs();
             
         // run command by myself
@@ -291,7 +297,7 @@ class QueryCache implements StoreInterface
     /**
      * Returns previously set chain successor.
      *
-     * @return StoreInterface
+     * @return Store
      */
     public function getChainSuccessor()
     {
@@ -341,12 +347,12 @@ class QueryCache implements StoreInterface
             
         // add filter, if subject is a named node or literal
         if (true === $s->isNamed() || true == $s->isLiteral()) {
-            $query .= 'FILTER (str(?s) = "'. $s->getValue() .'") ';
+            $query .= 'FILTER (str(?s) = "'. $s->getUri() .'") ';
         }
         
         // add filter, if predicate is a named node or literal
         if (true === $p->isNamed() || true == $p->isLiteral()) {
-            $query .= 'FILTER (str(?p) = "'. $p->getValue() .'") ';
+            $query .= 'FILTER (str(?p) = "'. $p->getUri() .'") ';
         }
         
         // add filter, if predicate is a named node or literal
@@ -364,7 +370,7 @@ class QueryCache implements StoreInterface
             $result = $result['result'];
          
         // if no cache entry available, run query by successor and save its result in the cache
-        } elseif ($this->successor instanceof StoreInterface) {
+        } elseif ($this->successor instanceof Store) {
             $result = $this->successor->getMatchingStatements($statement, $graphUri, $options);
             
             $this->rememberQueryResult($query, $result);
@@ -414,7 +420,7 @@ class QueryCache implements StoreInterface
     public function getStoreDescription()
     {
         // if successor is set, ask it first before run the command yourself.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             return $this->successor->getStoreDescription();
             
         // dont run command by myself
@@ -438,7 +444,7 @@ class QueryCache implements StoreInterface
     public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
     {
         // if successor is set, ask it first before run the command yourself.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             return $this->successor->hasMatchingStatement($statement, $graphUri, $options);
             
         // dont run command by myself
@@ -728,7 +734,7 @@ class QueryCache implements StoreInterface
         // no cache entry was found
         } else {
             // if successor is set, ask it and remember its result
-            if ($this->successor instanceof StoreInterface) {
+            if ($this->successor instanceof Store) {
                 $result = $this->successor->query($query, $options);
                 $this->rememberQueryResult($query, $result);
             
@@ -902,7 +908,7 @@ class QueryCache implements StoreInterface
      * E.g. you chain a query cache and a virtuoso instance. In this example all queries will be handled by
      * the query cache first, but if no cache entry was found, the virtuoso instance gets called.
      */
-    public function setChainSuccessor(StoreInterface $successor)
+    public function setChainSuccessor(Store $successor)
     {
         $this->successor = $successor;
     }

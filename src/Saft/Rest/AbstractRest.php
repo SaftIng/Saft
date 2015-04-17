@@ -1,7 +1,7 @@
 <?php
 namespace Saft\Rest;
 
-use Saft\Store\StoreInterface;
+use Saft\Store\Store;
 
 /**
  * http://coreymaynard.com/blog/creating-a-restful-api-with-php/
@@ -42,7 +42,7 @@ abstract class AbstractRest
      * @param [type]                             $request [description]
      * @param \Saft\StoreInterface\AbstractStore $store   concrete Store.
      */
-    public function __construct($request, StoreInterface $store)
+    public function __construct($request, Store $store)
     {
         // allow requests from any origin to be processed by this page
         header('Access-Control-Allow-Orgin: *');

@@ -12,7 +12,7 @@ use Saft\Rdf\StatementIterator;
  * Predefined sparql Store. All Triple methods reroute to the query-method. In the specific sparql-Store those
  * no longer have to be implemented, but only the Query method / SPARQL interpreter itself.
  */
-abstract class AbstractSparqlStore implements StoreInterface
+abstract class AbstractSparqlStore implements Store
 {
     /**
      * If set, all statement- and query related operations have to be in close collaboration with the
@@ -71,7 +71,7 @@ abstract class AbstractSparqlStore implements StoreInterface
                  
                 // use graphUri from statement
                 } else {
-                    $graphUriToUse = $statement->getGraph()->getValue();
+                    $graphUriToUse = $statement->getGraph()->getUri();
                 }
                 
                 if (false === isset($batchStatements[$graphUriToUse])) {
@@ -199,7 +199,7 @@ abstract class AbstractSparqlStore implements StoreInterface
      *
      * @return array Array which contains information about the store and its features.
      */
-    public function setChainSuccessor(StoreInterface $successor)
+    public function setChainSuccessor(Store $successor)
     {
         $this->successor = $successor;
     }

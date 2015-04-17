@@ -13,7 +13,7 @@ use Saft\Rdf\StatementIterator;
 use Saft\Rdf\Triple;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Store\AbstractSparqlStore;
-use Saft\Store\StoreInterface;
+use Saft\Store\Store;
 use Saft\Store\Result\EmptyResult;
 use Saft\Store\Result\ExceptionResult;
 use Saft\Store\Result\SetResult;
@@ -128,7 +128,7 @@ class Virtuoso extends AbstractSparqlStore
              
             // use graphUri from statement
             } else {
-                $graphUriToUse = $statement->getGraph()->getValue();
+                $graphUriToUse = $statement->getGraph()->getUri();
             }
             
             if (false === isset($batchStatements[$graphUriToUse])) {
@@ -171,7 +171,7 @@ class Virtuoso extends AbstractSparqlStore
         }
         
         // if successor is set, ask it too.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             $this->successor->addStatements($statements, $graphUri, $options);
         }
         
@@ -261,7 +261,7 @@ class Virtuoso extends AbstractSparqlStore
         $this->query($query, $options);
         
         // if successor is set, ask it too.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             $this->successor->deleteMatchingStatements($statement, $graphUri, $options);
         }
 
@@ -320,7 +320,7 @@ class Virtuoso extends AbstractSparqlStore
     public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
         // if successor is set, ask it too.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             $this->successor->getMatchingStatements($statement, $graphUri, $options);
         }
         
@@ -338,12 +338,12 @@ class Virtuoso extends AbstractSparqlStore
             
         // add filter, if subject is a named node or literal
         if (true === $s->isNamed() || true == $s->isLiteral()) {
-            $query .= 'FILTER (str(?s) = "'. $s->getValue() .'") ';
+            $query .= 'FILTER (str(?s) = "'. $s->getUri() .'") ';
         }
         
         // add filter, if predicate is a named node or literal
         if (true === $p->isNamed() || true == $p->isLiteral()) {
-            $query .= 'FILTER (str(?p) = "'. $p->getValue() .'") ';
+            $query .= 'FILTER (str(?p) = "'. $p->getUri() .'") ';
         }
         
         // add filter, if predicate is a named node or literal
@@ -420,14 +420,14 @@ class Virtuoso extends AbstractSparqlStore
     public function hasMatchingStatement(Statement $Statement, $graphUri = null, array $options = array())
     {
         // if successor is set, ask it too.
-        if ($this->successor instanceof StoreInterface) {
+        if ($this->successor instanceof Store) {
             $this->successor->hasMatchingStatement($Statement, $graphUri, $options);
         }
         
         // set graphUri, use that from the statement if $graphUri is null
         if (null === $graphUri) {
             $graph = $Statement->getGraph();
-            $graphUri = $graph->getValue();
+            $graphUri = $graph->getUri();
         }
         
         if (false === AbstractNamedNode::check($graphUri)) {
@@ -553,7 +553,7 @@ class Virtuoso extends AbstractSparqlStore
             }
             
             // if successor is set, ask it too.
-            if ($this->successor instanceof StoreInterface) {
+            if ($this->successor instanceof Store) {
                 $this->successor->query($query, $options);
             }
 

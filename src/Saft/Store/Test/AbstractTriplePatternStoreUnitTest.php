@@ -22,19 +22,21 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
 
     protected function getTestQuad()
     {
-        $subject1 = new NamedNodeImpl('http://saft/test/s1');
-        $predicate1 = new NamedNodeImpl('http://saft/test/p1');
-        $object1 = new NamedNodeImpl('http://saft/test/o1');
-        $graph1 = new NamedNodeImpl('http://saft/test/g1');
+        $subject1 = new NamedNodeImpl('http://saft/testquad/s1');
+        $predicate1 = new NamedNodeImpl('http://saft/testquad/p1');
+        $object1 = new NamedNodeImpl('http://saft/testquad/o1');
+        $graph1 = new NamedNodeImpl('http://saft/testquad/g1');
+        $quad = new StatementImpl($subject1, $predicate1, $object1, $graph1);
 
         return new StatementImpl($subject1, $predicate1, $object1, $graph1);
     }
 
     protected function getTestTriple()
     {
-        $subject2 = new NamedNodeImpl('http://saft/test/s2');
-        $predicate2 = new NamedNodeImpl('http://saft/test/p2');
-        $object2 = new NamedNodeImpl('http://saft/test/o2');
+        $subject2 = new NamedNodeImpl('http://saft/testtriple/s2');
+        $predicate2 = new NamedNodeImpl('http://saft/testtriple/p2');
+        $object2 = new NamedNodeImpl('http://saft/testtriple/o2');
+        $triple = new StatementImpl($subject2, $predicate2, $object2);
 
         return new StatementImpl($subject2, $predicate2, $object2);
     }
@@ -62,6 +64,7 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
 
     public function testAddStatementsNoTriplesAndQuads()
     {
+        // it throws an error because query contains NO triples or quads.
         $this->setExpectedException('\Exception');
         
         $query = 'INSERT DATA {  }';
@@ -136,6 +139,7 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
     public function testDeleteMultipleStatementsStatementsWithLiteral()
     {
         $statement = $this->getTestStatementWithLiteral();
+        
         $query = 'DELETE DATA { '. $statement->toSparqlFormat() .'}';
         
         $this->assertEquals(

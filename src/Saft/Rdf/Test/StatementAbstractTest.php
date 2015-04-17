@@ -12,6 +12,14 @@ abstract class StatementAbstractTest extends \PHPUnit_Framework_TestCase
     abstract public function newNamedNodeInstance($uri);
     abstract public function newVariableInstance($value);
     abstract public function newBlankNodeInstance($id);
+
+    /**
+     * @param $subject
+     * @param $predicate
+     * @param $object
+     * @param null $graph
+     * @return Statement
+     */
     abstract public function newInstance($subject, $predicate, $object, $graph = null);
 
     public function testNQuadsResource()
@@ -41,7 +49,7 @@ abstract class StatementAbstractTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \LogicException
      */
-    final public function testMatchesChecksIfConcrete()
+    public function testMatchesChecksIfConcrete()
     {
         $subject = new VariableImpl('?foo');
         $predicate = new VariableImpl('?bar');
@@ -57,7 +65,7 @@ abstract class StatementAbstractTest extends \PHPUnit_Framework_TestCase
         $fixture->matches($pattern);
     }
 
-    final public function testMatches()
+    public function testMatches()
     {
         $subject = new NamedNodeImpl('http://foo.net');
         $predicate = new NamedNodeImpl('http://bar.net');
@@ -93,5 +101,19 @@ abstract class StatementAbstractTest extends \PHPUnit_Framework_TestCase
         $object = new LiteralImpl('baz');
         $pattern = new StatementImpl($subject, $predicate, $object);
         $this->assertFalse($fixture->matches($pattern));
+    }
+
+    public function testQuads()
+    {
+        $subject = new NamedNodeImpl('http://foo.net');
+        $predicate = new NamedNodeImpl('http://bar.net');
+        $object = new NamedNodeImpl('http://baz.net');
+        $graph = new NamedNodeImpl('http://graph.net');
+        $fixture = $this->newInstance($subject, $predicate, $object, $graph);
+
+        $expected = "<http://foo.net> <http://bar.net> <http://baz.net> <http://graph.net> .";
+
+        $this->assertTrue($fixture->isQuad());
+        $this->assertEquals($expected, $fixture->toNQuads());
     }
 }
