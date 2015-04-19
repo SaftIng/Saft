@@ -11,6 +11,7 @@ use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\Triple;
+use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Store;
@@ -38,7 +39,7 @@ class Virtuoso extends AbstractSparqlStore
      * @var \PDO
      */
     protected $connection = null;
-    
+
     /**
      * If set, all statement- and query related operations have to be in close collaboration with the
      * successor.
@@ -81,7 +82,7 @@ class Virtuoso extends AbstractSparqlStore
     {
         $this->query('CREATE SILENT GRAPH <'. $graphUri .'>');
     }
-    
+
     /**
      * Adds multiple Statements to (default-) graph.
      *
@@ -100,41 +101,41 @@ class Virtuoso extends AbstractSparqlStore
         foreach ($statements as $st) {
             if ($st instanceof Statement && true === $st->isConcrete()) {
                 // everything is fine
-            
+
             // non-Statement instances not allowed
             } elseif (false === $st instanceof Statement) {
                 throw new \Exception('addStatements does not accept non-Statement instances.');
-            
+
             // non-concrete Statement instances not allowed
             } elseif ($st instanceof Statement && false === $st->isConcrete()) {
                 throw new \Exception('At least one Statement is not concrete');
-            
+
             } else {
                 throw new \Exception('Unknown error.');
             }
         }
-        
+
         /**
          * Create batches out of given statements to improve statement throughput.
          */
         $counter = 0;
         $batchSize = 100;
         $batchStatements = array();
-        
+
         foreach ($statements as $statement) {
             // given $graphUri forces usage of it and not the graph from the statement instance
             if (null !== $graphUri) {
                 $graphUriToUse = $graphUri;
-             
+
             // use graphUri from statement
             } else {
                 $graphUriToUse = $statement->getGraph()->getUri();
             }
-            
+
             if (false === isset($batchStatements[$graphUriToUse])) {
                 $batchStatements[$graphUriToUse] = new ArrayStatementIteratorImpl(array());
             }
-            
+
             /**
              * Notice: add a triple to the batch, even a quad was given, because we dont want the quad
              *         sparqlFormat call, because Virtuoso wont accepts queries like:
@@ -150,7 +151,7 @@ class Virtuoso extends AbstractSparqlStore
                 $statement->getPredicate(),
                 $statement->getObject()
             ));
-            
+
             // after batch is full, execute collected statements all at once
             if (0 === $counter % $batchSize) {
                 /**
@@ -164,17 +165,17 @@ class Virtuoso extends AbstractSparqlStore
                         $options
                     );
                 }
-                
+
                 // re-init variables
                 $batchStatements = array();
             }
         }
-        
+
         // if successor is set, ask it too.
         if ($this->successor instanceof Store) {
             $this->successor->addStatements($statements, $graphUri, $options);
         }
-        
+
         return true;
     }
 
@@ -190,12 +191,12 @@ class Virtuoso extends AbstractSparqlStore
         // check for odbc extension
         if (false === extension_loaded('odbc')) {
             throw new \Exception('Virtuoso store requires the PHP ODBC extension to be loaded.');
-            
+
         // check for pdo_odbc extension
         } elseif (false === extension_loaded('pdo_odbc')) {
             throw new \Exception('Virtuoso store requires the PHP PDO_ODBC extension to be loaded.');
         }
-        
+
         return true;
     }
 
@@ -259,7 +260,7 @@ class Virtuoso extends AbstractSparqlStore
         $query = 'WITH <'. $graphUri .'> DELETE {'. $condition .'} WHERE {'. $condition .'}';
 
         $this->query($query, $options);
-        
+
         // if successor is set, ask it too.
         if ($this->successor instanceof Store) {
             $this->successor->deleteMatchingStatements($statement, $graphUri, $options);
@@ -299,7 +300,7 @@ class Virtuoso extends AbstractSparqlStore
         }
         return $graphs;
     }
-    
+
     /**
      * It gets all statements of a given graph which match the following conditions:
      * - statement's subject is either equal to the subject of the same statement of the graph or it is null.
@@ -323,46 +324,46 @@ class Virtuoso extends AbstractSparqlStore
         if ($this->successor instanceof Store) {
             $this->successor->getMatchingStatements($statement, $graphUri, $options);
         }
-        
+
         // Remove, maybe available, graph from given statement and put it into an iterator.
         // reason for the removal of the graph is to avoid quads in the query. Virtuoso wants the graph
         // in the FROM part.
         $query = 'SELECT ?s ?p ?o ' .
             'FROM <'. $graphUri .'> '.
             'WHERE { ?s ?p ?o ';
-            
+
         // create shortcuts for S, P and O
         $s = $statement->getSubject();
         $p = $statement->getPredicate();
         $o = $statement->getObject();
-            
+
         // add filter, if subject is a named node or literal
         if (true === $s->isNamed() || true == $s->isLiteral()) {
             $query .= 'FILTER (str(?s) = "'. $s->getUri() .'") ';
         }
-        
+
         // add filter, if predicate is a named node or literal
         if (true === $p->isNamed() || true == $p->isLiteral()) {
             $query .= 'FILTER (str(?p) = "'. $p->getUri() .'") ';
         }
-        
+
         // add filter, if predicate is a named node or literal
         if (true === $o->isNamed() || true == $o->isLiteral()) {
             $query .= 'FILTER (str(?o) = "'. $o->getValue() .'") ';
         }
-        
+
         $query .= '}';
-        
+
         // execute query and save result
         // TODO transform getMatchingStatements into lazy loading, so a batch loading is possible
         $result = $this->query($query, $options);
-        
+
         /**
          * Transform SetResult into StatementResult
          */
         $statementResult = new StatementResult();
         $statementResult->setVariables($result->getVariables());
-        
+
         foreach ($result as $entry) {
             $statementList = array();
             $i = 0;
@@ -373,10 +374,10 @@ class Virtuoso extends AbstractSparqlStore
                 new StatementImpl($statementList[0], $statementList[1], $statementList[2])
             );
         }
-        
+
         return $statementResult;
     }
-    
+
     /**
      * @return array Empty array
      * @todo implement getStoreDescription
@@ -398,14 +399,14 @@ class Virtuoso extends AbstractSparqlStore
         if (true === AbstractNamedNode::check($graphUri)) {
             $result = $this->query('SELECT (COUNT(*) AS ?count) FROM <' . $graphUri . '> WHERE {?s ?p ?o.}');
             $result = $result->getResultObject();
-            
+
             return $result[0]['count']->getValue();
 
         } else {
             throw new \Exception('Parameter $graphUri is not valid or empty.');
         }
     }
-    
+
     /**
      * Returns true or false depending on whether or not the statements pattern has any matches in the given
      * graph. It overrides AbstractSparqlStore's hasMatchingStatement, because Virtuoso needs the graph URI
@@ -423,23 +424,23 @@ class Virtuoso extends AbstractSparqlStore
         if ($this->successor instanceof Store) {
             $this->successor->hasMatchingStatement($Statement, $graphUri, $options);
         }
-        
+
         // set graphUri, use that from the statement if $graphUri is null
         if (null === $graphUri) {
             $graph = $Statement->getGraph();
             $graphUri = $graph->getUri();
         }
-        
+
         if (false === AbstractNamedNode::check($graphUri)) {
             throw new \Exception('Neither $Statement has a valid graph nor $graphUri is valid URI.');
         }
-        
+
         $statementIterator = new ArrayStatementIteratorImpl(array($Statement));
         $result = $this->query(
             'ASK FROM <'. $graphUri .'> { '. $this->sparqlFormat($statementIterator) .'}',
             $options
         );
-        
+
         if (true === is_object($result)) {
             return $result->getResultObject();
         } else {
@@ -523,7 +524,7 @@ class Virtuoso extends AbstractSparqlStore
     {
         $queryObject = AbstractQuery::initByQueryString($query);
         $queryParts = $queryObject->getQueryParts();
-        
+
         /**
          * SPARQL query (usually to fetch data)
          */
@@ -531,7 +532,7 @@ class Virtuoso extends AbstractSparqlStore
             // force extended result to have detailed information about given result entries, such as datatype and
             // language information.
             $sparqlQuery = 'define output:format "JSON"' . PHP_EOL . $query;
-            
+
             // escape characters that delimit the query within the query using addcslashes
             $graphUri = 'NULL';
             $graphSpec = '';
@@ -551,7 +552,7 @@ class Virtuoso extends AbstractSparqlStore
             } catch (\PDOException $e) {
                 return new ExceptionResult($e);
             }
-            
+
             // if successor is set, ask it too.
             if ($this->successor instanceof Store) {
                 $this->successor->query($query, $options);
@@ -562,17 +563,17 @@ class Virtuoso extends AbstractSparqlStore
             // transform result to array in case we fired a non-UPDATE query
             if (false !== $pdoQuery) {
                 $resultArray = json_decode(current(current($pdoQuery->fetchAll(\PDO::FETCH_ASSOC))), true);
-                
+
                 $variables = $resultArray['head']['vars'];
-                
+
                 // in case the result was empty, Virtuoso does not return a list of variables, which are
                 // usually located in the SELECT part. so we try to extract the variables by ourselves.
                 if (0 == count($variables)) {
                     $variables = $queryParts['variables'];
                 }
-                
+
                 $setResult->setVariables($variables);
-                
+
                 /**
                  * go through all bindings and create according objects for SetResult instance.
                  *
@@ -587,7 +588,7 @@ class Virtuoso extends AbstractSparqlStore
                  */
                 foreach ($resultArray['results']['bindings'] as $bindingParts) {
                     $newEntry = array();
-                    
+
                     /**
                      * A part looks like:
                      * array(
@@ -602,7 +603,7 @@ class Virtuoso extends AbstractSparqlStore
                              */
                             case 'literal':
                                 $newEntry[$variable] = new LiteralImpl($part['value'], $part['xml:lang']);
-                                
+
                                 break;
                             /**
                              * Typed-Literal
@@ -610,41 +611,41 @@ class Virtuoso extends AbstractSparqlStore
                             case 'typed-literal':
                                 // get a value which has the same datatype as described in the given result
                                 // e.g. xsd:string => "foo" instead of only foo
-                                $newEntry[$variable] = AbstractLiteral::getRealValueBasedOnDatatype(
+                                $newEntry[$variable] = NodeUtils::getRealValueBasedOnDatatype(
                                     $part['datatype'],
                                     $part['value']
                                 );
-                                
+
                                 break;
-                            
+
                             /**
                              * NamedNode
                              */
                             case 'uri':
                                 $newEntry[$variable] = new NamedNodeImpl($part['value']);
                                 break;
-                        
+
                             default:
                                 throw new \Exception('Unknown type given.');
                                 break;
                         }
                     }
-                    
+
                     $setResult->append($newEntry);
                 }
 
                 return $setResult;
-            
+
             } else {
                 throw new \Exception('PDO query is false.');
             }
-            
+
         /**
          * SPARPQL Update query
          */
         } else {
             $sparqlQuery = 'SPARQL ' . $query;
-            
+
             // execute query
             try {
                 $pdoQuery = $this->connection->prepare(
@@ -657,7 +658,7 @@ class Virtuoso extends AbstractSparqlStore
             } catch (\PDOException $e) {
                 throw new \Exception($e->getMessage());
             }
-            
+
             // ask result
             if ('askQuery' === AbstractQuery::getQueryType($query)) {
                 $pdoResult = $pdoQuery->fetchAll(\PDO::FETCH_ASSOC);
@@ -667,7 +668,7 @@ class Virtuoso extends AbstractSparqlStore
             }
         }
     }
-    
+
     /**
      * Returns the Statement-Data in SPARQL-format. It overrides the sparqlFormat method of AbstractSparqlStore,
      * because Virtuoso does not support Graph in condition, so $graphUri will be ignored.
@@ -689,7 +690,7 @@ class Virtuoso extends AbstractSparqlStore
         }
         return $query;
     }
-    
+
     /**
      * Executes a SQL query on the database.
      *

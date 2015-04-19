@@ -16,7 +16,7 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
      * An abstract method which returns new instances of Literal
      * @todo The factory method approach could also be extended to use a factory object
      */
-    abstract public function newInstance($value, $lang = null, $datatype = null);
+    abstract public function newInstance($value, $datatype = null, $lang = null);
 
     /**
      * Tests term equality of two Literal instances:
@@ -38,13 +38,8 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($fixtureA->equals($fixtureB));
 
-        $fixtureC = $this->newInstance(1);
-        $fixtureD = $this->newInstance(1.0);
-
-        $this->assertFalse($fixtureC->equals($fixtureD));
-
         $fixtureE = $this->newInstance(1);
-        $fixtureF = $this->newInstance(1, null, 'http://www.w3.org/2001/XMLSchema#integer');
+        $fixtureF = $this->newInstance(1, 'http://www.w3.org/2001/XMLSchema#integer');
 
         $this->assertFalse($fixtureE->equals($fixtureF));
     }
@@ -55,11 +50,16 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
     public function testImplementationSpecificEquality()
     {
         $fixtureA = $this->newInstance(true);
-        $fixtureB = $this->newInstance(true, null, 'http://www.w3.org/2001/XMLSchema#boolean');
-        $fixtureC = $this->newInstance("true", null, 'http://www.w3.org/2001/XMLSchema#boolean');
+        $fixtureB = $this->newInstance(true, 'http://www.w3.org/2001/XMLSchema#boolean');
+        $fixtureC = $this->newInstance("true", 'http://www.w3.org/2001/XMLSchema#boolean');
 
         $this->assertFalse($fixtureA->equals($fixtureB));
         $this->assertTrue($fixtureB->equals($fixtureC));
+
+        $fixtureD = $this->newInstance(1);
+        $fixtureE = $this->newInstance(1.0);
+
+        $this->assertTrue($fixtureD->equals($fixtureE));
     }
 
     /**
@@ -67,14 +67,14 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetDatatypeBoolean()
     {
-        $fixture = $this->newInstance(true, null, 'http://www.w3.org/2001/XMLSchema#boolean');
+        $fixture = $this->newInstance(true, 'http://www.w3.org/2001/XMLSchema#boolean');
 
         $this->assertEquals('http://www.w3.org/2001/XMLSchema#boolean', $fixture->getDatatype());
     }
 
     public function testGetDatatypeDecimal()
     {
-        $fixture = $this->newInstance(3.18, null, 'http://www.w3.org/2001/XMLSchema#decimal');
+        $fixture = $this->newInstance(3.18, 'http://www.w3.org/2001/XMLSchema#decimal');
 
         $this->assertEquals(
             'http://www.w3.org/2001/XMLSchema#decimal',
@@ -84,7 +84,7 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDatatypeInteger()
     {
-        $fixture = $this->newInstance(3, null, 'http://www.w3.org/2001/XMLSchema#integer');
+        $fixture = $this->newInstance(3, 'http://www.w3.org/2001/XMLSchema#integer');
 
         $this->assertEquals(
             'http://www.w3.org/2001/XMLSchema#integer',
@@ -124,13 +124,27 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetDatatypeLangTagged()
     {
-        $fixtureA = $this->newInstance('foo', "en-us");
-        $fixtureB = $this->newInstance("etwas", "de");
-        $fixtureC = $this->newInstance("123", "fr");
+        $fixtureA = $this->newInstance('foo', null, "en-us");
+        $fixtureB = $this->newInstance("etwas", null, "de");
+        $fixtureC = $this->newInstance("123", null, "fr");
 
         $this->assertEquals('http://www.w3.org/1999/02/22-rdf-syntax-ns#langString', $fixtureA->getDatatype());
         $this->assertEquals('http://www.w3.org/1999/02/22-rdf-syntax-ns#langString', $fixtureB->getDatatype());
         $this->assertEquals('http://www.w3.org/1999/02/22-rdf-syntax-ns#langString', $fixtureC->getDatatype());
+    }
+
+    public function testInitializationWithLangTag()
+    {
+        $fixture = $this->newInstance("foo", "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString", "de");
+        $this->assertEquals('http://www.w3.org/1999/02/22-rdf-syntax-ns#langString', $fixture->getDatatype());
+        $this->assertEquals('de', $fixture->getLanguage());
+    }
+
+    public function testInitializationWithLangTagAndWrongDatatype()
+    {
+        $this->setExpectedException('\Exception');
+
+        $fixture = $this->newInstance("foo", "http://www.w3.org/2001/XMLSchema#string", "de");
     }
 
     /**
@@ -147,7 +161,7 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsConcrete()
     {
-        $fixture = $this->newInstance('hallo', 'de');
+        $fixture = $this->newInstance('hallo', null, 'de');
         $this->assertTrue($fixture->isConcrete());
     }
 
@@ -156,7 +170,7 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsLiteral()
     {
-        $fixture = $this->newInstance('hallo', 'de');
+        $fixture = $this->newInstance('hallo', null, 'de');
         $this->assertTrue($fixture->isLiteral());
     }
 
@@ -165,7 +179,7 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsNamed()
     {
-        $fixture = $this->newInstance('hallo', 'de');
+        $fixture = $this->newInstance('hallo', null, 'de');
         $this->assertFalse($fixture->isNamed());
     }
 
@@ -185,14 +199,14 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function testToNTLangAndValueSet()
     {
-        $fixture = $this->newInstance('foo', 'en');
+        $fixture = $this->newInstance('foo', null, 'en');
 
         $this->assertEquals('"foo"@en', $fixture->toNQuads());
     }
 
     public function testToNTValueBoolean()
     {
-        $fixture = $this->newInstance(true, null, "http://www.w3.org/2001/XMLSchema#boolean");
+        $fixture = $this->newInstance(true, "http://www.w3.org/2001/XMLSchema#boolean");
 
         $this->assertEquals(
             '"true"^^<http://www.w3.org/2001/XMLSchema#boolean>',
@@ -202,7 +216,7 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
 
     public function testToNTValueInteger()
     {
-        $fixture = $this->newInstance(30, null, "http://www.w3.org/2001/XMLSchema#integer");
+        $fixture = $this->newInstance(30, "http://www.w3.org/2001/XMLSchema#integer");
 
         $this->assertEquals(
             '"30"^^<http://www.w3.org/2001/XMLSchema#integer>',
@@ -212,7 +226,7 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
 
     public function testToNTValueString()
     {
-        $fixture = $this->newInstance('foo', null, "http://www.w3.org/2001/XMLSchema#string");
+        $fixture = $this->newInstance('foo', "http://www.w3.org/2001/XMLSchema#string");
 
         $this->assertEquals(
             '"foo"^^<http://www.w3.org/2001/XMLSchema#string>',
@@ -222,13 +236,13 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
 
     public function testMatches()
     {
-        $fixture = $this->newInstance('foo', 'en-US');
+        $fixture = $this->newInstance('foo', null, 'en-US');
 
         $this->assertTrue($fixture->matches(new VariableImpl('?o')));
-        $this->assertTrue($fixture->matches(new LiteralImpl('foo', 'en-US')));
-        $this->assertFalse($fixture->matches(new LiteralImpl('foo', 'de')));
+        $this->assertTrue($fixture->matches(new LiteralImpl('foo', null, 'en-US')));
+        $this->assertFalse($fixture->matches(new LiteralImpl('foo', null, 'de')));
         $this->assertFalse($fixture->matches(new LiteralImpl('foo')));
-        $this->assertFalse($fixture->matches(new LiteralImpl('bar', 'en-US')));
+        $this->assertFalse($fixture->matches(new LiteralImpl('bar', null, 'en-US')));
         $this->assertFalse($fixture->matches(new BlankNodeImpl('foo')));
     }
 
