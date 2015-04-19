@@ -11,18 +11,22 @@ namespace Saft\Rdf;
 interface Literal extends Node
 {
     /**
-     * @return mixed
+     * Get the value of the Literal in its string representations
+     * @return string the value of the Literal
      */
     public function getValue();
 
     /**
-     * @return string
-     * @throws \Exception
+     * Get the datatype URI of the Literal (this is always set according to the
+     * standard).
+     * @return string the datatype URI of the Literal
      */
     public function getDatatype();
 
     /**
-     * @return string|null
+     * Get the language tag of this Literal or null of the Literal has no
+     * language tag.
+     * @return string|null the language tag or null if none is given
      */
     public function getLanguage();
 }

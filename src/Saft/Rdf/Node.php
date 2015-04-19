@@ -5,7 +5,11 @@ namespace Saft\Rdf;
 interface Node
 {
     /**
-     * @return string
+     * This method is ment for getting some kind of human readable string
+     * representation of the current node. There is no definite syntax, but it
+     * should contain the the URI for NamedNodes and the value for Literals.
+     *
+     * @return string a human readable string representation of the node
      */
     public function __toString();
 
@@ -16,7 +20,7 @@ interface Node
      * @return boolean            True, if both instances are semantically equal, false otherwise.
      */
     public function equals(\Saft\Rdf\Node $toCompare);
-    
+
     /**
      * @return boolean
      */

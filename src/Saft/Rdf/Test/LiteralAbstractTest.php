@@ -220,7 +220,7 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    final public function testMatches()
+    public function testMatches()
     {
         $fixture = $this->newInstance('foo', 'en-US');
 
@@ -230,5 +230,13 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($fixture->matches(new LiteralImpl('foo')));
         $this->assertFalse($fixture->matches(new LiteralImpl('bar', 'en-US')));
         $this->assertFalse($fixture->matches(new BlankNodeImpl('foo')));
+    }
+
+    public function testToString()
+    {
+        $fixture = $this->newInstance('literal');
+
+        $this->assertTrue(is_string((string)$fixture));
+        $this->assertTrue(strpos((string)$fixture, $fixture->getValue()) >= 0);
     }
 }
