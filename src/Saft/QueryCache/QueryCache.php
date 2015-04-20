@@ -6,6 +6,7 @@ use Saft\Cache\Cache;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
+use Saft\Store\ChainableStore;
 use Saft\Store\Store;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\Query;
@@ -26,7 +27,7 @@ use Saft\Sparql\Query\Query;
  * The implementation here uses a key-value-pair based cache mechanism. The original approach was using a
  * relation database to store and manage query cache related entities.
  */
-class QueryCache implements Store
+class QueryCache implements Store, ChainableStore
 {
     /**
      * @var Cache
@@ -37,6 +38,24 @@ class QueryCache implements Store
      * @var array
      */
     protected $latestQueryCacheContainer = array();
+    
+    /**
+     * @var
+     */
+    protected $log;
+    
+    /**
+     * Used in pattern key's as seperator. Here an example for _:
+     * http://localhost/Saft/TestGraph/_http://a_*_*
+     * 
+     * @var string
+     */
+    protected $separator;
+    
+    /**
+     * @var Store
+     */
+    protected $successor;
     
     /**
      * Constructor
@@ -62,9 +81,19 @@ class QueryCache implements Store
      */
     public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
     {
+        // log it
+        $this->log[] = array(
+            'method' => 'addStatements',
+            'parameter' => array(
+                'statements' => $statements,
+                'graphUri' => $graphUri,
+                'options' => $options
+            )
+        );
+        
         // if successor is set, ask it first before run the command yourself.
         if ($this->successor instanceof Store) {
-            $this->invalidateBySubjectResources($statements, $graphUri);
+            $this->invalidateByTriplePattern($statements, $graphUri);
             
             return $this->successor->addStatements($statements, $graphUri, $options);
             
@@ -72,6 +101,155 @@ class QueryCache implements Store
         } else {
             throw new \Exception('QueryCache does not support adding new statements.');
         }
+    }
+    
+    /**
+     * Builds an array which contains all possible pattern for given S, P and O.
+     * 
+     * @param  string $s        Its * or an URI
+     * @param  string $p        Its * or an URI
+     * @param  string $o        Its * or an URI
+     * @param  string $graphUri Graph URI which belongs to given SPO.
+     * @return array
+     */
+    public function buildPatternListBySPO($s, $p, $o, $graphUri)
+    {
+        // log it
+        $this->log[] = array(
+            'method' => 'buildPatternListBySPO',
+            'parameter' => array('s' => $s, 'p' => $p, 'o' => $o, 'graphUri' => $graphUri)
+        );
+        
+        $patternList = array(
+            // this pattern based on the current statement: graphUri_URI|*_URI|*_URI|*
+            $graphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
+        );
+        
+        /**
+         * Generates pattern whereas only one place is set, e.g.: graphUri_http://a/_*_* 
+         */
+        if ('*' !== $s) {
+            $patternList[] = $graphUri . $this->separator . $s . $this->separator .'*'. $this->separator .'*';
+        }
+        
+        if ('*' !== $p) {
+            $patternList[] = $graphUri . $this->separator .'*'. $this->separator . $p . $this->separator .'*';
+        }
+        
+        if ('*' !== $o) {
+            $patternList[] = $graphUri . $this->separator .'*'. $this->separator .'*'. $this->separator . $o;
+        }
+        
+        /**
+         * Generates pattern whereas 2 places are set, e.g.: graphUri_http://a/_http://b/_* 
+         */
+        // s and p
+        if ('*' !== $s && '*' !== $p) {
+            $patternList[] = $graphUri . $this->separator . $s . $this->separator . $p . $this->separator .'*';
+        }
+        
+        // s and o
+        if ('*' !== $s && '*' !== $o) {
+            $patternList[] = $graphUri . $this->separator . $s . $this->separator .'*'. $this->separator . $o;
+        }
+        
+        // p and o
+        if ('*' !== $p && '*' !== $o) {
+            $patternList[] = $graphUri . $this->separator .'*'. $this->separator . $p . $this->separator . $o;
+        }
+        
+        /**
+         * If all 3 are not *
+         */
+        if ('*' !== $s && '*' !== $p && '*' !== $o) {
+            $patternList[] = $graphUri . $this->separator . $s . $this->separator . $p . $this->separator . $o;
+        }
+        
+        return $patternList;
+    }
+    
+    /**
+     * Builds an array which contains all possible pattern to cover a given $statement.
+     * 
+     * @param  Statement $statement
+     * @param  string    $graphUri
+     * @return array
+     */
+    public function buildPatternListByStatement(Statement $statement, $graphUri)
+    {
+        // log it
+        $this->log[] = array(
+            'method' => 'buildPatternListByStatement',
+            'parameter' => array(
+                'statement' => $statement,
+                'graphUri' => $graphUri,
+            )
+        );
+        
+        if (true === $statement->getSubject()->isNamed()) {
+            $subject = $statement->getSubject()->getUri();
+        } else {
+            $subject = '*';
+        }
+        
+        /**
+         * Build pattern part for predicate
+         */
+        if (true === $statement->getPredicate()->isNamed()) {
+            $predicate = $statement->getPredicate()->getUri();
+        } else {
+            $predicate = '*';
+        }
+        
+        /**
+         * Build pattern part for predicate
+         */
+        if (true === $statement->getObject()->isNamed()) {
+            $object = $statement->getObject()->getUri();
+        } else {
+            $object = '*';
+        }
+        
+        return $this->buildPatternListBySPO($subject, $predicate, $object, $graphUri);
+    }
+    
+    /**
+     * Builds an array which contains all possible pattern to cover a given triple pattern.
+     * 
+     * @param  array  $triplePattern
+     * @param  string $graphUri
+     * @return array
+     */
+    public function buildPatternListByTriplePattern(array $triplePattern, $graphUri)
+    {
+        // log it
+        $this->log[] = array(
+            'method' => 'buildPatternListByTriplePattern',
+            'parameter' => array(
+                'triplePattern' => $triplePattern,
+                'graphUri' => $graphUri,
+            )
+        );
+        
+        if ('uri' === $triplePattern['s_type']) {
+            $subject = $triplePattern['s'];
+        } else {
+            $subject = '*';
+        }
+        
+        if ('uri' === $triplePattern['p_type']) {
+            $predicate = $triplePattern['p'];
+        } else {
+            $predicate = '*';
+        }
+        
+        if ('uri' === $triplePattern['o_type']) {
+            $object = $triplePattern['o'];
+        } else {
+            $object = '*';
+        }
+        
+        return $this->buildPatternListBySPO($subject, $predicate, $object, $graphUri);
     }
     
     /**
@@ -129,6 +307,14 @@ class QueryCache implements Store
     }
     
     /**
+     * @return Store Store instance
+     */
+    public function getChainSuccessor()
+    {
+        return $this->successor;
+    }
+    
+    /**
      * Returns latest query cache container. It only contains contains which were created during this active
      * PHP session!
      * 
@@ -137,6 +323,16 @@ class QueryCache implements Store
     public function getLatestQueryCacheContainer()
     {
         return $this->latestQueryCacheContainer;
+    }
+    
+    /**
+     * Returns log array. It contains information about all operations during this active PHP session.
+     * 
+     * @return array
+     */
+    public function getLog()
+    {
+        return $this->log;
     }
 
     /**
@@ -255,18 +451,50 @@ class QueryCache implements Store
     {
         $this->cache = $cache;
         
-        // Contains a list of cache IDs which each refers to a list of QueryCache entries, which are belonging 
-        // together
-        $this->relatedQueryCacheEntryList = '';
+        $this->separator = '__.__';
+    }
+    
+    /**
+     * Invalidate according cache entries to the given $graphUri. That means, that all query cache entries, 
+     * which belonging to this graphURI will be invalidated.
+     *
+     * @param string $graphUri
+     */
+    public function invalidateByGraphUri($graphUri)
+    {
+        // log it
+        $this->log[] = array(
+            'method' => 'invalidateByGraphUri',
+            'parameter' => array(
+                'graphUri' => $graphUri
+            )
+        );
+        
+        $queryList = $this->cache->get($graphUri);
+        
+        // if a cache entry for this graph URI was found.
+        if (null !== $queryList) {
+            foreach ($queryList as $query) {
+                $this->invalidateByQuery(AbstractQuery::initByQueryString($query));
+            }
+        }
     }
     
     /**
      * Invalidates according graph Uri entries, the result and all triple pattern.
      *
-     * @param  Query $queryObject All data according to this query will be invalidated.
+     * @param Query $queryObject All data according to this query will be invalidated.
      */
     public function invalidateByQuery(Query $queryObject)
     {
+        // log it
+        $this->log[] = array(
+            'method' => 'invalidateByQuery',
+            'parameter' => array(
+                'queryObject' => $queryObject
+            )
+        );
+        
         $query = $queryObject->getQuery();
         
         // load query cache container by given query
@@ -315,6 +543,62 @@ class QueryCache implements Store
          * Remove query cache container
          */
         $this->cache->delete($query);
+    }
+    
+    /**
+     * Invalidate all query cache entries which belong to Statement Iterator entries.
+     *
+     * @param  StatementIterator $statements          Statement iterator containing statements to be created.
+     *                                                They will be invalidated first.
+     * @param  string            $graphUri   optional URI of the graph which is related to the statements. If
+     *                                                null, the graph of the statement will be used.
+     * @throws \Exception If no graph URI for a certain statement is available.
+     */
+    public function invalidateByTriplePattern(StatementIterator $statements, $graphUri = null)
+    {
+        // log it
+        $this->log[] = array(
+            'method' => 'invalidateByTriplePattern',
+            'parameter' => array(
+                'statements' => $statements,
+                'graphUri' => $graphUri
+            )
+        );
+        
+        $patternList = array();
+        
+        foreach ($statements as $statement) {
+            /**
+             * Find right graph URI.
+             */
+            // no graph URI given, but statement has one avaiable.
+            if (null === $graphUri && null !== $statement->getGraph()) {
+                $graphUri = $statement->getGraph()->getUri();
+                
+            // no graph URI given and statement has no one as well.
+            } elseif (null === $graphUri && null === $statement->getGraph()) {
+                throw new \Exception('No graph URI available for statement: ' . $statement->toSparqlFormat());
+            }
+            
+            /**
+             * Build patterns to match all combinations for $statement
+             */
+            $patternList = array_merge($patternList, $this->buildPatternListByStatement($statement, $graphUri));
+        }
+        
+        $patternList = array_unique($patternList);
+        
+        /**
+         * go through query list for each pattern and invalidate according query
+         */
+        foreach ($patternList as $pattern) {
+            $queryList = $this->cache->get($pattern);
+            if (null !== $queryList) {
+                foreach ($queryList as $query) {
+                    $this->invalidateByQuery(AbstractQuery::initByQueryString($query));
+                }
+            }
+        }
     }
     
     /**
@@ -424,7 +708,8 @@ class QueryCache implements Store
                  * Generate pattern key which contains graphUri, S, P and O. After that try to load existing
                  * query list from cache with generated $patternKey.
                  */
-                $patternKey = $graphUri . '_' . $subjectHash . '_' . $predicateHash . '_' . $objectHash;
+                $patternKey = $graphUri . $this->separator . $subjectHash . $this->separator . $predicateHash . 
+                    $this->separator . $objectHash;
 
                 $queryList = $this->cache->get($patternKey);
                 
@@ -453,5 +738,19 @@ class QueryCache implements Store
         $this->cache->set($query, $queryCacheContainer);
         
         $this->latestQueryCacheContainer[] = $queryCacheContainer;
+    }
+    
+    /**
+     * Set successor instance. This method is useful, if you wanna build chain of instances which implement
+     * Saft\Store\Store. It sets another instance which will be later called, if a statement- or
+     * query-related function gets called.
+     * E.g. you chain a query cache and a virtuoso instance. In this example all queries will be handled by
+     * the query cache first, but if no cache entry was found, the virtuoso instance gets called.
+     * 
+     * @param Store $successor
+     */
+    public function setChainSuccessor(Store $successor)
+    {
+        $this->successor = $successor;
     }
 }

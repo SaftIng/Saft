@@ -3,6 +3,10 @@
 namespace Saft\QueryCache\Test;
 
 use Saft\TestCase;
+use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\StatementImpl;
+use Saft\Rdf\VariableImpl;
 use Saft\Sparql\Query\AbstractQuery;
 use Symfony\Component\Yaml\Parser;
 
@@ -18,6 +22,14 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
      * @var string
      */
     protected $className = '';
+    
+    /**
+     * Used in pattern key's as seperator. Here an example for _:
+     * http://localhost/Saft/TestGraph/_http://a_*_*
+     * 
+     * @var string
+     */
+    protected $separator = '__.__';
     
     /**
      *
@@ -36,6 +48,383 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         // parse YAML file
         $yaml = new Parser();
         $this->config = $yaml->parse(file_get_contents($configFilepath));
+    }
+    
+    /**
+     * Tests addStatements
+     */
+     
+    public function testAddStatements()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+        
+        // build testdata
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        
+        // assumption is that all given parameter will be returned
+        $this->assertEquals(
+            array($statementIterator, $this->testGraphUri, array(1)),
+            $this->fixture->addStatements($statementIterator, $this->testGraphUri, array(1))
+        );
+    }
+     
+    // try to call addStatements method without a successor set leads to an exception
+    public function testAddStatementsNoSuccessor()
+    {
+        $this->setExpectedException('\Exception');
+        
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        
+        $this->fixture->addStatements($statementIterator);
+    }
+    
+    /**
+     * Tests buildPatternListBySPO
+     */
+     
+    public function testBuildPatternListBySPO3Placeholders()
+    {
+        $this->assertEquals(
+            array(
+                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+            ),
+            $this->fixture->buildPatternListBySPO(
+                '*', // s
+                '*', // p
+                '*', // o
+                $this->testGraphUri
+            )
+        );
+    }
+     
+    public function testBuildPatternListBySPOWithUriAndPlaceholders()
+    {
+        $sUri = 'http://foo/subject';
+        
+        $this->assertEquals(
+            array(
+                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
+                $this->testGraphUri . $this->separator . $sUri . $this->separator .'*'. $this->separator .'*'
+            ),
+            $this->fixture->buildPatternListBySPO(
+                $sUri, // s
+                '*', // p
+                '*', // o
+                $this->testGraphUri
+            )
+        );
+    }
+    
+    /**
+     * Tests buildPatternListByStatement
+     */
+     
+    public function testBuildPatternListByStatement()
+    {
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://a'), 
+            new NamedNodeImpl('http://b'), 
+            new NamedNodeImpl('http://c')
+        );
+        
+        $this->assertEquals(
+            array(
+                
+                // graphUri_*_*_*
+                'http://localhost/Saft/TestGraph/'. $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
+                
+                /**
+                 * 1 place set: graphUri_http://a_*_*
+                 */
+                'http://localhost/Saft/TestGraph/'. $this->separator .'http://a'. $this->separator .
+                    '*'. $this->separator .'*',
+                'http://localhost/Saft/TestGraph/'. $this->separator .'*'. $this->separator .'http://b'. 
+                    $this->separator .'*',
+                'http://localhost/Saft/TestGraph/'. $this->separator .'*'. $this->separator .'*'. 
+                    $this->separator .'http://c',
+                
+                /**
+                 * 2 places set: graphUri_http://a_http://b_*
+                 */
+                'http://localhost/Saft/TestGraph/'. $this->separator .'http://a'. $this->separator .'http://b'. 
+                    $this->separator .'*',
+                'http://localhost/Saft/TestGraph/'. $this->separator .'http://a'. $this->separator .'*'. 
+                    $this->separator .'http://c',
+                'http://localhost/Saft/TestGraph/'. $this->separator .'*'. $this->separator .'http://b'. 
+                    $this->separator .'http://c',
+                    
+                /**
+                 * all 3 places set
+                 */
+                'http://localhost/Saft/TestGraph/'. $this->separator .'http://a'. $this->separator .'http://b'. 
+                    $this->separator .'http://c',
+            ),
+            $this->fixture->buildPatternListByStatement($statement, $this->testGraphUri)
+        );
+    }
+    
+    public function testBuildPatternListByStatementOnlyVariables()
+    {
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        $this->assertEquals(
+            array(
+                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
+            ),
+            $this->fixture->buildPatternListByStatement($statement, $this->testGraphUri)
+        );
+    }
+    
+    /**
+     * Tests buildPatternListByTriplePattern
+     */
+    
+    public function testBuildPatternListByTriplePattern()
+    {
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        $this->assertEquals(
+            array(
+                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
+            
+                /**
+                 * 1 place set
+                 */
+                $this->testGraphUri . $this->separator .'http://a'. $this->separator .'*'. $this->separator .'*',
+                $this->testGraphUri . $this->separator .'*'. $this->separator .'http://b'. $this->separator .'*',
+                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'http://c',
+                
+                /**
+                 * 2 places set
+                 */
+                $this->testGraphUri . $this->separator .'http://a'. $this->separator .'http://b'. 
+                    $this->separator .'*',
+                $this->testGraphUri . $this->separator .'http://a'. $this->separator .'*'. 
+                    $this->separator .'http://c',
+                $this->testGraphUri . $this->separator .'*'. $this->separator .'http://b'. 
+                    $this->separator .'http://c',
+                    
+                // all 3 places set
+                $this->testGraphUri . $this->separator .'http://a'. $this->separator .'http://b'. 
+                    $this->separator .'http://c',
+            ),
+            $this->fixture->buildPatternListByTriplePattern(
+                array(
+                    's' => 'http://a',
+                    'p' => 'http://b',
+                    'o' => 'http://c',
+                    's_type' => 'uri',
+                    'p_type' => 'uri',
+                    'o_type' => 'uri',
+                ), 
+                $this->testGraphUri
+            )
+        );
+    }
+    
+    /**
+     * Tests getLog
+     * 
+     * The following functions tests the log result for certain function calls
+     */
+    
+    // TODO implement this test using @depends
+    public function testGetLogAddStatements()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+        
+        // build testdata
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        
+        $options = array(1);
+        
+        $this->fixture->addStatements($statementIterator, $this->testGraphUri, $options);
+        
+        $this->assertEquals(
+            array(
+                // that was called by us directly
+                array(
+                    'method' => 'addStatements',
+                    'parameter' => array(
+                        'statements' => $statementIterator,
+                        'graphUri' => $this->testGraphUri,
+                        'options' => $options
+                    )
+                ),
+                array(
+                    'method' => 'invalidateByTriplePattern',
+                    'parameter' => array(
+                        'statements' => $statementIterator,
+                        'graphUri' => $this->testGraphUri
+                    )
+                ),
+                array(
+                    'method' => 'buildPatternListByStatement',
+                    'parameter' => array(
+                        'statement' => $statement,
+                        'graphUri' => $this->testGraphUri
+                    )
+                ),
+                array(
+                    'method' => 'buildPatternListBySPO',
+                    'parameter' => array(
+                        's' => '*',
+                        'p' => '*',
+                        'o' => '*',
+                        'graphUri' => $this->testGraphUri
+                    )
+                ),
+            ),
+            $this->fixture->getLog()
+        );
+    }
+    
+    // TODO implement this test using @depends
+    public function testGetLogBuildPatternListByStatement()
+    {
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://a'), 
+            new NamedNodeImpl('http://b'), 
+            new NamedNodeImpl('http://c')
+        );
+        
+        $this->fixture->buildPatternListByStatement($statement, $this->testGraphUri);
+        
+        $this->assertEquals(
+            array(
+                array(
+                    'method' => 'buildPatternListByStatement', 
+                    'parameter' => array(
+                        'statement' => $statement,
+                        'graphUri' => $this->testGraphUri
+                    )
+                ),
+                array(
+                    'method' => 'buildPatternListBySPO', 
+                    'parameter' => array(
+                        's' => 'http://a',
+                        'p' => 'http://b',
+                        'o' => 'http://c',
+                        'graphUri' => $this->testGraphUri
+                    )
+                )
+            ),
+            $this->fixture->getLog()
+        );
+    }
+    
+    // TODO implement this test using @depends
+    // tests invalidateByTriplePattern with statement consisting of 3 variables and graph URI given
+    public function testGetLogInvalidateByTriplePatternGraph3VariablesAndUriGiven()
+    {
+        /**
+         * First create test data and save it via saveResult
+         */
+        $queryObject = AbstractQuery::initByQueryString(
+            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }'
+        );
+        
+        $result = array(1, 2, 3);
+        
+        $this->fixture->saveResult($queryObject, $result);
+        
+        /**
+         * Invalidate everything via a invalidateByTriplePattern call
+         */
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        
+        $this->fixture->invalidateByTriplePattern($statementIterator, $this->testGraphUri);
+        
+        // check log for method calls done
+        $this->assertEquals(
+            array(
+                // was directly called by us
+                array(
+                    'method' => 'invalidateByTriplePattern',
+                    'parameter' => array(
+                        'statements' => $statementIterator,
+                        'graphUri' => $this->testGraphUri
+                    )
+                ),
+                array(
+                    'method' => 'buildPatternListByStatement',
+                    'parameter' => array(
+                        'statement' => $statement,
+                        'graphUri' => $this->testGraphUri
+                    )
+                ),
+                array(
+                    'method' => 'buildPatternListBySPO',
+                    'parameter' => array(
+                        's' => '*',
+                        'p' => '*',
+                        'o' => '*',
+                        'graphUri' => $this->testGraphUri
+                    )
+                ),
+                // it was called by invalidateByTriplePattern for the "?s ?p ?o"-pattern
+                array(
+                    'method' => 'invalidateByQuery',
+                    'parameter' => array(
+                        'queryObject' => AbstractQuery::initByQueryString(
+                            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }'
+                        )
+                    )
+                )
+            ),
+            $this->fixture->getLog()
+        );
+    }
+    
+    
+    /**
+     * Tests invalidateByGraphUri
+     */
+    public function testInvalidateByGraphUri()
+    {
+        /**
+         * First create test data and save it via saveResult
+         */
+        $queryObject = AbstractQuery::initByQueryString(
+            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }'
+        );
+        
+        $result = array(1, 2, 3);
+        
+        $this->fixture->saveResult($queryObject, $result);
+        
+        /**
+         * Invalidate everything via a invalidateByGraphUri call
+         */
+        $this->fixture->invalidateByGraphUri($this->testGraphUri);
+        
+        /**
+         * Check that everything was invalidated:
+         * - graph URI entry
+         * - pattern key entry
+         * - query cache container itself
+         */
+         
+        // graph URI entry
+        $this->assertNull($this->fixture->getCache()->get($this->testGraphUri));
+        
+        // pattern key entry
+        $this->assertNull(
+            $this->fixture->getCache()->get(
+                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+            )
+        );
+        
+        // query cache container
+        $this->assertNull($this->fixture->getCache()->get($queryObject->getQuery()));
     }
     
     /**
@@ -70,7 +459,58 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->assertNull($this->fixture->getCache()->get($this->testGraphUri));
         
         // pattern key entry
-        $this->assertNull($this->fixture->getCache()->get($this->testGraphUri . '_*_*_*'));
+        $this->assertNull(
+            $this->fixture->getCache()->get(
+                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+            )
+        );
+        
+        // query cache container
+        $this->assertNull($this->fixture->getCache()->get($queryObject->getQuery()));
+    }
+    
+    /**
+     * Tests invalidateByTriplePattern
+     */
+     
+    public function testInvalidateByTriplePatternGraph3VariablesAndUriGiven()
+    {
+        /**
+         * First create test data and save it via saveResult
+         */
+        $queryObject = AbstractQuery::initByQueryString(
+            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }'
+        );
+        
+        $result = array(1, 2, 3);
+        
+        $this->fixture->saveResult($queryObject, $result);
+        
+        /**
+         * Invalidate everything via a invalidateByTriplePattern call
+         */
+        $statementIterator = new ArrayStatementIteratorImpl(
+            array(new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()))
+        );
+        
+        $this->fixture->invalidateByTriplePattern($statementIterator, $this->testGraphUri);
+        
+        /**
+         * Check that everything was invalidated:
+         * - graph URI entry
+         * - pattern key entry
+         * - query cache container itself
+         */
+         
+        // graph URI entry
+        $this->assertNull($this->fixture->getCache()->get($this->testGraphUri));
+        
+        // pattern key entry
+        $this->assertNull(
+            $this->fixture->getCache()->get(
+                $this->testGraphUri . '*'. $this->separator .'*'. $this->separator .'*'
+            )
+        );
         
         // query cache container
         $this->assertNull($this->fixture->getCache()->get($queryObject->getQuery()));
@@ -102,7 +542,9 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          */
         $this->assertEquals(
             array($queryObject->getQuery() => $queryObject->getQuery()), 
-            $this->fixture->getCache()->get($this->testGraphUri . '_*_*_*')
+            $this->fixture->getCache()->get(
+                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+            )
         );
         
         /**
@@ -114,7 +556,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                     $this->testGraphUri => $this->testGraphUri
                 ),
                 'triple_pattern' => array(
-                    $this->testGraphUri .'_*_*_*' => $this->testGraphUri .'_*_*_*'
+                    $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*' => 
+                        $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
                 ),
                 'result' => $result,
                 'query' => $queryObject->getQuery(),
@@ -132,7 +575,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                         $this->testGraphUri => $this->testGraphUri
                     ),
                     'triple_pattern' => array(
-                        $this->testGraphUri .'_*_*_*' => $this->testGraphUri .'_*_*_*'
+                        $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*' => 
+                            $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
                     ),
                     'result' => $result,
                     'query' => $queryObject->getQuery(),
@@ -140,5 +584,18 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
             ),
             $this->fixture->getLatestQueryCacheContainer()
         );
+    }
+    
+    /**
+     * Tests get- and setChainSuccessor
+     */
+     
+    public function testGetAndSetChainSuccessor()
+    {
+        $successor = new BasicStore();
+        
+        $this->fixture->setChainSuccessor($successor);
+        
+        $this->assertEquals($successor, $this->fixture->getChainSuccessor());
     }
 }
