@@ -183,6 +183,15 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($fixture->isNamed());
     }
 
+    /**
+     * Tests isVariable
+     */
+    public function testIsVariable()
+    {
+        $fixture = $this->newInstance('hallo');
+        $this->assertFalse($fixture->isVariable());
+    }
+
 
     /**
      * instanciation with null shouldn't be possible
