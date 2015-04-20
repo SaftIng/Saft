@@ -63,14 +63,6 @@ abstract class AbstractLiteral implements Literal
     /**
      * @return boolean
      */
-    public function isReturnable()
-    {
-        return false;
-    }
-
-    /**
-     * @return boolean
-     */
     public function isVariable()
     {
         return false;
