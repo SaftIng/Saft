@@ -37,11 +37,7 @@ class LiteralImpl extends AbstractLiteral
         $this->value = $value;
         $this->lang = $lang;
 
-        if (
-            $lang !== null
-            && $datatype !== null
-            && $datatype !== self::$rdfLangString
-        ) {
+        if ($lang !== null && $datatype !== null && $datatype !== self::$rdfLangString) {
             throw new \Exception(
                 "Language tagged Literals must have " .
                 "<" . self::$rdfLangString . "> " .
