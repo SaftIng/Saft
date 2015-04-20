@@ -3,8 +3,8 @@ namespace Saft\Backend\Redland\Rdf;
 
 class RedlandLiteralFactory
 {
-    public function newInstance($value, $lang = null, $datatype = null)
+    public function newInstance($value, $datatype = null, $lang = null)
     {
-        return new Literal($value, $lang, $datatype);
+        return new Literal($value, $datatype, $lang);
     }
 }

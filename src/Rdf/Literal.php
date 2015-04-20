@@ -5,12 +5,15 @@ use \Saft\Rdf\AbstractLiteral;
 
 class Literal extends AbstractLiteral
 {
+    protected static $xsdString = "http://www.w3.org/2001/XMLSchema#string";
+    protected static $rdfLangString = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString";
+
     /**
      * @var librdf_node the wrapped redland node
      */
     protected $redlandNode;
 
-    public function __construct($value, $lang = null, $datatype = null)
+    public function __construct($value, $datatype = null, $lang = null)
     {
         if ($value === null) {
             throw new \Exception("Can't initialize literal with null as value.");
@@ -18,13 +21,30 @@ class Literal extends AbstractLiteral
         if (gettype($value) == "resource" && get_resource_type($value) == "_p_librdf_node_s") {
             $this->redlandNode = $value;
         } else {
+
+            if ($lang !== null && $datatype !== null && $datatype !== self::$rdfLangString) {
+                throw new \Exception(
+                    "Language tagged Literals must have " .
+                    "<" . self::$rdfLangString . "> " .
+                    "datatype."
+                );
+            }
+
             $world = librdf_new_world();
-            if ($datatype !== null) {
+            if ($datatype !== null && $lang === null) {
+                // TODO catch invalid URIs
                 $datatypeUri = librdf_new_uri($world, $datatype);
             } else {
                 $datatypeUri = null;
             }
+
+            /*
+             * This redland method does only support either $lang or $datatypeUri or both null
+             */
             $this->redlandNode = librdf_new_node_from_typed_literal($world, $value, $lang, $datatypeUri);
+            if ($this->redlandNode === null) {
+                throw new \Exception("Initialization of redland node failed");
+            }
         }
     }
 
@@ -46,9 +66,9 @@ class Literal extends AbstractLiteral
         if ($datatype !== null) {
             return librdf_uri_to_string($datatype);
         } elseif ($this->getLanguage() !== null) {
-            return "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString";
+            return self::$rdfLangString;
         } else {
-            return "http://www.w3.org/2001/XMLSchema#string";
+            return self::$xsdString;
         }
     }
 

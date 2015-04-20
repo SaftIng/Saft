@@ -7,8 +7,8 @@ class LiteralTest extends \Saft\Rdf\Test\LiteralAbstractTest
     {
         $this->factory = new \Saft\Backend\Redland\Rdf\RedlandLiteralFactory();
     }
-    public function newInstance($value, $lang = null, $datatype = null)
+    public function newInstance($value, $datatype = null, $lang = null)
     {
-        return $this->factory->newInstance($value, $lang, $datatype);
+        return $this->factory->newInstance($value, $datatype, $lang);
     }
 }
