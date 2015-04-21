@@ -2,6 +2,7 @@ PHPUNIT = ./vendor/bin/phpunit
 PHPCS = ./vendor/bin/phpcs
 PHPCBF = ./vendor/bin/phpcbf
 SAMI = ./vendor/bin/sami.php
+XSLTPROC = xsltproc
 
 default:
 	@echo ""
@@ -17,7 +18,7 @@ setup-test-environment:
 
 test:
 	- $(PHPUNIT)
-	xsltproc -o gen/test/report.html resources/phpunit-results.xsl gen/test/log.junit.xml
+	$(XSLTPROC) -o gen/test/report.html resources/phpunit-results.xsl gen/test/log.junit.xml
 
 codesniffer:
 	$(PHPCS) --standard=PSR1,PSR2 --extensions=php -p src/*
