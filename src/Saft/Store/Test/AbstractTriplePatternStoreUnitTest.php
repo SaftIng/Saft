@@ -16,7 +16,7 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        
+
         $this->fixture = $this->getMockForAbstractClass('\Saft\Store\AbstractTriplePatternStore');
     }
 
@@ -57,7 +57,7 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
         $object2 = new LiteralImpl('John');
         return new StatementImpl($subject2, $predicate2, $object2);
     }
-    
+
     /**
      * Tests addStatements
      */
@@ -66,11 +66,11 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
     {
         // it throws an error because query contains NO triples or quads.
         $this->setExpectedException('\Exception');
-        
+
         $query = 'INSERT DATA {  }';
         $this->fixture->query($query);
     }
-    
+
     public function testAddStatementsTriples()
     {
         $statement = $this->getTestStatementWithLiteral();
@@ -82,7 +82,7 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
                 '. $statement->getObject()->toNQuads() .'
             }
         }';
-        
+
         $this->assertEquals(
             array(
                 $statementIterator,
@@ -92,7 +92,7 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
             $this->fixture->query($query)
         );
     }
-    
+
     /**
      * Tests deleteMultipleStatements
      */
@@ -105,12 +105,12 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
         $this->setExpectedException('\Exception');
         $this->fixture->query($query);
     }
-    
+
     public function testDeleteMultipleStatementsQuadRecognition()
     {
         $quad = $this->getTestQuad();
         $query = 'DELETE DATA { '. $quad->toSparqlFormat() .'}';
-        
+
         $this->assertEquals(
             array(
                 $quad,
@@ -125,7 +125,7 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
     {
         $statement = $this->getTestPatternStatement();
         $query = 'DELETE DATA { '. $statement->toSparqlFormat() .'}';
-        
+
         $this->assertEquals(
             array(
                 $statement,
@@ -139,9 +139,9 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
     public function testDeleteMultipleStatementsStatementsWithLiteral()
     {
         $statement = $this->getTestStatementWithLiteral();
-        
+
         $query = 'DELETE DATA { '. $statement->toSparqlFormat() .'}';
-        
+
         $this->assertEquals(
             array(
                 $statement,
@@ -151,7 +151,7 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
             $this->fixture->query($query)
         );
     }
-    
+
     /**
      * Tests hasMatchingStatement > triple recognition
      */
@@ -160,7 +160,7 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
     {
         $triple = $this->getTestTriple();
         $query = 'ASK { '. $triple->toSparqlFormat() .'}';
-        
+
         $this->assertEquals(
             array(
                 $triple,

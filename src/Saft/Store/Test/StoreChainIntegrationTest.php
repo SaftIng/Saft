@@ -21,7 +21,7 @@ class StoreChainIntegrationTest extends TestCase
      * @var string
      */
     protected $separator = '__.__';
-    
+
     /**
      *
      */
@@ -39,10 +39,10 @@ class StoreChainIntegrationTest extends TestCase
         // parse YAML file
         $yaml = new Parser();
         $this->config = $yaml->parse(file_get_contents($configFilepath));
-        
+
         $this->fixture = new StoreChain();
     }
-    
+
     /**
      *
      */
@@ -64,13 +64,13 @@ class StoreChainIntegrationTest extends TestCase
             $this->markTestSkipped('Array queryCacheConfig is not set in the config.yml.');
             return;
         }
-        
+
         // expects Exception to be thrown, because chain only contains query cache and it does not support
         // addStatement without successor
         $this->setExpectedException('\Exception');
-        
+
         $this->fixture->setupChain(array($this->config['queryCacheConfig']));
-        
+
         $this->fixture->addStatements(new ArrayStatementIteratorImpl(array(
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
@@ -97,9 +97,9 @@ class StoreChainIntegrationTest extends TestCase
             $this->markTestSkipped('Array virtuosoConfig is not set in the config.yml.');
             return;
         }
-        
+
         $this->fixture->setupChain(array($this->config['queryCacheConfig'], $this->config['virtuosoConfig']));
-        
+
         $this->fixture->addStatements(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
@@ -115,12 +115,12 @@ class StoreChainIntegrationTest extends TestCase
             )),
             $this->testGraphUri
         );
-        
+
         $result = $this->fixture->getMatchingStatements(
             new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
             $this->testGraphUri
         );
-        
+
         $statementResultToCheckAgainst = new StatementResult();
         $statementResultToCheckAgainst->setVariables(array('s', 'p', 'o'));
         $statementResultToCheckAgainst->append(
@@ -137,7 +137,7 @@ class StoreChainIntegrationTest extends TestCase
                 new LiteralImpl('"test literal"')
             )
         );
-        
+
         // only compare array values and ignore keys, because of the variables they are random
         $this->assertEquals($statementResultToCheckAgainst, $result);
     }
@@ -145,14 +145,13 @@ class StoreChainIntegrationTest extends TestCase
     public function testAddStatementsNoChainEntries()
     {
         $this->setExpectedException('\Exception');
-        
+
         $this->fixture->addStatements(new ArrayStatementIteratorImpl(array()));
     }
-    
+
     /**
      * Tests deleteMatchingStatements
      */
-     
     public function testDeleteMatchingStatementsChainQueryCache()
     {
         /**
@@ -162,16 +161,16 @@ class StoreChainIntegrationTest extends TestCase
             $this->markTestSkipped('Array queryCacheConfig is not set in the config.yml.');
             return;
         }
-        
+
         $this->setExpectedException('\Exception');
-        
+
         $this->fixture->setupChain(array($this->config['queryCacheConfig']));
-        
+
         $this->fixture->deleteMatchingStatements(
             new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl())
         );
     }
-     
+
     public function testDeleteMatchingStatementsChainQueryCacheAndVirtuoso()
     {
         /**
@@ -184,17 +183,17 @@ class StoreChainIntegrationTest extends TestCase
             $this->markTestSkipped('Array virtuosoConfig is not set in the config.yml.');
             return;
         }
-        
+
         $this->fixture->setupChain(array($this->config['queryCacheConfig'], $this->config['virtuosoConfig']));
-        
+
         $chainEntries = $this->fixture->getChainEntries();
-        
+
         // clean cache
         $chainEntries[0]->getCache()->clean();
-        
+
         // create graph freshly
         $chainEntries[1]->query('CLEAR GRAPH <'. $this->testGraphUri .'>');
-        
+
         $this->fixture->addStatements(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
@@ -210,7 +209,7 @@ class StoreChainIntegrationTest extends TestCase
             )),
             $this->testGraphUri
         );
-        
+
         // only compare array values and ignore keys, because of the variables they are random
         $this->assertEquals(
             2,
@@ -219,16 +218,16 @@ class StoreChainIntegrationTest extends TestCase
                 $this->testGraphUri
             )->getEntryCount()
         );
-        
+
         // remove all statements
         $this->fixture->deleteMatchingStatements(
             new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
             $this->testGraphUri
         );
-        
+
         $statementResult = new StatementResult();
         $statementResult->setVariables(array('s', 'p', 'o'));
-        
+
         // check that everything was removed accordingly
         $this->assertEquals(
             $statementResult,
@@ -238,11 +237,11 @@ class StoreChainIntegrationTest extends TestCase
             )
         );
     }
-     
+
     public function testDeleteMatchingStatementsNoChainEntries()
     {
         $this->setExpectedException('\Exception');
-        
+
         $this->fixture->deleteMatchingStatements(
             new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl())
         );
@@ -264,10 +263,10 @@ class StoreChainIntegrationTest extends TestCase
             $this->markTestSkipped('Array virtuosoConfig is not set in the config.yml.');
             return;
         }
-        
+
         // setup chain: query cache -> virtuoso
         $this->fixture->setupChain(array($this->config['queryCacheConfig'], $this->config['virtuosoConfig']));
-        
+
         /**
          * get available graphs of the chain
          */
@@ -281,13 +280,13 @@ class StoreChainIntegrationTest extends TestCase
         foreach ($query->fetchAll(\PDO::FETCH_ASSOC) as $graph) {
             $graphs[$graph['graph']] = $graph['graph'];
         }
-        
+
         /**
          * check both results
          */
         $this->assertEquals($graphs, $this->fixture->getAvailableGraphs());
     }
-    
+
     /**
      * Tests getMatchingStatements
      */
@@ -301,12 +300,12 @@ class StoreChainIntegrationTest extends TestCase
             $this->markTestSkipped('Array queryCacheConfig is not set in the config.yml.');
             return;
         }
-        
+
         $this->setExpectedException('\Exception');
-        
+
         // setup chain: query cache -> virtuoso
         $this->fixture->setupChain(array($this->config['queryCacheConfig']));
-        
+
         $statement = new StatementImpl(
             new NamedNodeImpl('http://s/'),
             new NamedNodeImpl('http://p/'),
@@ -324,7 +323,7 @@ class StoreChainIntegrationTest extends TestCase
             $this->markTestSkipped('Array virtuosoConfig is not set in the config.yml.');
             return;
         }
-        
+
         /**
          * Create test data
          */
@@ -346,14 +345,14 @@ class StoreChainIntegrationTest extends TestCase
             )),
             $this->testGraphUri
         );
-        
+
         // setup chain: query cache -> virtuoso
         $this->fixture->setupChain(array($this->config['queryCacheConfig'], $this->config['virtuosoConfig']));
-        
+
         // clean cache
         $chainEntries = $this->fixture->getChainEntries();
         $chainEntries[0]->getCache()->clean();
-        
+
         // check that no cache entry is available for the test query
         $statement = new StatementImpl(
             new NamedNodeImpl('http://s/'),
@@ -367,7 +366,7 @@ class StoreChainIntegrationTest extends TestCase
                 'WHERE {'. $statementIterator->toSparqlFormat($this->testGraphUri) .'}'
             )
         );
-        
+
         // build statement result to check against
         $statementResultToCheckAgainst = new StatementResult();
         $statementResultToCheckAgainst->setVariables(array('s', 'p', 'o'));
@@ -385,9 +384,9 @@ class StoreChainIntegrationTest extends TestCase
                 new LiteralImpl('"test literal"')
             )
         );
-        
+
         $result = $this->fixture->getMatchingStatements($statement, $this->testGraphUri);
-        
+
         /**
          * check both results
          */
@@ -405,7 +404,7 @@ class StoreChainIntegrationTest extends TestCase
             $this->markTestSkipped('Array virtuosoConfig is not set in the config.yml.');
             return;
         }
-        
+
         /**
          * Create test data
          */
@@ -427,14 +426,14 @@ class StoreChainIntegrationTest extends TestCase
             )),
             $this->testGraphUri
         );
-        
+
         // setup chain: query cache -> virtuoso
         $this->fixture->setupChain(array($this->config['queryCacheConfig'], $this->config['virtuosoConfig']));
-        
+
         // clean cache
         $chainEntries = $this->fixture->getChainEntries();
         $chainEntries[0]->getCache()->clean();
-        
+
         // check that no cache entry is available for the test query
         $statement = new StatementImpl(
             new NamedNodeImpl('http://s/'),
@@ -445,12 +444,12 @@ class StoreChainIntegrationTest extends TestCase
         $testQuery = 'SELECT * FROM <'. $this->testGraphUri .'> '.
                      'WHERE {'. $statementIterator->toSparqlFormat($this->testGraphUri) .'}';
         $this->assertTrue(null === $chainEntries[0]->getCache()->get($testQuery));
-        
+
         $this->assertEquals(0, count($chainEntries[0]->getLatestQueryCacheContainer()));
-        
+
         // call to fill cache
         $firstResult = $this->fixture->getMatchingStatements($statement, $this->testGraphUri);
-        
+
         // call again to use the cache instead of the store
         $statementResult = new StatementResult();
         $statementResult->setVariables(array('s', 'p', 'o'));
@@ -468,14 +467,14 @@ class StoreChainIntegrationTest extends TestCase
                 new LiteralImpl('"test literal"')
             )
         );
-        
+
         $cachedResult = $this->fixture->getMatchingStatements($statement, $this->testGraphUri);
-        
+
         $this->assertEquals($statementResult, $cachedResult);
-        
+
         // check count
         $this->assertEquals(1, count($chainEntries[0]->getLatestQueryCacheContainer()));
-        
+
         $statementResult = new StatementResult();
         $statementResult->setVariables(array('s', 'p', 'o'));
         $statementResult->append(
@@ -492,7 +491,7 @@ class StoreChainIntegrationTest extends TestCase
                 new LiteralImpl('"test literal"')
             )
         );
-        
+
         // check result
         $this->assertEquals(
             array(
@@ -510,11 +509,11 @@ class StoreChainIntegrationTest extends TestCase
             array_values($chainEntries[0]->getLatestQueryCacheContainer())
         );
     }
-    
+
     /**
      * Tests getStoreDescription
      */
-     
+
     public function testGetStoreDescriptionChainQueryCache()
     {
         /**
@@ -524,16 +523,16 @@ class StoreChainIntegrationTest extends TestCase
             $this->markTestSkipped('Array queryCacheConfig is not set in the config.yml.');
             return;
         }
-        
+
         $this->setExpectedException('\Exception');
-                
+
         $this->fixture->setupChain(array($this->config['queryCacheConfig']));
-        
+
         $this->fixture->getStoreDescription();
-        
+
         // exception because QueryCache does not support getStoreDescription because it is no store.
     }
-    
+
     public function testGetStoreDescriptionChainQueryCacheAndVirtuoso()
     {
         /**
@@ -546,23 +545,23 @@ class StoreChainIntegrationTest extends TestCase
             $this->markTestSkipped('Array virtuosoConfig is not set in the config.yml.');
             return;
         }
-        
+
         $this->fixture->setupChain(array($this->config['queryCacheConfig'], $this->config['virtuosoConfig']));
-        
+
         $this->assertEquals(array(), $this->fixture->getStoreDescription());
     }
-    
+
     public function testGetStoreDescriptionNoChainEntries()
     {
         $this->setExpectedException('\Exception');
-        
+
         $this->fixture->getStoreDescription();
     }
-    
+
     /**
      * Tests hasMatchingStatements
      */
-     
+
     public function testHasMatchingStatementsChainQueryCache()
     {
         /**
@@ -572,11 +571,11 @@ class StoreChainIntegrationTest extends TestCase
             $this->markTestSkipped('Array queryCacheConfig is not set in the config.yml.');
             return;
         }
-        
+
         $this->setExpectedException('\Exception');
-        
+
         $this->fixture->setupChain(array($this->config['queryCacheConfig']));
-        
+
         $this->fixture->hasMatchingStatement(
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
@@ -586,7 +585,7 @@ class StoreChainIntegrationTest extends TestCase
             $this->testGraphUri
         );
     }
-     
+
     public function testHasMatchingStatementsChainQueryCacheAndVirtuoso()
     {
         /**
@@ -599,12 +598,12 @@ class StoreChainIntegrationTest extends TestCase
             $this->markTestSkipped('Array virtuosoConfig is not set in the config.yml.');
             return;
         }
-        
+
         // drop and create test graph
         $virtuoso = new Virtuoso($this->config['virtuosoConfig']);
         $virtuoso->dropGraph($this->testGraphUri);
         $virtuoso->addGraph($this->testGraphUri);
-        
+
         $this->fixture->setupChain(array($this->config['queryCacheConfig'], $this->config['virtuosoConfig']));
 
         // first test for a statement which does not exist
@@ -637,7 +636,7 @@ class StoreChainIntegrationTest extends TestCase
             )),
             $this->testGraphUri
         );
-        
+
         $this->assertTrue(
             $this->fixture->hasMatchingStatement(
                 new StatementImpl(
@@ -649,11 +648,11 @@ class StoreChainIntegrationTest extends TestCase
             )
         );
     }
-    
+
     public function testHasMatchingStatementsNoChainEntries()
     {
         $this->setExpectedException('\Exception');
-        
+
         $this->fixture->hasMatchingStatement(
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
@@ -663,7 +662,7 @@ class StoreChainIntegrationTest extends TestCase
             $this->testGraphUri
         );
     }
-    
+
     /**
      * Tests query
      */
@@ -677,7 +676,7 @@ class StoreChainIntegrationTest extends TestCase
             $this->markTestSkipped('Array virtuosoConfig is not set in the config.yml.');
             return;
         }
-        
+
         /**
          * Create test data
          */
@@ -698,19 +697,19 @@ class StoreChainIntegrationTest extends TestCase
             )),
             $this->testGraphUri
         );
-        
+
         // setup chain: query cache -> virtuoso
         $this->fixture->setupChain(array($this->config['queryCacheConfig'], $this->config['virtuosoConfig']));
-        
+
         $testQuery = 'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}';
-        
+
         // clean cache
         $chainEntries = $this->fixture->getChainEntries();
         $chainEntries[0]->getCache()->clean();
-        
+
         // check that no cache entry is available for the test query
         $this->assertTrue(null === $chainEntries[0]->getCache()->get($testQuery));
-        
+
         /**
          * check both results
          */

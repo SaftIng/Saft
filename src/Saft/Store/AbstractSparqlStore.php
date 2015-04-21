@@ -21,7 +21,7 @@ abstract class AbstractSparqlStore implements Store
      * @var instance which implements Saft\Store\StoreInterface.
      */
     protected $successor;
-    
+
     /**
      * Adds multiple Statements to (default-) graph.
      *
@@ -40,20 +40,20 @@ abstract class AbstractSparqlStore implements Store
         foreach ($statements as $st) {
             if ($st instanceof Statement && true === $st->isConcrete()) {
                 // everything is fine
-            
+
             // non-Statement instances not allowed
             } elseif (false === $st instanceof Statement) {
                 throw new \Exception('addStatements does not accept non-Statement instances.');
-            
+
             // non-concrete Statement instances not allowed
             } elseif ($st instanceof Statement && false === $st->isConcrete()) {
                 throw new \Exception('At least one Statement is not concrete');
-            
+
             } else {
                 throw new \Exception('Unknown error.');
             }
         }
-        
+
         /**
          * Create batches out of given statements to improve statement throughput, only if query function is
          * callable. Thats only the case, if this functions gets called from a implemented backend and not
@@ -63,22 +63,22 @@ abstract class AbstractSparqlStore implements Store
             $counter = 0;
             $batchSize = 100;
             $batchStatements = array();
-            
+
             foreach ($statements as $statement) {
                 // given $graphUri forces usage of it and not the graph from the statement instance
                 if (null !== $graphUri) {
                     $graphUriToUse = $graphUri;
-                 
+
                 // use graphUri from statement
                 } else {
                     $graphUriToUse = $statement->getGraph()->getUri();
                 }
-                
+
                 if (false === isset($batchStatements[$graphUriToUse])) {
                     $batchStatements[$graphUriToUse] = new ArrayStatementIteratorImpl(array());
                 }
                 $batchStatements[$graphUriToUse]->append($statement);
-                
+
                 // after batch is full, execute collected statements all at once
                 if (0 === $counter % $batchSize) {
                     /**
@@ -94,12 +94,12 @@ abstract class AbstractSparqlStore implements Store
                             );
                         }
                     }
-                    
+
                     // re-init variables
                     $batchStatements = array();
                 }
             }
-            
+
         // if query function is not callable, just return generated query and use all statements given.
         } else {
             return 'INSERT DATA { '. $this->sparqlFormat($statements, $graphUri) .'}';
@@ -120,11 +120,11 @@ abstract class AbstractSparqlStore implements Store
     public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-        
+
         $query = 'DELETE DATA { '. $this->sparqlFormat($statementIterator, $graphUri) .'}';
         return $this->query($query, $options);
     }
-    
+
     /**
      * Returns array with graphUri's which are available.
      *
@@ -133,13 +133,13 @@ abstract class AbstractSparqlStore implements Store
     public function getAvailableGraphs()
     {
         $result = $this->query('SELECT DISTINCT ?g WHERE { GRAPH ?g {?s ?p ?o.} }');
-        
+
         $graphs = array();
 
         foreach ($result as $entry) {
             $graphs[$entry['g']] = $entry['g'];
         }
-        
+
         return $graphs;
     }
 
@@ -161,7 +161,7 @@ abstract class AbstractSparqlStore implements Store
     public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-        
+
         return $this->query(
             'SELECT * WHERE { '. $this->sparqlFormat($statementIterator, $graphUri) .'}',
             $options
@@ -182,14 +182,14 @@ abstract class AbstractSparqlStore implements Store
     {
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $result = $this->query('ASK { '. $this->sparqlFormat($statementIterator, $graphUri) .'}', $options);
-        
+
         if (true === is_object($result)) {
             return $result->getResultObject();
         } else {
             return $result;
         }
     }
-    
+
     /**
      * Set successor instance. This method is useful, if you wanna build chain of instances which implement
      * StoreInterface. It sets another instance which will be later called, if a statement- or query-related
@@ -226,7 +226,7 @@ abstract class AbstractSparqlStore implements Store
                 } else {
                     $sparqlString = $statement->toSparqlFormat();
                 }
-                
+
                 $query .= $sparqlString .' ';
             } else {
                 throw new \Exception('Not a Statement instance');
@@ -246,11 +246,11 @@ abstract class AbstractSparqlStore implements Store
         // check if its a valid URI
         if (true === AbstractNamedNode::check($graphUri)) {
             return '<'. $graphUri .'>';
-        
+
         // check for variable, which has a ? as first char
         } elseif ('?' == substr($graphUri, 0, 1)) {
              return $graphUri;
-        
+
         // invalid $graphUri
         } else {
             throw new \Exception('Parameter $graphUri is neither a valid URI nor variable.');

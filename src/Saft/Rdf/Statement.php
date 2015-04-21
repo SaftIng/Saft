@@ -31,7 +31,7 @@ interface Statement
      * @return boolean
      */
     public function isQuad();
-    
+
     /**
      * @return boolean
      */

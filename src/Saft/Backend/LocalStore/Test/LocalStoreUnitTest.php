@@ -50,7 +50,7 @@ EOD;
         $nonExisting = $this->tempDirectory . DIRECTORY_SEPARATOR
             . 'NonExisting';
         assert(!is_dir($nonExisting));
-        
+
         $store = new LocalStore($nonExisting);
         // Should fail in order of the non-existing base dir
         $store->initialize();
@@ -384,7 +384,7 @@ EOD;
         }
         $it->close();
         $this->assertEquals(3, $numMatches);
-        
+
         // Delete matching statements
         $preCount = $this->countStatements($store, 'http://localhost:8890/foaf');
         $store->deleteMatchingStatements($pattern, 'http://localhost:8890/foaf');

@@ -16,7 +16,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
     {
         parent::setUp();
         $this->fixture = $this->getMockForAbstractClass('\Saft\Store\AbstractSparqlStore');
-        
+
         // Override query method: it will always return the given query.
         $this->fixture->method('query')->will($this->returnArgument(0));
     }
@@ -93,7 +93,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
     public function testhasMatchingStatement()
     {
         $query = $this->fixture->hasMatchingStatement($this->getTestStatement());
-        
+
         $this->assertEquals(
             'ASK { Graph <http://saft/test/g1> {'.
             '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>} }',
@@ -116,7 +116,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
          */
         $object2 = new LiteralImpl('John');
         $triple2 = new StatementImpl($subject1, $predicate1, $object2);
-        
+
         // Setup array statement iterator
         $statements = new ArrayStatementIteratorImpl(array($triple1, $triple2));
 
@@ -147,7 +147,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $triple = new StatementImpl($subject, $predicate, $object);
 
         $query = $this->fixture->hasMatchingStatement($triple);
-        
+
         $this->assertEquals(
             'ASK { ?s1 <http://saft/test/p1> <http://saft/test/o1> . }',
             $query
@@ -160,7 +160,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $statement = new StatementImpl($subject, $predicate, $object, $graph1);
 
         $query = $this->fixture->hasMatchingStatement($statement);
-        
+
         $this->assertEquals(
             'ASK { Graph ?g1 {?s1 <http://saft/test/p1> <http://saft/test/o1>} }',
             $query
@@ -174,10 +174,10 @@ class AbstractSparqlStoreUnitTest extends TestCase
     {
         // Setup array statement iterator
         $statements = new ArrayStatementIteratorImpl(array($this->getTestStatement()));
-        
+
         // use the given graphUri
         $query = $this->fixture->addStatements($statements, 'http://saft/test/foograph');
-        
+
         $this->assertEquals(
             $query,
             'INSERT DATA { Graph <http://saft/test/foograph> {'.
@@ -187,7 +187,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
 
         // use the given graphUri-variable
         $query = $this->fixture->addStatements($statements, '?foo');
-        
+
         $this->assertEquals(
             $query,
             'INSERT DATA { Graph ?foo {'.

@@ -59,17 +59,17 @@ abstract class AbstractQuery implements Query
         'xml'     => 'http://www.w3.org/XML/1998/namespace',
         'xsd'     => 'http://www.w3.org/2001/XMLSchema#',
     );
-    
+
     /**
      * @var string
      */
     protected $query;
-    
+
     /**
      * @var array
      */
     protected $queryParts = array();
-    
+
     /**
      * Constructor.
      *
@@ -82,7 +82,7 @@ abstract class AbstractQuery implements Query
             $this->init($query);
         }
     }
-    
+
     /**
      * Determines type of a entity.
      *
@@ -96,35 +96,35 @@ abstract class AbstractQuery implements Query
         if ('<' == substr($entity, 0, 1)) {
             $entity = str_replace(array('>', '<'), '', $entity);
         }
-        
+
         // checks if $entity is an URL
         if (true === AbstractNamedNode::check($entity)) {
             return 'uri';
-        
+
         // checks if ^^< is in $entity OR if $entity is surrounded by quotation marks
         } elseif (false !== strpos($entity, '"^^<')
             || ('"' == substr($entity, 0, 1)
                 && '"' == substr($entity, strlen($entity)-1, 1))) {
             return 'typed-literal';
-        
+
         // checks if $entity is an URL, which was written with prefix, such as rdfs:label
         } elseif (false !== strpos($entity, ':')) {
             return 'uri';
-            
+
         // checks if "@ is in $entity
         } elseif (false !== strpos($entity, '"@')) {
             return 'literal';
-            
+
         // checks if $entity is a string; only strings can be a variable
         } elseif (true === is_string($entity)) {
             return 'var';
-            
+
         // unknown type
         } else {
             return null;
         }
     }
-    
+
     /**
      * Determines SPARQL datatype of a given string, usually of an object value.
      *
@@ -135,28 +135,28 @@ abstract class AbstractQuery implements Query
     public function determineObjectDatatype($objectString)
     {
         $datatype = null;
-        
+
         // checks if ^^< is in $objectString
         $arrowPos = strpos($objectString, '"^^<');
-        
+
         // checks if $objectString starts with " and contains "^^<
         if ('"' === substr($objectString, 0, 1) && false !== $arrowPos) {
             // extract datatype URI
             $datatype = substr($objectString, $arrowPos + 4);
             return substr($datatype, 0, strlen($datatype)-1);
-            
+
         // checks for surrounding ", without ^^<
         } elseif ('"' == substr($objectString, 0, 1)
             && '"' == substr($objectString, strlen($objectString)-1, 1)) {
             // if we land here, there are surrounding quotation marks, but no datatype
             return 'http://www.w3.org/2001/XMLSchema#string';
-        
+
         // malformed string, return null as datatype
         } else {
             return null;
         }
     }
-    
+
     /**
      * Determines SPARQL language of a given string, usually of an object value.
      *
@@ -166,16 +166,16 @@ abstract class AbstractQuery implements Query
     public function determineObjectLanguage($objectString)
     {
         $atPos = strpos($objectString, '"@');
-        
+
         // check for language @
         if (false !== $atPos) {
             $language = substr($objectString, $atPos + 2);
             return 2 <= strlen($language) ? $language : null;
         }
-        
+
         return null;
     }
-    
+
     /**
      * Determines SPARQL language of a given string, usually of an object value.
      *
@@ -187,30 +187,30 @@ abstract class AbstractQuery implements Query
         // checks if ^^< is in $objectString
         $arrowPos = strpos($objectString, '"^^<');
         $atPos = strpos($objectString, '"@');
-        
+
         // checks if $objectString starts with " and contains "^^<
         if ('"' === substr($objectString, 0, 1) && false !== $arrowPos) {
             return substr($objectString, 1, $arrowPos-1);
-            
+
         // checks for surrounding ", without ^^<
         } elseif ('"' == substr($objectString, 0, 1)
             && '"' == substr($objectString, strlen($objectString)-1, 1)) {
             return substr($objectString, 1, strlen($objectString)-2);
-            
+
         // checks for "@
         } elseif (false !== $atPos) {
             return substr($objectString, 1, $atPos - 1);
-        
+
         // checks for ? at the beginning
         } elseif ('?' === substr($objectString, 0, 1)) {
             return substr($objectString, 1);
-        
+
         // malformed string, return null as datatype
         } else {
             return null;
         }
     }
-    
+
     /**
      * Extracts filter pattern out of a given string.
      *
@@ -228,7 +228,7 @@ abstract class AbstractQuery implements Query
            - FILTER (lang(?title) = 'en')
            - FILTER regex(?ssn, '...')
         */
-        
+
         $pattern = array();
 
         preg_match_all(
@@ -334,7 +334,7 @@ abstract class AbstractQuery implements Query
 
         return $pattern;
     }
-    
+
     /**
      * Extracts graph(s) from queryPart.
      *
@@ -344,16 +344,16 @@ abstract class AbstractQuery implements Query
     public function extractGraphs($queryPart)
     {
         $graphs = array();
-        
+
         $result = preg_match_all('/\FROM\s*\<(.*)\\>/', $queryPart, $matches);
-        
+
         if (false !== $result && true === isset($matches[1][0])) {
             $graphs[] = $matches[1][0];
         }
-        
+
         return $graphs;
     }
-    
+
     /**
      * Extracts named graph(s) from queryPart.
      *
@@ -363,16 +363,16 @@ abstract class AbstractQuery implements Query
     public function extractNamedGraphs($queryPart)
     {
         $graphs = array();
-        
+
         $result = preg_match_all('/\FROM NAMED\s*\<(.*)\\>/', $queryPart, $matches);
-        
+
         if (false !== $result && true === isset($matches[1][0])) {
             $graphs[] = $matches[1][0];
         }
-        
+
         return $graphs;
     }
-    
+
     /**
      * Extracts prefixes from a given query.
      *
@@ -435,7 +435,7 @@ abstract class AbstractQuery implements Query
 
         return $prefixes;
     }
-    
+
     /**
      * Extracts prefixes from the prologue part of the given query.
      *
@@ -445,16 +445,16 @@ abstract class AbstractQuery implements Query
     public function extractPrefixesFromQuery($query)
     {
         preg_match_all('/PREFIX\s+([a-z0-9]+)\:\s*\<([a-z0-9\:\/\.\#\-]+)\>/', $query, $matches);
-        
+
         $prefixes = array();
-        
+
         foreach ($matches[1] as $index => $key) {
             $prefixes[$key] = $matches[2][$index];
         }
-        
+
         return $prefixes;
     }
-    
+
     /**
      * Extracts quads from query, if available.
      *
@@ -464,14 +464,14 @@ abstract class AbstractQuery implements Query
     public function extractQuads($query)
     {
         $quads = array();
-        
+
         /**
          * Matches the following pattern: Graph <http://uri/> { ?s ?p ?o }
          * Whereas ?s ?p ?o stands for any triple, so also for an URI. It also matches multi line strings
          * which have { and triple on different lines.
          */
         $result = preg_match_all('/GRAPH\s*\<(.*)\>\s*\{\n*(.*)\s*\n*\}/mi', $query, $matches);
-        
+
         // if no errors occour and graphs and triple where found
         if (false !== $result
             && true === isset($matches[1])
@@ -480,20 +480,20 @@ abstract class AbstractQuery implements Query
                 // parse according triple string, for instance: <http://saft/test/s1> dc:p1 <http://saft/test/o1>
                 // and extract S, P and O.
                 $triplePattern = $this->extractTriplePattern($matches[2][$key]);
-                
+
                 // TODO Handle case that more than one triple pattern or no one was found
-                
+
                 $quad = $triplePattern[0];
                 $quad['g'] = $graph;
                 $quad['g_type'] = 'uri';
-                
+
                 $quads[] = $quad;
             }
         }
-        
+
         return $quads;
     }
-    
+
     /**
      * Extracts triple pattern out of a given string.
      *
@@ -507,11 +507,11 @@ abstract class AbstractQuery implements Query
          * are, return empty.
          */
         $quads = $this->extractQuads($where);
-        
+
         if (0 < count($quads)) {
             return array();
         }
-        
+
         /**
          * Here we know, no quads are there.
          */
@@ -552,7 +552,7 @@ abstract class AbstractQuery implements Query
         );
 
         $lineIndex = 0;
-        
+
         foreach ($matches[0] as $match) {
             /**
              * Handle type and value of subject and predicate
@@ -560,47 +560,47 @@ abstract class AbstractQuery implements Query
             $s = $matches[1][$lineIndex];
             $p = $matches[2][$lineIndex];
             $o = $matches[3][$lineIndex];
-            
+
             $oIsUri = false;
             if ('<' == substr($o, 0, 1)) {
                 $o = str_replace(array('>', '<'), '', $o);
                 $oIsUri = true;
             }
-            
+
             /**
              * Determine types of subject, predicate and object
              */
             $sType = $this->determineEntityType($s);
             $pType = $this->determineEntityType($p);
             $oType = $this->determineEntityType($o);
-            
+
             /**
              * Check for prefixes and replace them with original URI
              */
             $prefixes = $this->extractPrefixesFromQuery($this->getQuery());
-            
+
             $s = $this->replacePrefixWithUri($s, $prefixes);
             $p = $this->replacePrefixWithUri($p, $prefixes);
             $o = $this->replacePrefixWithUri($o, $prefixes);
-            
+
             /**
              * If S or P are starting with a ?, remove it
              */
             if ('?' == substr($s, 0, 1)) {
                 $s = substr($s, 1);
             }
-            
+
             if ('?' == substr($p, 0, 1)) {
                 $p = substr($p, 1);
             }
-            
+
             /**
              * Determine all aspects of the object
              */
             $oDatatype = $this->determineObjectDatatype($o);
             $oLang = $this->determineObjectLanguage($o);
             $oValue = $this->determineObjectValue($o);
-            
+
             if ($oIsUri === true) {
                 $oValue = $o;
             }
@@ -622,7 +622,7 @@ abstract class AbstractQuery implements Query
 
         return $pattern;
     }
-    
+
     /**
      * Extracts variables array from a given query.
      *
@@ -637,7 +637,7 @@ abstract class AbstractQuery implements Query
 
         return array_values(array_unique($matches[1]));
     }
-    
+
     /**
      * Returns a list of common namespaces.
      *
@@ -647,7 +647,7 @@ abstract class AbstractQuery implements Query
     {
         return $this->commonNamespaces;
     }
-    
+
     /**
      * Returns raw query, if available.
      *
@@ -657,7 +657,7 @@ abstract class AbstractQuery implements Query
     {
         return $this->query;
     }
-    
+
     /**
      * Get type for a given query.
      *
@@ -671,66 +671,66 @@ abstract class AbstractQuery implements Query
          * First we get rid of all PREFIX information
          */
         $adaptedQuery = preg_replace('/PREFIX\s+[a-z0-9]+\:\s*\<[a-z0-9\:\/\.\#\-]+\>/', '', $query);
-        
+
         // remove trailing whitespaces
         $adaptedQuery = trim($adaptedQuery);
-        
+
         // only lower chars
         $adaptedQuery = strtolower($adaptedQuery);
-        
+
         /**
          * After we know the type, we initiate the according class and return it.
          */
         $firstPart = substr($adaptedQuery, 0, 3);
-        
+
         switch($firstPart) {
             // ASK
             case 'ask':
                 return 'askQuery';
-                
+
             // DESCRIBE
             case 'des':
                 return 'describeQuery';
-                
+
             /**
              * If we land here, we have to use a higher range of characters
              */
             default:
                 $firstPart = substr($adaptedQuery, 0, 6);
-                
+
                 switch($firstPart) {
                     // CLEAR GRAPH
                     case 'clear ':
                         return 'graphQuery';
-                        
+
                     // CREATE GRAPH
                     // CREATE SILENT GRAPH
                     case 'create':
                         return 'graphQuery';
-                    
+
                     // DELETE DATA
                     case 'delete':
                         return 'updateQuery';
-                    
+
                     // DROP GRAPH
                     case 'drop g':
                         return 'graphQuery';
-                    
+
                     // DROP SILENT GRAPH
                     case 'drop s':
                         return 'graphQuery';
-                    
+
                     // INSERT DATA
                     // INSERT INTO
                     case 'insert':
                         return 'updateQuery';
-                    
+
                     // SELECT
                     case 'select':
                         return 'selectQuery';
-                    
+
                     default:
-                    
+
                         // check if query is of type: WITH <http:// ... > DELETE { ... } WHERE { ... }
                         // TODO make it more precise
                         if (false !== strpos($adaptedQuery, 'with')
@@ -740,10 +740,10 @@ abstract class AbstractQuery implements Query
                         }
                 }
         }
-        
+
         throw new \Exception('Unknown query type: '. $firstPart);
     }
-    
+
     /**
      * Creates an instance of a subclass of AbstractQuery for the given query.
      *
@@ -755,24 +755,24 @@ abstract class AbstractQuery implements Query
         switch(self::getQueryType($query)) {
             case 'askQuery':
                 return new AskQuery($query);
-                
+
             case 'describeQuery':
                 return new DescribeQuery($query);
-                
+
             case 'graphQuery':
                 return new GraphQuery($query);
-                
+
             case 'selectQuery':
                 return new SelectQuery($query);
-                
+
             case 'updateQuery':
                 return new UpdateQuery($query);
-            
+
             default:
                 throw new \Exception('Unknown query type: '. $query);
         }
     }
-    
+
     /**
      * Replaces the prefix in a string with the original URI
      *
@@ -787,21 +787,21 @@ abstract class AbstractQuery implements Query
             false === strpos($prefixedString, '<') && false === strpos($prefixedString, '>')) {
             // prefix is the part before the :
             $prefix = substr($prefixedString, 0, strpos($prefixedString, ':'));
-            
+
             // if a prefix
             if (true === isset($prefixes[$prefix])) {
                 $prefixedString = str_replace($prefix . ':', $prefixes[$prefix], $prefixedString);
             }
         }
-        
+
         return $prefixedString;
     }
-    
+
     public function setQuery($query)
     {
         $this->query = $query;
     }
-    
+
     /**
      * Unsets values if its is empty
      *

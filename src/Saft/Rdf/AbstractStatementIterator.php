@@ -10,7 +10,7 @@ abstract class AbstractStatementIterator implements StatementIterator
     {
         // Nothing to do
     }
-    
+
     /**
      * Returns the Statement-Data in sparql-Format.
      *

@@ -10,9 +10,9 @@ class RestAPIUnitTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        
+
         $this->fixture = $this->getMockForAbstractClass('\Saft\Store\AbstractSparqlStore');
-        
+
         // Override query method: it will always return the given query.
         $this->fixture->method('query')->will($this->returnArgument(0));
 

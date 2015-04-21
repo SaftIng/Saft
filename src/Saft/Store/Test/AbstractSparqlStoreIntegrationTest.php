@@ -23,7 +23,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
      * @var array
      */
     protected $config;
-    
+
     /**
      * Contains an instance of the class to test.
      *
@@ -47,7 +47,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 
         parent::tearDown();
     }
-    
+
     /**
      * http://stackoverflow.com/a/12496979
      * Fixes assertEquals in case of check array equality.
@@ -63,7 +63,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $actual, $message);
     }
-    
+
     /**
      * Loads config.yml and return its content as array.
      */
@@ -82,7 +82,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         $yaml = new Parser();
         return $yaml->parse(file_get_contents($configFilepath));
     }
-    
+
     /**
      * function addStatements
      */
@@ -91,7 +91,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
     {
         // remove all triples from the test graph
         $this->fixture->query('CLEAR GRAPH <' . $this->testGraphUri . '>');
-        
+
         // graph is empty
         $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
 
@@ -115,7 +115,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         // graph has two entries
         $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraphUri));
     }
-    
+
     public function testAddStatementsLanguageTags()
     {
         // graph is empty
@@ -141,7 +141,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         // graph has now two entries
         $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraphUri));
     }
-    
+
     public function testAddStatementsWithSuccessor()
     {
         $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
@@ -161,9 +161,9 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
             }
             $instance = new '. $class .'();'
         );
-        
+
         $this->fixture->setChainSuccessor($instance);
-        
+
         $this->assertTrue($this->fixture->addStatements(new ArrayStatementIteratorImpl(array())));
     }
 
@@ -211,7 +211,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
     /**
      * Tests deleteMatchingStatements
      */
-    
+
     public function testDeleteMatchingStatementsWithSuccessor()
     {
         $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
@@ -231,14 +231,14 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
             }
             $instance = new '. $class .'();'
         );
-        
+
         $this->fixture->setChainSuccessor($instance);
         
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
-        
+
         $this->assertTrue($this->fixture->deleteMatchingStatements($statement, $this->testGraphUri));
     }
-    
+
     public function testDeleteMatchingStatementsWithVariables()
     {
         /**
@@ -275,11 +275,11 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 
         $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
     }
-    
+
     /**
      * Tests getMatchingStatements
      */
-    
+
     public function testGetMatchingStatements1()
     {
         // 2 triples
@@ -298,13 +298,13 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 
         // add triples
         $this->fixture->addStatements($statements, $this->testGraphUri);
-        
+
         $statement = new StatementImpl(
             new NamedNodeImpl('http://s/'),
             new NamedNodeImpl('http://p/'),
             new VariableImpl()
         );
-        
+
         /**
          * Build SetResult instance to check against
          */
@@ -324,26 +324,25 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
                 new LiteralImpl('"test literal"')
             )
         );
-        
+
         $this->assertEquals(
             $statementResultToCheckAgainst,
             $this->fixture->getMatchingStatements($statement, $this->testGraphUri)
         );
     }
-    
+
     public function testGetMatchingStatementsEmptyGraph()
     {
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
-        
         $statementResult = new StatementResult();
         $statementResult->setVariables(array('s', 'p', 'o'));
-        
+
         $this->assertEquals(
             $statementResult,
             $this->fixture->getMatchingStatements($statement, $this->testGraphUri)
         );
     }
-    
+
     public function testGetMatchingStatementsWithSuccessor()
     {
         $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
@@ -363,24 +362,24 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
             }
             $instance = new '. $class .'();'
         );
-        
+
         $this->fixture->setChainSuccessor($instance);
         
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
-        
+
         $statementResult = new StatementResult();
         $statementResult->setVariables(array('s', 'p', 'o'));
-        
+
         $this->assertEquals(
             $statementResult,
             $this->fixture->getMatchingStatements($statement, $this->testGraphUri)
         );
     }
-    
+
     /**
      * Tests hasMatchingStatements
      */
-    
+
     public function testHasMatchingStatement()
     {
         // 2 triples
@@ -404,7 +403,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         
         $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraphUri));
     }
-    
+
     public function testHasMatchingStatementEmptyGraph()
     {
         $this->fixture->query('CLEAR GRAPH <'. $this->testGraphUri .'>');
@@ -413,7 +412,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         
         $this->assertFalse($this->fixture->hasMatchingStatement($statement, $this->testGraphUri));
     }
-    
+
     public function testHasMatchingStatementWithSuccessor()
     {
         // 2 triples
@@ -432,7 +431,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 
         // add triples
         $this->fixture->addStatements($statements, $this->testGraphUri);
-        
+
         /**
          * Mock
          */
@@ -453,7 +452,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
             }
             $instance = new '. $class .'();'
         );
-        
+
         $this->fixture->setChainSuccessor($instance);
         
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
@@ -490,7 +489,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 
         // add triples
         $this->fixture->addStatements($statements, $this->testGraphUri);
-        
+
         /**
          * Build SetResult instance to check against
          */
@@ -508,7 +507,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
             's' => new NamedNodeImpl('http://s/'),
             'o' => new NamedNodeImpl('http://o/')
         ));
-        
+
         // check
         $this->assertEquals(
             $setResultToCheckAgainst,
@@ -519,7 +518,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
     public function testQueryAsk()
     {
         $this->fixture->query('CLEAR GRAPH <'. $this->testGraphUri .'>');
-        
+
         $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
 
         // 2 triples
@@ -546,13 +545,13 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
     {
         $setResult = new SetResult();
         $setResult->setVariables(array('s', 'p', 'o'));
-        
+
         $this->assertEquals(
             $setResult,
             $this->fixture->query('SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}')
         );
     }
-    
+
     public function testQueryWithSuccessor()
     {
         $storeInterfaceMock = $this->getMockBuilder('Saft\Store\Store')->getMock();
@@ -571,12 +570,12 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
             }
             $instance = new '. $class .'();'
         );
-        
+
         $this->fixture->setChainSuccessor($instance);
-        
+
         $setResult = new SetResult();
         $setResult->setVariables(array('s', 'p', 'o'));
-        
+
         $this->assertEquals(
             $setResult,
             $this->fixture->query('SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}')

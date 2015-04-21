@@ -57,7 +57,7 @@ class MatchingStatementIteratorUnitTest extends \PHPUnit_Framework_TestCase
                 $matches
             )
         );
-        
+
         $it->close();
     }
 
@@ -139,10 +139,10 @@ class MatchingStatementIteratorUnitTest extends \PHPUnit_Framework_TestCase
         } catch (SyntaxException $e) {
             $this->assertEquals(12, $e->getRow());
         }
-        
+
         $it->close();
     }
-    
+
     /**
      * @expectedException \InvalidArgumentException
      */

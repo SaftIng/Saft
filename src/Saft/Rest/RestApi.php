@@ -61,7 +61,7 @@ class RestApi extends AbstractRest
                     throw new \Exception('graphUri not valid.');
                 }
             }
-            
+
             //AddStatements
             if ($this->method == 'POST') {
                 $array = array();
@@ -155,7 +155,7 @@ class RestApi extends AbstractRest
         } elseif (null !== $value) {
             return new LiteralImpl($value);
         }
-        
+
         // in case null was given
         return null;
     }
