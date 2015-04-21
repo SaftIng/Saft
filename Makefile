@@ -15,6 +15,7 @@ default:
 
 setup-test-environment:
 	cp test-config.yml.dist test-config.yml
+	sudo apt-get install xsltproc
 
 test:
 	- $(PHPUNIT)
