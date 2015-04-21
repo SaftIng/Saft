@@ -4,7 +4,6 @@ namespace Saft\Backend\HttpStore\Store;
 
 use Saft\Backend\HttpStore\Net\Client;
 use Saft\Rdf\AbstractLiteral;
-use Saft\Rdf\AbstractNamedNode;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
@@ -451,7 +450,7 @@ class Http extends AbstractSparqlStore
      */
     public function getTripleCount($graphUri)
     {
-        if (true === AbstractNamedNode::check($graphUri)) {
+        if (true === NodeUtils::simpleCheckURI($graphUri)) {
             $result = $this->query('SELECT (COUNT(*) AS ?count) FROM <' . $graphUri . '> WHERE {?s ?p ?o.}');
             $result = $result->getResultObject();
 
@@ -490,7 +489,7 @@ class Http extends AbstractSparqlStore
                 $graphUri = $graph->getUri();
             }
 
-            if (false === AbstractNamedNode::check($graphUri)) {
+            if (false === NodeUtils::simpleCheckURI($graphUri)) {
                 throw new \Exception('Neither $Statement has a valid graph nor $graphUri is valid URI.');
             }
 

@@ -2,7 +2,7 @@
 
 namespace Saft\Sparql\Query;
 
-use Saft\Rdf\AbstractNamedNode;
+use Saft\Rdf\NodeUtils;
 
 /**
  * Represents a SPARQL query.
@@ -98,7 +98,7 @@ abstract class AbstractQuery implements Query
         }
 
         // checks if $entity is an URL
-        if (true === AbstractNamedNode::check($entity)) {
+        if (true === NodeUtils::simpleCheckURI($entity)) {
             return 'uri';
 
         // checks if ^^< is in $entity OR if $entity is surrounded by quotation marks

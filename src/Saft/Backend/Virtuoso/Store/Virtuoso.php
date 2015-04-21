@@ -3,7 +3,6 @@
 namespace Saft\Backend\Virtuoso\Store;
 
 use Saft\Rdf\AbstractLiteral;
-use Saft\Rdf\AbstractNamedNode;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
@@ -396,7 +395,7 @@ class Virtuoso extends AbstractSparqlStore
      */
     public function getTripleCount($graphUri)
     {
-        if (true === AbstractNamedNode::check($graphUri)) {
+        if (true === NodeUtils::simpleCheckURI($graphUri)) {
             $result = $this->query('SELECT (COUNT(*) AS ?count) FROM <' . $graphUri . '> WHERE {?s ?p ?o.}');
             $result = $result->getResultObject();
 
@@ -431,7 +430,7 @@ class Virtuoso extends AbstractSparqlStore
             $graphUri = $graph->getUri();
         }
 
-        if (false === AbstractNamedNode::check($graphUri)) {
+        if (false === NodeUtils::simpleCheckURI($graphUri)) {
             throw new \Exception('Neither $Statement has a valid graph nor $graphUri is valid URI.');
         }
 

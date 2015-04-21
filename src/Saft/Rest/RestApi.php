@@ -3,11 +3,11 @@
 namespace Saft\Rest;
 
 use Saft\Store\Store;
-use Saft\Rdf\AbstractNamedNode;
 use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\VariableImpl;
+use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
 
 /**
@@ -55,7 +55,7 @@ class RestApi extends AbstractRest
             // set graphUri if given
             $graphUri = null;
             if (isset($_POST['graphUri'])) {
-                if (NamedNodeImpl::check($_POST['graphUri']) || '?' == substr($_POST['graphUri'], 0, 1)) {
+                if (NodeUtils::simpleCheckURI($_POST['graphUri']) || '?' == substr($_POST['graphUri'], 0, 1)) {
                     $graphUri = $_POST['graphUri'];
                 } else {
                     throw new \Exception('graphUri not valid.');
@@ -148,7 +148,7 @@ class RestApi extends AbstractRest
      */
     protected function createNode($value)
     {
-        if (true === AbstractNamedNode::check($value)) {
+        if (true === NodeUtils::simpleCheckURI($value)) {
             return new NamedNodeImpl($value);
         } elseif ('?' == substr($value, 0, 1)) {
             return new VariableImpl($value);
