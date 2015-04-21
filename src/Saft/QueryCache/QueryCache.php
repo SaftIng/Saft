@@ -397,16 +397,16 @@ class QueryCache implements Store, ChainableStore
         $query = '';
             
         // add filter, if subject is a named node or literal
-        if (true === $s->isNamed()) { $query = 'FILTER (str(?s) = "'. $s->getUri() .'") '; }
-        if (true == $s->isLiteral()) { $query = 'FILTER (str(?s) = "'. $s->getValue() .'") '; }
+        if (true === $s->isNamed()) { $query .= 'FILTER (str(?s) = "'. $s->getUri() .'") '; }
+        if (true === $s->isLiteral()) { $query .= 'FILTER (str(?s) = '. $s->getValue() .') '; }
         
         // add filter, if predicate is a named node or literal
-        if (true === $p->isNamed()) { $query = 'FILTER (str(?p) = "'. $p->getUri() .'") '; }
-        if (true == $p->isLiteral()) { $query = 'FILTER (str(?p) = "'. $p->getValue() .'") '; }
+        if (true === $p->isNamed()) { $query .= 'FILTER (str(?p) = "'. $p->getUri() .'") '; }
+        if (true === $p->isLiteral()) { $query .= 'FILTER (str(?p) = '. $p->getValue() .') '; }
         
         // add filter, if predicate is a named node or literal
-        if (true === $o->isNamed()) { $query = 'FILTER (str(?o) = "'. $o->getUri() .'") '; }
-        if (true == $o->isLiteral()) { $query = 'FILTER (str(?o) = "'. $o->getValue() .'") '; }
+        if (true === $o->isNamed()) { $query .= 'FILTER (str(?o) = "'. $o->getUri() .'") '; }
+        if (true === $o->isLiteral()) { $query .= 'FILTER (str(?o) = '. $o->getValue() .') '; }
         
         $query = 'SELECT ?s ?p ?o FROM <'. $graphUri .'> WHERE { ?s ?p ?o '. $query .'}';
         
@@ -485,16 +485,16 @@ class QueryCache implements Store, ChainableStore
         $query = '';
             
         // add filter, if subject is a named node or literal
-        if (true === $s->isNamed()) { $query = 'FILTER (str(?s) = "'. $s->getUri() .'") '; }
-        if (true == $s->isLiteral()) { $query = 'FILTER (str(?s) = "'. $s->getValue() .'") '; }
+        if (true === $s->isNamed()) { $query .= 'FILTER (str(?s) = "'. $s->getUri() .'") '; }
+        if (true == $s->isLiteral()) { $query .= 'FILTER (str(?s) = '. $s->getValue() .') '; }
         
         // add filter, if predicate is a named node or literal
-        if (true === $p->isNamed()) { $query = 'FILTER (str(?p) = "'. $p->getUri() .'") '; }
-        if (true == $p->isLiteral()) { $query = 'FILTER (str(?p) = "'. $p->getValue() .'") '; }
+        if (true === $p->isNamed()) { $query .= 'FILTER (str(?p) = "'. $p->getUri() .'") '; }
+        if (true == $p->isLiteral()) { $query .= 'FILTER (str(?p) = '. $p->getValue() .') '; }
         
         // add filter, if predicate is a named node or literal
-        if (true === $o->isNamed()) { $query = 'FILTER (str(?o) = "'. $o->getUri() .'") '; }
-        if (true == $o->isLiteral()) { $query = 'FILTER (str(?o) = "'. $o->getValue() .'") '; }
+        if (true === $o->isNamed()) { $query .= 'FILTER (str(?o) = "'. $o->getUri() .'") '; }
+        if (true == $o->isLiteral()) { $query .= 'FILTER (str(?o) = '. $o->getValue() .') '; }
         
         $query = 'ASK FROM <'. $graphUri .'> { ?s ?p ?o '. $query .'}';
         

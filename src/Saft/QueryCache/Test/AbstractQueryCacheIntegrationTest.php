@@ -4,6 +4,7 @@ namespace Saft\QueryCache\Test;
 
 use Saft\TestCase;
 use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\VariableImpl;
@@ -762,6 +763,85 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
             ),
             $this->fixture->getLog()
         );
+    }
+    
+    /**
+     * Tests getMatchingStatement
+     */
+     
+    public function testGetMatchingStatementsNamedNodesLiteral()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+        
+        // test data
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new LiteralImpl('test literal')
+        );
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $options = array(1);
+        
+        // assumption is that all given parameter will be returned
+        $this->assertEquals(
+            array(
+                $statement, $this->testGraphUri, $options 
+            ),
+            $this->fixture->getMatchingStatements($statement, $this->testGraphUri, $options)
+        );
+        
+        $this->assertEquals(
+            array(
+                array(
+                    'graph_uris' => array($this->testGraphUri => $this->testGraphUri),
+                    'query' => 'SELECT ?s ?p ?o FROM <http://localhost/Saft/TestGraph/> '.
+                               'WHERE { '.
+                                    '?s ?p ?o '.
+                                    'FILTER (str(?s) = "'. $statement->getSubject()->getUri() .'") '.
+                                    'FILTER (str(?p) = "'. $statement->getPredicate()->getUri() .'") '.
+                                    'FILTER (str(?o) = '. $statement->getObject()->getValue() .') '.
+                                '}',
+                    'result' => array($statement, $this->testGraphUri, $options),
+                    'triple_pattern' => array(
+                        $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+                            => $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+                    )
+                )
+            ),
+            $this->fixture->getLatestQueryCacheContainer()
+        );
+    }
+     
+    public function testGetMatchingStatementsVariables()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+        
+        // test data
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $options = array(1);
+        
+        // assumption is that all given parameter will be returned
+        $this->assertEquals(
+            array(
+                $statement, $this->testGraphUri, $options 
+            ),
+            $this->fixture->getMatchingStatements($statement, $this->testGraphUri, $options)
+        );
+    }
+     
+    // try to call function method without a successor set leads to an exception
+    public function testHasMatchingStatementsNoSuccessor()
+    {
+        $this->setExpectedException('\Exception');
+        
+        // test data
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        $this->fixture->getMatchingStatements($statement);
     }
     
     /**
