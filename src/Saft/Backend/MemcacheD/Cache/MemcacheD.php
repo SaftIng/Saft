@@ -19,7 +19,7 @@ class MemcacheD implements CacheInterface
      *
      * @var string
      */
-    protected $keyPrefix;
+    protected $keyPrefix = 'saft-memD--';
     
     /**
      * Checks that all requirements for this adapter are fullfilled.
@@ -53,7 +53,9 @@ class MemcacheD implements CacheInterface
      */
     public function delete($key)
     {
-        return $this->cache->delete($this->keyPrefix . $key);
+        $hashedKey = hash('sha256', $key);
+        
+        return $this->cache->delete($this->keyPrefix . $hashedKey);
     }
 
     /**
@@ -76,14 +78,16 @@ class MemcacheD implements CacheInterface
      */
     public function getCompleteEntry($key)
     {
+        $hashedKey = hash('sha256', $key);
+        
         if (true === $this->isCached($key)) {
-            $container = $this->cache->get($this->keyPrefix . $key);
+            $container = $this->cache->get($this->keyPrefix . $hashedKey);
         
             /**
              * Update meta data
              */
             ++$container['get_count'];
-            $this->cache->set($this->keyPrefix . $key, $container);
+            $this->cache->set($this->keyPrefix . $hashedKey, $container);
             
             return $container;
             
@@ -110,7 +114,8 @@ class MemcacheD implements CacheInterface
      */
     public function isCached($key)
     {
-        return false !== $this->cache->get($this->keyPrefix . $key);
+        $hashedKey = hash('sha256', $key);
+        return false !== $this->cache->get($this->keyPrefix . $hashedKey);
     }
 
     /**
@@ -121,8 +126,10 @@ class MemcacheD implements CacheInterface
      */
     public function set($key, $value)
     {
+        $hashedKey = hash('sha256', $key);
+        
         if (true === $this->isCached($key)) {
-            $container = $this->cache->get($this->keyPrefix . $key);
+            $container = $this->cache->get($this->keyPrefix . $hashedKey);
             $container['value'] = $value;
             
             ++$container['set_count'];
@@ -133,7 +140,7 @@ class MemcacheD implements CacheInterface
             $container['value'] = $value;
         }
         
-        $this->cache->set($this->keyPrefix . $key, $container);
+        $this->cache->set($this->keyPrefix . $hashedKey, $container);
     }
 
     /**
