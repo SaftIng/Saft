@@ -193,7 +193,18 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
      * function set
      */
 
-    public function testSet()
+    public function testSetDifferentKeyTypes()
+    {
+        // no special chars
+        $this->fixture->set('testSet_normal', 1);
+        $this->assertEquals(1, $this->fixture->get('testSet_normal'));
+        
+        // special chars
+        $this->fixture->set('testSet_üöäß', 1);
+        $this->assertEquals(1, $this->fixture->get('testSet_üöäß'));
+    }
+
+    public function testSetDifferentValueTypes()
     {
         // int
         $this->fixture->set('testSet_int', 1);
