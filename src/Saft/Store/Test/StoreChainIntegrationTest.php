@@ -16,6 +16,13 @@ use Symfony\Component\Yaml\Parser;
 class StoreChainIntegrationTest extends TestCase
 {
     /**
+     * Separator. Related for triple pattern of the QueryCache.
+     * 
+     * @var string
+     */
+    protected $separator = '__.__';
+    
+    /**
      *
      */
     public function setUp()
@@ -58,6 +65,8 @@ class StoreChainIntegrationTest extends TestCase
             return;
         }
         
+        // expects Exception to be thrown, because chain only contains query cache and it does not support
+        // addStatement without successor
         $this->setExpectedException('\Exception');
         
         $this->fixture->setupChain(array($this->config['queryCacheConfig']));
@@ -211,10 +220,6 @@ class StoreChainIntegrationTest extends TestCase
             )->getEntryCount()
         );
         
-        
-        $latestResults = $chainEntries[0]->getLatestResults();
-        $firstOne = current(array_values($latestResults));
-        
         // remove all statements
         $this->fixture->deleteMatchingStatements(
             new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
@@ -357,10 +362,10 @@ class StoreChainIntegrationTest extends TestCase
         );
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $this->assertTrue(
-            null === $chainEntries[0]->getCache()->get($chainEntries[0]->generateShortId(
+            null === $chainEntries[0]->getCache()->get(
                 'SELECT * FROM <'. $this->testGraphUri .'> '.
-                'WHERE {'. $chainEntries[0]->sparqlFormat($statementIterator) .'}'
-            ))
+                'WHERE {'. $statementIterator->toSparqlFormat($this->testGraphUri) .'}'
+            )
         );
         
         // build statement result to check against
@@ -438,11 +443,10 @@ class StoreChainIntegrationTest extends TestCase
         );
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $testQuery = 'SELECT * FROM <'. $this->testGraphUri .'> '.
-                     'WHERE {'. $chainEntries[0]->sparqlFormat($statementIterator) .'}';
-        $this->assertTrue(
-            null === $chainEntries[0]->getCache()->get($chainEntries[0]->generateShortId($testQuery))
-        );
-        $this->assertEquals(0, count($chainEntries[0]->getLatestResults()));
+                     'WHERE {'. $statementIterator->toSparqlFormat($this->testGraphUri) .'}';
+        $this->assertTrue(null === $chainEntries[0]->getCache()->get($testQuery));
+        
+        $this->assertEquals(0, count($chainEntries[0]->getLatestQueryCacheContainer()));
         
         // call to fill cache
         $firstResult = $this->fixture->getMatchingStatements($statement, $this->testGraphUri);
@@ -470,8 +474,7 @@ class StoreChainIntegrationTest extends TestCase
         $this->assertEquals($statementResult, $cachedResult);
         
         // check count
-        $latestQueryCacheEntries = $chainEntries[0]->getLatestResults();
-        $this->assertEquals(1, count($latestQueryCacheEntries));
+        $this->assertEquals(1, count($chainEntries[0]->getLatestQueryCacheContainer()));
         
         $statementResult = new StatementResult();
         $statementResult->setVariables(array('s', 'p', 'o'));
@@ -494,19 +497,17 @@ class StoreChainIntegrationTest extends TestCase
         $this->assertEquals(
             array(
                 array(
-                    'graphIds' => array(0 => 'saft-qC-05f6680daccd57a437570d5f59b0e6'),
+                    'graph_uris' => array($this->testGraphUri => $this->testGraphUri),
                     'query' => 'SELECT ?s ?p ?o FROM <http://localhost/Saft/TestGraph/> '.
                                'WHERE { ?s ?p ?o FILTER (str(?s) = "http://s/") FILTER (str(?p) = "http://p/") }',
-                    'relatedQueryCacheEntries' => '',
                     'result' => $statementResult,
-                    'triplePattern' => array(
-                        'saft-qC-05f6680daccd57a437570d5f59b0e6' => array(
-                            'saft-qC-05f6680daccd57a437570d5f59b0e6_*_*_*'
-                        )
+                    'triple_pattern' => array(
+                        $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+                            => $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
                     )
                 )
             ),
-            array_values($latestQueryCacheEntries)
+            array_values($chainEntries[0]->getLatestQueryCacheContainer())
         );
     }
     
@@ -708,23 +709,12 @@ class StoreChainIntegrationTest extends TestCase
         $chainEntries[0]->getCache()->clean();
         
         // check that no cache entry is available for the test query
-        $this->assertTrue(
-            null === $chainEntries[0]->getCache()->get($chainEntries[0]->generateShortId($testQuery))
-        );
+        $this->assertTrue(null === $chainEntries[0]->getCache()->get($testQuery));
         
         /**
          * check both results
          */
         $result = $this->fixture->query($testQuery);
         $this->assertEquals($virtuoso->query($testQuery), $result);
-    }
-    
-    /**
-     * Tests setChainSuccessor
-     */
-
-    public function testSetChainSuccessor()
-    {
-        $this->fixture->setChainSuccessor($this->getMockBuilder('Saft\Store\Store')->getMock());
     }
 }

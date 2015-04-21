@@ -21,28 +21,32 @@ class SelectQuery extends AbstractQuery
      */
     public function __toString()
     {
-        $queryString = $this->select .' '. PHP_EOL;
+        $queryString = $this->queryParts['select'] .' '. PHP_EOL;
 
-        foreach (array_unique($this->from) as $from) {
-            $queryString .= 'FROM <' . $from . '>' . PHP_EOL;
+        if (true === isset($this->queryParts['graphs'])) {
+            foreach (array_unique($this->queryParts['graphs']) as $graphUri) {
+                $queryString .= 'FROM <' . $graphUri . '>' . PHP_EOL;
+            }
         }
 
-        foreach (array_unique($this->fromNamed) as $fromNamed) {
-            $queryString .= 'FROM NAMED <' . $fromNamed . '>' . PHP_EOL;
+        if (true === isset($this->queryParts['named_graphs'])) {
+            foreach (array_unique($this->queryParts['named_graphs']) as $graphUri) {
+                $queryString .= 'FROM NAMED <' . $graphUri . '>' . PHP_EOL;
+            }
         }
 
         $queryString .= $this->queryParts['where'] . ' ';
 
-        if ($this->order !== null) {
-            $queryString .= 'ORDER BY ' . $this->order . PHP_EOL;
+        if (true === isset($this->queryParts['order'])) {
+            $queryString .= 'ORDER BY ' . $this->queryParts['order'] . PHP_EOL;
         }
 
-        if ($this->limit !== null) {
-            $queryString .= 'LIMIT ' . $this->limit . PHP_EOL;
+        if (true === isset($this->queryParts['limit'])) {
+            $queryString .= 'LIMIT ' . $this->queryParts['limit'] . PHP_EOL;
         }
 
-        if ($this->offset !== null) {
-            $queryString .= 'OFFSET ' . $this->offset . PHP_EOL;
+        if (true === isset($this->queryParts['offset'])) {
+            $queryString .= 'OFFSET ' . $this->queryParts['offset'] . PHP_EOL;
         }
 
         return $queryString;
