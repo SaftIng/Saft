@@ -20,10 +20,8 @@ abstract class AbstractLiteral implements Literal
     public function equals(Node $toCompare)
     {
         // Only compare, if given instance is a literal
-        if ($toCompare->isLiteral()) {
-            if ($this->getDatatype() == $toCompare->getDatatype()) {
-                return $this->getValue() == $toCompare->getValue();
-            }
+        if ($toCompare->isLiteral() && $this->getDatatype() == $toCompare->getDatatype()) {
+            return $this->getValue() == $toCompare->getValue();
         }
         return false;
     }
@@ -73,19 +71,11 @@ abstract class AbstractLiteral implements Literal
      */
     public function toNQuads()
     {
+        $string = '"' . $this->getValue() . '"';
+
         // handle boolean values when transformed as n-triples by setting a
-        if (true === is_bool($this->getValue())) {
-            $string = $this->getValue() ? '"true"' : '"false"';
-        
-        // check for existing quotation marks in the value. if there are one at the beginning and end of the
-        // value, use value as it is
-        } elseif ('"' === substr($this->getValue(), 0, 1)
-            && '"' === substr($this->getValue(), strlen($this->getValue())-1, 1)) {
-            $string = $this->getValue();
-            
-        // surround everything else with quotation marks
-        } else {
-            $string = '"' . $this->getValue() . '"';
+        if (is_bool($this->getValue())) {
+            $string = $this->getValue()?'"true"':'"false"';
         }
 
         if ($this->getLanguage() !== null) {

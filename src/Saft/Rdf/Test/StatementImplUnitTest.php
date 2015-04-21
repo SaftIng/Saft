@@ -25,9 +25,9 @@ class StatementImplUnitTest extends StatementAbstractTest
         return new VariableImpl($value);
     }
 
-    public function newBlankNodeInstance($id)
+    public function newBlankNodeInstance($blankId)
     {
-        return new BlankNodeImpl($id);
+        return new BlankNodeImpl($blankId);
     }
 
     public function newInstance($subject, $predicate, $object, $graph = null)

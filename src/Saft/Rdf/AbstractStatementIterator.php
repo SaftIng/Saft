@@ -30,7 +30,7 @@ abstract class AbstractStatementIterator implements StatementIterator
                 if (null !== $graphUri) {
                     $con = 'Graph <'. $graphUri .'> {'. $con .'}';
                 } elseif (null !== $graph) {
-                    $con = 'Graph <'. $graph->__toString() .'> {'. $con .'}';
+                    $con = 'Graph <'. $graph->getUri() .'> {'. $con .'}';
                 }
                 $string .= $con .' ';
             } else {

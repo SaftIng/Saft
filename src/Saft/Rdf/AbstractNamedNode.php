@@ -19,7 +19,7 @@ abstract class AbstractNamedNode implements NamedNode
     {
         // It only compares URIs, everything will be quit with false.
         if (true === $toCompare->isNamed()) {
-            return $this->getUri() == $toCompare->getValue();
+            return $this->getUri() == $toCompare->getUri();
         }
 
         return false;
