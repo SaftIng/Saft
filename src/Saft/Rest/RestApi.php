@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Rest;
 
 use Saft\Store\Store;
@@ -10,9 +11,9 @@ use Saft\Rdf\VariableImpl;
 use Saft\Rdf\StatementImpl;
 
 /**
- * treated REST requests. expected graphUri in _POST['graphUri'] and
- *  statements in _POST['statementsarray'].
- * @todo  hasMatchingStatement missing
+ * treated REST requests. expected graphUri in _POST['graphUri'] and statements in _POST['statementsarray'].
+ *
+ * TODO hasMatchingStatement missing
  */
 class RestApi extends AbstractRest
 {
@@ -23,10 +24,12 @@ class RestApi extends AbstractRest
 
     /**
      * Rest-Endpoints. handled:
+     *
      * for servername/store/statements
      * - POST for add statements
      * - DELETE for delete matching statement
      * - GET for get matching statement
+     *
      * for servername/store/graph
      * - GET for get available Graphs
      * @return mixed
@@ -34,7 +37,7 @@ class RestApi extends AbstractRest
     protected function store()
     {
         //servername/store/statements
-        if ($this->verb == "statements") {
+        if ($this->verb == 'statements') {
             if (!isset($_POST['statementsarray'])) {
                 throw new \Exception('no statements passed.');
             }
@@ -103,18 +106,18 @@ class RestApi extends AbstractRest
                     return $this->store->getMatchingStatements($statement, $graphUri);
 
                 } else {
-                    return "Only accepts POST/GET/DELETE requests";
+                    return 'Only accepts POST/GET/DELETE requests';
                 }
             }
             //servername/store/graph
-        } elseif ($this->verb == "graph") {
+        } elseif ($this->verb == 'graph') {
             if ($this->method == 'GET') {
                 return $this->store->getAvailableGraphs();
             } else {
-                return "Only accepts POST requests";
+                return 'Only accepts POST requests';
             }
         } else {
-            return "Wrong input";
+            return 'Wrong input';
         }
     }
 
@@ -145,12 +148,15 @@ class RestApi extends AbstractRest
      */
     protected function createNode($value)
     {
-        if (true === AbstractNamedNode::check($value) || null === $value) {
+        if (true === AbstractNamedNode::check($value)) {
             return new NamedNodeImpl($value);
         } elseif ('?' == substr($value, 0, 1)) {
             return new VariableImpl($value);
-        } else {
+        } elseif (null !== $value) {
             return new LiteralImpl($value);
         }
+        
+        // in case null was given
+        return null;
     }
 }

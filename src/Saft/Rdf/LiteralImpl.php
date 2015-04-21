@@ -4,9 +4,15 @@ namespace Saft\Rdf;
 
 class LiteralImpl extends AbstractLiteral
 {
-
-    protected static $xsdString = "http://www.w3.org/2001/XMLSchema#string";
-    protected static $rdfLangString = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString";
+    /**
+     * @var string
+     */
+    protected static $xsdString = 'http://www.w3.org/2001/XMLSchema#string';
+    
+    /**
+     * @var string
+     */
+    protected static $rdfLangString = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString';
 
     /**
      * @var string
@@ -31,18 +37,14 @@ class LiteralImpl extends AbstractLiteral
     public function __construct($value, $datatype = null, $lang = null)
     {
         if ($value === null) {
-            throw new \Exception("Literal value can't be null.");
+            throw new \Exception('Literal value can\'t be null.');
         }
 
         $this->value = $value;
         $this->lang = $lang;
 
         if ($lang !== null && $datatype !== null && $datatype !== self::$rdfLangString) {
-            throw new \Exception(
-                "Language tagged Literals must have " .
-                "<" . self::$rdfLangString . "> " .
-                "datatype."
-            );
+            throw new \Exception('Language tagged Literals must have <'. self::$rdfLangString .'> datatype.');
         }
 
         if ($datatype !== null) {
@@ -66,8 +68,8 @@ class LiteralImpl extends AbstractLiteral
      * Get the datatype URI of the Literal. It can be one of the XML Schema
      * datatypes (XSD) or anything else.
      *
-     * An overview about all XML Schema datatypes:
-     * {@url http://www.w3.org/TR/xmlschema-2/#built-in-datatypes}
+     * An overview about all XML Schema datatypes: {@url http://www.w3.org/TR/xmlschema-2/#built-in-datatypes}
+     *
      * @return string the URI of the datatype of the Literal
      */
     public function getDatatype()

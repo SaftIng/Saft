@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Rest;
 
 use Saft\Store\Store;
@@ -10,37 +11,44 @@ abstract class AbstractRest
 {
     /**
      * concrete implementation of StoreInterface.
-     * @var \Saft\StoreInterface\StoreInterface
+     *
+     * @var Store
      */
     protected $store;
+    
     /**
-     * Property: method
      * The HTTP method this request was made in, either GET, POST or DELETE
+     *
+     * @var string
      */
     protected $method = '';
+    
     /**
-     * Property: endpoint
      * The Model requested in the URI. eg: /files
+     *
+     * @var string
      */
     protected $endpoint = '';
+    
     /**
-     * Property: verb
-     * An optional additional descriptor about the endpoint, used for things that can
-     * not be handled by the basic methods. eg: /files/process
+     * An optional additional descriptor about the endpoint, used for things that can not be handled by the
+     * basic methods. eg: /files/process
+     *
+     * @var string
      */
     protected $verb = '';
+    
     /**
-     * Property: args
-     * Any additional URI components after the endpoint and verb have been removed, in our
-     * case, an integer ID for the resource. eg: /<endpoint>/<verb>/<arg0>/<arg1>
-     * or /<endpoint>/<arg0>
+     * Any additional URI components after the endpoint and verb have been removed, in our case, an integer ID
+     * for the resource. eg: /<endpoint>/<verb>/<arg0>/<arg1> or /<endpoint>/<arg0>
      */
     protected $args = array();
 
     /**
-     * Allow for CORS, assemble and pre-process the data
-     * @param [type]                             $request [description]
-     * @param \Saft\StoreInterface\AbstractStore $store   concrete Store.
+     * Allow for CORS, assemble and pre-process the data.
+     *
+     * @param string        $request
+     * @param AbstractStore $store   concrete Store.
      */
     public function __construct($request, Store $store)
     {
@@ -82,30 +90,36 @@ abstract class AbstractRest
                 break;
         }
     }
-
+    
+    /**
+     * TODO find out its purpose
+     */
     public function processAPI()
     {
-        if ((int)method_exists($this, $this->endpoint) > 0) {
+        if (true === method_exists($this, $this->endpoint)) {
             return $this->response($this->{$this->endpoint}($this->args));
         }
         return $this->response('No Endpoint: '. $this->endpoint, 404);
     }
 
     /**
-     * gives response.
+     * Gives HTTP response.
+     *
      * @param  string  $data
      * @param  integer $status HTTP-Status
-     * @return Returns $data.
+     * @return Returns given $data.
      */
     protected function response($data, $status = 200)
     {
         header('HTTP/1.1 '. $status .' '. $this->requestStatus($status));
-        //TODO the JSON representation of $data.
+        
+        // TODO the JSON representation of $data.
         return $data;
     }
 
     /**
-     * remove HTML- and PHP Tags.
+     * Remove HTML- and PHP Tags.
+     *
      * @param  [type] $data [description]
      * @return string request-method
      */
@@ -123,7 +137,8 @@ abstract class AbstractRest
     }
 
     /**
-     * return HTTP-Status as String
+     * Return HTTP-Status as String.
+     *
      * @param  integer $code HTTP-Status
      * @return string http-status
      */
@@ -135,6 +150,6 @@ abstract class AbstractRest
             405 => 'Method Not Allowed',
             500 => 'Internal Server Error',
         );
-        return ($status[$code])?$status[$code]:$status[500];
+        return ($status[$code]) ? $status[$code] : $status[500];
     }
 }

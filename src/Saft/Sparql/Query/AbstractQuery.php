@@ -394,12 +394,15 @@ abstract class AbstractQuery implements Query
                 $uri = substr($match, 0, $hashPos + 1);
 
             } else {
-                $slashPos = strrpos($match, '/', 7);
+                if (7 < strlen($match)) {
+                    $slashPos = strrpos($match, '/', 7);
 
-                // check for last /
-                if (false !== $slashPos) {
-                    $uri = substr($match, 0, $slashPos + 1);
-
+                    // check for last /
+                    if (false !== $slashPos) {
+                        $uri = substr($match, 0, $slashPos + 1);
+                    } else {
+                        continue;
+                    }
                 } else {
                     continue;
                 }

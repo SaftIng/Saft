@@ -126,7 +126,7 @@ class StoreChain implements Store
         // run command on chain entries
         if (true === isset($this->chainEntries[0])) {
             return $this->chainEntries[0]->getStoreDescription();
-        } 
+        }
     
         // dont run the command by yourself
         throw new \Exception('No chain entries available, cant run command by myself.');

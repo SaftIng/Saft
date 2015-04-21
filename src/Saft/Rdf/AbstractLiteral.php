@@ -74,8 +74,16 @@ abstract class AbstractLiteral implements Literal
     public function toNQuads()
     {
         // handle boolean values when transformed as n-triples by setting a
-        if (is_bool($this->getValue())) {
-            $string = $this->getValue()?'"true"':'"false"';
+        if (true === is_bool($this->getValue())) {
+            $string = $this->getValue() ? '"true"' : '"false"';
+        
+        // check for existing quotation marks in the value. if there are one at the beginning and end of the
+        // value, use value as it is
+        } elseif ('"' === substr($this->getValue(), 0, 1)
+            && '"' === substr($this->getValue(), strlen($this->getValue())-1, 1)) {
+            $string = $this->getValue();
+            
+        // surround everything else with quotation marks
         } else {
             $string = '"' . $this->getValue() . '"';
         }

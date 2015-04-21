@@ -15,6 +15,21 @@ abstract class NamedNodeAbstractTest extends \PHPUnit_Framework_TestCase
     abstract public function newInstance($uri);
 
     /**
+     * Tests check
+     */
+    public function testCheck()
+    {
+        $fixture = $this->newInstance('http://saft/test');
+        $this->assertFalse($fixture->check(''));
+        $this->assertFalse($fixture->check('http//foobar/'));
+        
+        $this->assertTrue($fixture->check('http:foobar/'));
+        $this->assertTrue($fixture->check('http://foobar/'));
+        $this->assertTrue($fixture->check('http://foobar:42/'));
+        $this->assertTrue($fixture->check('http://foo:bar@foobar/'));
+    }
+
+    /**
      * Tests instanciation
      */
     public function testInstanciationInvalidUri()

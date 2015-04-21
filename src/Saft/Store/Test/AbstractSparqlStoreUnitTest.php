@@ -108,13 +108,13 @@ class AbstractSparqlStoreUnitTest extends TestCase
          */
         $subject1 = new NamedNodeImpl('http://saft/test/s1');
         $predicate1 = new NamedNodeImpl('http://saft/test/p1');
-        $object1 = new LiteralImpl(42);
+        $object1 = new LiteralImpl(42); // will be handled as string, because no datatype given.
         $triple1 = new StatementImpl($subject1, $predicate1, $object1);
 
         /**
          * object is a literal
          */
-        $object2 = new LiteralImpl("John");
+        $object2 = new LiteralImpl('John');
         $triple2 = new StatementImpl($subject1, $predicate1, $object2);
         
         // Setup array statement iterator
@@ -125,7 +125,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $this->assertEquals(
             'INSERT DATA { '.
             'Graph <'. $this->testGraphUri .'> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer>} '.
+            '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#string>} '.
             'Graph <'. $this->testGraphUri .'> {'.
             '<http://saft/test/s1> <http://saft/test/p1> "John"^^<http://www.w3.org/2001/XMLSchema#string>} '.
             '}',

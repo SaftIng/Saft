@@ -27,7 +27,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     /**
      * Used in pattern key's as seperator. Here an example for _:
      * http://localhost/Saft/TestGraph/_http://a_*_*
-     * 
+     *
      * @var string
      */
     protected $separator = '__.__';
@@ -127,8 +127,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testBuildPatternListByStatement()
     {
         $statement = new StatementImpl(
-            new NamedNodeImpl('http://a'), 
-            new NamedNodeImpl('http://b'), 
+            new NamedNodeImpl('http://a'),
+            new NamedNodeImpl('http://b'),
             new NamedNodeImpl('http://c')
         );
         
@@ -143,25 +143,25 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                  */
                 'http://localhost/Saft/TestGraph/'. $this->separator .'http://a'. $this->separator .
                     '*'. $this->separator .'*',
-                'http://localhost/Saft/TestGraph/'. $this->separator .'*'. $this->separator .'http://b'. 
+                'http://localhost/Saft/TestGraph/'. $this->separator .'*'. $this->separator .'http://b'.
                     $this->separator .'*',
-                'http://localhost/Saft/TestGraph/'. $this->separator .'*'. $this->separator .'*'. 
+                'http://localhost/Saft/TestGraph/'. $this->separator .'*'. $this->separator .'*'.
                     $this->separator .'http://c',
                 
                 /**
                  * 2 places set: graphUri_http://a_http://b_*
                  */
-                'http://localhost/Saft/TestGraph/'. $this->separator .'http://a'. $this->separator .'http://b'. 
+                'http://localhost/Saft/TestGraph/'. $this->separator .'http://a'. $this->separator .'http://b'.
                     $this->separator .'*',
-                'http://localhost/Saft/TestGraph/'. $this->separator .'http://a'. $this->separator .'*'. 
+                'http://localhost/Saft/TestGraph/'. $this->separator .'http://a'. $this->separator .'*'.
                     $this->separator .'http://c',
-                'http://localhost/Saft/TestGraph/'. $this->separator .'*'. $this->separator .'http://b'. 
+                'http://localhost/Saft/TestGraph/'. $this->separator .'*'. $this->separator .'http://b'.
                     $this->separator .'http://c',
                     
                 /**
                  * all 3 places set
                  */
-                'http://localhost/Saft/TestGraph/'. $this->separator .'http://a'. $this->separator .'http://b'. 
+                'http://localhost/Saft/TestGraph/'. $this->separator .'http://a'. $this->separator .'http://b'.
                     $this->separator .'http://c',
             ),
             $this->fixture->buildPatternListByStatement($statement, $this->testGraphUri)
@@ -202,15 +202,15 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                 /**
                  * 2 places set
                  */
-                $this->testGraphUri . $this->separator .'http://a'. $this->separator .'http://b'. 
+                $this->testGraphUri . $this->separator .'http://a'. $this->separator .'http://b'.
                     $this->separator .'*',
-                $this->testGraphUri . $this->separator .'http://a'. $this->separator .'*'. 
+                $this->testGraphUri . $this->separator .'http://a'. $this->separator .'*'.
                     $this->separator .'http://c',
-                $this->testGraphUri . $this->separator .'*'. $this->separator .'http://b'. 
+                $this->testGraphUri . $this->separator .'*'. $this->separator .'http://b'.
                     $this->separator .'http://c',
                     
                 // all 3 places set
-                $this->testGraphUri . $this->separator .'http://a'. $this->separator .'http://b'. 
+                $this->testGraphUri . $this->separator .'http://a'. $this->separator .'http://b'.
                     $this->separator .'http://c',
             ),
             $this->fixture->buildPatternListByTriplePattern(
@@ -221,7 +221,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                     's_type' => 'uri',
                     'p_type' => 'uri',
                     'o_type' => 'uri',
-                ), 
+                ),
                 $this->testGraphUri
             )
         );
@@ -297,7 +297,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     
     /**
      * Tests getLog
-     * 
+     *
      * The following functions tests the log result for certain function calls
      */
     
@@ -359,8 +359,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetLogBuildPatternListByStatement()
     {
         $statement = new StatementImpl(
-            new NamedNodeImpl('http://a'), 
-            new NamedNodeImpl('http://b'), 
+            new NamedNodeImpl('http://a'),
+            new NamedNodeImpl('http://b'),
             new NamedNodeImpl('http://c')
         );
         
@@ -369,14 +369,14 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->assertEquals(
             array(
                 array(
-                    'method' => 'buildPatternListByStatement', 
+                    'method' => 'buildPatternListByStatement',
                     'parameter' => array(
                         'statement' => $statement,
                         'graphUri' => $this->testGraphUri
                     )
                 ),
                 array(
-                    'method' => 'buildPatternListBySPO', 
+                    'method' => 'buildPatternListBySPO',
                     'parameter' => array(
                         's' => 'http://a',
                         'p' => 'http://b',
@@ -398,7 +398,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         
         // build testdata
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));        
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $options = array(1);
         
         $this->fixture->deleteMatchingStatements($statement, $this->testGraphUri, $options);
@@ -451,7 +451,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         
         // build testdata
         $statement = new StatementImpl(new VariableImpl('?s'), new VariableImpl('?p'), new VariableImpl('?o'));
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));        
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $options = array(1);
         
         $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }';
@@ -476,7 +476,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                     'parameter' => array(
                         'queryObject' => $queryObject,
                         'result' => array(
-                            $statement, 
+                            $statement,
                             $this->testGraphUri,
                             array(1)
                         )
@@ -520,7 +520,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         
         // build testdata
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));        
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $options = array(1);
         
         $this->fixture->hasMatchingStatement($statement, $this->testGraphUri, $options);
@@ -741,11 +741,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                 array(
                     'method' => 'saveResult',
                     'parameter' => array(
-                        'queryObject' => $queryObject, 
+                        'queryObject' => $queryObject,
                         'result' => array(
                             new StatementImpl(
-                                new VariableImpl('?s'), 
-                                new VariableImpl('?p'), 
+                                new VariableImpl('?s'),
+                                new VariableImpl('?p'),
                                 new VariableImpl('?o')
                             ),
                             null,
@@ -787,7 +787,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         // assumption is that all given parameter will be returned
         $this->assertEquals(
             array(
-                $statement, $this->testGraphUri, $options 
+                $statement, $this->testGraphUri, $options
             ),
             $this->fixture->getMatchingStatements($statement, $this->testGraphUri, $options)
         );
@@ -827,7 +827,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         // assumption is that all given parameter will be returned
         $this->assertEquals(
             array(
-                $statement, $this->testGraphUri, $options 
+                $statement, $this->testGraphUri, $options
             ),
             $this->fixture->getMatchingStatements($statement, $this->testGraphUri, $options)
         );
@@ -886,7 +886,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         // assumption is that all given parameter will be returned
         $this->assertEquals(
             array(
-                $statement, $this->testGraphUri, $options 
+                $statement, $this->testGraphUri, $options
             ),
             $this->fixture->hasMatchingStatement($statement, $this->testGraphUri, $options)
         );
@@ -895,7 +895,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     // try to call function method without a successor set leads to an exception
     public function testHasMatchingStatementNoSuccessor()
     {
-        $this->setExpectedException('\Exception');        
+        $this->setExpectedException('\Exception');
         
         // test data
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
@@ -1046,11 +1046,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         
         // test data
         $query = 'SELECT * FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}';
-        $options = array();        
+        $options = array();
         
         $this->assertEquals(
             array(
-                new StatementImpl(new VariableImpl('?s'), new VariableImpl('?p'), new VariableImpl('?o')), 
+                new StatementImpl(new VariableImpl('?s'), new VariableImpl('?p'), new VariableImpl('?o')),
                 null,
                 $options
             ),
@@ -1082,7 +1082,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          * check saved references between graph URIs (from query) and a array of query strings
          */
         $this->assertEquals(
-            array($queryObject->getQuery() => $queryObject->getQuery()), 
+            array($queryObject->getQuery() => $queryObject->getQuery()),
             $this->fixture->getCache()->get($this->testGraphUri)
         );
         
@@ -1090,7 +1090,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          * check saved references between triple pattern (from query) and a array of query strings
          */
         $this->assertEquals(
-            array($queryObject->getQuery() => $queryObject->getQuery()), 
+            array($queryObject->getQuery() => $queryObject->getQuery()),
             $this->fixture->getCache()->get(
                 $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
             )
@@ -1105,12 +1105,12 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                     $this->testGraphUri => $this->testGraphUri
                 ),
                 'triple_pattern' => array(
-                    $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*' => 
+                    $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*' =>
                         $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
                 ),
                 'result' => $result,
                 'query' => $queryObject->getQuery(),
-            ), 
+            ),
             $this->fixture->getCache()->get($queryObject->getQuery())
         );
         
@@ -1124,7 +1124,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                         $this->testGraphUri => $this->testGraphUri
                     ),
                     'triple_pattern' => array(
-                        $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*' => 
+                        $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*' =>
                             $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
                     ),
                     'result' => $result,

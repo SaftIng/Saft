@@ -1,6 +1,7 @@
 <?php
 namespace Saft\Store\Test;
 
+use Saft\TestCase;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
@@ -11,10 +12,10 @@ use Saft\Store\Result\SetResult;
 use Saft\Store\Result\ValueResult;
 use Symfony\Component\Yaml\Parser;
 
-abstract class AbstractSparqlStoreIntegrationTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 {
     /**
-     * @var \Saft\Cache\Cache
+     * @var Cache
      */
     protected $cache;
 
@@ -320,7 +321,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends \PHPUnit_Framework_Tes
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new LiteralImpl('test literal')
+                new LiteralImpl('"test literal"')
             )
         );
         
@@ -497,15 +498,15 @@ abstract class AbstractSparqlStoreIntegrationTest extends \PHPUnit_Framework_Tes
         $setResultToCheckAgainst->setVariables(array('s', 'o'));
         $setResultToCheckAgainst->append(array(
             's' => new NamedNodeImpl('http://s/'),
+            'o' => new LiteralImpl('"42"')
+        ));
+        $setResultToCheckAgainst->append(array(
+            's' => new NamedNodeImpl('http://s/'),
             'o' => new LiteralImpl('"foobar"')
         ));
         $setResultToCheckAgainst->append(array(
             's' => new NamedNodeImpl('http://s/'),
             'o' => new NamedNodeImpl('http://o/')
-        ));
-        $setResultToCheckAgainst->append(array(
-            's' => new NamedNodeImpl('http://s/'),
-            'o' => new LiteralImpl(42)
         ));
         
         // check
