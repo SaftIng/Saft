@@ -233,7 +233,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         );
 
         $this->fixture->setChainSuccessor($instance);
-        
+
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
 
         $this->assertTrue($this->fixture->deleteMatchingStatements($statement, $this->testGraphUri));
@@ -321,7 +321,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new LiteralImpl('"test literal"')
+                new LiteralImpl('test literal')
             )
         );
 
@@ -364,7 +364,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         );
 
         $this->fixture->setChainSuccessor($instance);
-        
+
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
 
         $statementResult = new StatementResult();
@@ -398,18 +398,18 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 
         // add triples
         $this->fixture->addStatements($statements, $this->testGraphUri);
-        
+
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
-        
+
         $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraphUri));
     }
 
     public function testHasMatchingStatementEmptyGraph()
     {
         $this->fixture->query('CLEAR GRAPH <'. $this->testGraphUri .'>');
-        
+
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
-        
+
         $this->assertFalse($this->fixture->hasMatchingStatement($statement, $this->testGraphUri));
     }
 
@@ -454,9 +454,9 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         );
 
         $this->fixture->setChainSuccessor($instance);
-        
+
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
-        
+
         $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraphUri));
     }
 
@@ -478,7 +478,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new LiteralImpl('"foobar"')
+                new LiteralImpl('foobar')
             ),
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
@@ -497,11 +497,11 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         $setResultToCheckAgainst->setVariables(array('s', 'o'));
         $setResultToCheckAgainst->append(array(
             's' => new NamedNodeImpl('http://s/'),
-            'o' => new LiteralImpl('"42"')
+            'o' => new LiteralImpl('42')
         ));
         $setResultToCheckAgainst->append(array(
             's' => new NamedNodeImpl('http://s/'),
-            'o' => new LiteralImpl('"foobar"')
+            'o' => new LiteralImpl('foobar')
         ));
         $setResultToCheckAgainst->append(array(
             's' => new NamedNodeImpl('http://s/'),
