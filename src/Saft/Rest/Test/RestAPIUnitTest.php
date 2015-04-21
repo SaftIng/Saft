@@ -90,37 +90,6 @@ class RestAPIUnitTest extends TestCase
 
     /**
      * @runInSeparateProcess
-     *
-     * k00ni: I dont understand whats going on here, so for that reason this test is commmented out.
-     *
-    public function testObjectAsLiteral()
-    {
-        //object is a number
-        $statement1 = array('http://saft/test/s1', 'http://saft/test/p1', 42);
-
-        //object is a literal
-        $statement2 = array('http://saft/test/s2', 'http://saft/test/p2', '"John"');
-
-        $statements = array($statement1, $statement2);
-
-        // Prep request
-        $_POST['statementsarray'] = $statements;
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-
-        $API = new RestApi($_POST['request'], $_SERVER['HTTP_ORIGIN'], $this->fixture);
-
-        $this->assertEquals(
-            'INSERT DATA { Graph <http://g/1> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#integer>'.
-            '} Graph <http://g/1> {'.
-            '<http://saft/test/s2> <http://saft/test/p2> "John"^^<http://www.w3.org/2001/XMLSchema#string>'.
-            '} }',
-            $API->processAPI()
-        );
-    }*/
-
-    /**
-     * @runInSeparateProcess
      */
     public function testPassGraphUri()
     {
