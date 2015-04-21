@@ -16,7 +16,8 @@ setup-test-environment:
 	cp test-config.yml.dist test-config.yml
 
 test:
-	$(PHPUNIT)
+	- $(PHPUNIT)
+	xsltproc -o gen/test/report.html resources/phpunit-results.xsl gen/test/log.junit.xml
 
 codesniffer:
 	$(PHPCS) --standard=PSR1,PSR2 --extensions=php -p src/*
