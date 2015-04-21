@@ -213,7 +213,7 @@
     </xsl:template>
     
     <xsl:template name="classes">
-        <xsl:for-each select="testsuite">
+        <xsl:for-each select="testsuite/testsuite">
             <xsl:sort select="@name"/>
             <!-- create an anchor to this class name -->
             <a name="{@name}"></a>
