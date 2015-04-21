@@ -40,6 +40,8 @@ class QueryCache implements Store, ChainableStore
     protected $latestQueryCacheContainer = array();
     
     /**
+     * Method log. Its an array which saves entry in the order they were given.
+     * 
      * @var
      */
     protected $log;
@@ -82,14 +84,14 @@ class QueryCache implements Store, ChainableStore
     public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
     {
         // log it
-        $this->log[] = array(
+        $this->addToLog(array(
             'method' => 'addStatements',
             'parameter' => array(
                 'statements' => $statements,
                 'graphUri' => $graphUri,
                 'options' => $options
             )
-        );
+        ));
         
         // if successor is set, ask it first before run the command yourself.
         if ($this->successor instanceof Store) {
@@ -99,8 +101,19 @@ class QueryCache implements Store, ChainableStore
             
         // dont run command by myself
         } else {
-            throw new \Exception('QueryCache does not support adding new statements.');
+            throw new \Exception('QueryCache does not support adding new statements, only by successor.');
         }
+    }
+    
+    /**
+     * Adds an entry to log. 
+     * 
+     * @param array $entry
+     */
+    protected function addToLog(array $entry)
+    {
+        $index = count($this->log);
+        $this->log[$index] = $entry;
     }
     
     /**
@@ -115,10 +128,10 @@ class QueryCache implements Store, ChainableStore
     public function buildPatternListBySPO($s, $p, $o, $graphUri)
     {
         // log it
-        $this->log[] = array(
+        $this->addToLog(array(
             'method' => 'buildPatternListBySPO',
             'parameter' => array('s' => $s, 'p' => $p, 'o' => $o, 'graphUri' => $graphUri)
-        );
+        ));
         
         $patternList = array(
             // this pattern based on the current statement: graphUri_URI|*_URI|*_URI|*
@@ -178,13 +191,13 @@ class QueryCache implements Store, ChainableStore
     public function buildPatternListByStatement(Statement $statement, $graphUri)
     {
         // log it
-        $this->log[] = array(
+        $this->addToLog(array(
             'method' => 'buildPatternListByStatement',
             'parameter' => array(
                 'statement' => $statement,
                 'graphUri' => $graphUri,
             )
-        );
+        ));
         
         if (true === $statement->getSubject()->isNamed()) {
             $subject = $statement->getSubject()->getUri();
@@ -223,13 +236,13 @@ class QueryCache implements Store, ChainableStore
     public function buildPatternListByTriplePattern(array $triplePattern, $graphUri)
     {
         // log it
-        $this->log[] = array(
+        $this->addToLog(array(
             'method' => 'buildPatternListByTriplePattern',
             'parameter' => array(
                 'triplePattern' => $triplePattern,
                 'graphUri' => $graphUri,
             )
-        );
+        ));
         
         if ('uri' === $triplePattern['s_type']) {
             $subject = $triplePattern['s'];
@@ -265,34 +278,46 @@ class QueryCache implements Store, ChainableStore
      */
     public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
+        // log it
+        $this->addToLog(array(
+            'method' => 'deleteMatchingStatements',
+            'parameter' => array(
+                'statement' => $statement,
+                'graphUri' => $graphUri,
+                'options' => $options
+            )
+        ));
+        
         // if successor is set, ask it first before run the command yourself.
         if ($this->successor instanceof Store) {
-            $this->invalidateBySubjectResources(new ArrayStatementIteratorImpl(array($statement)), $graphUri);
+            $this->invalidateByTriplePattern(new ArrayStatementIteratorImpl(array($statement)), $graphUri);
             
             return $this->successor->deleteMatchingStatements($statement, $graphUri, $options);
             
         // dont run command by myself
         } else {
-            throw new \Exception('QueryCache does not support delete matching statements.');
+            throw new \Exception('QueryCache does not support delete matching statements, only by successor.');
         }
     }
     
     /**
      * Returns array with graphUri's which are available.
      *
-     * @return array Array which contains graph URI's as values and keys.
+     * @return array      Array which contains graph URI's as values and keys.
+     * @throws \Exception If no successor is set but this function was called.
      */
     public function getAvailableGraphs()
     {
+        // log it
+        $this->addToLog(array('method' => 'getAvailableGraphs'));
+        
         // if successor is set, ask it first before run the command yourself.
         if ($this->successor instanceof Store) {
             return $this->successor->getAvailableGraphs();
             
-        // run command by myself
+        // dont run command by myself
         } else {
-            // TODO think about some key-value solution to store available graphs once they got returned by
-            //      the successor
-            return array();
+            throw new \Exception('QueryCache does not support get available graphs, only by successor.');
         }
     }
     
@@ -351,51 +376,55 @@ class QueryCache implements Store, ChainableStore
      */
     public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
     {
+        // log it
+        $this->addToLog(array(
+            'method' => 'getMatchingStatements',
+            'parameter' => array(
+                'statement' => $statement,
+                'graphUri' => $graphUri,
+                'options' => $options
+            )
+        ));
+        
         /**
          * build matching query and check for cache entry
          */
-        // Remove, maybe available, graph from given statement and put it into an iterator.
-        // reason for the removal of the graph is to avoid quads in the query. Virtuoso wants the graph
-        // in the FROM part.
-        $query = 'SELECT ?s ?p ?o FROM <'. $graphUri .'> WHERE { ?s ?p ?o ';
         // create shortcuts for S, P and O
         $s = $statement->getSubject();
         $p = $statement->getPredicate();
         $o = $statement->getObject();
+        
+        $query = '';
             
         // add filter, if subject is a named node or literal
-        if (true === $s->isNamed() || true == $s->isLiteral()) {
-            $query .= 'FILTER (str(?s) = "'. $s->getUri() .'") ';
-        }
+        if (true === $s->isNamed()) { $query = 'FILTER (str(?s) = "'. $s->getUri() .'") '; }
+        if (true == $s->isLiteral()) { $query = 'FILTER (str(?s) = "'. $s->getValue() .'") '; }
         
         // add filter, if predicate is a named node or literal
-        if (true === $p->isNamed() || true == $p->isLiteral()) {
-            $query .= 'FILTER (str(?p) = "'. $p->getUri() .'") ';
-        }
+        if (true === $p->isNamed()) { $query = 'FILTER (str(?p) = "'. $p->getUri() .'") '; }
+        if (true == $p->isLiteral()) { $query = 'FILTER (str(?p) = "'. $p->getValue() .'") '; }
         
         // add filter, if predicate is a named node or literal
-        if (true === $o->isNamed() || true == $o->isLiteral()) {
-            $query .= 'FILTER (str(?o) = "'. $o->getValue() .'") ';
-        }
+        if (true === $o->isNamed()) { $query = 'FILTER (str(?o) = "'. $o->getUri() .'") '; }
+        if (true == $o->isLiteral()) { $query = 'FILTER (str(?o) = "'. $o->getValue() .'") '; }
         
-        $query .= '}';
+        $query = 'SELECT ?s ?p ?o FROM <'. $graphUri .'> WHERE { ?s ?p ?o '. $query .'}';
         
-        $queryId = $this->generateShortId($query);
-        $result = $this->cache->get($queryId);
+        $queryCacheContainer = $this->cache->get($query);
         
         // check, if there is a cache entry for this statement
-        if (null !== $result) {
-            $result = $result['result'];
+        if (null !== $queryCacheContainer) {
+            $result = $queryCacheContainer['result'];
          
         // if no cache entry available, run query by successor and save its result in the cache
         } elseif ($this->successor instanceof Store) {
             $result = $this->successor->getMatchingStatements($statement, $graphUri, $options);
             
-            $this->rememberQueryResult($query, $result);
+            $this->saveResult(AbstractQuery::initByQueryString($query), $result);
             
         // dont run command by myself
         } else {
-            throw new \Exception('QueryCache does not support get matching statements without a successor.');
+            throw new \Exception('QueryCache does not support get matching statements, only by successor.');
         }
         
         return $result;
@@ -408,13 +437,16 @@ class QueryCache implements Store, ChainableStore
      */
     public function getStoreDescription()
     {
+        // log it
+        $this->addToLog(array('method' => 'getStoreDescription'));
+        
         // if successor is set, ask it first before run the command yourself.
         if ($this->successor instanceof Store) {
             return $this->successor->getStoreDescription();
             
         // dont run command by myself
         } else {
-            throw new \Exception('QueryCache does not support getting a store description.');
+            throw new \Exception('QueryCache does not support getting a store description, only by successor.');
         }
     }
     
@@ -432,13 +464,53 @@ class QueryCache implements Store, ChainableStore
      */
     public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
     {
+        // log it
+        $this->addToLog(array(
+            'method' => 'hasMatchingStatement',
+            'parameter' => array(
+                'statement' => $statement,
+                'graphUri' => $graphUri,
+                'options' => $options
+            )
+        ));
+        
+        /**
+         * build matching query and check for cache entry
+         */
+        // create shortcuts for S, P and O
+        $s = $statement->getSubject();
+        $p = $statement->getPredicate();
+        $o = $statement->getObject();
+        
+        $query = '';
+            
+        // add filter, if subject is a named node or literal
+        if (true === $s->isNamed()) { $query = 'FILTER (str(?s) = "'. $s->getUri() .'") '; }
+        if (true == $s->isLiteral()) { $query = 'FILTER (str(?s) = "'. $s->getValue() .'") '; }
+        
+        // add filter, if predicate is a named node or literal
+        if (true === $p->isNamed()) { $query = 'FILTER (str(?p) = "'. $p->getUri() .'") '; }
+        if (true == $p->isLiteral()) { $query = 'FILTER (str(?p) = "'. $p->getValue() .'") '; }
+        
+        // add filter, if predicate is a named node or literal
+        if (true === $o->isNamed()) { $query = 'FILTER (str(?o) = "'. $o->getUri() .'") '; }
+        if (true == $o->isLiteral()) { $query = 'FILTER (str(?o) = "'. $o->getValue() .'") '; }
+        
+        $query = 'ASK FROM <'. $graphUri .'> { ?s ?p ?o '. $query .'}';
+        
+        $queryCacheContainer = $this->cache->get($query);
+        
+        // check, if there is a cache entry for this statement
+        if (null !== $queryCacheContainer) {
+            $result = $queryCacheContainer['result'];
+        
         // if successor is set, ask it first before run the command yourself.
-        if ($this->successor instanceof Store) {
+        } elseif ($this->successor instanceof Store) {
             return $this->successor->hasMatchingStatement($statement, $graphUri, $options);
             
         // dont run command by myself
         } else {
-            throw new \Exception('QueryCache does not support has matching statement calls.');
+            throw new \Exception('QueryCache does not support has matching statement calls, only by successor.');
         }
     }
     
@@ -450,6 +522,8 @@ class QueryCache implements Store, ChainableStore
     public function init(Cache $cache)
     {
         $this->cache = $cache;
+        
+        $this->log = array();
         
         $this->separator = '__.__';
     }
@@ -463,12 +537,12 @@ class QueryCache implements Store, ChainableStore
     public function invalidateByGraphUri($graphUri)
     {
         // log it
-        $this->log[] = array(
+        $this->addToLog(array(
             'method' => 'invalidateByGraphUri',
             'parameter' => array(
                 'graphUri' => $graphUri
             )
-        );
+        ));
         
         $queryList = $this->cache->get($graphUri);
         
@@ -488,12 +562,12 @@ class QueryCache implements Store, ChainableStore
     public function invalidateByQuery(Query $queryObject)
     {
         // log it
-        $this->log[] = array(
+        $this->addToLog(array(
             'method' => 'invalidateByQuery',
             'parameter' => array(
                 'queryObject' => $queryObject
             )
-        );
+        ));
         
         $query = $queryObject->getQuery();
         
@@ -557,13 +631,13 @@ class QueryCache implements Store, ChainableStore
     public function invalidateByTriplePattern(StatementIterator $statements, $graphUri = null)
     {
         // log it
-        $this->log[] = array(
+        $this->addToLog(array(
             'method' => 'invalidateByTriplePattern',
             'parameter' => array(
                 'statements' => $statements,
                 'graphUri' => $graphUri
             )
-        );
+        ));
         
         $patternList = array();
         
@@ -615,28 +689,36 @@ class QueryCache implements Store, ChainableStore
      */
     public function query($query, array $options = array())
     {
+        // log it
+        $this->addToLog(array(
+            'method' => 'query',
+            'parameter' => array(
+                'query' => $query,
+                'options' => $options
+            )
+        ));
+        
         /**
          * run command by myself and check, if the cache already contains the result to this query.
          */
-        $queryResult = $this->cache->get($query);
+        $queryCacheContainer = $this->cache->get($query);
         
         // if a cache entry was found. usually at the beginning, no cache entry is available. so ask the
         // successor and save its result as query result in the cache. the next call of this function will
         // lead to reuse of cache entry.
-        if (null !== $queryResult) {
-            $result = $queryResult['result'];
+        if (null !== $queryCacheContainer) {
+            $result = $queryCacheContainer['result'];
         
         // no cache entry was found
         } else {
             // if successor is set, ask it and remember its result
             if ($this->successor instanceof Store) {
                 $result = $this->successor->query($query, $options);
-                $this->rememberQueryResult($query, $result);
+                $this->saveResult(AbstractQuery::initByQueryString($query), $result);
             
-            // if successor is not set, return empty array.
+            // if successor is not set, throw exception
             } else {
-                $result = new EmptyResult();
-                $this->rememberQueryResult($query, $result);
+                throw new \Exception('QueryCache does not support querying, only by successor.');
             }
         }
         
@@ -644,14 +726,26 @@ class QueryCache implements Store, ChainableStore
     }
     
     /**
+     * Saves the result to a given query. This function creates a couple of entry in the cache to interconnect
+     * query parts with the result.
      * 
-     * @param Query $queryObject
-     * @param mixed $result
-     * @return 
-     * @throws
+     * @param Query $queryObject Query instance which represents the query to the result.
+     * @param mixed $result      Represents the result to a given query.
      */
     public function saveResult(Query $queryObject, $result)
     {
+        // log it
+        $this->addToLog(array(
+            'method' => 'saveResult',
+            'parameter' => array(
+                'queryObject' => $queryObject,
+                'result' => $result
+            )
+        ));
+        
+        // invalidate previous result
+        $this->invalidateByQuery($queryObject);
+        
         $queryCacheContainer = array('graph_uris' => array(), 'triple_pattern' => array());
         
         $query = $queryObject->getQuery();

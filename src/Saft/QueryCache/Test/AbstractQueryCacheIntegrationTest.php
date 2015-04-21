@@ -71,7 +71,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         );
     }
      
-    // try to call addStatements method without a successor set leads to an exception
+    // try to call function method without a successor set leads to an exception
     public function testAddStatementsNoSuccessor()
     {
         $this->setExpectedException('\Exception');
@@ -227,6 +227,74 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     }
     
     /**
+     * Tests deleteMatchingStatements
+     */
+     
+    public function testDeleteMatchingStatements()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+        
+        // build testdata
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        // assumption is that all given parameter will be returned
+        $this->assertEquals(
+            array($statement, $this->testGraphUri, array(1)),
+            $this->fixture->deleteMatchingStatements($statement, $this->testGraphUri, array(1))
+        );
+    }
+     
+    // try to call function method without a successor set leads to an exception
+    public function testDeleteMatchingStatementsNoSuccessor()
+    {
+        $this->setExpectedException('\Exception');
+        
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        $this->fixture->deleteMatchingStatements($statement);
+    }
+    
+    /**
+     * Tests getAvailableGraphs
+     */
+     
+    public function testGetAvailableGraphs()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+        
+        // assumption is that all given parameter will be returned
+        $this->assertEquals(
+            array(),
+            $this->fixture->getAvailableGraphs()
+        );
+    }
+     
+    // try to call function method without a successor set leads to an exception
+    public function testGetAvailableGraphsNoSuccessor()
+    {
+        $this->setExpectedException('\Exception');
+        
+        $this->fixture->getAvailableGraphs();
+    }
+    
+    /**
+     * Tests get- and setChainSuccessor
+     */
+     
+    public function testGetAndSetChainSuccessor()
+    {
+        $successor = new BasicStore();
+        
+        $this->fixture->setChainSuccessor($successor);
+        
+        $this->assertEquals($successor, $this->fixture->getChainSuccessor());
+    }
+    
+    /**
      * Tests getLog
      * 
      * The following functions tests the log result for certain function calls
@@ -321,32 +389,30 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     }
     
     // TODO implement this test using @depends
-    // tests invalidateByTriplePattern with statement consisting of 3 variables and graph URI given
-    public function testGetLogInvalidateByTriplePatternGraph3VariablesAndUriGiven()
+    public function testGetLogDeleteMatchingStatements()
     {
-        /**
-         * First create test data and save it via saveResult
-         */
-        $queryObject = AbstractQuery::initByQueryString(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }'
-        );
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
         
-        $result = array(1, 2, 3);
-        
-        $this->fixture->saveResult($queryObject, $result);
-        
-        /**
-         * Invalidate everything via a invalidateByTriplePattern call
-         */
+        // build testdata
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));        
+        $options = array(1);
         
-        $this->fixture->invalidateByTriplePattern($statementIterator, $this->testGraphUri);
+        $this->fixture->deleteMatchingStatements($statement, $this->testGraphUri, $options);
         
-        // check log for method calls done
         $this->assertEquals(
             array(
-                // was directly called by us
+                // that was called by us directly
+                array(
+                    'method' => 'deleteMatchingStatements',
+                    'parameter' => array(
+                        'statement' => $statement,
+                        'graphUri' => $this->testGraphUri,
+                        'options' => $options
+                    )
+                ),
                 array(
                     'method' => 'invalidateByTriplePattern',
                     'parameter' => array(
@@ -370,13 +436,55 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                         'graphUri' => $this->testGraphUri
                     )
                 ),
-                // it was called by invalidateByTriplePattern for the "?s ?p ?o"-pattern
+            ),
+            $this->fixture->getLog()
+        );
+    }
+    
+    // TODO implement this test using @depends
+    public function testGetLogGetMatchingStatements()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+        
+        // build testdata
+        $statement = new StatementImpl(new VariableImpl('?s'), new VariableImpl('?p'), new VariableImpl('?o'));
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));        
+        $options = array(1);
+        
+        $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }';
+        $queryObject = AbstractQuery::initByQueryString($query);
+        $queryObject->getQueryParts();
+        
+        $this->fixture->getMatchingStatements($statement, $this->testGraphUri, $options);
+        
+        $this->assertEquals(
+            array(
+                // that was called by us directly
+                array(
+                    'method' => 'getMatchingStatements',
+                    'parameter' => array(
+                        'statement' => $statement,
+                        'graphUri' => $this->testGraphUri,
+                        'options' => $options
+                    )
+                ),
+                array(
+                    'method' => 'saveResult',
+                    'parameter' => array(
+                        'queryObject' => $queryObject,
+                        'result' => array(
+                            $statement, 
+                            $this->testGraphUri,
+                            array(1)
+                        )
+                    )
+                ),
                 array(
                     'method' => 'invalidateByQuery',
                     'parameter' => array(
-                        'queryObject' => AbstractQuery::initByQueryString(
-                            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }'
-                        )
+                        'queryObject' => $queryObject
                     )
                 )
             ),
@@ -384,6 +492,336 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         );
     }
     
+    // TODO implement this test using @depends
+    public function testGetLogGetStoreDescription()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+        
+        $this->fixture->getStoreDescription();
+        
+        $this->assertEquals(
+            array(
+                // that was called by us directly
+                array('method' => 'getStoreDescription')
+            ),
+            $this->fixture->getLog()
+        );
+    }
+    
+    // TODO implement this test using @depends
+    public function testGetLogHasMatchingStatement()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+        
+        // build testdata
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));        
+        $options = array(1);
+        
+        $this->fixture->hasMatchingStatement($statement, $this->testGraphUri, $options);
+        
+        $this->assertEquals(
+            array(
+                // that was called by us directly
+                array(
+                    'method' => 'hasMatchingStatement',
+                    'parameter' => array(
+                        'statement' => $statement,
+                        'graphUri' => $this->testGraphUri,
+                        'options' => $options,
+                    )
+                )
+            ),
+            $this->fixture->getLog()
+        );
+    }
+    
+    // TODO implement this test using @depends
+    public function testGetLogInvalidateByGraphUri()
+    {
+        /**
+         * First create test data and save it via saveResult
+         */
+        $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }';
+        $queryObject = AbstractQuery::initByQueryString($query);
+        
+        $result = array(1, 2, 3);
+        
+        $this->fixture->saveResult($queryObject, $result);
+        
+        /**
+         * Invalidate everything via a invalidateByQuery call
+         */
+        $this->fixture->invalidateByGraphUri($this->testGraphUri);
+        
+        // check log for method calls done
+        $this->assertEquals(
+            array(
+                array(
+                    'method' => 'saveResult',
+                    'parameter' => array(
+                        'queryObject' => $queryObject,
+                        'result' => $result
+                    )
+                ),
+                array(
+                    'method' => 'invalidateByQuery',
+                    'parameter' => array(
+                        'queryObject' => $queryObject
+                    )
+                ),
+                array(
+                    'method' => 'invalidateByGraphUri',
+                    'parameter' => array(
+                        'graphUri' => $this->testGraphUri
+                    )
+                ),
+                array(
+                    'method' => 'invalidateByQuery',
+                    'parameter' => array(
+                        'queryObject' => AbstractQuery::initByQueryString($query)
+                    )
+                )
+            ),
+            $this->fixture->getLog()
+        );
+    }
+    
+    // TODO implement this test using @depends
+    public function testGetLogInvalidateByQuery()
+    {
+        /**
+         * First create test data and save it via saveResult
+         */
+        $queryObject = AbstractQuery::initByQueryString(
+            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }'
+        );
+        
+        $result = array(1, 2, 3);
+        
+        $this->fixture->saveResult($queryObject, $result);
+        
+        /**
+         * Invalidate everything via a invalidateByQuery call
+         */
+        $this->fixture->invalidateByQuery($queryObject);
+        
+        // check log for method calls done
+        $this->assertEquals(
+            array(
+                array(
+                    'method' => 'saveResult',
+                    'parameter' => array(
+                        'queryObject' => $queryObject,
+                        'result' => $result
+                    )
+                ),
+                array(
+                    'method' => 'invalidateByQuery',
+                    'parameter' => array(
+                        'queryObject' => $queryObject
+                    )
+                ),
+                array(
+                    'method' => 'invalidateByQuery',
+                    'parameter' => array(
+                        'queryObject' => $queryObject
+                    )
+                ),
+            ),
+            $this->fixture->getLog()
+        );
+    }
+    
+    // TODO implement this test using @depends
+    // tests invalidateByTriplePattern with statement consisting of 3 variables and graph URI given
+    public function testGetLogInvalidateByTriplePatternGraph3VariablesAndUriGiven()
+    {
+        /**
+         * First create test data and save it via saveResult
+         */
+        $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }';
+        $queryObject = AbstractQuery::initByQueryString($query);
+        
+        $result = array(1, 2, 3);
+        
+        $this->fixture->saveResult($queryObject, $result);
+        
+        /**
+         * Invalidate everything via a invalidateByTriplePattern call
+         */
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        
+        $this->fixture->invalidateByTriplePattern($statementIterator, $this->testGraphUri);
+        
+        // check log for method calls done
+        $this->assertEquals(
+            array(
+                array(
+                    'method' => 'saveResult',
+                    'parameter' => array(
+                        'queryObject' => $queryObject,
+                        'result' => $result
+                    )
+                ),
+                array(
+                    'method' => 'invalidateByQuery',
+                    'parameter' => array(
+                        'queryObject' => $queryObject
+                    )
+                ),
+                array(
+                    'method' => 'invalidateByTriplePattern',
+                    'parameter' => array(
+                        'statements' => $statementIterator,
+                        'graphUri' => $this->testGraphUri
+                    )
+                ),
+                array(
+                    'method' => 'buildPatternListByStatement',
+                    'parameter' => array(
+                        'statement' => $statement,
+                        'graphUri' => $this->testGraphUri
+                    )
+                ),
+                array(
+                    'method' => 'buildPatternListBySPO',
+                    'parameter' => array(
+                        's' => '*',
+                        'p' => '*',
+                        'o' => '*',
+                        'graphUri' => $this->testGraphUri
+                    )
+                ),
+                array(
+                    'method' => 'invalidateByQuery',
+                    'parameter' => array(
+                        'queryObject' => AbstractQuery::initByQueryString($query)
+                    )
+                ),
+            ),
+            $this->fixture->getLog()
+        );
+    }
+    
+    // TODO implement this test using @depends
+    public function testGetLogQuery()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+        
+        // build testdata
+        $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }';
+        $queryObject = AbstractQuery::initByQueryString($query);
+        $queryObject->getQueryParts();
+        
+        $options = array();
+        
+        $this->fixture->query($query, $options);
+        
+        // check log for method calls done
+        $this->assertEquals(
+            array(
+                // was directly called by us
+                array(
+                    'method' => 'query',
+                    'parameter' => array(
+                        'query' => $query,
+                        'options' => $options
+                    )
+                ),
+                // saves query result
+                array(
+                    'method' => 'saveResult',
+                    'parameter' => array(
+                        'queryObject' => $queryObject, 
+                        'result' => array(
+                            new StatementImpl(
+                                new VariableImpl('?s'), 
+                                new VariableImpl('?p'), 
+                                new VariableImpl('?o')
+                            ),
+                            null,
+                            array()
+                        )
+                    )
+                ),
+                // invalidate previous saved result, if available
+                array(
+                    'method' => 'invalidateByQuery',
+                    'parameter' => array(
+                        'queryObject' => $queryObject
+                    )
+                ),
+            ),
+            $this->fixture->getLog()
+        );
+    }
+    
+    /**
+     * Tests getStoreDescription
+     */
+     
+    public function testGetStoreDescription()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+        
+        // assumption is that all given parameter will be returned
+        $this->assertEquals(
+            array(),
+            $this->fixture->getStoreDescription()
+        );
+    }
+     
+    // try to call function method without a successor set leads to an exception
+    public function testGetStoreDescriptionNoSuccessor()
+    {
+        $this->setExpectedException('\Exception');
+        
+        $this->fixture->getStoreDescription();
+    }
+    
+    /**
+     * Tests hasMatchingStatement
+     */
+     
+    public function testHasMatchingStatement()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+        
+        // test data
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $options = array(1);
+        
+        // assumption is that all given parameter will be returned
+        $this->assertEquals(
+            array(
+                $statement, $this->testGraphUri, $options 
+            ),
+            $this->fixture->hasMatchingStatement($statement, $this->testGraphUri, $options)
+        );
+    }
+     
+    // try to call function method without a successor set leads to an exception
+    public function testHasMatchingStatementNoSuccessor()
+    {
+        $this->setExpectedException('\Exception');        
+        
+        // test data
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        
+        $this->fixture->hasMatchingStatement($statement);
+    }
     
     /**
      * Tests invalidateByGraphUri
@@ -517,6 +955,37 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     }
     
     /**
+     * Tests query
+     */
+     
+    public function testQuery()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+        
+        // test data
+        $query = 'SELECT * FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}';
+        $options = array();        
+        
+        $this->assertEquals(
+            array(
+                new StatementImpl(new VariableImpl('?s'), new VariableImpl('?p'), new VariableImpl('?o')), 
+                null,
+                $options
+            ),
+            $this->fixture->query($query, $options)
+        );
+    }
+     
+    public function testQueryNoSuccessor()
+    {
+        $this->setExpectedException('\Exception');
+        
+        $this->fixture->query('SELECT * FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}', array());
+    }
+    
+    /**
      * Tests saveResult
      */
     public function testSaveResultCacheEntries()
@@ -584,18 +1053,5 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
             ),
             $this->fixture->getLatestQueryCacheContainer()
         );
-    }
-    
-    /**
-     * Tests get- and setChainSuccessor
-     */
-     
-    public function testGetAndSetChainSuccessor()
-    {
-        $successor = new BasicStore();
-        
-        $this->fixture->setChainSuccessor($successor);
-        
-        $this->assertEquals($successor, $this->fixture->getChainSuccessor());
     }
 }
