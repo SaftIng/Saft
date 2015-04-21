@@ -54,14 +54,6 @@ abstract class AbstractBlankNode implements BlankNode
     /**
      * @return boolean
      */
-    public function isReturnable()
-    {
-        return true;
-    }
-    
-    /**
-     * @return boolean
-     */
     public function isVariable()
     {
         return false;

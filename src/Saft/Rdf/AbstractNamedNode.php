@@ -60,14 +60,6 @@ abstract class AbstractNamedNode implements NamedNode
     /**
      * @return boolean
      */
-    public function isReturnable()
-    {
-        return false;
-    }
-    
-    /**
-     * @return boolean
-     */
     public function isVariable()
     {
         return false;
