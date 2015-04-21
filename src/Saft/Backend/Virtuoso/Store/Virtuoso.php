@@ -608,8 +608,8 @@ class Virtuoso extends AbstractSparqlStore
                              * Typed-Literal
                              */
                             case 'typed-literal':
-                                // get a value which has the same datatype as described in the given result
-                                // e.g. xsd:string => "foo" instead of only foo
+                                // interprete some datatypes to convert the value to the corresponding type
+                                // e.g. xsd:int => "5" will become a PHP-integer 5
                                 $newEntry[$variable] = NodeUtils::getRealValueBasedOnDatatype(
                                     $part['datatype'],
                                     $part['value']

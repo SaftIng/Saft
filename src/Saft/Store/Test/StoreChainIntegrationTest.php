@@ -134,7 +134,7 @@ class StoreChainIntegrationTest extends TestCase
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new LiteralImpl('"test literal"')
+                new LiteralImpl('test literal')
             )
         );
 
@@ -381,7 +381,7 @@ class StoreChainIntegrationTest extends TestCase
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new LiteralImpl('"test literal"')
+                new LiteralImpl('test literal')
             )
         );
 
@@ -464,7 +464,7 @@ class StoreChainIntegrationTest extends TestCase
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new LiteralImpl('"test literal"')
+                new LiteralImpl('test literal')
             )
         );
 
@@ -488,7 +488,7 @@ class StoreChainIntegrationTest extends TestCase
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new LiteralImpl('"test literal"')
+                new LiteralImpl('test literal')
             )
         );
 

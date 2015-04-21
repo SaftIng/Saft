@@ -117,12 +117,8 @@ class NodeUtils
             case 'http://www.w3.org/2001/XMLSchema#integer':
                 return new LiteralImpl((int)$value);
 
-            // xsd:string
-            case 'http://www.w3.org/2001/XMLSchema#string':
-                return new LiteralImpl('"'. $value .'"');
-
             default:
-                throw new \Exception('Unknown $datatype given.');
+                return new LiteralImpl($value);
         }
     }
 
