@@ -11,7 +11,7 @@ class GraphQueryUnitTest extends TestCase
     {
         $this->fixture = new GraphQuery();
     }
-    
+
     /**
      * Tests constructor
      */
@@ -22,7 +22,7 @@ class GraphQueryUnitTest extends TestCase
         
         $this->assertEquals('CREATE GRAPH <'. $this->testGraphUri .'>', $this->fixture->getQuery());
     }
-    
+
     /**
      * Tests extractFilterPattern
      */
@@ -31,7 +31,7 @@ class GraphQueryUnitTest extends TestCase
     {
         $this->assertEquals(array(), $this->fixture->extractFilterPattern(''));
     }
-    
+
     /**
      * Tests extractNamespacesFromQuery
      */
@@ -67,7 +67,7 @@ class GraphQueryUnitTest extends TestCase
     {
         $this->assertEquals(array(), $this->fixture->extractVariablesFromQuery(''));
     }
-    
+
     /**
      * Tests getQueryParts
      */
@@ -77,12 +77,12 @@ class GraphQueryUnitTest extends TestCase
         $this->fixture->init('CLEAR GRAPH <'. $this->testGraphUri .'>');
         
         $queryParts = $this->fixture->getQueryParts();
-        
+
         $this->assertEquals(2, count($queryParts));
         $this->assertEquals(array($this->testGraphUri), $queryParts['graphs']);
         $this->assertEquals('clearGraph', $queryParts['sub_type']);
     }
-    
+
     /**
      * Tests determineSubType
      */
@@ -93,22 +93,22 @@ class GraphQueryUnitTest extends TestCase
             'clearGraph',
             $this->fixture->determineSubType('CLEAR GRAPH <'. $this->testGraphUri .'>')
         );
-        
+
         $this->assertEquals(
             'createGraph',
             $this->fixture->determineSubType('CREATE GRAPH <'. $this->testGraphUri .'>')
         );
-        
+
         $this->assertEquals(
             'createSilentGraph',
             $this->fixture->determineSubType('CREATE SILENT GRAPH <'. $this->testGraphUri .'>')
         );
-        
+
         $this->assertEquals(
             'dropGraph',
             $this->fixture->determineSubType('DROP GRAPH <'. $this->testGraphUri .'>')
         );
-        
+
         $this->assertEquals(
             'dropSilentGraph',
             $this->fixture->determineSubType('DROP SILENT GRAPH <'. $this->testGraphUri .'>')
@@ -119,11 +119,11 @@ class GraphQueryUnitTest extends TestCase
     {
         $this->assertNull($this->fixture->determineSubType('unknown type'));
     }
-    
+
     /**
      * Tests init
      */
-     
+
     public function testInit()
     {
         $this->fixture = new GraphQuery();
@@ -131,47 +131,47 @@ class GraphQueryUnitTest extends TestCase
         
         $this->assertEquals('CREATE GRAPH <'. $this->testGraphUri .'>', $this->fixture->getQuery());
     }
-    
+
     /**
      * Tests isAskQuery
      */
-     
+
     public function testIsAskQuery()
     {
         $this->assertFalse($this->fixture->isAskQuery());
     }
-    
+
     /**
      * Tests isDescribeQuery
      */
-     
+
     public function testIsDescribeQuery()
     {
         $this->assertFalse($this->fixture->isDescribeQuery());
     }
-    
+
     /**
      * Tests isGraphQuery
      */
-     
+
     public function testIsGraphQuery()
     {
         $this->assertTrue($this->fixture->isGraphQuery());
     }
-    
+
     /**
      * Tests isSelectQuery
      */
-     
+
     public function testIsSelectQuery()
     {
         $this->assertFalse($this->fixture->isSelectQuery());
     }
-    
+
     /**
      * Tests isUpdateQuery
      */
-     
+
     public function testIsUpdateQuery()
     {
         $this->assertFalse($this->fixture->isUpdateQuery());

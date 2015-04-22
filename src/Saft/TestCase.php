@@ -13,7 +13,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      * @var array
      */
     protected $config;
-    
+
     /**
      * Contains an instance of the class to test.
      *

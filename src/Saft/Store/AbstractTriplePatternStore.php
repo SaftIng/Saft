@@ -42,7 +42,7 @@ abstract class AbstractTriplePatternStore implements Store
          */
         return array($statements, $graphUri, $options);
     }
-    
+
     /**
      * Removes all statements from a (default-) graph which match with given statement.
      *
@@ -61,7 +61,7 @@ abstract class AbstractTriplePatternStore implements Store
          */
         return array($statement, $graphUri, $options);
     }
-    
+
     /**
      * It gets all statements of a given graph which match the following conditions:
      * - statement's subject is either equal to the subject of the same statement of the graph or it is null.
@@ -96,24 +96,24 @@ abstract class AbstractTriplePatternStore implements Store
     {
         $nodeFactory = new NodeFactory();
         $queryParts = $queryObject->getQueryParts();
-        
+
         $tupleInformaton = null;
         $tupleType = null;
-        
+
         /**
          * Use triple pattern
          */
         if (true === isset($queryParts['triple_pattern'])) {
             $tupleInformation = $queryParts['triple_pattern'];
             $tupleType = 'triple';
-            
+
         /**
          * Use quad pattern
          */
         } elseif (true === isset($queryParts['quad_pattern'])) {
             $tupleInformation = $queryParts['quad_pattern'];
             $tupleType = 'quad';
-        
+
         /**
          * Neither triple nor quad information
          */
@@ -122,7 +122,7 @@ abstract class AbstractTriplePatternStore implements Store
                 'Neither triple nor quad information available in given query object: ' . $queryObject->getQuery()
             );
         }
-        
+
         if (1 == count($tupleInformation)) {
             /**
              * Triple
@@ -132,7 +132,7 @@ abstract class AbstractTriplePatternStore implements Store
                 $predicate = $nodeFactory->getInstance($tupleInformation[0]['p'], $tupleInformation[0]['p_type']);
                 $object = $nodeFactory->getInstance($tupleInformation[0]['o'], $tupleInformation[0]['o_type']);
                 $graph = null;
-            
+
             /**
              * Quad
              */
@@ -142,12 +142,12 @@ abstract class AbstractTriplePatternStore implements Store
                 $object = $nodeFactory->getInstance($tupleInformation[0]['o'], $tupleInformation[0]['o_type']);
                 $graph = $nodeFactory->getInstance($tupleInformation[0]['g'], 'uri');
             }
-            
+
             // no else neccessary, because otherwise the upper exception would be thrown if tupleType is neither
             // quad or triple.
-            
+
             return new StatementImpl($subject, $predicate, $object, $graph);
-            
+
         } else {
             throw new \Exception('Query contains more than one triple- respectivly quad pattern.');
         }
@@ -165,7 +165,7 @@ abstract class AbstractTriplePatternStore implements Store
         $nodeFactory = new NodeFactory();
 
         $statements = new ArrayStatementIteratorImpl(array());
-        
+
         // if only triples, but no quads
         if (true === isset($queryParts['triple_pattern'])
             && false === isset($queryParts['quad_pattern'])) {
@@ -177,10 +177,10 @@ abstract class AbstractTriplePatternStore implements Store
                 $p = $nodeFactory->getInstance($pattern['p'], $pattern['p_type']);
                 $o = $nodeFactory->getInstance($pattern['o'], $pattern['o_type']);
                 $g = null;
-                
+
                 $statements->append(new StatementImpl($s, $p, $o, $g));
             }
-            
+
         // if only quads, but not triples
         } elseif (false === isset($queryParts['triple_pattern'])
             && true === isset($queryParts['quad_pattern'])) {
@@ -192,23 +192,23 @@ abstract class AbstractTriplePatternStore implements Store
                 $p = $nodeFactory->getInstance($pattern['p'], $pattern['p_type']);
                 $o = $nodeFactory->getInstance($pattern['o'], $pattern['o_type']);
                 $g = $nodeFactory->getInstance($pattern['g'], $pattern['g_type']);
-                
+
                 $statements->append(new StatementImpl($s, $p, $o, $g));
             }
-        
+
         // found quads and triples
         } elseif (true === isset($queryParts['triple_pattern'])
             && true === isset($queryParts['quad_pattern'])) {
             throw new \Exception('Query contains quads and triples. That is not supported yet.');
-        
+
         // neither quads nor triples
         } else {
             throw new \Exception('Query contains neither quads nor triples.');
         }
-        
+
         return $statements;
     }
-    
+
     /**
      * Returns true or false depending on whether or not the statements pattern has any matches in the given
      * graph.
@@ -227,7 +227,7 @@ abstract class AbstractTriplePatternStore implements Store
          */
         return array($statement, $graphUri, $options);
     }
-    
+
     /**
      * @param  string     $query            SPARQL query string.
      * @param  string     $options optional Further configurations.
@@ -237,22 +237,22 @@ abstract class AbstractTriplePatternStore implements Store
     public function query($query, array $options = array())
     {
         $queryObject = AbstractQuery::initByQueryString($query);
-        
+
         /**
          * INSERT or DELETE query
          */
         if ('updateQuery' == AbstractQuery::getQueryType($query)) {
             $firstPart = substr($queryObject->getSubType(), 0, 6);
-            
+
             // DELETE DATA query
             if ('delete' == $firstPart) {
                 $statement = $this->getStatement($queryObject);
                 return $this->deleteMatchingStatements($statement);
-            
+
             // INSERT DATA or INSERT INTO query
             } elseif ('insert' == $firstPart) {
                 return $this->addStatements($this->getStatements($queryObject));
-                
+
             // TODO Support
             // WITH ... DELETE ... WHERE queries
             // WITH ... DELETE ... INSERT ... WHERE queries
@@ -261,21 +261,21 @@ abstract class AbstractTriplePatternStore implements Store
                     'WITH-DELETE-WHERE and WITH-DELETE-INSERT-WHERE queries are not supported yet.'
                 );
             }
-            
+
         /**
          * ASK query
          */
         } elseif ('askQuery' == AbstractQuery::getQueryType($query)) {
             $statement = $this->getStatement($queryObject);
             return $this->hasMatchingStatement($statement);
-            
+
         /**
          * SELECT query
          */
         } elseif ('selectQuery' == AbstractQuery::getQueryType($query)) {
             $statement = $this->getStatement($queryObject);
             return $this->getMatchingStatements($statement);
-            
+
         /**
          * Unsupported query
          */

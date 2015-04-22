@@ -11,7 +11,7 @@ class SelectQueryUnitTest extends TestCase
     {
         $this->fixture = new SelectQuery();
     }
-    
+
     /**
      * Tests constructor
      */
@@ -20,7 +20,6 @@ class SelectQueryUnitTest extends TestCase
     {
         $instanceToCheckAgainst = new SelectQuery();
         $instanceToCheckAgainst->init('SELECT ?x FROM <'. $this->testGraphUri .'> WHERE {?x ?y ?z}');
-        
         $this->assertEquals(
             $instanceToCheckAgainst,
             new SelectQuery('SELECT ?x FROM <'. $this->testGraphUri .'> WHERE {?x ?y ?z}')
@@ -52,7 +51,7 @@ class SelectQueryUnitTest extends TestCase
         );
 
         $queryParts = $this->fixture->getQueryParts();
-        
+
         // Checks the return for the following patterns:
         // FILTER (?o = 'Bar')
         // FILTER (?o > 40)
@@ -198,7 +197,7 @@ class SelectQueryUnitTest extends TestCase
          * offset
          */
         $this->assertEquals('5', $queryParts['offset']);
-        
+
         /**
          * prefixes
          */
@@ -209,23 +208,23 @@ class SelectQueryUnitTest extends TestCase
             ),
             $queryParts['namespaces']
         );
-        
+
         /**
          * prefixes
          */
         $this->assertEquals(array('foo' => 'http://bar.de/'), $queryParts['prefixes']);
-        
+
         /**
          * result vars
          */
         $this->assertEquals(array('s', 'p', 'o'), $queryParts['result_variables']);
-        
+
         /**
          * variables
          */
         $this->assertEquals(array('s', 'p', 'o', 'foo', 'g'), $queryParts['variables']);
     }
-    
+
     /**
      * Tests init
      */
@@ -235,110 +234,110 @@ class SelectQueryUnitTest extends TestCase
         $this->fixture->init(
             'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         // select
         $this->assertEquals('SELECT ?s ?p ?o', $queryParts['select']);
-        
+
         // from
         $this->assertEquals(array($this->testGraphUri), $queryParts['graphs']);
-        
+
         // where
         $this->assertEquals('WHERE {?s ?p ?o.}', $queryParts['where']);
     }
-    
+
     public function testInitWithLimit()
     {
         $this->fixture = new SelectQuery();
         $this->fixture->init(
             'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.} LIMIT 10'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         // limit
         $this->assertEquals('10', $queryParts['limit']);
     }
-    
+
     public function testInitWithOffset()
     {
         $this->fixture = new SelectQuery();
         $this->fixture->init(
             'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.} Offset 5'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         // offset
         $this->assertEquals('5', $queryParts['offset']);
     }
-    
+
     public function testInitWithLimitOffset()
     {
         $this->fixture = new SelectQuery();
         $this->fixture->init(
             'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.} LIMIT 10 OFFSET 5'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         // select
         $this->assertEquals('SELECT ?s ?p ?o', $queryParts['select']);
-        
+
         // from
         $this->assertEquals(array($this->testGraphUri), $queryParts['graphs']);
         
         // where
         $this->assertEquals('WHERE {?s ?p ?o.}', $queryParts['where']);
-        
+
         // limit
         $this->assertEquals('10', $queryParts['limit']);
-        
+
         // offset
         $this->assertEquals('5', $queryParts['offset']);
     }
-    
+
     /**
      * Tests isAskQuery
      */
-     
+
     public function testIsAskQuery()
     {
         $this->assertFalse($this->fixture->isAskQuery());
     }
-    
+
     /**
      * Tests isDescribeQuery
      */
-     
+
     public function testIsDescribeQuery()
     {
         $this->assertFalse($this->fixture->isDescribeQuery());
     }
-    
+
     /**
      * Tests isGraphQuery
      */
-     
+
     public function testIsGraphQuery()
     {
         $this->assertFalse($this->fixture->isGraphQuery());
     }
-    
+
     /**
      * Tests isSelectQuery
      */
-     
+
     public function testIsSelectQuery()
     {
         $this->assertTrue($this->fixture->isSelectQuery());
     }
-    
+
     /**
      * Tests isUpdateQuery
      */
-     
+
     public function testIsUpdateQuery()
     {
         $this->assertFalse($this->fixture->isUpdateQuery());

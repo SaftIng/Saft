@@ -18,7 +18,7 @@ class StoreChain implements Store
      * @var array of instances which implement Store
      */
     protected $chainEntries = array();
-    
+
     /**
      * redirects to the query method.
      * Adds multiple Statements to (default-) graph.
@@ -43,7 +43,7 @@ class StoreChain implements Store
             throw new \Exception('No chain entries available and no successor set.');
         }
     }
-    
+
     /**
      * Removes all statements from a (default-) graph which match with given statement.
      *
@@ -66,7 +66,7 @@ class StoreChain implements Store
             throw new \Exception('No chain entries available, cant run command by myself.');
         }
     }
-    
+
     /**
      * Returns array with graphUri's which are available.
      *
@@ -77,13 +77,13 @@ class StoreChain implements Store
         // run command on chain entries
         if (true === isset($this->chainEntries[0])) {
             return $this->chainEntries[0]->getAvailableGraphs();
-        
+
         // dont run the command by yourself
         } else {
             throw new \Exception('No chain entries available, cant run command by myself.');
         }
     }
-    
+
     /**
      * Get saved chain entries.
      *
@@ -93,7 +93,7 @@ class StoreChain implements Store
     {
         return $this->chainEntries;
     }
-    
+
     /**
      * It gets all statements of a given graph which match the following conditions:
      * - statement's subject is either equal to the subject of the same statement of the graph or it is null.
@@ -113,11 +113,11 @@ class StoreChain implements Store
         if (true === isset($this->chainEntries[0])) {
             return $this->chainEntries[0]->getMatchingStatements($statement, $graphUri, $options);
         }
-        
+
         // dont run the command by yourself
         throw new \Exception('No chain entries available, cant run command by myself.');
     }
-    
+
     /**
      * @return array Empty array
      */
@@ -127,11 +127,11 @@ class StoreChain implements Store
         if (true === isset($this->chainEntries[0])) {
             return $this->chainEntries[0]->getStoreDescription();
         }
-    
+
         // dont run the command by yourself
         throw new \Exception('No chain entries available, cant run command by myself.');
     }
-    
+
     /**
      * redirects to the query method.
      * Returns true or false depending on whether or not the statements pattern
@@ -149,11 +149,11 @@ class StoreChain implements Store
         if (true === isset($this->chainEntries[0])) {
             return $this->chainEntries[0]->hasMatchingStatement($statement, $graphUri, $options);
         }
-        
+
         // dont run the command by yourself
         throw new \Exception('No chain entries available, cant run command by myself.');
     }
-    
+
     /**
      * This method sends a SPARQL query to the store.
      *
@@ -171,11 +171,11 @@ class StoreChain implements Store
         if (true === isset($this->chainEntries[0])) {
             return $this->chainEntries[0]->query($query, $options);
         }
-        
+
         // dont run the command by yourself
         throw new \Exception('No chain entries available, cant run command by myself.');
     }
-    
+
     /**
      * Setup a chain of instances, which implement Saft\Store\StoreInterface.
      *
@@ -193,7 +193,7 @@ class StoreChain implements Store
         if (true === is_array($configuration) && 0 < count($configuration)) {
             $this->chainEntries = array();
             $chainIndex = 0;
-            
+
             /**
              * Basic structure of the $configuration array:
              *
@@ -212,20 +212,20 @@ class StoreChain implements Store
             foreach ($configuration as $configEntry) {
                 // setup entry
                 $this->chainEntries[$chainIndex] = $this->setupChainEntry($configEntry);
-                
+
                 // set current entry as backend for the entry before
                 if (0 < $chainIndex) {
                     $this->chainEntries[$chainIndex-1]->setChainSuccessor($this->chainEntries[$chainIndex]);
                 }
-                
+
                 ++$chainIndex;
             }
-        
+
         } else {
             throw new \Exception('Empty configuration array given.');
         }
     }
-    
+
     /**
      * Setup a chain entry with a given configuration.
      *
@@ -240,31 +240,31 @@ class StoreChain implements Store
     {
         if (true === isset($configEntry['type'])) {
             $chainEntry = null;
-            
+
             switch ($configEntry['type']) {
                 case 'http':
                     $chainEntry = new Http($configEntry);
                     break;
-                    
+
                 case 'querycache':
                     // TODO change that, so that you only give a config array and QueryCache init cache by
                     //      itself
                     $cache = new Cache(array('type' => 'file'));
-                    
+
                     $chainEntry = new QueryCache($cache);
                     break;
-                    
+
                 case 'virtuoso':
                     $chainEntry = new Virtuoso($configEntry);
                     break;
-            
+
                 default:
                     throw new \Exception('Unknown type given.');
                     break;
             }
-            
+
             return $chainEntry;
-            
+
         } else {
             throw new \Exception('Field "type" is not set.');
         }

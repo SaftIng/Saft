@@ -16,7 +16,7 @@ class AbstractQueryUnitTest extends TestCase
     {
         $this->fixture = $this->getMockForAbstractClass('\Saft\Sparql\Query\AbstractQuery');
     }
-    
+
     /**
      * Tests determineObjectDatatype
      */
@@ -27,12 +27,12 @@ class AbstractQueryUnitTest extends TestCase
             'http://www.w3.org/2001/XMLSchema#string',
             $this->fixture->determineObjectDatatype('"Foo"')
         );
-        
+
         $this->assertEquals(
             'http://www.w3.org/2001/XMLSchema#string',
             $this->fixture->determineObjectDatatype('"Foo"^^<http://www.w3.org/2001/XMLSchema#string>')
         );
-        
+
         $this->assertEquals(
             'http://www.w3.org/2001/XMLSchema#boolean',
             $this->fixture->determineObjectDatatype('"true"^^<http://www.w3.org/2001/XMLSchema#boolean>')
@@ -43,7 +43,7 @@ class AbstractQueryUnitTest extends TestCase
     {
         $this->assertNull($this->fixture->determineObjectDatatype('Foo'));
     }
-    
+
     /**
      * Tests determineEntityType
      */
@@ -55,12 +55,12 @@ class AbstractQueryUnitTest extends TestCase
         $this->assertEquals('uri', $this->fixture->determineEntityType('<'. $this->testGraphUri .'>'));
         $this->assertEquals('var', $this->fixture->determineEntityType('Foo'));
     }
-    
+
     public function testDetermineEntityTypeUnknownType()
     {
         $this->assertNull($this->fixture->determineEntityType(time()));
     }
-    
+
     /**
      * Tests determineObjectLanguage
      */
@@ -79,7 +79,7 @@ class AbstractQueryUnitTest extends TestCase
         $this->assertNull($this->fixture->determineObjectLanguage('"Foo"@'));
         $this->assertNull($this->fixture->determineObjectLanguage('"Foo@"'));
     }
-    
+
     /**
      * Tests determineObjectValue
      */
@@ -90,13 +90,13 @@ class AbstractQueryUnitTest extends TestCase
             'Foo',
             $this->fixture->determineObjectValue('"Foo"')
         );
-        
+
         // with datatype
         $this->assertEquals(
             'Foo',
             $this->fixture->determineObjectValue('"Foo"^^<http://www.w3.org/2001/XMLSchema#string>')
         );
-        
+
         // with language
         $this->assertEquals(
             'Foo',
@@ -111,7 +111,7 @@ class AbstractQueryUnitTest extends TestCase
         $this->assertNull($this->fixture->determineObjectValue('"Foo@'));
         $this->assertNull($this->fixture->determineObjectValue('Foo@"^^<'));
     }
-       
+
     /**
      * Tests extractFilterPattern
      */
@@ -123,9 +123,9 @@ class AbstractQueryUnitTest extends TestCase
                 ?s <http://foobar/hey> ?o. FILTER regex(?g, "aar", "i")
              }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         $this->assertEquals(
             array(
                 array(
@@ -163,9 +163,9 @@ class AbstractQueryUnitTest extends TestCase
                 ?s <http://foobar/hey> ?o. FILTER (?o < 40)
              }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         $this->assertEquals(
             array(
                 array(
@@ -190,7 +190,7 @@ class AbstractQueryUnitTest extends TestCase
             $queryParts['filter_pattern']
         );
     }
-       
+
     /**
      * Tests extractNamespacesFromQuery
      */
@@ -202,9 +202,9 @@ class AbstractQueryUnitTest extends TestCase
                 ?s <http://foobar/hey> ?o. ?s <http://foobar.de> ?o. ?s <http://www.w3.org/2001/XMLSchema#> ?o 
              }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         // FYI: the uri http://foobar.de is not usuable for namespacing because it does not contain a / or #
         //      as last character
 
@@ -216,13 +216,13 @@ class AbstractQueryUnitTest extends TestCase
             $queryParts['namespaces']
         );
     }
-    
+
     public function testExtractNamespacesFromQueryNoNamespaces()
     {
         $this->fixture = AbstractQuery::initByQueryString(
             'SELECT ?s FROM <http://foo> WHERE { ?s ?p ?o }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
 
         $this->assertFalse(isset($queryParts['namespaces']));
@@ -231,16 +231,16 @@ class AbstractQueryUnitTest extends TestCase
     /**
      * Tests extractProloguePrefixesFromQuery
      */
-     
+
     public function testExtractPrefixesFromQueryNoPrefixes()
     {
         // assumption here is that fixture is of type
         $this->fixture = AbstractQuery::initByQueryString(
             'SELECT ?s FROM <http://foo> WHERE { ?s ?p ?o }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         $this->assertFalse(isset($queryParts['prefixes']));
     }
 
@@ -250,16 +250,16 @@ class AbstractQueryUnitTest extends TestCase
         $this->fixture = AbstractQuery::initByQueryString(
             'PREFIX foo: <http://bar.de> SELECT ?s FROM <http://foo> WHERE { ?s ?p ?o }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         $this->assertEquals(array('foo' => 'http://bar.de'), $queryParts['prefixes']);
     }
-    
+
     /**
      * Tests extractQuads
      */
-    
+
     public function testExtractQuads()
     {
         // assumption here is that fixture is of type
@@ -273,9 +273,9 @@ class AbstractQueryUnitTest extends TestCase
                 }
             }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         $this->assertEqualsArrays(
             array(
                 array(
@@ -318,11 +318,11 @@ class AbstractQueryUnitTest extends TestCase
             $queryParts['quad_pattern']
         );
     }
-    
+
     /**
      * Tests extractTriplePattern
      */
-     
+
     public function testExtractTriplePatternLiteral()
     {
         $this->assertEquals(
@@ -343,7 +343,7 @@ class AbstractQueryUnitTest extends TestCase
             )
         );
     }
-     
+
     public function testExtractTriplePatternPrefix()
     {
         $this->assertEquals(
@@ -367,7 +367,7 @@ class AbstractQueryUnitTest extends TestCase
             )
         );
     }
-     
+
     public function testExtractTriplePatternPrefixNotFound()
     {
         $this->assertEquals(
@@ -391,7 +391,7 @@ class AbstractQueryUnitTest extends TestCase
             )
         );
     }
-     
+
     public function testExtractTriplePatternTypedLiteral()
     {
         $this->assertEquals(
@@ -412,7 +412,7 @@ class AbstractQueryUnitTest extends TestCase
             )
         );
     }
-     
+
     public function testExtractTriplePatternUri()
     {
         $this->assertEquals(
@@ -451,7 +451,7 @@ class AbstractQueryUnitTest extends TestCase
             ),
             $this->fixture->extractTriplePattern('?s ?p ?o.')
         );
-        
+
         $this->assertEquals(
             array(
                 array(
@@ -472,7 +472,7 @@ class AbstractQueryUnitTest extends TestCase
     /**
      * Tests that all common namespaces are available
      */
-     
+
     public function testGetCommmonNamespaces()
     {
         $this->assertEquals(
@@ -524,11 +524,11 @@ class AbstractQueryUnitTest extends TestCase
             $this->fixture->getCommonNamespaces()
         );
     }
-    
+
     /**
      * Tests getQueryType
      */
-     
+
     public function testGetQueryTypeAsk()
     {
         $query = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -537,74 +537,74 @@ class AbstractQueryUnitTest extends TestCase
 
         $this->assertEquals('askQuery', AbstractQuery::getQueryType($query));
     }
-     
+
     public function testGetQueryTypeClearGraph()
     {
         $query = 'CLEAR GRAPH <';
-        
+
         $this->assertEquals('graphQuery', AbstractQuery::getQueryType($query));
     }
-     
+
     public function testGetQueryTypeCreateGraph()
     {
         $query = 'CREATE GRAPH <';
-        
+
         $this->assertEquals('graphQuery', AbstractQuery::getQueryType($query));
     }
-     
+
     public function testGetQueryTypeCreateSilentGraph()
     {
         $query = 'CREATE SILENT GRAPH <';
-        
+
         $this->assertEquals('graphQuery', AbstractQuery::getQueryType($query));
     }
-     
+
     public function testGetQueryTypeDescribe()
     {
         $query = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                   DESCRIBE ?x
                   WHERE { ?x foaf:mbox <mailto:alice@org> }';
-        
+
         $this->assertEquals('describeQuery', AbstractQuery::getQueryType($query));
     }
-     
+
     public function testGetQueryTypeDropGraph()
     {
         $query = 'DROP GRAPH';
-        
+
         $this->assertEquals('graphQuery', AbstractQuery::getQueryType($query));
     }
-     
+
     public function testGetQueryTypeDropSilentGraph()
     {
         $query = 'DROP SILENT GRAPH';
-        
+
         $this->assertEquals('graphQuery', AbstractQuery::getQueryType($query));
     }
-     
+
     public function testGetQueryTypeInsertData()
     {
         $query = 'INSERT DATA';
-        
+
         $this->assertEquals('updateQuery', AbstractQuery::getQueryType($query));
     }
-     
+
     public function testGetQueryTypeInsertIntoGraph()
     {
         $query = 'INSERT INTO GRAPH';
-        
+
         $this->assertEquals('updateQuery', AbstractQuery::getQueryType($query));
     }
-     
+
     public function testGetQueryTypeSelect()
     {
         $query = ' SELECT ?x
                   FROM <'. $this->testGraphUri .'>
                   WHERE { ?x foaf:mbox <mailto:alice@org> }';
-        
+
         $this->assertEquals('selectQuery', AbstractQuery::getQueryType($query));
     }
-     
+
     public function testGetQueryTypeUpdate()
     {
         /**
@@ -612,60 +612,60 @@ class AbstractQueryUnitTest extends TestCase
          */
         $query = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                   INSERT DATA {Graph <>}';
-        
+
         $this->assertEquals('updateQuery', AbstractQuery::getQueryType($query));
-        
+
         /**
          * INSERT INTO GRAPH
          */
         $query = 'INSERT INTO GRAPH {}';
-        
+
         $this->assertEquals('updateQuery', AbstractQuery::getQueryType($query));
-        
+
         /**
          * DELETE
          */
         $query = 'DELETE {}';
-        
+
         $this->assertEquals('updateQuery', AbstractQuery::getQueryType($query));
-        
+
         /**
          * DELETE DATA
          */
         $query = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                   DELETE DATA {}';
-        
+
         $this->assertEquals('updateQuery', AbstractQuery::getQueryType($query));
     }
-    
+
     /**
      * Tests initByQueryString
      */
-     
+
     public function testInitByQueryStringAskQuery()
     {
         $query = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                   ASK  { ?x foaf:name  "Alice" ;
                   foaf:mbox  <mailto:alice@work.example> }';
-        
+
         $this->assertEquals(
             new AskQuery($query),
             $this->fixture->initByQueryString($query)
         );
     }
-     
+
     public function testInitByQueryStringDescribeQuery()
     {
         $query = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                   DESCRIBE ?x
                   WHERE { ?x foaf:mbox <mailto:alice@org> }';
-        
+
         $this->assertEquals(
             new DescribeQuery($query),
             $this->fixture->initByQueryString($query)
         );
     }
-     
+
     public function testInitByQueryStringGraphQuery()
     {
         $query = 'CREATE GRAPH <'. $this->testGraphUri .'>';
@@ -675,27 +675,27 @@ class AbstractQueryUnitTest extends TestCase
             $this->fixture->initByQueryString($query)
         );
     }
-     
+
     public function testInitByQueryStringSelectQuery()
     {
         $query = ' SELECT ?x
                   FROM <'. $this->testGraphUri .'>
                   WHERE { ?x foaf:mbox <mailto:alice@org> }';
-        
+
         $this->assertEquals(
             new SelectQuery($query),
             $this->fixture->initByQueryString($query)
         );
     }
-    
+
     public function testInitByQueryStringUnknownType()
     {
         $this->setExpectedException('\Exception');
-        
+
         $query = ' unknown type';
         $this->fixture->initByQueryString($query);
     }
-     
+
     public function testInitByQueryStringUpdateQuery()
     {
         /**
@@ -703,22 +703,22 @@ class AbstractQueryUnitTest extends TestCase
          */
         $query = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                   INSERT DATA {Graph <>}';
-        
+
         $this->assertEquals(
             new UpdateQuery($query),
             $this->fixture->initByQueryString($query)
         );
-        
+
         /**
          * INSERT INTO GRAPH
          */
         $query = 'INSERT INTO GRAPH <> { ... }';
-        
+
         $this->assertEquals(
             new UpdateQuery($query),
             $this->fixture->initByQueryString($query)
         );
-        
+
         /**
          * WITH ... DELETE ... WHERE
          */
@@ -728,26 +728,26 @@ class AbstractQueryUnitTest extends TestCase
             new UpdateQuery($query),
             $this->fixture->initByQueryString($query)
         );
-        
+
         /**
          * DELETE DATA
          */
         $query = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                   DELETE DATA {}';
-        
+
         $this->assertEquals(
             new UpdateQuery($query),
             $this->fixture->initByQueryString($query)
         );
     }
-    
+
     /**
      * Tests setQuery
      */
     public function testSetQuery()
     {
         $this->fixture->setQuery('foo');
-        
+
         $this->assertEquals('foo', $this->fixture->getQuery());
     }
 }
