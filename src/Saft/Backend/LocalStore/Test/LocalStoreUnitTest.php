@@ -32,17 +32,12 @@ EOD;
         }
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructorChecksBaseDirForNull()
     {
+        $this->setExpectedException('\Exception');
         new LocalStore(null);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testInitializeChecksIfBaseDirExists()
     {
         $this->tempDirectory = TestUtil::createTempDirectory();
@@ -53,6 +48,7 @@ EOD;
 
         $store = new LocalStore($nonExisting);
         // Should fail in order of the non-existing base dir
+        $this->setExpectedException('\Exception');
         $store->initialize();
     }
 
@@ -75,15 +71,73 @@ EOD;
         $this->assertTrue($store->isInitialized());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testGetAvailableGraphsChecksIfInitialized()
     {
         $this->tempDirectory = TestUtil::createTempDirectory();
         $store = new LocalStore($this->tempDirectory);
-        // Must intiailized before
+        // Fails because intiailize was not called before
+        // TODO is this the intended behavior? Can't this be done in the constructor
+        $this->setExpectedException('\LogicException');
         $store->getAvailableGraphs();
+    }
+
+    public function testIsGraphAvailableChecksIfInitialized()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        // Fails because intiailize was not called before
+        // TODO is this the intended behavior? Can't this be done in the constructor
+        $this->setExpectedException('\LogicException');
+        $store->isGraphAvailable('foo');
+    }
+
+    public function testHasMatchingStatementChecksIfInitialized()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        $pattern = self::createAllPattern();
+        // Fails because intiailize was not called before
+        // TODO is this the intended behavior? Can't this be done in the constructor
+        $this->setExpectedException('\LogicException');
+        $store->hasMatchingStatement($pattern, 'http://localhost:8890/foaf');
+    }
+
+    public function testGetMatchingStatementsChecksIfInitialized()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        $pattern = self::createAllPattern();
+        // Fails because intiailize was not called before
+        // TODO is this the intended behavior? Can't this be done in the constructor
+        $this->setExpectedException('\LogicException');
+        $store->getMatchingStatements($pattern);
+    }
+
+    public function testAddStatementsChecksIfInitialized()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        $statement = new StatementImpl(
+            new BlankNodeImpl('foo'),
+            new NamedNodeImpl('http://bar'),
+            new LiteralImpl('baz')
+        );
+        $statements = new ArrayStatementIteratorImpl([$statement]);
+        // Fails because intiailize was not called before
+        // TODO is this the intended behavior? Can't this be done in the constructor
+        $this->setExpectedException('\LogicException');
+        $store->addStatements($statements, 'http://localhost:8890/foaf');
+    }
+
+    public function testDeleteMatchingStatementsChecksIfInitialized()
+    {
+        $this->tempDirectory = TestUtil::createTempDirectory();
+        $store = new LocalStore($this->tempDirectory);
+        $pattern = self::createAllPattern();
+        // Fails because intiailize was not called before
+        // TODO is this the intended behavior? Can't this be done in the constructor
+        $this->setExpectedException('\LogicException');
+        $store->deleteMatchingStatements($pattern, 'http://localhost:8890/foaf');
     }
 
     public function testNoAvailableGraphsAfterInitializingAnEmptyBaseDir()
@@ -107,17 +161,6 @@ EOD;
         $this->assertContains('http://dbpedia.org/data/ireland', $graphs);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
-    public function testIsGraphAvailableChecksIfInitialized()
-    {
-        $this->tempDirectory = TestUtil::createTempDirectory();
-        $store = new LocalStore($this->tempDirectory);
-        // Must intiailized before
-        $store->isGraphAvailable('foo');
-    }
-
     public function testIsGraphAvailable()
     {
         $this->tempDirectory = TestUtil::createTempDirectory();
@@ -128,112 +171,6 @@ EOD;
         $this->assertTrue($store->isGraphAvailable('http://localhost:8890/foo'));
         $this->assertTrue($store->isGraphAvailable('http://dbpedia.org/data/ireland'));
         $this->assertFalse($store->isGraphAvailable('http://non.existing/graph'));
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testHasMatchingStatementChecksIfInitialized()
-    {
-        $this->tempDirectory = TestUtil::createTempDirectory();
-        $store = new LocalStore($this->tempDirectory);
-        $pattern = self::createAllPattern();
-        $store->hasMatchingStatement($pattern, 'http://localhost:8890/foaf');
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testHasMatchingStatementChecksIfGraphIsSpecified()
-    {
-        $this->tempDirectory = TestUtil::createTempDirectory();
-        $store = new LocalStore($this->tempDirectory);
-        $store->initialize();
-        $pattern = self::createAllPattern();
-        assert(!$pattern->isQuad());
-        $store->hasMatchingStatement($pattern);
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testGetMatchingStatementsChecksIfInitialized()
-    {
-        $this->tempDirectory = TestUtil::createTempDirectory();
-        $store = new LocalStore($this->tempDirectory);
-        $pattern = self::createAllPattern();
-        $store->getMatchingStatements($pattern);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testGetMatchingStatementsChecksIfGraphIsSpecified()
-    {
-        $this->tempDirectory = TestUtil::createTempDirectory();
-        $store = new LocalStore($this->tempDirectory);
-        $store->initialize();
-        $pattern = self::createAllPattern();
-        assert(!$pattern->isQuad());
-        $store->getMatchingStatements($pattern, null);
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testAddStatementsChecksIfInitialized()
-    {
-        $this->tempDirectory = TestUtil::createTempDirectory();
-        $store = new LocalStore($this->tempDirectory);
-        $statement = new StatementImpl(
-            new BlankNodeImpl('foo'),
-            new NamedNodeImpl('http://bar'),
-            new LiteralImpl('baz')
-        );
-        $statements = new ArrayStatementIteratorImpl([$statement]);
-        $store->addStatements($statements, 'http://localhost:8890/foaf');
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testAddStatementsChecksIfGraphIsSpecified()
-    {
-        $this->tempDirectory = TestUtil::createTempDirectory();
-        $store = new LocalStore($this->tempDirectory);
-        $store->initialize();
-        $statement = new StatementImpl(
-            new BlankNodeImpl('foo'),
-            new NamedNodeImpl('http://bar'),
-            new LiteralImpl('baz')
-        );
-        assert(!$statement->isQuad());
-        $statements = new ArrayStatementIteratorImpl([$statement]);
-        $store->addStatements($statements, null);
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testDeleteMatchingStatementsChecksIfInitialized()
-    {
-        $this->tempDirectory = TestUtil::createTempDirectory();
-        $store = new LocalStore($this->tempDirectory);
-        $pattern = self::createAllPattern();
-        $store->deleteMatchingStatements($pattern, 'http://localhost:8890/foaf');
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testDeleteMatchingStatementsChecksIfGraphIsSpecified()
-    {
-        $this->tempDirectory = TestUtil::createTempDirectory();
-        $store = new LocalStore($this->tempDirectory);
-        $store->initialize();
-        $pattern = self::createAllPattern();
-        assert(!$pattern->isQuad());
-        $store->deleteMatchingStatements($pattern, null);
     }
 
     public function testAddGraph()
