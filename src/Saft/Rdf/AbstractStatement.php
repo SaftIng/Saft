@@ -66,7 +66,11 @@ abstract class AbstractStatement implements Statement
 
     public function __toString()
     {
-        return $this->toSparqlFormat();
+        $string = sprintf("s: %s, p: %s, o: %s", $this->getSubject(), $this->getPredicate(), $this->getObject());
+        if ($this->isQuad()) {
+            $string .= ", g: " . $this->getGraph();
+        }
+        return $string;
     }
 
     /**

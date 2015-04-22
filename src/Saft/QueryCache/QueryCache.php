@@ -675,7 +675,7 @@ class QueryCache implements Store, ChainableStore
 
             // no graph URI given and statement has no one as well.
             } elseif (null === $graphUri && null === $statement->getGraph()) {
-                throw new \Exception('No graph URI available for statement: ' . $statement->toSparqlFormat());
+                throw new \Exception('No graph URI available for statement: ' . $statement);
             }
 
             /**

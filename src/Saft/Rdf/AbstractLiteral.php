@@ -11,7 +11,7 @@ abstract class AbstractLiteral implements Literal
      */
     public function __toString()
     {
-        return $this->getValue();
+        return (string)$this->getValue();
     }
 
     /**
