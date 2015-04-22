@@ -14,11 +14,12 @@ class QueryCacheFileCacheIntegrationTest extends AbstractQueryCacheIntegrationTe
     public function setUp()
     {
         parent::setUp();
-        
+
         $this->cache = new Cache($this->config['fileCacheConfig']);
 
         $this->fixture = new QueryCache($this->cache);
         $this->fixture->getCache()->clean();
         $this->className = 'QueryCacheFileCacheIntegrationTest';
+
     }
 }

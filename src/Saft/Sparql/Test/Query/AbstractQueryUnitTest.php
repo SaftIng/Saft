@@ -129,7 +129,7 @@ class AbstractQueryUnitTest extends TestCase
     public function testExtractFilterPatternRegex()
     {
         $this->fixture = AbstractQuery::initByQueryString(
-            'PREFIX foo: <http://bar.de> SELECT ?s FROM <http://foo> WHERE { 
+            'PREFIX foo: <http://bar.de> SELECT ?s FROM <http://foo> WHERE {
                 ?s <http://foobar/hey> ?o. FILTER regex(?g, "aar", "i")
              }'
         );
@@ -169,7 +169,7 @@ class AbstractQueryUnitTest extends TestCase
     public function testExtractFilterPatternRelation()
     {
         $this->fixture = AbstractQuery::initByQueryString(
-            'PREFIX foo: <http://bar.de> SELECT ?s FROM <http://foo> WHERE { 
+            'PREFIX foo: <http://bar.de> SELECT ?s FROM <http://foo> WHERE {
                 ?s <http://foobar/hey> ?o. FILTER (?o < 40)
              }'
         );
@@ -208,8 +208,8 @@ class AbstractQueryUnitTest extends TestCase
     public function testExtractNamespacesFromQuery()
     {
         $this->fixture = AbstractQuery::initByQueryString(
-            'PREFIX foo: <http://bar.de> SELECT ?s FROM <http://foo> WHERE { 
-                ?s <http://foobar/hey> ?o. ?s <http://foobar.de> ?o. ?s <http://www.w3.org/2001/XMLSchema#> ?o 
+            'PREFIX foo: <http://bar.de> SELECT ?s FROM <http://foo> WHERE {
+                ?s <http://foobar/hey> ?o. ?s <http://foobar.de> ?o. ?s <http://www.w3.org/2001/XMLSchema#> ?o
              }'
         );
 
@@ -275,7 +275,7 @@ class AbstractQueryUnitTest extends TestCase
         // assumption here is that fixture is of type
         $this->fixture = AbstractQuery::initByQueryString(
             'PREFIX dc: <http://foo/bar/>
-            INSERT DATA { 
+            INSERT DATA {
                 Graph <http://saft/test/g1> { <http://saft/test/s1> dc:p1 <http://saft/test/o1>}
                 Graph <http://saft/test/g1> {<http://saft/test/s2> <http://test/p2> <http://saft/test/o2>.}
                 Graph <http://saft/test/g2> {
