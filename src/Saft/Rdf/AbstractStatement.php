@@ -64,6 +64,11 @@ abstract class AbstractStatement implements Statement
         }
     }
 
+    public function __toString()
+    {
+        return $this->toSparqlFormat();
+    }
+
     /**
      * {@inheritdoc}
      */

@@ -50,14 +50,26 @@ interface Statement
     public function isPattern();
 
     /**
-     * @return boolean
+     * Get a valid NQuads serialization of the statement. If the statement is not concrete i.e. it contains variable
+     * parts this method will throw an exception.
+     *
+     * @throws \Exception if the statment is not concrete
+     * @return string a string representation of the statement in valid NQuads syntax.
      */
     public function toNQuads();
 
     /**
-     * @return boolean
+     * @return string
      */
     public function toSparqlFormat();
+
+    /**
+     * Get a string representation of the current statement. It should contain a human readable description of the parts
+     * of the statement.
+     *
+     * @return string a string representation of the statement
+     */
+    public function __toString();
 
     /**
      * Returns true, if this matches the given pattern. This have to be concrete.
