@@ -8,8 +8,10 @@ class HttpIntegrationTest extends AbstractSparqlStoreIntegrationTest
 {
     public function setUp()
     {
+        parent::setUp();
+
         $this->config = $this->getConfigContent();
-        
+
         if (true === isset($this->config['httpConfig'])) {
             $this->fixture = new Http($this->config['httpConfig']);
         } elseif (true === isset($this->config['configuration']['standardStore'])
@@ -20,7 +22,7 @@ class HttpIntegrationTest extends AbstractSparqlStoreIntegrationTest
         } else {
             $this->markTestSkipped('Array httpConfig is not set in the config.yml.');
         }
-        
+
         $this->className = 'HttpIntegrationTest';
     }
 }

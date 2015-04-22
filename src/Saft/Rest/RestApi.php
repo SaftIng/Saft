@@ -52,11 +52,12 @@ class RestApi extends AbstractRest
                     }
                 }
             }
-            // set graphUri if given
-            $graphUri = null;
+            // set graph if given
+            $graph = null;
             if (isset($_POST['graphUri'])) {
                 if (NodeUtils::simpleCheckURI($_POST['graphUri']) || '?' == substr($_POST['graphUri'], 0, 1)) {
                     $graphUri = $_POST['graphUri'];
+                    $graph = new NamedNodeImpl($graphUri);
                 } else {
                     throw new \Exception('graphUri not valid.');
                 }
@@ -79,7 +80,7 @@ class RestApi extends AbstractRest
                     $i++;
                 }
                 $stArray = new ArrayStatementIteratorImpl($array);
-                return $this->store->addStatements($stArray, $graphUri);
+                return $this->store->addStatements($stArray, $graph);
 
             } else {
                 if (is_array($statements[0])) {
@@ -93,7 +94,7 @@ class RestApi extends AbstractRest
                         $statements[2],
                         $statements[3]
                     );
-                    return $this->store->deleteMatchingStatements($statement, $graphUri);
+                    return $this->store->deleteMatchingStatements($statement, $graph);
 
                     //getMatchingStatements
                 } elseif ($this->method == 'GET') {
@@ -103,7 +104,7 @@ class RestApi extends AbstractRest
                         $statements[2],
                         $statements[3]
                     );
-                    return $this->store->getMatchingStatements($statement, $graphUri);
+                    return $this->store->getMatchingStatements($statement, $graph);
 
                 } else {
                     return 'Only accepts POST/GET/DELETE requests';
@@ -134,7 +135,10 @@ class RestApi extends AbstractRest
         $subject = $this->createNode($sub);
         $predicate = $this->createNode($pred);
         $object = $this->createNode($obj);
-        $graph = $this->createNode($gr);
+        $graph = null;
+        if ($gr !== null) {
+            $graph = $this->createNode($gr);
+        }
 
         $statement = new StatementImpl($subject, $predicate, $object, $graph);
         return $statement;

@@ -10,6 +10,7 @@ use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\Triple;
+use Saft\Rdf\Node;
 use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Store\AbstractSparqlStore;
@@ -74,12 +75,12 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * Adds a new empty and named graph.
      *
-     * @param  string $graphUri URI of the graph to create.
+     * @param  Node $graphUri URI of the graph to create.
      * @throws \Exception
      */
-    public function addGraph($graphUri)
+    public function addGraph(Node $graph)
     {
-        $this->query('CREATE SILENT GRAPH <'. $graphUri .'>');
+        $this->query('CREATE SILENT GRAPH <'. $graph->getUri() .'>');
     }
 
     /**
@@ -87,7 +88,7 @@ class Virtuoso extends AbstractSparqlStore
      *
      * @param  StatementIterator $statements          StatementList instance must contain Statement instances
      *                                                which are 'concret-' and not 'pattern'-statements.
-     * @param  string            $graphUri   optional Overrides target graph. If set, all statements will
+     * @param  Node              $graph      optional Overrides target graph. If set, all statements will
      *                                                be add to that graph, if available.
      * @param  array             $options    optional It contains key-value pairs and should provide additional
      *                                                introductions for the store and/or its adapter(s).
@@ -95,8 +96,14 @@ class Virtuoso extends AbstractSparqlStore
      *                 will be thrown.
      * @todo implement usage of graph inside the statement(s). create groups for each graph
      */
-    public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
+    public function addStatements(StatementIterator $statements, Node $graph = null, array $options = array())
     {
+        // TODO migrate code to new interface
+        $graphUri = null;
+        if ($graph !== null) {
+            $graphUri = $graph->getUri();
+        }
+
         foreach ($statements as $st) {
             if ($st instanceof Statement && true === $st->isConcrete()) {
                 // everything is fine
@@ -172,7 +179,7 @@ class Virtuoso extends AbstractSparqlStore
 
         // if successor is set, ask it too.
         if ($this->successor instanceof Store) {
-            $this->successor->addStatements($statements, $graphUri, $options);
+            $this->successor->addStatements($statements, $graph, $options);
         }
 
         return true;
@@ -204,10 +211,10 @@ class Virtuoso extends AbstractSparqlStore
      *
      * @throws TODO Exceptions
      */
-    public function clearGraph($graphUri)
+    public function clearGraph(Node $graph)
     {
-        $this->dropGraph($graphUri);
-        $this->addGraph($graphUri);
+        $this->dropGraph($graph);
+        $this->addGraph($graph);
     }
 
     /**
@@ -222,15 +229,21 @@ class Virtuoso extends AbstractSparqlStore
      * Removes all statements from a (default-) graph which match with given statement.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph. If set, all statements will be delete in
+     * @param  Node      $graph     optional Overrides target graph. If set, all statements will be delete in
      *                                       that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
      *                 will be thrown.
      */
-    public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
+    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
+        // TODO migrate code to new interface
+        $graphUri = null;
+        if ($graph !== null) {
+            $graphUri = $graph->getUri();
+        }
+
         /**
          * At least Virtuoso 6.1.8 does not understand DELETE DATA calls containing graph and variables such as:
          *
@@ -262,7 +275,7 @@ class Virtuoso extends AbstractSparqlStore
 
         // if successor is set, ask it too.
         if ($this->successor instanceof Store) {
-            $this->successor->deleteMatchingStatements($statement, $graphUri, $options);
+            $this->successor->deleteMatchingStatements($statement, $graph, $options);
         }
 
         return true;
@@ -276,9 +289,9 @@ class Virtuoso extends AbstractSparqlStore
      *                                  for the store and/or its adapter(s).
      * @throw \Exception
      */
-    public function dropGraph($graphUri, array $options = array())
+    public function dropGraph(Node $graph, array $options = array())
     {
-        $this->query('DROP SILENT GRAPH <'. $graphUri .'>');
+        $this->query('DROP SILENT GRAPH <'. $graph->getUri() .'>');
     }
 
     /**
@@ -307,7 +320,7 @@ class Virtuoso extends AbstractSparqlStore
      * - statement's object is either equal to the object of a statement of the graph or it is null.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph. If set, you will get all
+     * @param  Node      $graph     optional Overrides target graph. If set, you will get all
      *                                       matching statements of that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
@@ -317,11 +330,17 @@ class Virtuoso extends AbstractSparqlStore
      * @todo check if graph URI is valid
      * @todo make it possible to read graphUri from $statement, if given $graphUri is null
      */
-    public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
+    public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
+        // TODO migrate code to new interface
+        $graphUri = null;
+        if ($graph !== null) {
+            $graphUri = $graph->getUri();
+        }
+
         // if successor is set, ask it too.
         if ($this->successor instanceof Store) {
-            $this->successor->getMatchingStatements($statement, $graphUri, $options);
+            $this->successor->getMatchingStatements($statement, $graph, $options);
         }
 
         // Remove, maybe available, graph from given statement and put it into an iterator.
@@ -389,21 +408,15 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * Counts the number of triples in a graph.
      *
-     * @param  string  $graphUri URI of the graph you wanna count triples
+     * @param  Node  $graph URI of the graph you wanna count triples
      * @return integer Number of found triples
-     * @throws \Exception
      */
-    public function getTripleCount($graphUri)
+    public function getTripleCount(Node $graph)
     {
-        if (true === NodeUtils::simpleCheckURI($graphUri)) {
-            $result = $this->query('SELECT (COUNT(*) AS ?count) FROM <' . $graphUri . '> WHERE {?s ?p ?o.}');
-            $result = $result->getResultObject();
+        $result = $this->query('SELECT (COUNT(*) AS ?count) FROM <' . $graph->getUri() . '> WHERE {?s ?p ?o.}');
+        $result = $result->getResultObject();
 
-            return $result[0]['count']->getValue();
-
-        } else {
-            throw new \Exception('Parameter $graphUri is not valid or empty.');
-        }
+        return $result[0]['count']->getValue();
     }
 
     /**
@@ -412,16 +425,22 @@ class Virtuoso extends AbstractSparqlStore
      * outside the braces and not within the condition, such as ASK Graph <http://foo/> { ... }
      *
      * @param  Statement $Statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph.
+     * @param  Node      $graph     optional Overrides target graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return boolean Returns true if at least one match was found, false otherwise.
      */
-    public function hasMatchingStatement(Statement $Statement, $graphUri = null, array $options = array())
+    public function hasMatchingStatement(Statement $Statement, Node $graph = null, array $options = array())
     {
+        // TODO migrate code to new interface
+        $graphUri = null;
+        if ($graph !== null) {
+            $graphUri = $graph->getUri();
+        }
+
         // if successor is set, ask it too.
         if ($this->successor instanceof Store) {
-            $this->successor->hasMatchingStatement($Statement, $graphUri, $options);
+            $this->successor->hasMatchingStatement($Statement, $graph, $options);
         }
 
         // set graphUri, use that from the statement if $graphUri is null
@@ -450,14 +469,14 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * Checks if a certain graph is available in the store.
      *
-     * @param  string $graphUri URI of the graph to check if it is available.
+     * @param  Node $graph URI of the graph to check if it is available.
      * @return boolean True if graph is available, false otherwise.
      */
-    public function isGraphAvailable($graphUri)
+    public function isGraphAvailable(Node $graph)
     {
         $graphs = $this->getAvailableGraphs();
 
-        return true === isset($graphs[$graphUri]);
+        return true === isset($graphs[$graph->getUri()]);
     }
 
     /**
@@ -673,11 +692,11 @@ class Virtuoso extends AbstractSparqlStore
      * because Virtuoso does not support Graph in condition, so $graphUri will be ignored.
      *
      * @param StatementIterator $statements   List of statements to format as SPARQL string.
-     * @param string            $graphUri     Will be ignored, because Virtuoso does not support Graph in
+     * @param Node              $graph        Will be ignored, because Virtuoso does not support Graph in
      *                                        condition.
      * @return string, part of query
      */
-    protected function sparqlFormat(StatementIterator $statements, $graphUri = null)
+    protected function sparqlFormat(StatementIterator $statements, Node $graph = null)
     {
         $query = '';
         foreach ($statements as $statement) {

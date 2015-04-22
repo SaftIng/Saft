@@ -33,11 +33,18 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     protected $separator = '__.__';
 
     /**
+     * @var string
+     */
+    protected $testGraph;
+
+    /**
      *
      */
     public function setUp()
     {
         parent::setUp();
+
+        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
 
         // set path to test dir
         $saftRootDir = dirname(__FILE__) . '/../../../../';
@@ -67,8 +74,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         // assumption is that all given parameter will be returned
         $this->assertEquals(
-            array($statementIterator, $this->testGraphUri, array(1)),
-            $this->fixture->addStatements($statementIterator, $this->testGraphUri, array(1))
+            array($statementIterator, $this->testGraph, array(1)),
+            $this->fixture->addStatements($statementIterator, $this->testGraph, array(1))
         );
     }
 
@@ -91,13 +98,13 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     {
         $this->assertEquals(
             array(
-                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+                $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
             ),
             $this->fixture->buildPatternListBySPO(
                 '*', // s
                 '*', // p
                 '*', // o
-                $this->testGraphUri
+                $this->testGraph->getUri()
             )
         );
     }
@@ -108,14 +115,14 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         $this->assertEquals(
             array(
-                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
-                $this->testGraphUri . $this->separator . $sUri . $this->separator .'*'. $this->separator .'*'
+                $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
+                $this->testGraph->getUri() . $this->separator . $sUri . $this->separator .'*'. $this->separator .'*'
             ),
             $this->fixture->buildPatternListBySPO(
                 $sUri, // s
                 '*', // p
                 '*', // o
-                $this->testGraphUri
+                $this->testGraph->getUri()
             )
         );
     }
@@ -164,7 +171,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                 'http://localhost/Saft/TestGraph/'. $this->separator .'http://a'. $this->separator .'http://b'.
                     $this->separator .'http://c',
             ),
-            $this->fixture->buildPatternListByStatement($statement, $this->testGraphUri)
+            $this->fixture->buildPatternListByStatement($statement, $this->testGraph->getUri())
         );
     }
 
@@ -174,9 +181,9 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         
         $this->assertEquals(
             array(
-                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
+                $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
             ),
-            $this->fixture->buildPatternListByStatement($statement, $this->testGraphUri)
+            $this->fixture->buildPatternListByStatement($statement, $this->testGraph)
         );
     }
 
@@ -190,27 +197,27 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         
         $this->assertEquals(
             array(
-                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
+                $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
 
                 /**
                  * 1 place set
                  */
-                $this->testGraphUri . $this->separator .'http://a'. $this->separator .'*'. $this->separator .'*',
-                $this->testGraphUri . $this->separator .'*'. $this->separator .'http://b'. $this->separator .'*',
-                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'http://c',
+                $this->testGraph->getUri() . $this->separator .'http://a'. $this->separator .'*'. $this->separator .'*',
+                $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'http://b'. $this->separator .'*',
+                $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'http://c',
 
                 /**
                  * 2 places set
                  */
-                $this->testGraphUri . $this->separator .'http://a'. $this->separator .'http://b'.
+                $this->testGraph->getUri() . $this->separator .'http://a'. $this->separator .'http://b'.
                     $this->separator .'*',
-                $this->testGraphUri . $this->separator .'http://a'. $this->separator .'*'.
+                $this->testGraph->getUri() . $this->separator .'http://a'. $this->separator .'*'.
                     $this->separator .'http://c',
-                $this->testGraphUri . $this->separator .'*'. $this->separator .'http://b'.
+                $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'http://b'.
                     $this->separator .'http://c',
 
                 // all 3 places set
-                $this->testGraphUri . $this->separator .'http://a'. $this->separator .'http://b'.
+                $this->testGraph->getUri() . $this->separator .'http://a'. $this->separator .'http://b'.
                     $this->separator .'http://c',
             ),
             $this->fixture->buildPatternListByTriplePattern(
@@ -222,7 +229,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                     'p_type' => 'uri',
                     'o_type' => 'uri',
                 ),
-                $this->testGraphUri
+                $this->testGraph->getUri()
             )
         );
     }
@@ -242,8 +249,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         
         // assumption is that all given parameter will be returned
         $this->assertEquals(
-            array($statement, $this->testGraphUri, array(1)),
-            $this->fixture->deleteMatchingStatements($statement, $this->testGraphUri, array(1))
+            array($statement, $this->testGraph->getUri(), array(1)),
+            $this->fixture->deleteMatchingStatements($statement, $this->testGraph, array(1))
         );
     }
 
@@ -314,7 +321,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         $options = array(1);
 
-        $this->fixture->addStatements($statementIterator, $this->testGraphUri, $options);
+        $this->fixture->addStatements($statementIterator, $this->testGraph, $options);
 
         $this->assertEquals(
             array(
@@ -323,7 +330,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                     'method' => 'addStatements',
                     'parameter' => array(
                         'statements' => $statementIterator,
-                        'graphUri' => $this->testGraphUri,
+                        'graphUri' => $this->testGraph->getUri(),
                         'options' => $options
                     )
                 ),
@@ -331,14 +338,14 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                     'method' => 'invalidateByTriplePattern',
                     'parameter' => array(
                         'statements' => $statementIterator,
-                        'graphUri' => $this->testGraphUri
+                        'graphUri' => $this->testGraph->getUri()
                     )
                 ),
                 array(
                     'method' => 'buildPatternListByStatement',
                     'parameter' => array(
                         'statement' => $statement,
-                        'graphUri' => $this->testGraphUri
+                        'graphUri' => $this->testGraph->getUri()
                     )
                 ),
                 array(
@@ -347,7 +354,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                         's' => '*',
                         'p' => '*',
                         'o' => '*',
-                        'graphUri' => $this->testGraphUri
+                        'graphUri' => $this->testGraph->getUri()
                     )
                 ),
             ),
@@ -364,7 +371,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
             new NamedNodeImpl('http://c')
         );
 
-        $this->fixture->buildPatternListByStatement($statement, $this->testGraphUri);
+        $this->fixture->buildPatternListByStatement($statement, $this->testGraph->getUri());
 
         $this->assertEquals(
             array(
@@ -372,7 +379,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                     'method' => 'buildPatternListByStatement',
                     'parameter' => array(
                         'statement' => $statement,
-                        'graphUri' => $this->testGraphUri
+                        'graphUri' => $this->testGraph->getUri()
                     )
                 ),
                 array(
@@ -381,7 +388,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                         's' => 'http://a',
                         'p' => 'http://b',
                         'o' => 'http://c',
-                        'graphUri' => $this->testGraphUri
+                        'graphUri' => $this->testGraph->getUri()
                     )
                 )
             ),
@@ -401,7 +408,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $options = array(1);
 
-        $this->fixture->deleteMatchingStatements($statement, $this->testGraphUri, $options);
+        $this->fixture->deleteMatchingStatements($statement, $this->testGraph, $options);
 
         $this->assertEquals(
             array(
@@ -410,7 +417,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                     'method' => 'deleteMatchingStatements',
                     'parameter' => array(
                         'statement' => $statement,
-                        'graphUri' => $this->testGraphUri,
+                        'graphUri' => $this->testGraph->getUri(),
                         'options' => $options
                     )
                 ),
@@ -418,14 +425,14 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                     'method' => 'invalidateByTriplePattern',
                     'parameter' => array(
                         'statements' => $statementIterator,
-                        'graphUri' => $this->testGraphUri
+                        'graphUri' => $this->testGraph->getUri()
                     )
                 ),
                 array(
                     'method' => 'buildPatternListByStatement',
                     'parameter' => array(
                         'statement' => $statement,
-                        'graphUri' => $this->testGraphUri
+                        'graphUri' => $this->testGraph->getUri()
                     )
                 ),
                 array(
@@ -434,7 +441,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                         's' => '*',
                         'p' => '*',
                         'o' => '*',
-                        'graphUri' => $this->testGraphUri
+                        'graphUri' => $this->testGraph->getUri()
                     )
                 ),
             ),
@@ -454,11 +461,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $options = array(1);
 
-        $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }';
+        $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }';
         $queryObject = AbstractQuery::initByQueryString($query);
         $queryObject->getQueryParts();
 
-        $this->fixture->getMatchingStatements($statement, $this->testGraphUri, $options);
+        $this->fixture->getMatchingStatements($statement, $this->testGraph, $options);
 
         $this->assertEquals(
             array(
@@ -467,7 +474,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                     'method' => 'getMatchingStatements',
                     'parameter' => array(
                         'statement' => $statement,
-                        'graphUri' => $this->testGraphUri,
+                        'graphUri' => $this->testGraph->getUri(),
                         'options' => $options
                     )
                 ),
@@ -477,7 +484,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                         'queryObject' => $queryObject,
                         'result' => array(
                             $statement,
-                            $this->testGraphUri,
+                            $this->testGraph->getUri(),
                             array(1)
                         )
                     )
@@ -523,7 +530,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $options = array(1);
 
-        $this->fixture->hasMatchingStatement($statement, $this->testGraphUri, $options);
+        $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options);
 
         $this->assertEquals(
             array(
@@ -532,7 +539,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                     'method' => 'hasMatchingStatement',
                     'parameter' => array(
                         'statement' => $statement,
-                        'graphUri' => $this->testGraphUri,
+                        'graphUri' => $this->testGraph->getUri(),
                         'options' => $options,
                     )
                 )
@@ -547,7 +554,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         /**
          * First create test data and save it via saveResult
          */
-        $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }';
+        $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }';
         $queryObject = AbstractQuery::initByQueryString($query);
 
         $result = array(1, 2, 3);
@@ -557,7 +564,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         /**
          * Invalidate everything via a invalidateByQuery call
          */
-        $this->fixture->invalidateByGraphUri($this->testGraphUri);
+        $this->fixture->invalidateByGraphUri($this->testGraph->getUri());
 
         // check log for method calls done
         $this->assertEquals(
@@ -578,7 +585,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                 array(
                     'method' => 'invalidateByGraphUri',
                     'parameter' => array(
-                        'graphUri' => $this->testGraphUri
+                        'graphUri' => $this->testGraph->getUri()
                     )
                 ),
                 array(
@@ -599,7 +606,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          * First create test data and save it via saveResult
          */
         $queryObject = AbstractQuery::initByQueryString(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }'
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }'
         );
 
         $result = array(1, 2, 3);
@@ -645,7 +652,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         /**
          * First create test data and save it via saveResult
          */
-        $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }';
+        $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }';
         $queryObject = AbstractQuery::initByQueryString($query);
 
         $result = array(1, 2, 3);
@@ -658,7 +665,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
 
-        $this->fixture->invalidateByTriplePattern($statementIterator, $this->testGraphUri);
+        $this->fixture->invalidateByTriplePattern($statementIterator, $this->testGraph->getUri());
 
         // check log for method calls done
         $this->assertEquals(
@@ -680,14 +687,14 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                     'method' => 'invalidateByTriplePattern',
                     'parameter' => array(
                         'statements' => $statementIterator,
-                        'graphUri' => $this->testGraphUri
+                        'graphUri' => $this->testGraph->getUri()
                     )
                 ),
                 array(
                     'method' => 'buildPatternListByStatement',
                     'parameter' => array(
                         'statement' => $statement,
-                        'graphUri' => $this->testGraphUri
+                        'graphUri' => $this->testGraph->getUri()
                     )
                 ),
                 array(
@@ -696,7 +703,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                         's' => '*',
                         'p' => '*',
                         'o' => '*',
-                        'graphUri' => $this->testGraphUri
+                        'graphUri' => $this->testGraph->getUri()
                     )
                 ),
                 array(
@@ -718,7 +725,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->fixture->setChainSuccessor($successor);
 
         // build testdata
-        $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }';
+        $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }';
         $queryObject = AbstractQuery::initByQueryString($query);
         $queryObject->getQueryParts();
 
@@ -787,15 +794,15 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         // assumption is that all given parameter will be returned
         $this->assertEquals(
             array(
-                $statement, $this->testGraphUri, $options
+                $statement, $this->testGraph->getUri(), $options
             ),
-            $this->fixture->getMatchingStatements($statement, $this->testGraphUri, $options)
+            $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
         );
 
         $this->assertEquals(
             array(
                 array(
-                    'graph_uris' => array($this->testGraphUri => $this->testGraphUri),
+                    'graph_uris' => array($this->testGraph->getUri() => $this->testGraph->getUri()),
                     'query' => 'SELECT ?s ?p ?o FROM <http://localhost/Saft/TestGraph/> '.
                                'WHERE { '.
                                     '?s ?p ?o '.
@@ -803,10 +810,12 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                                     'FILTER (str(?p) = "'. $statement->getPredicate()->getUri() .'") '.
                                     'FILTER (str(?o) = '. $statement->getObject()->getValue() .') '.
                                 '}',
-                    'result' => array($statement, $this->testGraphUri, $options),
+                    'result' => array($statement, $this->testGraph->getUri(), $options),
                     'triple_pattern' => array(
-                        $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
-                            => $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+                        $this->testGraph->getUri() .
+                        $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+                        => $this->testGraph->getUri() .
+                        $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
                     )
                 )
             ),
@@ -827,9 +836,9 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         // assumption is that all given parameter will be returned
         $this->assertEquals(
             array(
-                $statement, $this->testGraphUri, $options
+                $statement, $this->testGraph->getUri(), $options
             ),
-            $this->fixture->getMatchingStatements($statement, $this->testGraphUri, $options)
+            $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
         );
     }
 
@@ -886,9 +895,9 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         // assumption is that all given parameter will be returned
         $this->assertEquals(
             array(
-                $statement, $this->testGraphUri, $options
+                $statement, $this->testGraph->getUri(), $options
             ),
-            $this->fixture->hasMatchingStatement($statement, $this->testGraphUri, $options)
+            $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options)
         );
     }
 
@@ -912,7 +921,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          * First create test data and save it via saveResult
          */
         $queryObject = AbstractQuery::initByQueryString(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }'
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }'
         );
 
         $result = array(1, 2, 3);
@@ -922,7 +931,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         /**
          * Invalidate everything via a invalidateByGraphUri call
          */
-        $this->fixture->invalidateByGraphUri($this->testGraphUri);
+        $this->fixture->invalidateByGraphUri($this->testGraph->getUri());
 
         /**
          * Check that everything was invalidated:
@@ -932,12 +941,12 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          */
 
         // graph URI entry
-        $this->assertNull($this->fixture->getCache()->get($this->testGraphUri));
+        $this->assertNull($this->fixture->getCache()->get($this->testGraph->getUri()));
 
         // pattern key entry
         $this->assertNull(
             $this->fixture->getCache()->get(
-                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+                $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
             )
         );
 
@@ -954,7 +963,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          * First create test data and save it via saveResult
          */
         $queryObject = AbstractQuery::initByQueryString(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }'
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }'
         );
 
         $result = array(1, 2, 3);
@@ -974,12 +983,12 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          */
 
         // graph URI entry
-        $this->assertNull($this->fixture->getCache()->get($this->testGraphUri));
+        $this->assertNull($this->fixture->getCache()->get($this->testGraph->getUri()));
 
         // pattern key entry
         $this->assertNull(
             $this->fixture->getCache()->get(
-                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+                $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
             )
         );
 
@@ -997,7 +1006,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          * First create test data and save it via saveResult
          */
         $queryObject = AbstractQuery::initByQueryString(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }'
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }'
         );
 
         $result = array(1, 2, 3);
@@ -1011,7 +1020,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
             array(new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()))
         );
 
-        $this->fixture->invalidateByTriplePattern($statementIterator, $this->testGraphUri);
+        $this->fixture->invalidateByTriplePattern($statementIterator, $this->testGraph->getUri());
 
         /**
          * Check that everything was invalidated:
@@ -1021,12 +1030,12 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          */
 
         // graph URI entry
-        $this->assertNull($this->fixture->getCache()->get($this->testGraphUri));
+        $this->assertNull($this->fixture->getCache()->get($this->testGraph->getUri()));
 
         // pattern key entry
         $this->assertNull(
             $this->fixture->getCache()->get(
-                $this->testGraphUri . '*'. $this->separator .'*'. $this->separator .'*'
+                $this->testGraph->getUri() . '*'. $this->separator .'*'. $this->separator .'*'
             )
         );
 
@@ -1045,7 +1054,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->fixture->setChainSuccessor($successor);
 
         // test data
-        $query = 'SELECT * FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}';
+        $query = 'SELECT * FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}';
         $options = array();
 
         $this->assertEquals(
@@ -1062,7 +1071,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     {
         $this->setExpectedException('\Exception');
 
-        $this->fixture->query('SELECT * FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}', array());
+        $this->fixture->query('SELECT * FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}', array());
     }
 
     /**
@@ -1071,7 +1080,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testSaveResultCacheEntries()
     {
         $queryObject = AbstractQuery::initByQueryString(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE { ?s ?p ?o }'
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }'
         );
 
         $result = array(1, 2, 3);
@@ -1083,7 +1092,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          */
         $this->assertEquals(
             array($queryObject->getQuery() => $queryObject->getQuery()),
-            $this->fixture->getCache()->get($this->testGraphUri)
+            $this->fixture->getCache()->get($this->testGraph->getUri())
         );
 
         /**
@@ -1092,7 +1101,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->assertEquals(
             array($queryObject->getQuery() => $queryObject->getQuery()),
             $this->fixture->getCache()->get(
-                $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+                $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
             )
         );
 
@@ -1102,11 +1111,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->assertEquals(
             array(
                 'graph_uris' => array(
-                    $this->testGraphUri => $this->testGraphUri
+                    $this->testGraph->getUri() => $this->testGraph->getUri()
                 ),
                 'triple_pattern' => array(
-                    $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*' =>
-                        $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
+                    $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*' =>
+                        $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
                 ),
                 'result' => $result,
                 'query' => $queryObject->getQuery(),
@@ -1121,11 +1130,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
             array(
                 array(
                     'graph_uris' => array(
-                        $this->testGraphUri => $this->testGraphUri
+                        $this->testGraph->getUri() => $this->testGraph->getUri()
                     ),
                     'triple_pattern' => array(
-                        $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*' =>
-                            $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
+                        $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*' =>
+                            $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
                     ),
                     'result' => $result,
                     'query' => $queryObject->getQuery(),

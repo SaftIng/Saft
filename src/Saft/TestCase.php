@@ -22,11 +22,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     protected $fixture;
 
     /**
-     * @var string
-     */
-    protected $testGraphUri = 'http://localhost/Saft/TestGraph/';
-
-    /**
      * http://stackoverflow.com/a/12496979
      * Fixes assertEquals in case of check array equality.
      *
@@ -39,6 +34,17 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         sort($expected);
         sort($actual);
 
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * compares two SPARQL query strings by removing all whitespace. This method still does not ensur semantic equality
+     * and will also lose information about neccessary whitespace.
+     */
+    public function assertEqualsSparql($expected, $actual, $message = "")
+    {
+        $expected = preg_replace('/\s+/', '', $expected);
+        $actual = preg_replace('/\s+/', '', $actual);
         $this->assertEquals($expected, $actual, $message);
     }
 }

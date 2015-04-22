@@ -34,15 +34,23 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
     /**
      * @var string
      */
-    protected $testGraphUri = 'http://localhost/Saft/TestGraph/';
+    protected $testGraph;
+
+    public function setUp()
+    {
+        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
+
+        parent::setUp();
+    }
 
     /**
      *
      */
     public function tearDown()
     {
+        // TODO there is no dropGraph method on stores
         if (null !== $this->fixture) {
-            $this->fixture->dropGraph($this->testGraphUri);
+            $this->fixture->dropGraph($this->testGraph);
         }
 
         parent::tearDown();
@@ -90,10 +98,10 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
     public function testAddStatements()
     {
         // remove all triples from the test graph
-        $this->fixture->query('CLEAR GRAPH <' . $this->testGraphUri . '>');
+        $this->fixture->query('CLEAR GRAPH <' . $this->testGraph->getUri() . '>');
 
         // graph is empty
-        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -110,16 +118,16 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         ));
 
         // add triples
-        $this->assertTrue($this->fixture->addStatements($statements, $this->testGraphUri));
+        $this->assertTrue($this->fixture->addStatements($statements, $this->testGraph));
 
         // graph has two entries
-        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraphUri));
+        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraph));
     }
 
     public function testAddStatementsLanguageTags()
     {
         // graph is empty
-        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -136,10 +144,10 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         ));
 
         // add triples
-        $this->fixture->addStatements($statements, $this->testGraphUri);
+        $this->fixture->addStatements($statements, $this->testGraph);
 
         // graph has now two entries
-        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraphUri));
+        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraph));
     }
 
     public function testAddStatementsWithSuccessor()
@@ -154,7 +162,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         // backend implementations like Virtuoso.
         eval(
             'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
-                public function addStatements(Saft\Rdf\StatementIterator $statements, $graphUri = null, '.
+                public function addStatements(Saft\Rdf\StatementIterator $statements, Saft\Rdf\Node $graph = null, '.
                     'array $options = array()) {
                     return $statements;
                 }
@@ -176,7 +184,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         /**
          * Create some test data
          */
-        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -193,19 +201,19 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         ));
 
         // add triples
-        $this->fixture->addStatements($statements, $this->testGraphUri);
+        $this->fixture->addStatements($statements, $this->testGraph);
 
-        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraphUri));
+        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraph));
 
         /**
          * drop all triples
          */
         $this->fixture->deleteMatchingStatements(
             new StatementImpl(new NamedNodeImpl('http://s/'), new NamedNodeImpl('http://p/'), new VariableImpl()),
-            $this->testGraphUri
+            $this->testGraph
         );
 
-        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
     }
 
     /**
@@ -224,7 +232,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         // backend implementations like Virtuoso.
         eval(
             'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
-                public function deleteMatchingStatements(Saft\Rdf\Statement $statement, $graphUri = null, '.
+                public function deleteMatchingStatements(Saft\Rdf\Statement $statement, Saft\Rdf\Node $graph = null, '.
                     'array $options = array()) {
                     return $statement;
                 }
@@ -236,7 +244,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
 
-        $this->assertTrue($this->fixture->deleteMatchingStatements($statement, $this->testGraphUri));
+        $this->assertTrue($this->fixture->deleteMatchingStatements($statement, $this->testGraph));
     }
 
     public function testDeleteMatchingStatementsWithVariables()
@@ -244,7 +252,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         /**
          * Create some test data
          */
-        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -261,19 +269,19 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         ));
 
         // add triples
-        $this->fixture->addStatements($statements, $this->testGraphUri);
+        $this->fixture->addStatements($statements, $this->testGraph);
 
-        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraphUri));
+        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraph));
 
         /**
          * drop all triples
          */
         $this->fixture->deleteMatchingStatements(
             new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
-            $this->testGraphUri
+            $this->testGraph
         );
 
-        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
     }
 
     /**
@@ -297,7 +305,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         ));
 
         // add triples
-        $this->fixture->addStatements($statements, $this->testGraphUri);
+        $this->fixture->addStatements($statements, $this->testGraph);
 
         $statement = new StatementImpl(
             new NamedNodeImpl('http://s/'),
@@ -327,7 +335,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 
         $this->assertEquals(
             $statementResultToCheckAgainst,
-            $this->fixture->getMatchingStatements($statement, $this->testGraphUri)
+            $this->fixture->getMatchingStatements($statement, $this->testGraph)
         );
     }
 
@@ -339,7 +347,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 
         $this->assertEquals(
             $statementResult,
-            $this->fixture->getMatchingStatements($statement, $this->testGraphUri)
+            $this->fixture->getMatchingStatements($statement, $this->testGraph)
         );
     }
 
@@ -355,7 +363,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         // backend implementations like Virtuoso.
         eval(
             'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
-                public function getMatchingStatements(Saft\Rdf\Statement $statement, $graphUri = null, '.
+                public function getMatchingStatements(Saft\Rdf\Statement $statement, Saft\Rdf\Node $graph = null, '.
                     'array $options = array()) {
                     return $statement;
                 }
@@ -372,7 +380,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 
         $this->assertEquals(
             $statementResult,
-            $this->fixture->getMatchingStatements($statement, $this->testGraphUri)
+            $this->fixture->getMatchingStatements($statement, $this->testGraph)
         );
     }
 
@@ -397,20 +405,20 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         ));
 
         // add triples
-        $this->fixture->addStatements($statements, $this->testGraphUri);
+        $this->fixture->addStatements($statements, $this->testGraph);
 
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
 
-        $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraphUri));
+        $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraph));
     }
 
     public function testHasMatchingStatementEmptyGraph()
     {
-        $this->fixture->query('CLEAR GRAPH <'. $this->testGraphUri .'>');
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
 
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
 
-        $this->assertFalse($this->fixture->hasMatchingStatement($statement, $this->testGraphUri));
+        $this->assertFalse($this->fixture->hasMatchingStatement($statement, $this->testGraph));
     }
 
     public function testHasMatchingStatementWithSuccessor()
@@ -430,7 +438,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         ));
 
         // add triples
-        $this->fixture->addStatements($statements, $this->testGraphUri);
+        $this->fixture->addStatements($statements, $this->testGraph);
 
         /**
          * Mock
@@ -445,7 +453,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         // backend implementations like Virtuoso.
         eval(
             'class '. $class .' extends '. get_class($storeInterfaceMock) .' {
-                public function hasMatchingStatements(Saft\Rdf\Statement $statement, $graphUri = null, '.
+                public function hasMatchingStatements(Saft\Rdf\Statement $statement, Saft\Rdf\Node $graph = null, '.
                     'array $options = array()) {
                     return $statement;
                 }
@@ -457,7 +465,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
 
-        $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraphUri));
+        $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraph));
     }
 
     /**
@@ -466,7 +474,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 
     public function testQuery()
     {
-        $this->fixture->query('CLEAR GRAPH <'. $this->testGraphUri .'>');
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -488,7 +496,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         ));
 
         // add triples
-        $this->fixture->addStatements($statements, $this->testGraphUri);
+        $this->fixture->addStatements($statements, $this->testGraph);
 
         /**
          * Build SetResult instance to check against
@@ -511,15 +519,15 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         // check
         $this->assertEquals(
             $setResultToCheckAgainst,
-            $this->fixture->query('SELECT ?s ?o FROM <' . $this->testGraphUri . '> WHERE {?s ?p ?o.} ORDER BY ?o')
+            $this->fixture->query('SELECT ?s ?o FROM <' . $this->testGraph->getUri() . '> WHERE {?s ?p ?o.} ORDER BY ?o')
         );
     }
 
     public function testQueryAsk()
     {
-        $this->fixture->query('CLEAR GRAPH <'. $this->testGraphUri .'>');
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
 
-        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -531,12 +539,12 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         ));
 
         // add triples
-        $this->fixture->addStatements($statements, $this->testGraphUri);
+        $this->fixture->addStatements($statements, $this->testGraph);
 
         $this->assertEquals(
             new ValueResult(true),
             $this->fixture->query(
-                'ASK { SELECT * FROM <'. $this->testGraphUri . '> WHERE {<http://s/> <http://p/> ?o.}}'
+                'ASK { SELECT * FROM <'. $this->testGraph->getUri() . '> WHERE {<http://s/> <http://p/> ?o.}}'
             )
         );
     }
@@ -548,7 +556,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 
         $this->assertEquals(
             $setResult,
-            $this->fixture->query('SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}')
+            $this->fixture->query('SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}')
         );
     }
 
@@ -578,7 +586,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
 
         $this->assertEquals(
             $setResult,
-            $this->fixture->query('SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}')
+            $this->fixture->query('SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}')
         );
     }
 }

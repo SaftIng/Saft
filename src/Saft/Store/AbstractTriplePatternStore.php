@@ -7,6 +7,7 @@ use Saft\Rdf\AbstractNamedNode;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactory;
+use Saft\Rdf\Node;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
@@ -26,7 +27,7 @@ abstract class AbstractTriplePatternStore implements Store
      *
      * @param  StatementIterator $statements          StatementList instance must contain Statement instances
      *                                                which are 'concret-' and not 'pattern'-statements.
-     * @param  string            $graphUri   optional Overrides target graph. If set, all statements will
+     * @param  Node              $graph      optional Overrides target graph. If set, all statements will
      *                                                be add to that graph, if available.
      * @param  array             $options    optional It contains key-value pairs and should provide additional
      *                                                introductions for the store and/or its adapter(s).
@@ -34,32 +35,32 @@ abstract class AbstractTriplePatternStore implements Store
      *
      * @todo implement usage of graph inside the statement(s). create groups for each graph
      */
-    public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
+    public function addStatements(StatementIterator $statements, Node $graph = null, array $options = array())
     {
         /**
          * This basic implementation only returns what was given. It is basically for test purposes and
          * later real implementations will rather override this function.
          */
-        return array($statements, $graphUri, $options);
+        return array($statements, $graph, $options);
     }
 
     /**
      * Removes all statements from a (default-) graph which match with given statement.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph. If set, all statements will be delete in
+     * @param  Node      $graph     optional Overrides target graph. If set, all statements will be delete in
      *                                       that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return array Array containing all given arguments.
      */
-    public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
+    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
         /**
          * This basic implementation only returns what was given. It is basically for test purposes and
          * later real implementations will rather override this function.
          */
-        return array($statement, $graphUri, $options);
+        return array($statement, $graph, $options);
     }
 
     /**
@@ -69,19 +70,19 @@ abstract class AbstractTriplePatternStore implements Store
      * - statement's object is either equal to the object of a statement of the graph or it is null.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph. If set, you will get all
+     * @param  Node      $graph     optional Overrides target graph. If set, you will get all
      *                                       matching statements of that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return array Array containing all given arguments.
      */
-    public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
+    public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
         /**
          * This basic implementation only returns what was given. It is basically for test purposes and
          * later real implementations will rather override this function.
          */
-        return array($statement, $graphUri, $options);
+        return array($statement, $graph, $options);
     }
 
     /**
@@ -214,18 +215,18 @@ abstract class AbstractTriplePatternStore implements Store
      * graph.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph.
+     * @param  Node      $graph     optional Overrides target graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return array Array containing all given arguments.
      */
-    public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
+    public function hasMatchingStatement(Statement $statement, Node $graph = null, array $options = array())
     {
         /**
          * This basic implementation only returns what was given. It is basically for test purposes and
          * later real implementations will rather override this function.
          */
-        return array($statement, $graphUri, $options);
+        return array($statement, $graph, $options);
     }
 
     /**

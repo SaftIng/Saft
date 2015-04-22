@@ -88,7 +88,7 @@ EOD;
         // Fails because intiailize was not called before
         // TODO is this the intended behavior? Can't this be done in the constructor
         $this->setExpectedException('\LogicException');
-        $store->isGraphAvailable('foo');
+        $store->isGraphAvailable(new NamedNodeImpl('http://foo.org/'));
     }
 
     public function testHasMatchingStatementChecksIfInitialized()
@@ -99,7 +99,7 @@ EOD;
         // Fails because intiailize was not called before
         // TODO is this the intended behavior? Can't this be done in the constructor
         $this->setExpectedException('\LogicException');
-        $store->hasMatchingStatement($pattern, 'http://localhost:8890/foaf');
+        $store->hasMatchingStatement($pattern, new NamedNodeImpl('http://localhost:8890/foaf'));
     }
 
     public function testGetMatchingStatementsChecksIfInitialized()
@@ -126,7 +126,7 @@ EOD;
         // Fails because intiailize was not called before
         // TODO is this the intended behavior? Can't this be done in the constructor
         $this->setExpectedException('\LogicException');
-        $store->addStatements($statements, 'http://localhost:8890/foaf');
+        $store->addStatements($statements, new NamedNodeImpl('http://localhost:8890/foaf'));
     }
 
     public function testDeleteMatchingStatementsChecksIfInitialized()
@@ -137,7 +137,7 @@ EOD;
         // Fails because intiailize was not called before
         // TODO is this the intended behavior? Can't this be done in the constructor
         $this->setExpectedException('\LogicException');
-        $store->deleteMatchingStatements($pattern, 'http://localhost:8890/foaf');
+        $store->deleteMatchingStatements($pattern, new NamedNodeImpl('http://localhost:8890/foaf'));
     }
 
     public function testNoAvailableGraphsAfterInitializingAnEmptyBaseDir()
@@ -168,9 +168,9 @@ EOD;
 
         $store = new LocalStore($this->tempDirectory);
         $store->initialize();
-        $this->assertTrue($store->isGraphAvailable('http://localhost:8890/foo'));
-        $this->assertTrue($store->isGraphAvailable('http://dbpedia.org/data/ireland'));
-        $this->assertFalse($store->isGraphAvailable('http://non.existing/graph'));
+        $this->assertTrue($store->isGraphAvailable(new NamedNodeImpl('http://localhost:8890/foo')));
+        $this->assertTrue($store->isGraphAvailable(new NamedNodeImpl('http://dbpedia.org/data/ireland')));
+        $this->assertFalse($store->isGraphAvailable(new NamedNodeImpl('http://non.existing/graph')));
     }
 
     public function testAddGraph()
@@ -182,11 +182,11 @@ EOD;
 
         $store = new LocalStore($this->tempDirectory);
         $store->initialize();
-        $uri = 'http://localhost:8890/bar';
+        $graph = new NamedNodeImpl('http://localhost:8890/bar');
         $path = 'bar.nt';
-        $this->assertFalse($store->isGraphAvailable($uri));
-        $store->addGraph($uri, $path);
-        $this->assertTrue($store->isGraphAvailable($uri));
+        $this->assertFalse($store->isGraphAvailable($graph));
+        $store->addGraph($graph, $path);
+        $this->assertTrue($store->isGraphAvailable($graph));
         $this->assertFileExists($this->tempDirectory . DIRECTORY_SEPARATOR . $path);
     }
 
@@ -204,7 +204,7 @@ EOD;
             new VariableImpl('?p'),
             new VariableImpl('?o')
         );
-        $it = $store->getMatchingStatements($pattern, 'http://localhost:8890/foaf');
+        $it = $store->getMatchingStatements($pattern, new NamedNodeImpl('http://localhost:8890/foaf'));
         $matches = [];
         foreach ($it as $statement) {
             $this->assertTrue($statement->isConcrete());
@@ -220,7 +220,7 @@ EOD;
             new VariableImpl('?p'),
             new VariableImpl('?o')
         );
-        $it = $store->getMatchingStatements($pattern, 'http://localhost:8890/foaf');
+        $it = $store->getMatchingStatements($pattern, new NamedNodeImpl('http://localhost:8890/foaf'));
         $this->assertFalse($it->valid());
         $it->close();
     }
@@ -241,7 +241,7 @@ EOD;
         );
         $this->assertTrue($store->hasMatchingStatement(
             $pattern,
-            'http://localhost:8890/foaf'
+            new NamedNodeImpl('http://localhost:8890/foaf')
         ));
 
         $pattern = new StatementImpl(
@@ -251,7 +251,7 @@ EOD;
         );
         $this->assertFalse($store->hasMatchingStatement(
             $pattern,
-            'http://localhost:8890/foaf'
+            new NamedNodeImpl('http://localhost:8890/foaf')
         ));
     }
 
@@ -265,18 +265,18 @@ EOD;
         $store = new LocalStore($this->tempDirectory);
         $store->initialize();
 
-        $preCount = $this->countStatements($store, 'http://localhost:8890/foaf');
+        $preCount = $this->countStatements($store, new NamedNodeImpl('http://localhost:8890/foaf'));
         $statement = new StatementImpl(
             new BlankNodeImpl('genid1'),
             new NamedNodeImpl('http://example.net'),
             new BlankNodeImpl('genid2')
         );
         $statements = new ArrayStatementIteratorImpl([$statement]);
-        $store->addStatements($statements, 'http://localhost:8890/foaf');
-        $postCount = $this->countStatements($store, 'http://localhost:8890/foaf');
+        $store->addStatements($statements, new NamedNodeImpl('http://localhost:8890/foaf'));
+        $postCount = $this->countStatements($store, new NamedNodeImpl('http://localhost:8890/foaf'));
         $this->assertEquals($preCount + 1, $postCount);
 
-        $this->assertFalse($store->isGraphAvailable('http://localhost:8890/baz'));
+        $this->assertFalse($store->isGraphAvailable(new NamedNodeImpl('http://localhost:8890/baz')));
         $statement = new StatementImpl(
             new BlankNodeImpl('genid1'),
             new NamedNodeImpl('http://example.net'),
@@ -285,11 +285,11 @@ EOD;
         );
         $statements = new ArrayStatementIteratorImpl([$statement]);
         $store->addStatements($statements);
-        $this->assertTrue($store->isGraphAvailable('http://localhost:8890/baz'));
+        $this->assertTrue($store->isGraphAvailable(new NamedNodeImpl('http://localhost:8890/baz')));
 
         $it = $store->getMatchingStatements(
             self::createAllPattern(),
-            'http://localhost:8890/baz'
+            new NamedNodeImpl('http://localhost:8890/baz')
         );
         $it->rewind();
         $this->assertTrue($it->valid());
@@ -314,7 +314,7 @@ EOD;
         );
 
         // Count how many statements matches the pattern
-        $it = $store->getMatchingStatements($pattern, 'http://localhost:8890/foaf');
+        $it = $store->getMatchingStatements($pattern, new NamedNodeImpl('http://localhost:8890/foaf'));
         $numMatches = 0;
         foreach ($it as $statement) {
             $numMatches++;
@@ -323,13 +323,13 @@ EOD;
         $this->assertEquals(3, $numMatches);
 
         // Delete matching statements
-        $preCount = $this->countStatements($store, 'http://localhost:8890/foaf');
-        $store->deleteMatchingStatements($pattern, 'http://localhost:8890/foaf');
-        $postCount = $this->countStatements($store, 'http://localhost:8890/foaf');
+        $preCount = $this->countStatements($store, new NamedNodeImpl('http://localhost:8890/foaf'));
+        $store->deleteMatchingStatements($pattern, new NamedNodeImpl('http://localhost:8890/foaf'));
+        $postCount = $this->countStatements($store, new NamedNodeImpl('http://localhost:8890/foaf'));
         $this->assertEquals(3, $preCount - $postCount);
 
         // Check, that all matches has been deleted
-        $it = $store->getMatchingStatements($pattern, 'http://localhost:8890/foaf');
+        $it = $store->getMatchingStatements($pattern, new NamedNodeImpl('http://localhost:8890/foaf'));
         $numMatches = 0;
         foreach ($it as $statement) {
             $numMatches++;

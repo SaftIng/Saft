@@ -3,12 +3,22 @@
 namespace Saft\Sparql\Test\Query;
 
 use Saft\TestCase;
+use Saft\Rdf\NamedNodeImpl;
 use Saft\Sparql\Query\GraphQuery;
 
 class GraphQueryUnitTest extends TestCase
 {
+    /**
+     * @var string
+     */
+    protected $testGraph;
+
     public function setUp()
     {
+        parent::setUp();
+
+        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
+
         $this->fixture = new GraphQuery();
     }
 
@@ -18,9 +28,9 @@ class GraphQueryUnitTest extends TestCase
 
     public function testConstructor()
     {
-        $this->fixture = new GraphQuery('CREATE GRAPH <'. $this->testGraphUri .'>');
-        
-        $this->assertEquals('CREATE GRAPH <'. $this->testGraphUri .'>', $this->fixture->getQuery());
+        $this->fixture = new GraphQuery('CREATE GRAPH <'. $this->testGraph->getUri() .'>');
+
+        $this->assertEquals('CREATE GRAPH <'. $this->testGraph->getUri() .'>', $this->fixture->getQuery());
     }
 
     /**
@@ -74,12 +84,12 @@ class GraphQueryUnitTest extends TestCase
 
     public function testGetQueryParts()
     {
-        $this->fixture->init('CLEAR GRAPH <'. $this->testGraphUri .'>');
-        
+        $this->fixture->init('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
+
         $queryParts = $this->fixture->getQueryParts();
 
         $this->assertEquals(2, count($queryParts));
-        $this->assertEquals(array($this->testGraphUri), $queryParts['graphs']);
+        $this->assertEquals(array($this->testGraph->getUri()), $queryParts['graphs']);
         $this->assertEquals('clearGraph', $queryParts['sub_type']);
     }
 
@@ -91,27 +101,27 @@ class GraphQueryUnitTest extends TestCase
     {
         $this->assertEquals(
             'clearGraph',
-            $this->fixture->determineSubType('CLEAR GRAPH <'. $this->testGraphUri .'>')
+            $this->fixture->determineSubType('CLEAR GRAPH <'. $this->testGraph->getUri() .'>')
         );
 
         $this->assertEquals(
             'createGraph',
-            $this->fixture->determineSubType('CREATE GRAPH <'. $this->testGraphUri .'>')
+            $this->fixture->determineSubType('CREATE GRAPH <'. $this->testGraph->getUri() .'>')
         );
 
         $this->assertEquals(
             'createSilentGraph',
-            $this->fixture->determineSubType('CREATE SILENT GRAPH <'. $this->testGraphUri .'>')
+            $this->fixture->determineSubType('CREATE SILENT GRAPH <'. $this->testGraph->getUri() .'>')
         );
 
         $this->assertEquals(
             'dropGraph',
-            $this->fixture->determineSubType('DROP GRAPH <'. $this->testGraphUri .'>')
+            $this->fixture->determineSubType('DROP GRAPH <'. $this->testGraph->getUri() .'>')
         );
 
         $this->assertEquals(
             'dropSilentGraph',
-            $this->fixture->determineSubType('DROP SILENT GRAPH <'. $this->testGraphUri .'>')
+            $this->fixture->determineSubType('DROP SILENT GRAPH <'. $this->testGraph->getUri() .'>')
         );
     }
 
@@ -127,9 +137,9 @@ class GraphQueryUnitTest extends TestCase
     public function testInit()
     {
         $this->fixture = new GraphQuery();
-        $this->fixture->init('CREATE GRAPH <'. $this->testGraphUri .'>');
-        
-        $this->assertEquals('CREATE GRAPH <'. $this->testGraphUri .'>', $this->fixture->getQuery());
+        $this->fixture->init('CREATE GRAPH <'. $this->testGraph->getUri() .'>');
+
+        $this->assertEquals('CREATE GRAPH <'. $this->testGraph->getUri() .'>', $this->fixture->getQuery());
     }
 
     /**

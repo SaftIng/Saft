@@ -19,7 +19,7 @@ class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
      * @var array
      */
     protected $config;
-    
+
     /**
      * Contains an instance of the class to test.
      *
@@ -30,10 +30,12 @@ class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    protected $testGraphUri = 'http://localhost/Saft/TestGraph/';
-    
+    protected $testGraph;
+
     public function setUp()
     {
+        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
+
         // set path to test dir
         $saftRootDir = dirname(__FILE__) . '/../../../../../';
         $configFilepath = $saftRootDir . 'test-config.yml';
@@ -65,12 +67,12 @@ class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
     public function tearDown()
     {
         if (null !== $this->fixture) {
-            $this->fixture->dropGraph($this->testGraphUri);
+            $this->fixture->dropGraph($this->testGraph);
         }
 
         parent::tearDown();
     }
-    
+
     /**
      * http://stackoverflow.com/a/12496979
      * Fixes assertEquals in case of check array equality.
@@ -86,18 +88,18 @@ class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $actual, $message);
     }
-    
+
     /**
      * Tests addGraph
      */
 
     public function testAddGraph()
     {
-        $this->assertFalse($this->fixture->isGraphAvailable($this->testGraphUri));
-         
-        $this->fixture->addGraph($this->testGraphUri);
-        
-        $this->assertTrue($this->fixture->isGraphAvailable($this->testGraphUri));
+        $this->assertFalse($this->fixture->isGraphAvailable($this->testGraph));
+
+        $this->fixture->addGraph($this->testGraph);
+
+        $this->assertTrue($this->fixture->isGraphAvailable($this->testGraph));
     }
 
     /**
@@ -106,22 +108,22 @@ class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
 
     public function testDropGraph()
     {
-        $this->fixture->dropGraph($this->testGraphUri);
+        $this->fixture->dropGraph($this->testGraph);
 
         $this->assertFalse(
-            $this->fixture->isGraphAvailable($this->testGraphUri)
+            $this->fixture->isGraphAvailable($this->testGraph)
         );
 
-        $this->fixture->addGraph($this->testGraphUri);
+        $this->fixture->addGraph($this->testGraph);
 
         $this->assertTrue(
-            $this->fixture->isGraphAvailable($this->testGraphUri)
+            $this->fixture->isGraphAvailable($this->testGraph)
         );
 
-        $this->fixture->dropGraph($this->testGraphUri);
+        $this->fixture->dropGraph($this->testGraph);
 
         $this->assertFalse(
-            $this->fixture->isGraphAvailable($this->testGraphUri)
+            $this->fixture->isGraphAvailable($this->testGraph)
         );
     }
 
@@ -163,7 +165,7 @@ class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
     public function testGetTripleCount()
     {
         // graph is empty
-        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraphUri));
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -180,10 +182,10 @@ class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
         ));
 
         // add triples
-        $this->fixture->addStatements($statements, $this->testGraphUri);
+        $this->fixture->addStatements($statements, $this->testGraph);
 
         // graph has to contain 2 triples
-        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraphUri));
+        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraph));
     }
 
     /**

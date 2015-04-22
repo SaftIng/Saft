@@ -3,6 +3,7 @@
 namespace Saft\Sparql\Test\Query;
 
 use Saft\TestCase;
+use Saft\Rdf\NamedNodeImpl;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\AskQuery;
 use Saft\Sparql\Query\DescribeQuery;
@@ -12,8 +13,17 @@ use Saft\Sparql\Query\UpdateQuery;
 
 class AbstractQueryUnitTest extends TestCase
 {
+    /**
+     * @var string
+     */
+    protected $testGraph;
+
     public function setUp()
     {
+        parent::setUp();
+
+        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
+
         $this->fixture = $this->getMockForAbstractClass('\Saft\Sparql\Query\AbstractQuery');
     }
 
@@ -52,7 +62,7 @@ class AbstractQueryUnitTest extends TestCase
     {
         $this->assertEquals('literal', $this->fixture->determineEntityType('"foo"@en'));
         $this->assertEquals('typed-literal', $this->fixture->determineEntityType('"foo"^^<http://foobar/>'));
-        $this->assertEquals('uri', $this->fixture->determineEntityType('<'. $this->testGraphUri .'>'));
+        $this->assertEquals('uri', $this->fixture->determineEntityType('<'. $this->testGraph->getUri() .'>'));
         $this->assertEquals('var', $this->fixture->determineEntityType('Foo'));
     }
 
@@ -599,7 +609,7 @@ class AbstractQueryUnitTest extends TestCase
     public function testGetQueryTypeSelect()
     {
         $query = ' SELECT ?x
-                  FROM <'. $this->testGraphUri .'>
+                  FROM <'. $this->testGraph->getUri() .'>
                   WHERE { ?x foaf:mbox <mailto:alice@org> }';
 
         $this->assertEquals('selectQuery', AbstractQuery::getQueryType($query));
@@ -668,8 +678,8 @@ class AbstractQueryUnitTest extends TestCase
 
     public function testInitByQueryStringGraphQuery()
     {
-        $query = 'CREATE GRAPH <'. $this->testGraphUri .'>';
-        
+        $query = 'CREATE GRAPH <'. $this->testGraph->getUri() .'>';
+
         $this->assertEquals(
             new GraphQuery($query),
             $this->fixture->initByQueryString($query)
@@ -679,7 +689,7 @@ class AbstractQueryUnitTest extends TestCase
     public function testInitByQueryStringSelectQuery()
     {
         $query = ' SELECT ?x
-                  FROM <'. $this->testGraphUri .'>
+                  FROM <'. $this->testGraph->getUri() .'>
                   WHERE { ?x foaf:mbox <mailto:alice@org> }';
 
         $this->assertEquals(
@@ -722,8 +732,8 @@ class AbstractQueryUnitTest extends TestCase
         /**
          * WITH ... DELETE ... WHERE
          */
-        $query = 'WITH <'. $this->testGraphUri .'> DELETE { ... } WHERE { ... }';
-        
+        $query = 'WITH <'. $this->testGraph->getUri() .'> DELETE { ... } WHERE { ... }';
+
         $this->assertEquals(
             new UpdateQuery($query),
             $this->fixture->initByQueryString($query)

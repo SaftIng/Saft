@@ -3,6 +3,7 @@
 namespace Saft\Store;
 
 use Saft\Rdf;
+use Saft\Rdf\Node;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\ResultIterator;
@@ -27,27 +28,27 @@ interface Store
      *
      * @param  StatementIterator $statements          StatementList instance must contain Statement instances
      *                                                which are 'concret-' and not 'pattern'-statements.
-     * @param  string            $graphUri   optional Overrides target graph. If set, all statements will
+     * @param  Node              $graph      optional Overrides target graph. If set, all statements will
      *                                                be add to that graph, if available.
      * @param  array             $options    optional It contains key-value pairs and should provide additional
      *                                                introductions for the store and/or its adapter(s).
      * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
      *                 will be thrown.
      */
-    public function addStatements(StatementIterator $Statements, $graphUri = null, array $options = array());
+    public function addStatements(StatementIterator $Statements, Node $graph = null, array $options = array());
 
     /**
      * Removes all statements from a (default-) graph which match with given statement.
      *
      * @param  Statement $Statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph. If set, all statements will be delete in
+     * @param  Node      $graph     optional Overrides target graph. If set, all statements will be delete in
      *                                       that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return boolean Returns true, if function performed without errors. In case
      *                 an error occur, an exception will be thrown.
      */
-    public function deleteMatchingStatements(Statement $Statement, $graphUri = null, array $options = array());
+    public function deleteMatchingStatements(Statement $Statement, Node $graph = null, array $options = array());
 
     /**
      * It gets all statements of a given graph which match the following conditions:
@@ -56,25 +57,25 @@ interface Store
      * - statement's object is either equal to the object of a statement of the graph or it is null.
      *
      * @param  Statement $Statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph. If set, you will get all
+     * @param  Node      $graph     optional Overrides target graph. If set, you will get all
      *                                       matching statements of that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return StatementIterator It contains Statement instances  of all matching statements of the given graph.
      */
-    public function getMatchingStatements(Statement $Statement, $graphUri = null, array $options = array());
+    public function getMatchingStatements(Statement $Statement, Node $graph = null, array $options = array());
 
     /**
      * Returns true or false depending on whether or not the statements pattern
      * has any matches in the given graph.
      *
      * @param  Statement $Statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph.
+     * @param  Node      $graph     optional Overrides target graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return boolean Returns true if at least one match was found, false otherwise.
      */
-    public function hasMatchingStatement(Statement $Statement, $graphUri = null, array $options = array());
+    public function hasMatchingStatement(Statement $Statement, Node $graph = null, array $options = array());
 
     /**
      * Get information about the store and its features.

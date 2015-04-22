@@ -5,6 +5,7 @@ use Saft\Backend\HttpStore\Store\Http;
 use Saft\Backend\Virtuoso\Store\Virtuoso;
 use Saft\Cache\Cache;
 use Saft\QueryCache\QueryCache;
+use Saft\Rdf\Node;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
 use Saft\Store\Result\Result;
@@ -25,19 +26,25 @@ class StoreChain implements Store
      *
      * @param  StatementIterator $statements          StatementList instance must contain Statement instances
      *                                                which are 'concret-' and not 'pattern'-statements.
-     * @param  string            $graphUri   optional Overrides target graph. If set, all statements will
+     * @param  Node              $graph      optional Overrides target graph. If set, all statements will
      *                                                be add to that graph, if available.
      * @param  array             $options    optional It contains key-value pairs and should provide additional
      *                                                introductions for the store and/or its adapter(s).
      * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
      *                 will be thrown.
      */
-    public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
+    public function addStatements(StatementIterator $statements, Node $graph = null, array $options = array())
     {
+        // TODO migrate code to new interface
+        $graphUri = null;
+        if ($graph !== null) {
+            $graphUri = $graph->getUri();
+        }
+
         // run command on chain entries
         if (true === isset($this->chainEntries[0])) {
-            return $this->chainEntries[0]->addStatements($statements, $graphUri, $options);
-        
+            return $this->chainEntries[0]->addStatements($statements, $graph, $options);
+
         // dont run the command by yourself
         } else {
             throw new \Exception('No chain entries available and no successor set.');
@@ -48,19 +55,25 @@ class StoreChain implements Store
      * Removes all statements from a (default-) graph which match with given statement.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph. If set, all statements will be delete in
+     * @param  Node      $graph     optional Overrides target graph. If set, all statements will be delete in
      *                                       that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
      *                 will be thrown.
      */
-    public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
+    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
+        // TODO migrate code to new interface
+        $graphUri = null;
+        if ($graph !== null) {
+            $graphUri = $graph->getUri();
+        }
+
         // run command on chain entries
         if (true === isset($this->chainEntries[0])) {
-            return $this->chainEntries[0]->deleteMatchingStatements($statement, $graphUri, $options);
-        
+            return $this->chainEntries[0]->deleteMatchingStatements($statement, $graph, $options);
+
         // dont run the command by yourself
         } else {
             throw new \Exception('No chain entries available, cant run command by myself.');
@@ -101,17 +114,23 @@ class StoreChain implements Store
      * - statement's object is either equal to the object of a statement of the graph or it is null.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph. If set, you will get all
+     * @param  Node      $graph     optional Overrides target graph. If set, you will get all
      *                                       matching statements of that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return StatementIterator It contains Statement instances  of all matching statements of the given graph.
      */
-    public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
+    public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
+        // TODO migrate code to new interface
+        $graphUri = null;
+        if ($graph !== null) {
+            $graphUri = $graph->getUri();
+        }
+
         // run command on chain entries
         if (true === isset($this->chainEntries[0])) {
-            return $this->chainEntries[0]->getMatchingStatements($statement, $graphUri, $options);
+            return $this->chainEntries[0]->getMatchingStatements($statement, $graph, $options);
         }
 
         // dont run the command by yourself
@@ -138,16 +157,22 @@ class StoreChain implements Store
      * has any matches in the given graph.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph.
+     * @param  Node      $graph     optional Overrides target graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return boolean Returns true if at least one match was found, false otherwise.
      */
-    public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
+    public function hasMatchingStatement(Statement $statement, Node $graph = null, array $options = array())
     {
+        // TODO migrate code to new interface
+        $graphUri = null;
+        if ($graph !== null) {
+            $graphUri = $graph->getUri();
+        }
+
         // run command on chain entries
         if (true === isset($this->chainEntries[0])) {
-            return $this->chainEntries[0]->hasMatchingStatement($statement, $graphUri, $options);
+            return $this->chainEntries[0]->hasMatchingStatement($statement, $graph, $options);
         }
 
         // dont run the command by yourself

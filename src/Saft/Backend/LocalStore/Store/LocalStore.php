@@ -4,6 +4,7 @@ namespace Saft\Backend\LocalStore\Store;
 
 use Saft\Store\Store;
 use Saft\Store\AbstractTriplePatternStore;
+use Saft\Rdf\Node;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\Statement;
 use Monolog\Logger;
@@ -54,15 +55,10 @@ class LocalStore extends AbstractTriplePatternStore
         return array_keys($this->graphUriFileMapping);
     }
 
-    public function isGraphAvailable($uri)
+    public function isGraphAvailable(Node $graph)
     {
-        if (!Util::isValidUri($uri)) {
-            throw new \InvalidArgumentException(
-                '$uri ' . $uri . ' is not valid'
-            );
-        }
         $this->ensureInitialized();
-        return array_key_exists($uri, $this->graphUriFileMapping);
+        return array_key_exists($graph->getUri(), $this->graphUriFileMapping);
     }
 
     public function setFilenameFactory(FilenameFactory $factory)
@@ -78,42 +74,42 @@ class LocalStore extends AbstractTriplePatternStore
     /**
      * Adds an empty graph with the given URI to store. This graph
      * is available after.
-     * @param string $uri URI of the graph
+     * @param Node $graph URI of the graph
      * @param string $filename filename relative to the base directory
      */
-    public function addGraph($uri, $path)
+    public function addGraph(Node $graph, $path)
     {
-        if ($this->isGraphAvailable($uri)) {
+        if ($this->isGraphAvailable($graph)) {
             return;
         }
 
-        $this->graphUriFileMapping[$uri] =
+        $this->graphUriFileMapping[$graph->getUri()] =
             $this->fileSystem->getFile($path);
-        $this->graphUriFileMapping[$uri]->createFile();
+        $this->graphUriFileMapping[$graph->getUri()]->createFile();
         $this->saveStoreInfo();
-        $this->log->addInfo('Graph <' . $uri . '> added');
+        $this->log->addInfo('Graph <' . $graph->getUri() . '> added');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
+    public function addStatements(StatementIterator $statements, Node $graph = null, array $options = array())
     {
         // This method have to handle multiple graphs.
         // Keep graph file open until the graph uri changes.
-        $prevGraphUri = null;
+        $prevGraph = null;
         $pointer = null;
         $count = 0;
         foreach ($statements as $statement) {
             self::ensureStatementIsConcrete($statement);
-            $resolvedUri = $this->resolveGraphUri($graphUri, $statement);
+            $resolvedGraph = $this->resolveGraph($graph, $statement);
             // If graph uri changed, close the old graph file and open the new file.
-            if ($resolvedUri != $prevGraphUri) {
+            if ($resolvedGraph != $prevGraph) {
                 if (!is_null($pointer)) {
                     @fclose($pointer);
                 }
-                $this->createGraphIfNotExists($resolvedUri);
-                $graphFile = $this->getGraphFile($resolvedUri);
+                $this->createGraphIfNotExists($resolvedGraph);
+                $graphFile = $this->getGraphFile($resolvedGraph);
                 $filename = Util::getAbsolutePath($this->baseDir, $graphFile->getPathname());
                 $size = @filesize($filename);
                 if ($size === false) {
@@ -145,22 +141,28 @@ class LocalStore extends AbstractTriplePatternStore
         }
     }
 
-    private function createGraphIfNotExists($uri)
+    private function createGraphIfNotExists(Node $graph)
     {
-        if (!$this->isGraphAvailable($uri)) {
+        if (!$this->isGraphAvailable($graph)) {
             $absoluteBaseDir = realpath($this->baseDir);
-            $filename = $this->filenameFactory->generateFilename($uri, $absoluteBaseDir);
-            $this->addGraph($uri, $filename);
+            $filename = $this->filenameFactory->generateFilename($graph->getUri(), $absoluteBaseDir);
+            $this->addGraph($graph, $filename);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteMatchingStatements(Statement $pattern, $graphUri = null, array $options = array())
+    public function deleteMatchingStatements(Statement $pattern, Node $graph = null, array $options = array())
     {
-        $graphUri = $this->resolveGraphUri($graphUri, $pattern);
-        $graphFile = $this->getGraphFile($graphUri);
+        // TODO migrate code to new interface
+        $graphUri = null;
+        if ($graph !== null) {
+            $graphUri = $graph->getUri();
+        }
+
+        $graphUri = $this->resolveGraph($graph, $pattern);
+        $graphFile = $this->getGraphFile($graph);
 
         // Collect the line numbers to delete
         $linesToDelete = [];
@@ -241,49 +243,61 @@ class LocalStore extends AbstractTriplePatternStore
      * {@inheritdoc}
      * @return MatchingStatementIterator
      */
-    public function getMatchingStatements(Statement $pattern, $graphUri = null, array $options = array())
+    public function getMatchingStatements(Statement $pattern, Node $graph = null, array $options = array())
     {
-        $graphUri = $this->resolveGraphUri($graphUri, $pattern);
-        $graphFile = $this->getGraphFile($graphUri);
+        // TODO migrate code to new interface
+        $graphUri = null;
+        if ($graph !== null) {
+            $graphUri = $graph->getUri();
+        }
+
+        $graphUri = $this->resolveGraph($graph, $pattern);
+        $graphFile = $this->getGraphFile($graph);
         return new MatchingStatementIterator($graphFile, $pattern);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasMatchingStatement(Statement $pattern, $graphUri = null, array $options = array())
+    public function hasMatchingStatement(Statement $pattern, Node $graph = null, array $options = array())
     {
-        $it = $this->getMatchingStatements($pattern, $graphUri);
+        // TODO migrate code to new interface
+        $graphUri = null;
+        if ($graph !== null) {
+            $graphUri = $graph->getUri();
+        }
+
+        $it = $this->getMatchingStatements($pattern, $graph);
         $it->rewind();
         $found = $it->valid();
         $it->close();
         return $found;
     }
 
-    protected function resolveGraphUri($graphUri, Statement $statement)
+    protected function resolveGraph($graph, Statement $statement)
     {
-        if (is_null($graphUri)) {
+        if (is_null($graph)) {
             if (!$statement->isQuad()) {
                 throw new \InvalidArgumentException(
                     'Graph URI is not specified. '
-                    . '$graphUri is null and $statement is not a quad.'
+                    . '$graph is null and $statement is not a quad.'
                 );
             } elseif (!$statement->getGraph()->isConcrete()) {
                 throw new \InvalidArgumentException('Graph is not concrete');
             }
-            return $statement->getGraph()->getUri();
+            return $statement->getGraph();
         }
-        return $graphUri;
+        return $graph;
     }
 
-    protected function getGraphFile($graphUri)
+    protected function getGraphFile(Node $graph)
     {
-        if (!$this->isGraphAvailable($graphUri)) {
+        if (!$this->isGraphAvailable($graph)) {
             throw new \Exception(
-                'Graph with uri ' . $graphUri . ' is not available'
+                'Graph with uri ' . $graph->getUri() . ' is not available'
             );
         }
-        $graphFile = $this->graphUriFileMapping[$graphUri];
+        $graphFile = $this->graphUriFileMapping[$graph->getUri()];
         return $graphFile;
     }
 

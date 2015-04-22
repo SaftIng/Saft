@@ -28,7 +28,7 @@ abstract class AbstractSparqlStore implements Store
      *
      * @param  StatementIterator $statements          StatementList instance must contain Statement instances
      *                                                which are 'concret-' and not 'pattern'-statements.
-     * @param  string            $graphUri   optional Overrides target graph. If set, all statements will
+     * @param  Node              $graph      optional Overrides target graph. If set, all statements will
      *                                                be add to that graph, if available.
      * @param  array             $options    optional It contains key-value pairs and should provide additional
      *                                                introductions for the store and/or its adapter(s).
@@ -36,8 +36,14 @@ abstract class AbstractSparqlStore implements Store
      *                 will be thrown.
      * @todo implement usage of graph inside the statement(s). create groups for each graph
      */
-    public function addStatements(StatementIterator $statements, $graphUri = null, array $options = array())
+    public function addStatements(StatementIterator $statements, Node $graph = null, array $options = array())
     {
+        // TODO migrate code to new interface
+        $graphUri = null;
+        if ($graph !== null) {
+            $graphUri = $graph->getUri();
+        }
+
         foreach ($statements as $st) {
             if ($st instanceof Statement && true === $st->isConcrete()) {
                 // everything is fine
@@ -103,7 +109,7 @@ abstract class AbstractSparqlStore implements Store
 
         // if query function is not callable, just return generated query and use all statements given.
         } else {
-            return 'INSERT DATA { '. $this->sparqlFormat($statements, $graphUri) .'}';
+            return 'INSERT DATA { '. $this->sparqlFormat($statements, $graph) .'}';
         }
     }
 
@@ -111,15 +117,21 @@ abstract class AbstractSparqlStore implements Store
      * Removes all statements from a (default-) graph which match with given statement.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph. If set, all statements will be delete in
+     * @param  Node      $graph     optional Overrides target graph. If set, all statements will be delete in
      *                                       that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
      *                 will be thrown.
      */
-    public function deleteMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
+    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
+        // TODO migrate code to new interface
+        $graphUri = null;
+        if ($graph !== null) {
+            $graphUri = $graph->getUri();
+        }
+
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
 
         $query = 'DELETE DATA { '. $this->sparqlFormat($statementIterator, $graphUri) .'}';
@@ -151,7 +163,7 @@ abstract class AbstractSparqlStore implements Store
      * - statement's object is either equal to the object of a statement of the graph or it is null.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph. If set, you will get all
+     * @param  Node      $graph     optional Overrides target graph. If set, you will get all
      *                                       matching statements of that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
@@ -159,14 +171,28 @@ abstract class AbstractSparqlStore implements Store
      *                           statements of the given graph.
      * @todo FILTER select
      */
-    public function getMatchingStatements(Statement $statement, $graphUri = null, array $options = array())
+    public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        // TODO migrate code to new interface
+        $graphUri = null;
+        if ($graph !== null) {
+            $graphUri = $graph->getUri();
+        }
 
-        return $this->query(
-            'SELECT * WHERE { '. $this->sparqlFormat($statementIterator, $graphUri) .'}',
-            $options
-        );
+        $query = "";
+        if ($graphUri !== null) {
+            $query = "FROM <" . $graphUri . ">" . PHP_EOL;
+        } elseif ($statement->isQuad() && $statement->getGraph()->isConcrete()) {
+            $query = "FROM <" . $statement->getGraph()->getUri() . ">" . PHP_EOL;
+        }
+
+        $query.= "SELECT * WHERE { ";
+        $query.= $this->getNodeInSparqlFormat($statement->getSubject(), "s") . " ";
+        $query.= $this->getNodeInSparqlFormat($statement->getPredicate(), "p") . " ";
+        $query.= $this->getNodeInSparqlFormat($statement->getObject(), "o") . " ";
+        $query.= " }" . PHP_EOL;
+
+        return $this->query($query, $options);
     }
 
     /**
@@ -174,13 +200,19 @@ abstract class AbstractSparqlStore implements Store
      * has any matches in the given graph.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  string    $graphUri  optional Overrides target graph.
+     * @param  Node      $graph     optional Overrides target graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
      * @return boolean Returns true if at least one match was found, false otherwise.
      */
-    public function hasMatchingStatement(Statement $statement, $graphUri = null, array $options = array())
+    public function hasMatchingStatement(Statement $statement, Node $graph = null, array $options = array())
     {
+        // TODO migrate code to new interface
+        $graphUri = null;
+        if ($graph !== null) {
+            $graphUri = $graph->getUri();
+        }
+
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $result = $this->query('ASK { '. $this->sparqlFormat($statementIterator, $graphUri) .'}', $options);
 
@@ -213,19 +245,24 @@ abstract class AbstractSparqlStore implements Store
      *                                        the default.
      * @return string, part of query
      */
-    protected function sparqlFormat(StatementIterator $statements, $graphUri = null)
+    protected function sparqlFormat(StatementIterator $statements, Node $graph = null)
     {
         $query = '';
         foreach ($statements as $statement) {
             if ($statement instanceof Statement) {
                 $con = $this->getNodeInSparqlFormat($statement->getSubject()) . ' ' .
                     $this->getNodeInSparqlFormat($statement->getPredicate()) . ' ' .
-                    $this->getNodeInSparqlFormat($statement->getObject());
+                    $this->getNodeInSparqlFormat($statement->getObject()) . ' . ';
 
-                if (null !== $graphUri && true === is_string($graphUri)) {
-                    $sparqlString = 'Graph '. $this->parseGraphUri($graphUri) .' {' . $con .'}';
+                $graphToUse = $graph;
+                if ($graph == null && $statement->isQuad()) {
+                    $graphToUse = $statement->getGraph();
+                }
+
+                if (null !== $graphToUse) {
+                    $sparqlString = 'Graph '. $this->getNodeInSparqlFormat($graphToUse) .' {' . $con .'}';
                 } else {
-                    $sparqlString = $statement->toSparqlFormat();
+                    $sparqlString = $con;
                 }
 
                 $query .= $sparqlString .' ';
@@ -237,39 +274,20 @@ abstract class AbstractSparqlStore implements Store
     }
 
     /**
-     * Check if $graphUri is a valid Uri or is a vairable and retrun $graphUri
-     * in valid sparql-Format
-     * @param  string $graphUri
-     * @return string           $graphUri in sparql-format
-     */
-    protected function parseGraphUri($graphUri)
-    {
-        // check if its a valid URI
-        if (true === NodeUtils::simpleCheckURI($graphUri)) {
-            return '<'. $graphUri .'>';
-
-        // check for variable, which has a ? as first char
-        } elseif ('?' == substr($graphUri, 0, 1)) {
-             return $graphUri;
-
-        // invalid $graphUri
-        } else {
-            throw new \Exception('Parameter $graphUri is neither a valid URI nor variable.');
-        }
-    }
-
-    /**
-     * Returns given Node instance in SPARQL format.
+     * Returns given Node instance in SPARQL format, which is in NQuads or as Variable
      *
-     * @param  Node   $node Node instance to format.
-     * @return string       Either NQuad notation (if node is concrete) or string representation of given node.
+     * @param Node $node Node instance to format.
+     * @param string $var The variablename, which should be used, if the node is not concrete
+     * @return string Either NQuad notation (if node is concrete) or as variable.
      */
-    protected function getNodeInSparqlFormat(Node $node)
+    protected function getNodeInSparqlFormat(Node $node, $var = null)
     {
-        if (true === $node->isConcrete()) {
+        if ($node->isConcrete()) {
             return $node->toNQuads();
-        } else {
-            return $node->__toString();
         }
+        if ($var == null) {
+            $var = uniqid("tempVar");
+        }
+        return "?" . $var;
     }
 }

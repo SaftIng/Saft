@@ -3,12 +3,22 @@
 namespace Saft\Sparql\Test\Query;
 
 use Saft\TestCase;
+use Saft\Rdf\NamedNodeImpl;
 use Saft\Sparql\Query\SelectQuery;
 
 class SelectQueryUnitTest extends TestCase
 {
+    /**
+     * @var string
+     */
+    protected $testGraph;
+
     public function setUp()
     {
+        parent::setUp();
+
+        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
+
         $this->fixture = new SelectQuery();
     }
 
@@ -19,10 +29,11 @@ class SelectQueryUnitTest extends TestCase
     public function testConstructor()
     {
         $instanceToCheckAgainst = new SelectQuery();
-        $instanceToCheckAgainst->init('SELECT ?x FROM <'. $this->testGraphUri .'> WHERE {?x ?y ?z}');
+        $instanceToCheckAgainst->init('SELECT ?x FROM <'. $this->testGraph->getUri() .'> WHERE {?x ?y ?z}');
+
         $this->assertEquals(
             $instanceToCheckAgainst,
-            new SelectQuery('SELECT ?x FROM <'. $this->testGraphUri .'> WHERE {?x ?y ?z}')
+            new SelectQuery('SELECT ?x FROM <'. $this->testGraph->getUri() .'> WHERE {?x ?y ?z}')
         );
     }
 
@@ -232,7 +243,7 @@ class SelectQueryUnitTest extends TestCase
     {
         $this->fixture = new SelectQuery();
         $this->fixture->init(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}'
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}'
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -241,7 +252,7 @@ class SelectQueryUnitTest extends TestCase
         $this->assertEquals('SELECT ?s ?p ?o', $queryParts['select']);
 
         // from
-        $this->assertEquals(array($this->testGraphUri), $queryParts['graphs']);
+        $this->assertEquals(array($this->testGraph->getUri()), $queryParts['graphs']);
 
         // where
         $this->assertEquals('WHERE {?s ?p ?o.}', $queryParts['where']);
@@ -251,7 +262,7 @@ class SelectQueryUnitTest extends TestCase
     {
         $this->fixture = new SelectQuery();
         $this->fixture->init(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.} LIMIT 10'
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} LIMIT 10'
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -264,7 +275,7 @@ class SelectQueryUnitTest extends TestCase
     {
         $this->fixture = new SelectQuery();
         $this->fixture->init(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.} Offset 5'
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} Offset 5'
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -277,7 +288,7 @@ class SelectQueryUnitTest extends TestCase
     {
         $this->fixture = new SelectQuery();
         $this->fixture->init(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.} LIMIT 10 OFFSET 5'
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} LIMIT 10 OFFSET 5'
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -286,8 +297,8 @@ class SelectQueryUnitTest extends TestCase
         $this->assertEquals('SELECT ?s ?p ?o', $queryParts['select']);
 
         // from
-        $this->assertEquals(array($this->testGraphUri), $queryParts['graphs']);
-        
+        $this->assertEquals(array($this->testGraph->getUri()), $queryParts['graphs']);
+
         // where
         $this->assertEquals('WHERE {?s ?p ?o.}', $queryParts['where']);
 

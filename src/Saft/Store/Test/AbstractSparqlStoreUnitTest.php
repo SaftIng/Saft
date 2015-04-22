@@ -12,9 +12,17 @@ use Saft\Rdf\StatementImpl;
 
 class AbstractSparqlStoreUnitTest extends TestCase
 {
+    /**
+     * @var string
+     */
+    protected $testGraph;
+
     public function setUp()
     {
         parent::setUp();
+
+        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
+
         $this->fixture = $this->getMockForAbstractClass('\Saft\Store\AbstractSparqlStore');
 
         // Override query method: it will always return the given query.
@@ -48,10 +56,10 @@ class AbstractSparqlStoreUnitTest extends TestCase
     public function testGetMatchingStatements()
     {
         $query = $this->fixture->getMatchingStatements($this->getTestStatement());
-        $this->assertEquals(
-            'SELECT * WHERE { Graph <http://saft/test/g1> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>'.
-            '} }',
+        $this->assertEqualsSparql(
+            'FROM <http://saft/test/g1> SELECT * WHERE {'.
+            ' <http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1> '.
+            '}',
             $query
         );
     }
@@ -60,10 +68,10 @@ class AbstractSparqlStoreUnitTest extends TestCase
     {
         $query = $this->fixture->addStatements($this->getFilledTestArrayStatementIterator());
 
-        $this->assertEquals(
+        $this->assertEqualsSparql(
             'INSERT DATA { '.
-            'Graph <http://saft/test/g1> {<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>} '.
-            'Graph <http://saft/test/g2> {<http://saft/test/s2> <http://saft/test/p2> <http://saft/test/o2>} '.
+            'Graph <http://saft/test/g1> {<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.} '.
+            'Graph <http://saft/test/g2> {<http://saft/test/s2> <http://saft/test/p2> <http://saft/test/o2>.} '.
             '}',
             $query
         );
@@ -83,9 +91,9 @@ class AbstractSparqlStoreUnitTest extends TestCase
     {
         $query = $this->fixture->deleteMatchingStatements($this->getTestStatement());
         //echo $query;
-        $this->assertEquals(
+        $this->assertEqualsSparql(
             'DELETE DATA { Graph <http://saft/test/g1> '.
-            '{<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>} }',
+            '{<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.} }',
             $query
         );
     }
@@ -94,9 +102,9 @@ class AbstractSparqlStoreUnitTest extends TestCase
     {
         $query = $this->fixture->hasMatchingStatement($this->getTestStatement());
 
-        $this->assertEquals(
+        $this->assertEqualsSparql(
             'ASK { Graph <http://saft/test/g1> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>} }',
+            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1> . } }',
             $query
         );
     }
@@ -121,13 +129,13 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $statements = new ArrayStatementIteratorImpl(array($triple1, $triple2));
 
         // add test statements
-        $query = $this->fixture->addStatements($statements, $this->testGraphUri);
-        $this->assertEquals(
+        $query = $this->fixture->addStatements($statements, $this->testGraph);
+        $this->assertEqualsSparql(
             'INSERT DATA { '.
-            'Graph <'. $this->testGraphUri .'> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#string>} '.
-            'Graph <'. $this->testGraphUri .'> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> "John"^^<http://www.w3.org/2001/XMLSchema#string>} '.
+            'Graph <'. $this->testGraph .'> {'.
+            '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#string>. } '.
+            'Graph <'. $this->testGraph .'> {'.
+            '<http://saft/test/s1> <http://saft/test/p1> "John"^^<http://www.w3.org/2001/XMLSchema#string>. } '.
             '}',
             $query
         );
@@ -138,6 +146,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
      */
     public function testPatternStatement()
     {
+        $this->markTestSkipped("Variable have to be introduced");
         /**
          * subject is a pattern variable
          */
@@ -148,7 +157,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
 
         $query = $this->fixture->hasMatchingStatement($triple);
 
-        $this->assertEquals(
+        $this->assertEqualsSparql(
             'ASK { ?s1 <http://saft/test/p1> <http://saft/test/o1> . }',
             $query
         );
@@ -161,7 +170,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
 
         $query = $this->fixture->hasMatchingStatement($statement);
 
-        $this->assertEquals(
+        $this->assertEqualsSparql(
             'ASK { Graph ?g1 {?s1 <http://saft/test/p1> <http://saft/test/o1>} }',
             $query
         );
@@ -176,22 +185,24 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $statements = new ArrayStatementIteratorImpl(array($this->getTestStatement()));
 
         // use the given graphUri
-        $query = $this->fixture->addStatements($statements, 'http://saft/test/foograph');
+        $query = $this->fixture->addStatements($statements, new NamedNodeImpl('http://saft/test/foograph'));
 
-        $this->assertEquals(
+        $this->assertEqualsSparql(
             $query,
             'INSERT DATA { Graph <http://saft/test/foograph> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>'.
+            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>. '.
             '} }'
         );
+
+        $this->markTestIncomplete("Im not sure if the following is valid");
 
         // use the given graphUri-variable
         $query = $this->fixture->addStatements($statements, '?foo');
 
-        $this->assertEquals(
+        $this->assertEqualsSparql(
             $query,
             'INSERT DATA { Graph ?foo {'.
-            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>'.
+            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>. '.
             '} }'
         );
     }

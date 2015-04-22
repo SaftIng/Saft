@@ -23,10 +23,19 @@ class StoreChainIntegrationTest extends TestCase
     protected $separator = '__.__';
 
     /**
+     * @var string
+     */
+    protected $testGraph;
+
+    /**
      *
      */
     public function setUp()
     {
+        parent::setUp();
+
+        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
+
         // set path to test dir
         $saftRootDir = dirname(__FILE__) . '/../../../../';
         $configFilepath = $saftRootDir . 'test-config.yml';
@@ -113,12 +122,12 @@ class StoreChainIntegrationTest extends TestCase
                     new LiteralImpl('test literal')
                 ),
             )),
-            $this->testGraphUri
+            $this->testGraph
         );
 
         $result = $this->fixture->getMatchingStatements(
             new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
-            $this->testGraphUri
+            $this->testGraph
         );
 
         $statementResultToCheckAgainst = new StatementResult();
@@ -192,7 +201,7 @@ class StoreChainIntegrationTest extends TestCase
         $chainEntries[0]->getCache()->clean();
 
         // create graph freshly
-        $chainEntries[1]->query('CLEAR GRAPH <'. $this->testGraphUri .'>');
+        $chainEntries[1]->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
 
         $this->fixture->addStatements(
             new ArrayStatementIteratorImpl(array(
@@ -207,7 +216,7 @@ class StoreChainIntegrationTest extends TestCase
                     new LiteralImpl('test literal')
                 ),
             )),
-            $this->testGraphUri
+            $this->testGraph
         );
 
         // only compare array values and ignore keys, because of the variables they are random
@@ -215,14 +224,14 @@ class StoreChainIntegrationTest extends TestCase
             2,
             $this->fixture->getMatchingStatements(
                 new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
-                $this->testGraphUri
+                $this->testGraph
             )->getEntryCount()
         );
 
         // remove all statements
         $this->fixture->deleteMatchingStatements(
             new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
-            $this->testGraphUri
+            $this->testGraph
         );
 
         $statementResult = new StatementResult();
@@ -233,7 +242,7 @@ class StoreChainIntegrationTest extends TestCase
             $statementResult,
             $this->fixture->getMatchingStatements(
                 new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
-                $this->testGraphUri
+                $this->testGraph
             )
         );
     }
@@ -311,7 +320,7 @@ class StoreChainIntegrationTest extends TestCase
             new NamedNodeImpl('http://p/'),
             new VariableImpl()
         );
-        $this->fixture->getMatchingStatements($statement, $this->testGraphUri);
+        $this->fixture->getMatchingStatements($statement, $this->testGraph);
     }
 
     public function testGetMatchingStatementsChainQueryCacheCacheOffAndVirtuoso()
@@ -328,8 +337,8 @@ class StoreChainIntegrationTest extends TestCase
          * Create test data
          */
         $virtuoso = new Virtuoso($this->config['virtuosoConfig']);
-        $virtuoso->dropGraph($this->testGraphUri);
-        $virtuoso->addGraph($this->testGraphUri);
+        $virtuoso->dropGraph($this->testGraph);
+        $virtuoso->addGraph($this->testGraph);
         $virtuoso->addStatements(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
@@ -343,7 +352,7 @@ class StoreChainIntegrationTest extends TestCase
                     new LiteralImpl('test literal')
                 ),
             )),
-            $this->testGraphUri
+            $this->testGraph
         );
 
         // setup chain: query cache -> virtuoso
@@ -360,10 +369,11 @@ class StoreChainIntegrationTest extends TestCase
             new VariableImpl()
         );
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        // TODO remove usage of StatementIterator::toSparqlFormat()
         $this->assertTrue(
             null === $chainEntries[0]->getCache()->get(
-                'SELECT * FROM <'. $this->testGraphUri .'> '.
-                'WHERE {'. $statementIterator->toSparqlFormat($this->testGraphUri) .'}'
+                'SELECT * FROM <'. $this->testGraph->getUri() .'> '.
+                'WHERE {'. $statementIterator->toSparqlFormat($this->testGraph->getUri()) .'}'
             )
         );
 
@@ -385,7 +395,7 @@ class StoreChainIntegrationTest extends TestCase
             )
         );
 
-        $result = $this->fixture->getMatchingStatements($statement, $this->testGraphUri);
+        $result = $this->fixture->getMatchingStatements($statement, $this->testGraph);
 
         /**
          * check both results
@@ -409,8 +419,8 @@ class StoreChainIntegrationTest extends TestCase
          * Create test data
          */
         $virtuoso = new Virtuoso($this->config['virtuosoConfig']);
-        $virtuoso->dropGraph($this->testGraphUri);
-        $virtuoso->addGraph($this->testGraphUri);
+        $virtuoso->dropGraph($this->testGraph);
+        $virtuoso->addGraph($this->testGraph);
         $virtuoso->addStatements(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
@@ -424,7 +434,7 @@ class StoreChainIntegrationTest extends TestCase
                     new LiteralImpl('test literal')
                 ),
             )),
-            $this->testGraphUri
+            $this->testGraph
         );
 
         // setup chain: query cache -> virtuoso
@@ -441,14 +451,14 @@ class StoreChainIntegrationTest extends TestCase
             new VariableImpl()
         );
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-        $testQuery = 'SELECT * FROM <'. $this->testGraphUri .'> '.
-                     'WHERE {'. $statementIterator->toSparqlFormat($this->testGraphUri) .'}';
+        $testQuery = 'SELECT * FROM <'. $this->testGraph->getUri() .'> '.
+                     'WHERE {'. $statementIterator->toSparqlFormat($this->testGraph->getUri()) .'}';
         $this->assertTrue(null === $chainEntries[0]->getCache()->get($testQuery));
 
         $this->assertEquals(0, count($chainEntries[0]->getLatestQueryCacheContainer()));
 
         // call to fill cache
-        $firstResult = $this->fixture->getMatchingStatements($statement, $this->testGraphUri);
+        $firstResult = $this->fixture->getMatchingStatements($statement, $this->testGraph);
 
         // call again to use the cache instead of the store
         $statementResult = new StatementResult();
@@ -468,7 +478,7 @@ class StoreChainIntegrationTest extends TestCase
             )
         );
 
-        $cachedResult = $this->fixture->getMatchingStatements($statement, $this->testGraphUri);
+        $cachedResult = $this->fixture->getMatchingStatements($statement, $this->testGraph);
 
         $this->assertEquals($statementResult, $cachedResult);
 
@@ -496,13 +506,13 @@ class StoreChainIntegrationTest extends TestCase
         $this->assertEquals(
             array(
                 array(
-                    'graph_uris' => array($this->testGraphUri => $this->testGraphUri),
+                    'graph_uris' => array($this->testGraph->getUri() => $this->testGraph->getUri()),
                     'query' => 'SELECT ?s ?p ?o FROM <http://localhost/Saft/TestGraph/> '.
                                'WHERE { ?s ?p ?o FILTER (str(?s) = "http://s/") FILTER (str(?p) = "http://p/") }',
                     'result' => $statementResult,
                     'triple_pattern' => array(
-                        $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
-                            => $this->testGraphUri . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+                        $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+                            => $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
                     )
                 )
             ),
@@ -582,7 +592,7 @@ class StoreChainIntegrationTest extends TestCase
                 new NamedNodeImpl('http://p/'),
                 new NamedNodeImpl('http://o/')
             ),
-            $this->testGraphUri
+            $this->testGraph
         );
     }
 
@@ -601,8 +611,8 @@ class StoreChainIntegrationTest extends TestCase
 
         // drop and create test graph
         $virtuoso = new Virtuoso($this->config['virtuosoConfig']);
-        $virtuoso->dropGraph($this->testGraphUri);
-        $virtuoso->addGraph($this->testGraphUri);
+        $virtuoso->dropGraph($this->testGraph);
+        $virtuoso->addGraph($this->testGraph);
 
         $this->fixture->setupChain(array($this->config['queryCacheConfig'], $this->config['virtuosoConfig']));
 
@@ -634,7 +644,7 @@ class StoreChainIntegrationTest extends TestCase
                     new LiteralImpl('test literal')
                 ),
             )),
-            $this->testGraphUri
+            $this->testGraph
         );
 
         $this->assertTrue(
@@ -644,7 +654,7 @@ class StoreChainIntegrationTest extends TestCase
                     new NamedNodeImpl('http://p/'),
                     new VariableImpl()
                 ),
-                $this->testGraphUri
+                $this->testGraph
             )
         );
     }
@@ -659,7 +669,7 @@ class StoreChainIntegrationTest extends TestCase
                 new NamedNodeImpl('http://p/'),
                 new NamedNodeImpl('http://o/')
             ),
-            $this->testGraphUri
+            $this->testGraph
         );
     }
 
@@ -681,7 +691,7 @@ class StoreChainIntegrationTest extends TestCase
          * Create test data
          */
         $virtuoso = new Virtuoso($this->config['virtuosoConfig']);
-        $virtuoso->addGraph($this->testGraphUri);
+        $virtuoso->addGraph($this->testGraph);
         $virtuoso->addStatements(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
@@ -695,13 +705,13 @@ class StoreChainIntegrationTest extends TestCase
                     new LiteralImpl('test literal')
                 ),
             )),
-            $this->testGraphUri
+            $this->testGraph
         );
 
         // setup chain: query cache -> virtuoso
         $this->fixture->setupChain(array($this->config['queryCacheConfig'], $this->config['virtuosoConfig']));
 
-        $testQuery = 'SELECT ?s ?p ?o FROM <'. $this->testGraphUri .'> WHERE {?s ?p ?o.}';
+        $testQuery = 'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}';
 
         // clean cache
         $chainEntries = $this->fixture->getChainEntries();
