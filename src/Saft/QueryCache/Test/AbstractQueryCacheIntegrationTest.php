@@ -841,6 +841,35 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
             $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
         );
     }
+    
+    /**
+     * Tests getResult
+     */
+
+    public function testGetResultQueryObject()
+    {
+        $queryObject = AbstractQuery::initByQueryString(
+            'SELECT * FROM <http://graph/> WHERE {?s ?p ?o}'
+        );
+        
+        $this->assertNull($this->fixture->getResult($queryObject));
+    }
+
+    public function testGetResultString()
+    {
+        $this->assertNull($this->fixture->getResult('foo'));
+    }
+
+    public function testGetResultInvalidParameter()
+    {
+        $this->setExpectedException('\Exception');
+        
+        $this->fixture->getResult(032);
+    }
+    
+    /**
+     * Tests hasMatchingStatements
+     */
 
     // try to call function method without a successor set leads to an exception
     public function testHasMatchingStatementsNoSuccessor()

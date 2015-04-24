@@ -460,6 +460,29 @@ class QueryCache implements Store, ChainableStore
 
         return $result;
     }
+    
+    /**
+     * Returns a prevoiusly stored result, if available.
+     *
+     * @param string|Query Query representation: either a string or instance of Query
+     * @return null|mixed Mixed if cache entry was found, null otherwise.
+     * @throws \Exception If parameter $query is neither a string nor an instance of Query.
+     */
+    public function getResult($query)
+    {
+        // instance of Query was given
+        if ($query instanceof Query) {
+            return $this->cache->get((string)$query);
+            
+        // string was given
+        } elseif (true === is_string($query)) {
+            return $this->cache->get($query);
+        
+        // invalid $query parameter
+        } else {
+            throw new \Exception('Parameter $query is neither a string nor an instance of Query.');
+        }
+    }
 
     /**
      * Get information about the store and its features.
