@@ -419,16 +419,10 @@ class QueryCache implements Store, ChainableStore
         if (true === $s->isNamed()) {
             $query .= 'FILTER (str(?s) = "'. $s->getUri() .'") ';
         }
-        if (true === $s->isLiteral()) {
-            $query .= 'FILTER (str(?s) = '. $s->getValue() .') ';
-        }
 
         // add filter, if predicate is a named node or literal
         if (true === $p->isNamed()) {
             $query .= 'FILTER (str(?p) = "'. $p->getUri() .'") ';
-        }
-        if (true === $p->isLiteral()) {
-            $query .= 'FILTER (str(?p) = '. $p->getValue() .') ';
         }
 
         // add filter, if predicate is a named node or literal
@@ -436,7 +430,7 @@ class QueryCache implements Store, ChainableStore
             $query .= 'FILTER (str(?o) = "'. $o->getUri() .'") ';
         }
         if (true === $o->isLiteral()) {
-            $query .= 'FILTER (str(?o) = '. $o->getValue() .') ';
+            $query .= 'FILTER (str(?o) = "'. $o->getValue() .'") ';
         }
 
         $query = 'SELECT ?s ?p ?o FROM <'. $graphUri .'> WHERE { ?s ?p ?o '. $query .'}';
@@ -548,16 +542,10 @@ class QueryCache implements Store, ChainableStore
         if (true === $s->isNamed()) {
             $query .= 'FILTER (str(?s) = "'. $s->getUri() .'") ';
         }
-        if (true == $s->isLiteral()) {
-            $query .= 'FILTER (str(?s) = '. $s->getValue() .') ';
-        }
 
         // add filter, if predicate is a named node or literal
         if (true === $p->isNamed()) {
             $query .= 'FILTER (str(?p) = "'. $p->getUri() .'") ';
-        }
-        if (true == $p->isLiteral()) {
-            $query .= 'FILTER (str(?p) = '. $p->getValue() .') ';
         }
 
         // add filter, if predicate is a named node or literal
@@ -569,16 +557,17 @@ class QueryCache implements Store, ChainableStore
         }
 
         $query = 'ASK FROM <'. $graphUri .'> { ?s ?p ?o '. $query .'}';
-
         $queryCacheContainer = $this->cache->get($query);
 
         // check, if there is a cache entry for this statement
         if (null !== $queryCacheContainer) {
-            $result = $queryCacheContainer['result'];
+            return $queryCacheContainer['result'];
 
         // if successor is set, ask it first before run the command yourself.
         } elseif ($this->successor instanceof Store) {
-            return $this->successor->hasMatchingStatement($statement, $graph, $options);
+            $result = $this->successor->hasMatchingStatement($statement, $graph, $options);
+            $this->saveResult(AbstractQuery::initByQueryString($query), $result);
+            return $result;
 
         // dont run command by myself
         } else {

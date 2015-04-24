@@ -234,6 +234,26 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         );
     }
 
+    public function testBuildPatternListByTriplePatternOnlyPlaceholders()
+    {
+        $this->assertEquals(
+            array(
+                $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+            ),
+            $this->fixture->buildPatternListByTriplePattern(
+                array(
+                    's' => '*',
+                    'p' => '*',
+                    'o' => '*',
+                    's_type' => '',
+                    'p_type' => '',
+                    'o_type' => '',
+                ),
+                $this->testGraph->getUri()
+            )
+        );
+    }
+
     /**
      * Tests deleteMatchingStatements
      */
@@ -530,7 +550,14 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $options = array(1);
 
-        $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options);
+        // save result of the function call
+        $result = $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options);
+        
+        // query
+        $queryObject = AbstractQuery::initByQueryString(
+            'ASK FROM <'. $this->testGraph->getUri() .'> { ?s ?p ?o }'
+        );
+        $queryObject->getQueryParts();
 
         $this->assertEquals(
             array(
@@ -542,7 +569,20 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                         'graphUri' => $this->testGraph->getUri(),
                         'options' => $options,
                     )
-                )
+                ),
+                array(
+                    'method' => 'saveResult',
+                    'parameter' => array(
+                        'queryObject' => $queryObject,
+                        'result' => $result
+                    )
+                ),
+                array(
+                    'method' => 'invalidateByQuery',
+                    'parameter' => array(
+                        'queryObject' => $queryObject
+                    )
+                ),
             ),
             $this->fixture->getLog()
         );
@@ -776,6 +816,53 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
      * Tests getMatchingStatement
      */
 
+    public function testGetMatchingStatementsNamedNodes()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+
+        // test data
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new NamedNodeImpl('http://o/')
+        );
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $options = array(1);
+
+        // assumption is that all given parameter will be returned
+        $this->assertEquals(
+            array(
+                $statement, $this->testGraph->getUri(), $options
+            ),
+            $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
+        );
+
+        $this->assertEquals(
+            array(
+                array(
+                    'graph_uris' => array($this->testGraph->getUri() => $this->testGraph->getUri()),
+                    'query' => 'SELECT ?s ?p ?o FROM <http://localhost/Saft/TestGraph/> '.
+                               'WHERE { '.
+                                    '?s ?p ?o '.
+                                    'FILTER (str(?s) = "'. $statement->getSubject()->getUri() .'") '.
+                                    'FILTER (str(?p) = "'. $statement->getPredicate()->getUri() .'") '.
+                                    'FILTER (str(?o) = "'. $statement->getObject()->getUri() .'") '.
+                                '}',
+                    'result' => array($statement, $this->testGraph->getUri(), $options),
+                    'triple_pattern' => array(
+                        $this->testGraph->getUri() .
+                        $this->separator .'*'. $this->separator .'*'. $this->separator .'*' =>
+                            $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'.
+                            $this->separator .'*'
+                    )
+                )
+            ),
+            $this->fixture->getLatestQueryCacheContainer()
+        );
+    }
+
     public function testGetMatchingStatementsNamedNodesLiteral()
     {
         // set basic store as successor
@@ -808,7 +895,79 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                                     '?s ?p ?o '.
                                     'FILTER (str(?s) = "'. $statement->getSubject()->getUri() .'") '.
                                     'FILTER (str(?p) = "'. $statement->getPredicate()->getUri() .'") '.
-                                    'FILTER (str(?o) = '. $statement->getObject()->getValue() .') '.
+                                    'FILTER (str(?o) = "'. $statement->getObject()->getValue() .'") '.
+                                '}',
+                    'result' => array($statement, $this->testGraph->getUri(), $options),
+                    'triple_pattern' => array(
+                        $this->testGraph->getUri() .
+                        $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+                        => $this->testGraph->getUri() .
+                        $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+                    )
+                )
+            ),
+            $this->fixture->getLatestQueryCacheContainer()
+        );
+    }
+
+    public function testGetMatchingStatementsNoSuccessor()
+    {
+        $this->setExpectedException('\Exception');
+        
+        // test data
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new LiteralImpl('test literal')
+        );
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $options = array(1);
+
+        $this->fixture->getMatchingStatements($statement, $this->testGraph, $options);
+    }
+    
+    public function testGetMatchingStatementsUseCachedResult()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+
+        // test data
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new NamedNodeImpl('http://o/')
+        );
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $options = array(1);
+
+        // assumption is that all given parameter will be returned
+        $this->assertEquals(
+            array(
+                $statement, $this->testGraph->getUri(), $options
+            ),
+            $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
+        );
+
+        // call getMatchingStatements again and see what happens
+        $this->assertEquals(
+            array(
+                $statement, $this->testGraph->getUri(), $options
+            ),
+            $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
+        );
+        
+        // check latest query cache container
+        $this->assertEquals(
+            array(
+                array(
+                    'graph_uris' => array($this->testGraph->getUri() => $this->testGraph->getUri()),
+                    'query' => 'SELECT ?s ?p ?o FROM <http://localhost/Saft/TestGraph/> '.
+                               'WHERE { '.
+                                    '?s ?p ?o '.
+                                    'FILTER (str(?s) = "'. $statement->getSubject()->getUri() .'") '.
+                                    'FILTER (str(?p) = "'. $statement->getPredicate()->getUri() .'") '.
+                                    'FILTER (str(?o) = "'. $statement->getObject()->getUri() .'") '.
                                 '}',
                     'result' => array($statement, $this->testGraph->getUri(), $options),
                     'triple_pattern' => array(
@@ -866,21 +1025,6 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         
         $this->fixture->getResult(032);
     }
-    
-    /**
-     * Tests hasMatchingStatements
-     */
-
-    // try to call function method without a successor set leads to an exception
-    public function testHasMatchingStatementsNoSuccessor()
-    {
-        $this->setExpectedException('\Exception');
-
-        // test data
-        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
-        
-        $this->fixture->getMatchingStatements($statement);
-    }
 
     /**
      * Tests getStoreDescription
@@ -911,14 +1055,41 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
      * Tests hasMatchingStatement
      */
 
-    public function testHasMatchingStatement()
+    public function testHasMatchingStatementNamedNodesLiteral()
     {
         // set basic store as successor
         $successor = new BasicStore();
         $this->fixture->setChainSuccessor($successor);
 
         // test data
-        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s'),
+            new NamedNodeImpl('http://p'),
+            new LiteralImpl('foo')
+        );
+        $options = array(1);
+
+        // assumption is that all given parameter will be returned
+        $this->assertEquals(
+            array(
+                $statement, $this->testGraph->getUri(), $options
+            ),
+            $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options)
+        );
+    }
+
+    public function testHasMatchingStatementOnlyNamedNodes()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+
+        // test data
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s'),
+            new NamedNodeImpl('http://p'),
+            new NamedNodeImpl('http://o')
+        );
         $options = array(1);
 
         // assumption is that all given parameter will be returned
@@ -939,6 +1110,70 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
         
         $this->fixture->hasMatchingStatement($statement);
+    }
+    
+    public function testHasMatchingStatementOnlyVariables()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+
+        // test data
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $options = array(1);
+
+        // assumption is that all given parameter will be returned
+        $this->assertEquals(
+            array(
+                $statement, $this->testGraph->getUri(), $options
+            ),
+            $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options)
+        );
+    }
+    
+    public function testHasMatchingStatementUseCachedResult()
+    {
+        // set basic store as successor
+        $successor = new BasicStore();
+        $this->fixture->setChainSuccessor($successor);
+
+        // test data
+        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $options = array(1);
+
+        // assumption is that all given parameter will be returned
+        $this->assertEquals(
+            array(
+                $statement, $this->testGraph->getUri(), $options
+            ),
+            $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options)
+        );
+        
+        // call hasMatchingStatement again and see what happens
+        $this->assertEquals(
+            array(
+                $statement, $this->testGraph->getUri(), $options
+            ),
+            $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options)
+        );
+        
+        // check latest query cache container
+        $this->assertEquals(
+            array(
+                array(
+                    'graph_uris' => array($this->testGraph->getUri() => $this->testGraph->getUri()),
+                    'query' => 'ASK FROM <http://localhost/Saft/TestGraph/> { ?s ?p ?o }',
+                    'result' => array($statement, $this->testGraph->getUri(), $options),
+                    'triple_pattern' => array(
+                        $this->testGraph->getUri() .
+                        $this->separator .'*'. $this->separator .'*'. $this->separator .'*' =>
+                            $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'.
+                                $this->separator .'*'
+                    )
+                )
+            ),
+            $this->fixture->getLatestQueryCacheContainer()
+        );
     }
 
     /**
