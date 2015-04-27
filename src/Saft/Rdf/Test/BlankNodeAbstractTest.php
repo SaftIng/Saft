@@ -1,8 +1,6 @@
 <?php
 namespace Saft\Rdf\Test;
 
-use Saft\Rdf\VariableImpl;
-use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\BlankNodeImpl;
 
 abstract class BlankNodeAbstractTest extends \PHPUnit_Framework_TestCase
@@ -10,15 +8,15 @@ abstract class BlankNodeAbstractTest extends \PHPUnit_Framework_TestCase
     /**
      * An abstract method which returns new instances of BlankNode
      */
-    abstract public function newInstance($id);
+    abstract public function newInstance($blankId);
 
     final public function testMatches()
     {
-        $fixture = $this->newInstance('foo');
+        $fixtureA = $this->newInstance('foo');
+        $fixtureB = $this->newInstance('foo');
+        $fixtureC = $this->newInstance('bar');
 
-        $this->assertTrue($fixture->matches(new VariableImpl('?s')));
-        $this->assertTrue($fixture->matches(new BlankNodeImpl('foo')));
-        $this->assertFalse($fixture->matches(new BlankNodeImpl('bar')));
-        $this->assertFalse($fixture->matches(new LiteralImpl('foo')));
+        $this->assertTrue($fixtureA->matches($fixtureB));
+        $this->assertFalse($fixtureA->matches($fixtureC));
     }
 }

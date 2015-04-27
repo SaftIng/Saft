@@ -56,28 +56,56 @@ abstract class AbstractStatement implements Statement
         return $string;
     }
 
+    public function equals(Statement $toTest)
+    {
+        if ($toTest instanceof Statement &&
+            $this->getSubject()->equals($toTest->getSubject()) &&
+            $this->getPredicate()->equals($toTest->getPredicate()) &&
+            $this->getObject()->equals($toTest->getObject())
+        ) {
+            if ($this->isQuad() && $toTest->isQuad() && $this->getGraph()->equals($toTest->getGraph())) {
+                return true;
+            } elseif ($this->isTriple() && $toTest->isTriple()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function matches(Statement $pattern)
+    public function matches(Statement $toTest)
     {
-        if ($this->isPattern()) {
-            throw new \LogicException('This must be concrete');
+        if ($this->isConcrete() && $this->equals($toTest)) {
+            return true;
         }
 
-        $subjectsMatch = $this->getSubject()->matches($pattern->getSubject());
-        $predicatesMatch = $this->getPredicate()->matches($pattern->getPredicate());
-        $objectsMatch = $this->getObject()->matches($pattern->getObject());
-        if ($this->isQuad() && $pattern->isQuad()) {
-            $graphsMatch = $this->getGraph()->matches($pattern->getGraph());
-        } elseif ($this->isQuad() && $pattern->isTriple()) {
-            $graphsMatch = true;
-        } elseif ($this->isTriple() && $pattern->isQuad()) {
-            $graphsMatch = !$pattern->getGraph()->isConcrete();
-        } elseif ($this->isTriple() && $pattern->isTriple()) {
-            $graphsMatch = true;
+        if ($toTest instanceof Statement &&
+            $this->getSubject()->matches($toTest->getSubject()) &&
+            $this->getPredicate()->matches($toTest->getPredicate()) &&
+            $this->getObject()->matches($toTest->getObject())
+        ) {
+            if ($this->isQuad() && $toTest->isQuad() && $this->getGraph()->matches($toTest->getGraph())) {
+                return true;
+            } elseif ($this->isQuad() && $this->getGraph()->isVariable()) {
+                /*
+                 * This case also matches the default graph i.e. if the graph is set to a variable it also matches the
+                 * defaultgraph
+                 */
+                return true;
+            } elseif ($this->isTriple() && $toTest->isTriple()) {
+                return true;
+            }
+            /*
+             * TODO What should happen if $this->isTriple() is true, should this pattern match any $quad?
+             * This is the same descission, as, if the default graph should contain the union of all graphs!
+             *
+             * As I understand the situation with SPARQL it doesn't give a descission for this, but in the case that
+             * named graphs are included in a query only using FROM NAMED the default graph is empty per definiton.
+             * {@url http://www.w3.org/TR/2013/REC-sparql11-query-20130321/#rdfDataset}
+             */
         }
-
-        return $subjectsMatch && $predicatesMatch && $objectsMatch && $graphsMatch;
+        return false;
     }
 }

@@ -9,7 +9,7 @@ use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementImpl;
-use Saft\Rdf\VariableImpl;
+use Saft\Rdf\AnyPatternImpl;
 use Saft\Sparql\SparqlUtils;
 
 class AbstractTriplePatternStoreUnitTest extends TestCase
@@ -44,9 +44,9 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
 
     protected function getTestPatternStatement()
     {
-        $subject1 = new VariableImpl('?s1');
-        $predicate1 = new VariableImpl('?p1');
-        $object1 = new VariableImpl('?o1');
+        $subject1 = new AnyPatternImpl();
+        $predicate1 = new AnyPatternImpl();
+        $object1 = new AnyPatternImpl();
 
         return new StatementImpl($subject1, $predicate1, $object1);
     }
@@ -76,8 +76,8 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
     {
         $statement = $this->getTestStatementWithLiteral();
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-        $query = 'INSERT DATA { 
-            Graph <http://graph/> { 
+        $query = 'INSERT DATA {
+            Graph <http://graph/> {
                 '. $statement->getSubject()->toNQuads() .'
                 '. $statement->getPredicate()->toNQuads() .'
                 '. $statement->getObject()->toNQuads() .'

@@ -3,7 +3,7 @@ namespace Saft\Backend\LocalStore\Test;
 
 use Saft\Backend\LocalStore\Store\MatchingStatementIterator;
 use Saft\Rdf\StatementImpl;
-use Saft\Rdf\VariableImpl;
+use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Backend\LocalStore\Store\NtriplesParser;
@@ -32,8 +32,8 @@ class MatchingStatementIteratorUnitTest extends \PHPUnit_Framework_TestCase
         $it = new MatchingStatementIterator($filename);
         $pattern = new StatementImpl(
             new NamedNodeImpl('http://www.example.com/joe#me'),
-            new VariableImpl('?p'),
-            new VariableImpl('?o')
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
         );
         $it->setPattern($pattern);
         $matches = [];
@@ -66,8 +66,8 @@ class MatchingStatementIteratorUnitTest extends \PHPUnit_Framework_TestCase
         $filename = $this->fixtureFile('foaf.nt');
         $it = new MatchingStatementIterator($filename);
         $pattern = new StatementImpl(
-            new VariableImpl('?s'),
-            new VariableImpl('?p'),
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
             new LiteralImpl('Joe')
         );
         $it->setPattern($pattern);
@@ -100,8 +100,8 @@ class MatchingStatementIteratorUnitTest extends \PHPUnit_Framework_TestCase
         $filename = $this->fixtureFile('foaf.nt');
         $it = new MatchingStatementIterator($filename);
         $pattern = new StatementImpl(
-            new VariableImpl('?s'),
-            new VariableImpl('?p'),
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
             new LiteralImpl('Joe')
         );
         $it->setPattern($pattern);
@@ -297,9 +297,9 @@ class MatchingStatementIteratorUnitTest extends \PHPUnit_Framework_TestCase
     private static function createSelectAllPattern()
     {
         return new StatementImpl(
-            new VariableImpl('?s'),
-            new VariableImpl('?p'),
-            new VariableImpl('?o')
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
         );
     }
 

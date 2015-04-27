@@ -27,6 +27,15 @@ abstract class AbstractLiteral implements Literal
     }
 
     /**
+     * see also {@url http://www.w3.org/TR/2013/REC-sparql11-query-20130321/#matchingRDFLiterals}
+     * @see \Saft\Node
+     */
+    public function matches(Node $toMatch)
+    {
+        return $this->equals($toMatch);
+    }
+
+    /**
      * @return boolean
      */
     public function isBlank()
@@ -85,30 +94,5 @@ abstract class AbstractLiteral implements Literal
         }
 
         return $string;
-    }
-
-    /**
-     * A literal matches only another literal if there values, datatypes and languages are equal.
-     *
-     * {@inheritdoc}
-     */
-    public function matches(Node $pattern)
-    {
-        if (!$this->isConcrete()) {
-            throw new \LogicException('This have to be concrete');
-        }
-
-        if ($pattern->isConcrete()) {
-            if ($pattern instanceof Literal) {
-                return $this->getValue() === $pattern->getValue()
-                    && $this->getDatatype() === $pattern->getDatatype()
-                    && $this->getLanguage() === $pattern->getLanguage();
-            } else {
-                return false;
-            }
-        } else {
-            // All Literals matches a variable/pattern
-            return true;
-        }
     }
 }

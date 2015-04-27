@@ -94,7 +94,7 @@ final class MatchingStatementIterator extends \Saft\Rdf\AbstractStatementIterato
                     $e->getColumn()
                 );
             }
-            if ($statement->matches($this->pattern)) {
+            if ($this->pattern->matches($statement)) {
                 $this->currentStatement = $statement;
                 break;
             }

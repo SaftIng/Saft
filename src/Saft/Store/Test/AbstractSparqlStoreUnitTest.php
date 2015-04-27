@@ -6,7 +6,7 @@ use Saft\TestCase;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\VariableImpl;
+use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
 
@@ -77,7 +77,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
         );
 
         //test to add not concrete Statement
-        $subject1 = new VariableImpl('?s1');
+        $subject1 = new AnyPatternImpl();
         $predicate1 = new NamedNodeImpl('http://saft/test/p1');
         $object1 = new NamedNodeImpl('http://saft/test/o1');
         $graph1 = new NamedNodeImpl('http://saft/test/g1');
