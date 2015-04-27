@@ -6,7 +6,7 @@ use Saft\Store\Store;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\LiteralImpl;
-use Saft\Rdf\VariableImpl;
+use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
 
@@ -124,6 +124,7 @@ class RestApi extends AbstractRest
 
     /**
      * Create a Statement from strings.
+     * @deprecated There shouldn't be a method like that, this is the task of a factory
      * @param  string $sub
      * @param  string $pred
      * @param  string $obj
@@ -147,6 +148,7 @@ class RestApi extends AbstractRest
     /**
      * Create a Node from string.
      *
+     * @deprecated There shouldn't be a method like that, this is the task of a factory
      * @param  string $value value of Node
      * @return Node   Returns NamedNode, Variable or Literal
      */
@@ -155,8 +157,8 @@ class RestApi extends AbstractRest
         if (true === NodeUtils::simpleCheckURI($value)) {
             return new NamedNodeImpl($value);
         } elseif ('?' == substr($value, 0, 1)) {
-            return new VariableImpl($value);
-        } elseif (null !== $value) {
+            return new AnyPatternImpl();
+        } elseif ($value !== null) {
             return new LiteralImpl($value);
         }
 
