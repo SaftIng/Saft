@@ -708,31 +708,4 @@ class Http extends AbstractSparqlStore
     {
         $this->successor = $successor;
     }
-
-    /**
-     * Returns the Statement-Data in SPARQL-format. It overrides the sparqlFormat method of AbstractSparqlStore,
-     * because Virtuoso does not support Graph in condition, so $graphUri will be ignored.
-     *
-     * @param StatementIterator $statements   List of statements to format as SPARQL string.
-     * @param Node              $graph        Will be ignored, because Virtuoso does not support Graph in
-     *                                        condition.
-     * @return string, part of query
-     */
-    protected function sparqlFormat(StatementIterator $statements, Node $graph = null)
-    {
-        if ('virtuoso' === $this->storeName) {
-            $query = '';
-            foreach ($statements as $statement) {
-                if ($statement instanceof Statement) {
-                    $query .= $sparqlString = $statement->toSparqlFormat() .' ';
-                } else {
-                    throw new \Exception('sparqlFormat only accepts Statement instances.');
-                }
-            }
-            return $query;
-
-        } else {
-            return parent::sparqlFormat($statements, $graph);
-        }
-    }
 }
