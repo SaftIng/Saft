@@ -1372,14 +1372,15 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         /**
          * check saved references between triple pattern (from query) and a array of query strings
          */
+        $sep = $this->separator;
         $this->assertEquals(
             array(
                 'graph_uris' => array(
                     $this->testGraph->getUri() => $this->testGraph->getUri()
                 ),
                 'triple_pattern' => array(
-                    $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*' =>
-                        $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
+                    $this->testGraph->getUri() . $sep .'*'. $sep .'*'. $sep .'*' =>
+                        $this->testGraph->getUri() . $sep .'*'. $sep .'*'. $sep .'*',
                 ),
                 'result' => $result,
                 'query' => $queryObject->getQuery(),
@@ -1397,8 +1398,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                         $this->testGraph->getUri() => $this->testGraph->getUri()
                     ),
                     'triple_pattern' => array(
-                        $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*' =>
-                            $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
+                        $this->testGraph->getUri() . $sep .'*'. $sep .'*'. $sep .'*' =>
+                            $this->testGraph->getUri() . $sep .'*'. $sep .'*'. $sep .'*',
                     ),
                     'result' => $result,
                     'query' => $queryObject->getQuery(),

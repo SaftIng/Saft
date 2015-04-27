@@ -501,6 +501,8 @@ class StoreChainIntegrationTest extends TestCase
                 new LiteralImpl('test literal')
             )
         );
+        
+        $sep = $this->separator;
 
         // check result
         $this->assertEquals(
@@ -511,8 +513,8 @@ class StoreChainIntegrationTest extends TestCase
                                'WHERE { ?s ?p ?o FILTER (str(?s) = "http://s/") FILTER (str(?p) = "http://p/") }',
                     'result' => $statementResult,
                     'triple_pattern' => array(
-                        $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
-                            => $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+                        $this->testGraph->getUri() . $sep .'*'. $sep .'*'. $sep .'*' =>
+                            $this->testGraph->getUri() . $sep .'*'. $sep .'*'. $sep .'*'
                     )
                 )
             ),

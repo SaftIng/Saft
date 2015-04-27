@@ -113,8 +113,8 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
      */
 
     public function testGetCacheObject()
-    {   
-        $this->assertTrue($this->fixture->getCacheObject() instanceOf CacheInterface);
+    {
+        $this->assertTrue($this->fixture->getCacheObject() instanceof CacheInterface);
     }
     
     /**
