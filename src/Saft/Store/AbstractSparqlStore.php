@@ -4,9 +4,7 @@ namespace Saft\Store;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Statement;
-use Saft\Rdf\AbstractNamedNode;
 use Saft\Rdf\Node;
-use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\SparqlUtils;
 
@@ -16,14 +14,6 @@ use Saft\Sparql\SparqlUtils;
  */
 abstract class AbstractSparqlStore implements Store
 {
-    /**
-     * If set, all statement- and query related operations have to be in close collaboration with the
-     * successor.
-     *
-     * @var instance which implements Saft\Store\StoreInterface.
-     */
-    protected $successor;
-
     /**
      * Adds multiple Statements to (default-) graph.
      *
@@ -63,54 +53,46 @@ abstract class AbstractSparqlStore implements Store
         }
 
         /**
-         * Create batches out of given statements to improve statement throughput, only if query function is
-         * callable. Thats only the case, if this functions gets called from a implemented backend and not
-         * the AbstractSparqlStore itself.
+         * Create batches out of given statements to improve statement throughput.
          */
-        if (true === is_callable($this, 'query')) {
-            $counter = 0;
-            $batchSize = 100;
-            $batchStatements = array();
+        $counter = 0;
+        $batchSize = 100;
+        $batchStatements = array();
 
-            foreach ($statements as $statement) {
-                // given $graphUri forces usage of it and not the graph from the statement instance
-                if (null !== $graphUri) {
-                    $graphUriToUse = $graphUri;
+        foreach ($statements as $statement) {
+            // given $graphUri forces usage of it and not the graph from the statement instance
+            if (null !== $graphUri) {
+                $graphUriToUse = $graphUri;
 
-                // use graphUri from statement
-                } else {
-                    $graphUriToUse = $statement->getGraph()->getUri();
-                }
-
-                if (false === isset($batchStatements[$graphUriToUse])) {
-                    $batchStatements[$graphUriToUse] = new ArrayStatementIteratorImpl(array());
-                }
-                $batchStatements[$graphUriToUse]->append($statement);
-
-                // after batch is full, execute collected statements all at once
-                if (0 === $counter % $batchSize) {
-                    /**
-                     * $batchStatements is an array with graphUri('s) as key(s) and ArrayStatementIteratorImpl
-                     * instances as value. Each entry is related to a certain graph and contains a bunch of
-                     * statement instances.
-                     */
-                    foreach ($batchStatements as $graphUriToUse => $batch) {
-                        foreach ($batch as $batchStatements) {
-                            $this->query(
-                                'INSERT DATA {'. $this->sparqlFormat($batchStatements, $graphUriToUse) .'}',
-                                $options
-                            );
-                        }
-                    }
-
-                    // re-init variables
-                    $batchStatements = array();
-                }
+            // use graphUri from statement
+            } else {
+                $graphUriToUse = $statement->getGraph()->getUri();
             }
 
-        // if query function is not callable, just return generated query and use all statements given.
-        } else {
-            return 'INSERT DATA { '. $this->sparqlFormat($statements, $graph) .'}';
+            if (false === isset($batchStatements[$graphUriToUse])) {
+                $batchStatements[$graphUriToUse] = new ArrayStatementIteratorImpl(array());
+            }
+            $batchStatements[$graphUriToUse]->append($statement);
+
+            // after batch is full, execute collected statements all at once
+            if (0 === $counter % $batchSize) {
+                /**
+                 * $batchStatements is an array with graphUri('s) as key(s) and ArrayStatementIteratorImpl
+                 * instances as value. Each entry is related to a certain graph and contains a bunch of
+                 * statement instances.
+                 */
+                foreach ($batchStatements as $graphUriToUse => $batch) {
+                    foreach ($batch as $batchStatements) {
+                        $this->query(
+                            'INSERT DATA {'. $this->sparqlFormat($batchStatements, $graphUriToUse) .'}',
+                            $options
+                        );
+                    }
+                }
+
+                // re-init variables
+                $batchStatements = array();
+            }
         }
     }
 
@@ -222,20 +204,6 @@ abstract class AbstractSparqlStore implements Store
         } else {
             return $result;
         }
-    }
-
-    /**
-     * Set successor instance. This method is useful, if you wanna build chain of instances which implement
-     * StoreInterface. It sets another instance which will be later called, if a statement- or query-related
-     * function gets called.
-     * E.g. you chain a query cache and a virtuoso instance. In this example all queries will be handled by
-     * the query cache first, but if no cache entry was found, the virtuoso instance gets called.
-     *
-     * @return array Array which contains information about the store and its features.
-     */
-    public function setChainSuccessor(Store $successor)
-    {
-        $this->successor = $successor;
     }
 
     /**

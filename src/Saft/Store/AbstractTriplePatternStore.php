@@ -3,12 +3,7 @@
 namespace Saft\Store;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Rdf\AbstractNamedNode;
-use Saft\Rdf\AnyPatternImpl;
-use Saft\Rdf\LiteralImpl;
-use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactory;
-use Saft\Rdf\Node;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
@@ -21,68 +16,60 @@ use Saft\Sparql\Query\Query;
  */
 abstract class AbstractTriplePatternStore implements Store
 {
-
     /**
-     * Adds multiple Statements to (default-) graph.
-     *
-     * @param  StatementIterator $statements          StatementList instance must contain Statement instances
-     *                                                which are 'concret-' and not 'pattern'-statements.
-     * @param  Node              $graph      optional Overrides target graph. If set, all statements will
-     *                                                be add to that graph, if available.
-     * @param  array             $options    optional It contains key-value pairs and should provide additional
-     *                                                introductions for the store and/or its adapter(s).
-     * @return array Array containing all given arguments.
-     *
-     * @todo implement usage of graph inside the statement(s). create groups for each graph
+     * @param  string     $query            SPARQL query string.
+     * @param  string     $options optional Further configuration options.
+     * @throws \Exception If unsupported query was given or if WITH-DELETE-WHERE and WITH-DELETE-INSERT-WHERE query was
+     *                    given.
      */
-    public function addStatements(StatementIterator $statements, Node $graph = null, array $options = array())
+    public function query($query, array $options = array())
     {
-        /**
-         * This basic implementation only returns what was given. It is basically for test purposes and
-         * later real implementations will rather override this function.
-         */
-        return array($statements, $graph, $options);
-    }
+        $queryObject = AbstractQuery::initByQueryString($query);
 
-    /**
-     * Removes all statements from a (default-) graph which match with given statement.
-     *
-     * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  Node      $graph     optional Overrides target graph. If set, all statements will be delete in
-     *                                       that graph.
-     * @param  array     $options   optional It contains key-value pairs and should provide additional
-     *                                       introductions for the store and/or its adapter(s).
-     * @return array Array containing all given arguments.
-     */
-    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
-    {
         /**
-         * This basic implementation only returns what was given. It is basically for test purposes and
-         * later real implementations will rather override this function.
+         * INSERT or DELETE query
          */
-        return array($statement, $graph, $options);
-    }
+        if ('updateQuery' == AbstractQuery::getQueryType($query)) {
+            $firstPart = substr($queryObject->getSubType(), 0, 6);
 
-    /**
-     * It gets all statements of a given graph which match the following conditions:
-     * - statement's subject is either equal to the subject of the same statement of the graph or it is null.
-     * - statement's predicate is either equal to the predicate of the same statement of the graph or it is null.
-     * - statement's object is either equal to the object of a statement of the graph or it is null.
-     *
-     * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  Node      $graph     optional Overrides target graph. If set, you will get all
-     *                                       matching statements of that graph.
-     * @param  array     $options   optional It contains key-value pairs and should provide additional
-     *                                       introductions for the store and/or its adapter(s).
-     * @return array Array containing all given arguments.
-     */
-    public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
-    {
+            // DELETE DATA query
+            if ('delete' == $firstPart) {
+                $statement = $this->getStatement($queryObject);
+                return $this->deleteMatchingStatements($statement);
+
+            // INSERT DATA or INSERT INTO query
+            } elseif ('insert' == $firstPart) {
+                return $this->addStatements($this->getStatements($queryObject));
+
+            // TODO Support
+            // WITH ... DELETE ... WHERE queries
+            // WITH ... DELETE ... INSERT ... WHERE queries
+            } else {
+                throw new \Exception(
+                    'Not yet implemented: WITH-DELETE-WHERE and WITH-DELETE-INSERT-WHERE queries are not supported yet.'
+                );
+            }
+
         /**
-         * This basic implementation only returns what was given. It is basically for test purposes and
-         * later real implementations will rather override this function.
+         * ASK query
          */
-        return array($statement, $graph, $options);
+        } elseif ('askQuery' == AbstractQuery::getQueryType($query)) {
+            $statement = $this->getStatement($queryObject);
+            return $this->hasMatchingStatement($statement);
+
+        /**
+         * SELECT query
+         */
+        } elseif ('selectQuery' == AbstractQuery::getQueryType($query)) {
+            $statement = $this->getStatement($queryObject);
+            return $this->getMatchingStatements($statement);
+
+        /**
+         * Unsupported query
+         */
+        } else {
+            throw new \Exception('Unsupported query was given: '. $query);
+        }
     }
 
     /**
@@ -208,80 +195,5 @@ abstract class AbstractTriplePatternStore implements Store
         }
 
         return $statements;
-    }
-
-    /**
-     * Returns true or false depending on whether or not the statements pattern has any matches in the given
-     * graph.
-     *
-     * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  Node      $graph     optional Overrides target graph.
-     * @param  array     $options   optional It contains key-value pairs and should provide additional
-     *                                       introductions for the store and/or its adapter(s).
-     * @return array Array containing all given arguments.
-     */
-    public function hasMatchingStatement(Statement $statement, Node $graph = null, array $options = array())
-    {
-        /**
-         * This basic implementation only returns what was given. It is basically for test purposes and
-         * later real implementations will rather override this function.
-         */
-        return array($statement, $graph, $options);
-    }
-
-    /**
-     * @param  string     $query            SPARQL query string.
-     * @param  string     $options optional Further configurations.
-     * @throws \Exception                   If unsupported query was given
-     * @throws \Exception                   If WITH-DELETE-WHERE and WITH-DELETE-INSERT-WHERE query was given.
-     */
-    public function query($query, array $options = array())
-    {
-        $queryObject = AbstractQuery::initByQueryString($query);
-
-        /**
-         * INSERT or DELETE query
-         */
-        if ('updateQuery' == AbstractQuery::getQueryType($query)) {
-            $firstPart = substr($queryObject->getSubType(), 0, 6);
-
-            // DELETE DATA query
-            if ('delete' == $firstPart) {
-                $statement = $this->getStatement($queryObject);
-                return $this->deleteMatchingStatements($statement);
-
-            // INSERT DATA or INSERT INTO query
-            } elseif ('insert' == $firstPart) {
-                return $this->addStatements($this->getStatements($queryObject));
-
-            // TODO Support
-            // WITH ... DELETE ... WHERE queries
-            // WITH ... DELETE ... INSERT ... WHERE queries
-            } else {
-                throw new \Exception(
-                    'WITH-DELETE-WHERE and WITH-DELETE-INSERT-WHERE queries are not supported yet.'
-                );
-            }
-
-        /**
-         * ASK query
-         */
-        } elseif ('askQuery' == AbstractQuery::getQueryType($query)) {
-            $statement = $this->getStatement($queryObject);
-            return $this->hasMatchingStatement($statement);
-
-        /**
-         * SELECT query
-         */
-        } elseif ('selectQuery' == AbstractQuery::getQueryType($query)) {
-            $statement = $this->getStatement($queryObject);
-            return $this->getMatchingStatements($statement);
-
-        /**
-         * Unsupported query
-         */
-        } else {
-            throw new \Exception('Unsupported query was given: '. $query);
-        }
     }
 }
