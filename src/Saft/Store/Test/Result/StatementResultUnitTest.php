@@ -2,7 +2,7 @@
 namespace Saft\Store\Test\Result;
 
 use Saft\Rdf\StatementImpl;
-use Saft\Rdf\VariableImpl;
+use Saft\Rdf\AnyPatternImpl;
 use Saft\Store\Result\StatementResult;
 
 class StatementResultUnitTest extends \PHPUnit_Framework_TestCase
@@ -37,7 +37,7 @@ class StatementResultUnitTest extends \PHPUnit_Framework_TestCase
 
     public function testAppend()
     {
-        $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+        $statement = new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl());
 
         $this->fixture->append($statement);
     }

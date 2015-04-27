@@ -8,7 +8,7 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
-use Saft\Rdf\VariableImpl;
+use Saft\Rdf\AnyPatternImpl;
 use Saft\Store\StoreChain;
 use Saft\Store\Result\StatementResult;
 use Saft\Sparql\SparqlUtils;
@@ -127,7 +127,7 @@ class StoreChainIntegrationTest extends TestCase
         );
 
         $result = $this->fixture->getMatchingStatements(
-            new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
+            new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl()),
             $this->testGraph
         );
 
@@ -177,7 +177,7 @@ class StoreChainIntegrationTest extends TestCase
         $this->fixture->setupChain(array($this->config['queryCacheConfig']));
 
         $this->fixture->deleteMatchingStatements(
-            new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl())
+            new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl())
         );
     }
 
@@ -224,14 +224,14 @@ class StoreChainIntegrationTest extends TestCase
         $this->assertEquals(
             2,
             $this->fixture->getMatchingStatements(
-                new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
+                new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl()),
                 $this->testGraph
             )->getEntryCount()
         );
 
         // remove all statements
         $this->fixture->deleteMatchingStatements(
-            new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
+            new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl()),
             $this->testGraph
         );
 
@@ -242,7 +242,7 @@ class StoreChainIntegrationTest extends TestCase
         $this->assertEquals(
             $statementResult,
             $this->fixture->getMatchingStatements(
-                new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
+                new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl()),
                 $this->testGraph
             )
         );
@@ -253,7 +253,7 @@ class StoreChainIntegrationTest extends TestCase
         $this->setExpectedException('\Exception');
 
         $this->fixture->deleteMatchingStatements(
-            new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl())
+            new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl())
         );
     }
 
@@ -319,7 +319,7 @@ class StoreChainIntegrationTest extends TestCase
         $statement = new StatementImpl(
             new NamedNodeImpl('http://s/'),
             new NamedNodeImpl('http://p/'),
-            new VariableImpl()
+            new AnyPatternImpl()
         );
         $this->fixture->getMatchingStatements($statement, $this->testGraph);
     }
@@ -367,7 +367,7 @@ class StoreChainIntegrationTest extends TestCase
         $statement = new StatementImpl(
             new NamedNodeImpl('http://s/'),
             new NamedNodeImpl('http://p/'),
-            new VariableImpl()
+            new AnyPatternImpl()
         );
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $this->assertTrue(
@@ -448,7 +448,7 @@ class StoreChainIntegrationTest extends TestCase
         $statement = new StatementImpl(
             new NamedNodeImpl('http://s/'),
             new NamedNodeImpl('http://p/'),
-            new VariableImpl()
+            new AnyPatternImpl()
         );
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $testQuery = 'SELECT * FROM <'. $this->testGraph->getUri() .'> '.
@@ -652,7 +652,7 @@ class StoreChainIntegrationTest extends TestCase
                 new StatementImpl(
                     new NamedNodeImpl('http://s/'),
                     new NamedNodeImpl('http://p/'),
-                    new VariableImpl()
+                    new AnyPatternImpl()
                 ),
                 $this->testGraph
             )

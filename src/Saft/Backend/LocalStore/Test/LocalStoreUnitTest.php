@@ -3,7 +3,7 @@ namespace Saft\Backend\LocalStore\Test;
 
 use Saft\Backend\LocalStore\Store\LocalStore;
 use Saft\Rdf\StatementImpl;
-use Saft\Rdf\VariableImpl;
+use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\BlankNode;
 use Saft\Rdf\NamedNodeImpl;
@@ -201,8 +201,8 @@ EOD;
         $store->initialize();
         $pattern = new StatementImpl(
             new BlankNodeImpl('genid1'),
-            new VariableImpl('?p'),
-            new VariableImpl('?o')
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
         );
         $it = $store->getMatchingStatements($pattern, new NamedNodeImpl('http://localhost:8890/foaf'));
         $matches = [];
@@ -217,8 +217,8 @@ EOD;
 
         $pattern = new StatementImpl(
             new NamedNodeImpl('http://notexist/'),
-            new VariableImpl('?p'),
-            new VariableImpl('?o')
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
         );
         $it = $store->getMatchingStatements($pattern, new NamedNodeImpl('http://localhost:8890/foaf'));
         $this->assertFalse($it->valid());
@@ -236,8 +236,8 @@ EOD;
         $store->initialize();
         $pattern = new StatementImpl(
             new BlankNodeImpl('genid1'),
-            new VariableImpl('?p'),
-            new VariableImpl('?o')
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
         );
         $this->assertTrue($store->hasMatchingStatement(
             $pattern,
@@ -246,8 +246,8 @@ EOD;
 
         $pattern = new StatementImpl(
             new NamedNodeImpl('http://notexist/'),
-            new VariableImpl('?p'),
-            new VariableImpl('?o')
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
         );
         $this->assertFalse($store->hasMatchingStatement(
             $pattern,
@@ -295,7 +295,13 @@ EOD;
         $this->assertTrue($it->valid());
         $match = $it->current();
         $it->close();
-        $this->assertTrue($statement->matches($match));
+        $comparePattern = new StatementImpl(
+            $match->getSubject(),
+            $match->getPredicate(),
+            $match->getObject(),
+            new AnyPatternImpl()
+        );
+        $this->assertTrue($comparePattern->matches($statement));
     }
 
     public function testDeleteMatchingStatements()
@@ -309,8 +315,8 @@ EOD;
         $store->initialize();
         $pattern = new StatementImpl(
             new BlankNodeImpl('genid1'),
-            new VariableImpl('?p'),
-            new VariableImpl('?o')
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
         );
 
         // Count how many statements matches the pattern
@@ -368,9 +374,9 @@ EOD;
     protected static function createAllPattern()
     {
         $pattern = new StatementImpl(
-            new VariableImpl('?s'),
-            new VariableImpl('?p'),
-            new VariableImpl('?o')
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
         );
         return $pattern;
     }
