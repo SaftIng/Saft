@@ -66,9 +66,9 @@ class Cache
     /**
      * Returns the current active cache instance.
      *
-     * @return mixed Instance which implements \Saft\Cache\CacheInterface
+     * @return mixed Instance which implements CacheInterface
      */
-    public function getCacheObj()
+    public function getCacheObject()
     {
         return $this->cache;
     }

@@ -10,12 +10,7 @@ class File implements CacheInterface
     /**
      * @var string
      */
-    protected $cacheDir;
-
-    /**
-     * @var string
-     */
-    protected $tempDir;
+    protected $cachePath;
     
     /**
      * Checks that all requirements for this adapter are fullfilled.
@@ -25,12 +20,10 @@ class File implements CacheInterface
      */
     public function checkRequirements()
     {
-        if (true === is_readable($this->tempDir) && true === is_writable($this->tempDir)) {
+        if (true === is_readable($this->cachePath) && true === is_writable($this->cachePath)) {
             return true;
         } else {
-            throw new \Enable\Exception(
-                'Systems temporary folder is either not readable or writable.'
-            );
+            throw new \Exception('Cache folder is either not readable or writable.');
         }
     }
 
@@ -39,10 +32,10 @@ class File implements CacheInterface
      */
     public function clean()
     {
-        $dir = new \DirectoryIterator($this->cacheDir);
+        $dir = new \DirectoryIterator($this->cachePath);
         foreach ($dir as $fileinfo) {
             if (!$fileinfo->isDot()) {
-                unlink($this->cacheDir . $fileinfo->getFilename());
+                unlink($this->cachePath . $fileinfo->getFilename());
             }
         }
     }
@@ -57,7 +50,7 @@ class File implements CacheInterface
         $filename = hash('sha256', $key);
 
         if (true === $this->isCached($key)) {
-            unlink($this->cacheDir . $filename .'.cache');
+            unlink($this->cachePath . $filename .'.cache');
         }
     }
 
@@ -85,7 +78,7 @@ class File implements CacheInterface
 
         if (true === $this->isCached($key)) {
             // load content from cache file and decode it
-            $encodedContainer = file_get_contents($this->cacheDir . $filename . '.cache');
+            $encodedContainer = file_get_contents($this->cachePath . $filename . '.cache');
 
             $container = json_decode($encodedContainer, true);
             
@@ -96,7 +89,7 @@ class File implements CacheInterface
             
             // save adapted $container
             $encodedContainer = json_encode($container);
-            file_put_contents($this->cacheDir . $filename .'.cache', $encodedContainer);
+            file_put_contents($this->cachePath . $filename .'.cache', $encodedContainer);
             
             // unserialize value, if it is serialized
             if (true === Cache::isSerialized($container['value'])) {
@@ -117,7 +110,7 @@ class File implements CacheInterface
      */
     public function getType()
     {
-        return $this->_config['type'];
+        return $this->config['type'];
     }
 
     /**
@@ -130,7 +123,7 @@ class File implements CacheInterface
     {
         $filename = hash('sha256', $key);
 
-        return true === file_exists($this->cacheDir . $filename .'.cache');
+        return true === file_exists($this->cachePath . $filename .'.cache');
     }
 
     /**
@@ -147,7 +140,7 @@ class File implements CacheInterface
         $value = serialize($value);
         
         if (true === $this->isCached($key)) {
-            $content = file_get_contents($this->cacheDir . $filename . '.cache');
+            $content = file_get_contents($this->cachePath . $filename . '.cache');
             $container = json_decode($content, true);
             
             $container['value'] = $value;
@@ -162,7 +155,7 @@ class File implements CacheInterface
         
         $encodedContainer = json_encode($container);
 
-        file_put_contents($this->cacheDir . $filename .'.cache', $encodedContainer);
+        file_put_contents($this->cachePath . $filename .'.cache', $encodedContainer);
     }
 
     /**
@@ -170,27 +163,25 @@ class File implements CacheInterface
      * call checkRequirements to be sure all requirements are fullfilled, before init anything.
      *
      * @param array $config Array containing necessary parameter to setup a cache adapter.
-     * @throws \Exception If one requirement is not fullfilled.
-     * @todo support the use of user defined dir
+     * @throws \Exception If cache dir is not read- or writeable.
      */
     public function setup(array $config)
     {
-        // save reference to systems temp directory
-        $this->tempDir = sys_get_temp_dir();
-
-        if (true === $this->checkRequirements()) {
-            $this->cacheDir = $this->tempDir . '/saft/';
-
-            try {
-                // if caching folder does not exists, create it
-                if (false === file_exists($this->cacheDir)) {
-                    mkdir($this->cacheDir, 0744);
-                }
-            } catch (\Exception $e) {
-                throw new \Exception($e->getMessage());
+        // if cachePath key is not set, save reference to systems temp directory
+        if (false === isset($config['cachePath'])) {
+            $this->cachePath = sys_get_temp_dir() . '/saft/';
+        } else {
+            $this->cachePath = $config['cachePath'];
+            
+            // check that there is a / at the end
+            if ('/' !== substr($this->cachePath, strlen($this->cachePath)-1, 1)) {
+                $this->cachePath .= '/';
             }
+        }
 
-            $this->_config = $config;
+        // init, if requirements are fullfilled
+        if (true === $this->checkRequirements()) {
+            $this->config = $config;
         }
     }
 }

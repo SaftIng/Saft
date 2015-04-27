@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Backend\FileCache\Test;
 
 use Saft\Cache\Test\AbstractCacheTest;
