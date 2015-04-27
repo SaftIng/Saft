@@ -23,6 +23,7 @@
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src</directory>
             <exclude>
+                <directory>./src/Saft/Test</directory>
                 <directory suffix="Test.php">./src/Saft/*/Test</directory>
                 <directory suffix="Test.php">./src/Saft/Backend/*/Test</directory>
                 <file>./src/Saft/TestCase.php</file>

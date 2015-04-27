@@ -2,9 +2,9 @@
 namespace Saft\Backend\Virtuoso\Test;
 
 use Saft\Backend\Virtuoso\Store\Virtuoso;
-use Saft\Store\Test\AbstractSparqlStoreIntegrationTest;
+use Saft\Store\Test\SparqlStoreAbstractTest;
 
-class VirtuosoIntegrationTest extends AbstractSparqlStoreIntegrationTest
+class VirtuosoAbstractTest extends SparqlStoreAbstractTest
 {
     public function setUp()
     {

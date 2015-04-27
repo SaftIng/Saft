@@ -12,7 +12,7 @@ use Saft\Store\Result\SetResult;
 use Saft\Store\Result\ValueResult;
 use Symfony\Component\Yaml\Parser;
 
-abstract class AbstractSparqlStoreIntegrationTest extends TestCase
+abstract class SparqlStoreAbstractTest extends TestCase
 {
     /**
      * @var Cache
@@ -54,22 +54,6 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         }
 
         parent::tearDown();
-    }
-
-    /**
-     * http://stackoverflow.com/a/12496979
-     * Fixes assertEquals in case of check array equality.
-     *
-     * @param array  $expected
-     * @param array  $actual
-     * @param string $message  optional
-     */
-    protected function assertEqualsArrays($expected, $actual, $message = '')
-    {
-        sort($expected);
-        sort($actual);
-
-        $this->assertEquals($expected, $actual, $message);
     }
 
     /**

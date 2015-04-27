@@ -9,8 +9,9 @@ use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
+use Saft\Test\EqualsSparqlConstraint;
 
-class AbstractSparqlStoreUnitTest extends TestCase
+class AbstractSparqlStoreTest extends TestCase
 {
     /**
      * @var string
@@ -23,13 +24,14 @@ class AbstractSparqlStoreUnitTest extends TestCase
 
         $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
 
-        $this->fixture = $this->getMockForAbstractClass('\Saft\Store\AbstractSparqlStore');
-
-        // Override query method: it will always return the given query.
-        $this->fixture->method('query')->will($this->returnArgument(0));
+        $this->mock = $this->getMockForAbstractClass('\Saft\Store\AbstractSparqlStore');
     }
 
-    public function getTestStatement()
+    /*
+     * Test provisioning method
+     */
+
+    protected function getTestStatement()
     {
         $subject1 = new NamedNodeImpl('http://saft/test/s1');
         $predicate1 = new NamedNodeImpl('http://saft/test/p1');
@@ -40,7 +42,7 @@ class AbstractSparqlStoreUnitTest extends TestCase
         return $triple1;
     }
 
-    public function getFilledTestArrayStatementIterator()
+    protected function getFilledTestArrayStatementIterator()
     {
         $subject2 = new NamedNodeImpl('http://saft/test/s2');
         $predicate2 = new NamedNodeImpl('http://saft/test/p2');
@@ -53,28 +55,32 @@ class AbstractSparqlStoreUnitTest extends TestCase
         return $statements;
     }
 
+    /*
+     * Actual test methods
+     */
+
     public function testGetMatchingStatements()
     {
-        $query = $this->fixture->getMatchingStatements($this->getTestStatement());
-        $this->assertEqualsSparql(
-            'FROM <http://saft/test/g1> SELECT * WHERE {'.
-            ' <http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1> '.
-            '}',
-            $query
-        );
+        $query = 'FROM <http://saft/test/g1> SELECT * WHERE { ';
+        $query.= ' <http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1> ';
+        $query.= '}';
+
+        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
+
+        $result = $this->mock->getMatchingStatements($this->getTestStatement());
+
+        // TODO Assert to check if result is a StatementIterator
     }
 
     public function testAddStatements()
     {
-        $query = $this->fixture->addStatements($this->getFilledTestArrayStatementIterator());
+        $query = 'INSERT DATA { ';
+        $query.= 'Graph <http://saft/test/g1> {<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.} ';
+        $query.= 'Graph <http://saft/test/g2> {<http://saft/test/s2> <http://saft/test/p2> <http://saft/test/o2>.} ';
+        $query.= '}';
 
-        $this->assertEqualsSparql(
-            'INSERT DATA { '.
-            'Graph <http://saft/test/g1> {<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.} '.
-            'Graph <http://saft/test/g2> {<http://saft/test/s2> <http://saft/test/p2> <http://saft/test/o2>.} '.
-            '}',
-            $query
-        );
+        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
+        $this->mock->addStatements($this->getFilledTestArrayStatementIterator());
 
         //test to add not concrete Statement
         $subject1 = new AnyPatternImpl();
@@ -83,30 +89,31 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $graph1 = new NamedNodeImpl('http://saft/test/g1');
         $triple1 = new StatementImpl($subject1, $predicate1, $object1, $graph1);
         $statements = new ArrayStatementIteratorImpl(array($triple1));
+
         $this->setExpectedException('\Exception');
-        $this->fixture->addStatements($statements);
+        $this->mock->addStatements($statements);
     }
 
     public function testDeleteMatchingStatements()
     {
-        $query = $this->fixture->deleteMatchingStatements($this->getTestStatement());
-        //echo $query;
-        $this->assertEqualsSparql(
-            'DELETE DATA { Graph <http://saft/test/g1> '.
-            '{<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.} }',
-            $query
-        );
+        $query = 'DELETE DATA { Graph <http://saft/test/g1> ';
+        $query.= '{<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.} }';
+
+        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
+
+        $this->mock->deleteMatchingStatements($this->getTestStatement());
     }
 
     public function testhasMatchingStatement()
     {
-        $query = $this->fixture->hasMatchingStatement($this->getTestStatement());
+        $query = 'ASK { Graph <http://saft/test/g1> { ';
+        $query.= '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1> . } }';
 
-        $this->assertEqualsSparql(
-            'ASK { Graph <http://saft/test/g1> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1> . } }',
-            $query
-        );
+        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
+
+        $result = $this->mock->hasMatchingStatement($this->getTestStatement());
+
+        $this->assertTrue(is_bool($result));
     }
 
     public function testMultipleVariatonOfObjects()
@@ -128,17 +135,17 @@ class AbstractSparqlStoreUnitTest extends TestCase
         // Setup array statement iterator
         $statements = new ArrayStatementIteratorImpl(array($triple1, $triple2));
 
+        $query = 'INSERT DATA { ';
+        $query.= 'Graph <'. $this->testGraph .'> {';
+        $query.= '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#string>. } ';
+        $query.= 'Graph <'. $this->testGraph .'> {';
+        $query.= '<http://saft/test/s1> <http://saft/test/p1> "John"^^<http://www.w3.org/2001/XMLSchema#string>. } ';
+        $query.= '}';
+
+        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
+
         // add test statements
-        $query = $this->fixture->addStatements($statements, $this->testGraph);
-        $this->assertEqualsSparql(
-            'INSERT DATA { '.
-            'Graph <'. $this->testGraph .'> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#string>. } '.
-            'Graph <'. $this->testGraph .'> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> "John"^^<http://www.w3.org/2001/XMLSchema#string>. } '.
-            '}',
-            $query
-        );
+        $this->mock->addStatements($statements, $this->testGraph);
     }
 
     /**
@@ -155,12 +162,13 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $object = new NamedNodeImpl('http://saft/test/o1');
         $triple = new StatementImpl($subject, $predicate, $object);
 
-        $query = $this->fixture->hasMatchingStatement($triple);
+        $query = 'ASK { ?s1 <http://saft/test/p1> <http://saft/test/o1> . }';
 
-        $this->assertEqualsSparql(
-            'ASK { ?s1 <http://saft/test/p1> <http://saft/test/o1> . }',
-            $query
-        );
+        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
+
+        $result = $this->mock->hasMatchingStatement($triple);
+
+        $this->assertTrue(is_bool($result));
 
         /**
          * graph is a pattern variable
@@ -168,12 +176,13 @@ class AbstractSparqlStoreUnitTest extends TestCase
         $graph1 = new AnyPatternImpl('?g1');
         $statement = new StatementImpl($subject, $predicate, $object, $graph1);
 
-        $query = $this->fixture->hasMatchingStatement($statement);
+        $query = 'ASK { Graph ?g1 {?s1 <http://saft/test/p1> <http://saft/test/o1>} }';
 
-        $this->assertEqualsSparql(
-            'ASK { Graph ?g1 {?s1 <http://saft/test/p1> <http://saft/test/o1>} }',
-            $query
-        );
+        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
+
+        $result = $this->mock->hasMatchingStatement($statement);
+
+        $this->assertTrue(is_bool($result));
     }
 
     /**
@@ -184,26 +193,24 @@ class AbstractSparqlStoreUnitTest extends TestCase
         // Setup array statement iterator
         $statements = new ArrayStatementIteratorImpl(array($this->getTestStatement()));
 
-        // use the given graphUri
-        $query = $this->fixture->addStatements($statements, new NamedNodeImpl('http://saft/test/foograph'));
+        $query = 'INSERT DATA { Graph <http://saft/test/foograph> {';
+        $query.= '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>. ';
+        $query.= '} }';
 
-        $this->assertEqualsSparql(
-            $query,
-            'INSERT DATA { Graph <http://saft/test/foograph> {'.
-            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>. '.
-            '} }'
-        );
+        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
+
+        // use the given graphUri
+        $query = $this->mock->addStatements($statements, new NamedNodeImpl('http://saft/test/foograph'));
 
         $this->markTestIncomplete("Im not sure if the following is valid");
 
-        // use the given graphUri-variable
-        $query = $this->fixture->addStatements($statements, '?foo');
+        $query = 'INSERT DATA { Graph ?foo {';
+        $query.= '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>. ';
+        $query.= '} }';
 
-        $this->assertEqualsSparql(
-            $query,
-            'INSERT DATA { Graph ?foo {'.
-            '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>. '.
-            '} }'
-        );
+        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
+
+        // use the given graphUri-variable
+        $query = $this->mock->addStatements($statements, '?foo');
     }
 }
