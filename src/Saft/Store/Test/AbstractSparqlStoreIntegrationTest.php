@@ -124,6 +124,18 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraph));
     }
 
+    public function testAddStatementsInvalidStatements()
+    {
+        // build statement iterator containing one statement which consists only of variables.
+        $statements = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl())
+        ));
+
+        // expect exception, because only concrete (no variable) statements are allowed
+        $this->setExpectedException('\Exception');
+        $this->fixture->addStatements($statements);
+    }
+
     public function testAddStatementsLanguageTags()
     {
         // graph is empty
@@ -147,6 +159,37 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         $this->fixture->addStatements($statements, $this->testGraph);
 
         // graph has now two entries
+        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraph));
+    }
+    
+    public function testAddStatementsUseStatementGraph()
+    {
+        // remove all triples from the test graph
+        $this->fixture->query('CLEAR GRAPH <' . $this->testGraph->getUri() . '>');
+
+        // graph is empty
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
+
+        // 2 triples
+        $statements = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/'),
+                $this->testGraph
+            ),
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal'),
+                $this->testGraph
+            ),
+        ));
+
+        // add triples
+        $this->assertTrue($this->fixture->addStatements($statements));
+
+        // graph has two entries
         $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraph));
     }
 
@@ -211,6 +254,63 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         $this->fixture->deleteMatchingStatements(
             new StatementImpl(new NamedNodeImpl('http://s/'), new NamedNodeImpl('http://p/'), new VariableImpl()),
             $this->testGraph
+        );
+
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
+    }
+
+    public function testDeleteMatchingStatementsNoGraphGiven()
+    {
+        // expect exception thrown, because no graph was given, neither set in Statement nor given extra
+        $this->setExpectedException('\Exception');
+        
+        $this->fixture->deleteMatchingStatements(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new VariableImpl()
+            )
+        );
+    }
+
+    public function testDeleteMatchingStatementsUseStatementGraph()
+    {
+        /**
+         * Create some test data
+         */
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
+
+        // 2 triples
+        $statements = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/'),
+                $this->testGraph
+            ),
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal'),
+                $this->testGraph
+            ),
+        ));
+
+        // add triples
+        $this->fixture->addStatements($statements, $this->testGraph);
+
+        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraph));
+
+        /**
+         * drop all triples
+         */
+        $this->fixture->deleteMatchingStatements(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new VariableImpl(),
+                $this->testGraph
+            )
         );
 
         $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
@@ -519,7 +619,9 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         // check
         $this->assertEquals(
             $setResultToCheckAgainst,
-            $this->fixture->query('SELECT ?s ?o FROM <' . $this->testGraph->getUri() . '> WHERE {?s ?p ?o.} ORDER BY ?o')
+            $this->fixture->query(
+                'SELECT ?s ?o FROM <' . $this->testGraph->getUri() . '> WHERE {?s ?p ?o.} ORDER BY ?o'
+            )
         );
     }
 

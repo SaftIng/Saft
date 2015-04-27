@@ -115,6 +115,44 @@ class HttpUnitTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests clearGraph
+     */
+
+    public function testClearGraph()
+    {
+        // remove all triples from the test graph
+        $this->fixture->query('CLEAR GRAPH <' . $this->testGraph->getUri() . '>');
+
+        // graph is empty
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
+
+        // 2 triples
+        $statements = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
+            ),
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
+            ),
+        ));
+
+        // add triples
+        $this->assertTrue($this->fixture->addStatements($statements, $this->testGraph));
+
+        // graph has two entries now
+        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraph));
+        
+        $this->fixture->clearGraph($this->testGraph);
+        
+        // check number of triples again
+        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
+    }
+
+    /**
      * Tests dropGraph
      */
 

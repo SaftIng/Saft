@@ -118,25 +118,8 @@ class Http extends AbstractSparqlStore
              * so we have to change it to:
              *
              *          INSERT INTO GRAPH <...> {<...> <...> <...>.}
-             */
-            foreach ($statements as $st) {
-                if ($st instanceof Statement && true === $st->isConcrete()) {
-                    // everything is fine
-
-                // non-Statement instances not allowed
-                } elseif (false === $st instanceof Statement) {
-                    throw new \Exception('addStatements does not accept non-Statement instances.');
-
-                // non-concrete Statement instances not allowed
-                } elseif ($st instanceof Statement && false === $st->isConcrete()) {
-                    throw new \Exception('At least one Statement is not concrete');
-
-                } else {
-                    throw new \Exception('Unknown error.');
-                }
-            }
-
-            /**
+             *
+             * 
              * Create batches out of given statements to improve statement throughput.
              */
             $counter = 0;
@@ -144,6 +127,14 @@ class Http extends AbstractSparqlStore
             $batchStatements = array();
 
             foreach ($statements as $statement) {
+                // we dont have to check, if $st is a valid Statement, because StatementIterator implementations
+                // dont allow non-Statement entries.
+                
+                // non-concrete Statement instances not allowed
+                if (false === $statement->isConcrete()) {
+                    throw new \Exception('At least one Statement is not concrete');
+                }
+                
                 // given $graphUri forces usage of it and not the graph from the statement instance
                 if (null !== $graphUri) {
                     $graphUriToUse = $graphUri;
@@ -269,8 +260,6 @@ class Http extends AbstractSparqlStore
              *      DELETE { <http://s/> <http://p/> ?o. }
              *      WHERE { <http://s/> <http://p/> ?o. }
              */
-            $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-
             if (null === $graphUri) {
                 $graphUri = $statement->getGraph();
             }
@@ -280,6 +269,7 @@ class Http extends AbstractSparqlStore
                 throw new \Exception('Neither $graphUri nor $statement graph were set.');
             }
 
+            $statementIterator = new ArrayStatementIteratorImpl(array($statement));
             $condition = $this->sparqlFormat($statementIterator);
             $query = 'WITH <'. $graphUri .'> DELETE {'. $condition .'} WHERE {'. $condition .'}';
             $this->query($query, $options);
@@ -351,16 +341,6 @@ class Http extends AbstractSparqlStore
         }
 
         return $graphs;
-    }
-
-    /**
-     * Returns the URI of which all the queries where send to.
-     *
-     * @return string URI on which all queries where send to.
-     */
-    public function getDsn()
-    {
-        return $this->client->getUri();
     }
 
     /**
