@@ -30,14 +30,14 @@ class LiteralImpl extends AbstractLiteral
     protected $datatype;
 
     /**
-     * @param mixed $value the Literal value
-     * @param string $datatype the datatype URI for the Literal
-     * @param string $lang the language tag of the Literal (optional)
+     * @param mixed  $value    optional the Literal value
+     * @param string $datatype optional the datatype URI for the Literal
+     * @param string $lang     optional the language tag of the Literal (optional)
      */
     public function __construct($value, $datatype = null, $lang = null)
     {
         if ($value === null) {
-            throw new \Exception('Literal value can\'t be null.');
+            throw new \Exception('Literal value can\'t be null. Please use AnyPattern if you need a variable.');
         }
 
         $this->value = $value;

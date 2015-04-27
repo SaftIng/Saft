@@ -197,6 +197,16 @@ class HttpUnitTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests getStoreDescription
+     */
+
+    public function testGetStoreDescription()
+    {
+        // as long as getStoreDescription is not implemented, we expect an empty array as result value
+        $this->assertEquals(array(), $this->fixture->getStoreDescription());
+    }
+
+    /**
      * Tests getTripleCount
      */
 
@@ -223,5 +233,18 @@ class HttpUnitTest extends \PHPUnit_Framework_TestCase
 
         // graph has to contain 3 triples
         $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraph));
+    }
+
+    /**
+     * Tests openConnection
+     */
+
+    public function testOpenConnectionInvalidUrl()
+    {
+        // We expect that authentication fails, because the auth url is not valid
+        $this->setExpectedException('\Exception');
+        
+        $config = array('authUrl' => 'http://not existend');
+        new Http($config);
     }
 }

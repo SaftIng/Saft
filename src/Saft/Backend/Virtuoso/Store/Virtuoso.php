@@ -620,7 +620,11 @@ class Virtuoso extends AbstractSparqlStore
                              * Literal (language'd)
                              */
                             case 'literal':
-                                $newEntry[$variable] = new LiteralImpl($part['value'], $part['xml:lang']);
+                                $newEntry[$variable] = new LiteralImpl(
+                                    $part['value'],
+                                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
+                                    $part['xml:lang']
+                                );
 
                                 break;
                             /**

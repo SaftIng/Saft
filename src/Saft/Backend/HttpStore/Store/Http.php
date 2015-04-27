@@ -433,7 +433,7 @@ class Http extends AbstractSparqlStore
 
     /**
      * @return array Empty
-     * @todo implement getStoreDescription
+     * TODO implement getStoreDescription
      */
     public function getStoreDescription()
     {
@@ -485,13 +485,11 @@ class Http extends AbstractSparqlStore
         if ('virtuoso' === $this->storeName) {
             // set graphUri, use that from the statement if $graphUri is null
             if (null === $graphUri) {
-                $graph = $Statement->getGraph();
-                $graphUri = $graph->getUri();
+                $graphUri = $Statement->getGraph()->getUri();
             }
 
-            if (false === NodeUtils::simpleCheckURI($graphUri)) {
-                throw new \Exception('Neither $Statement has a valid graph nor $graphUri is valid URI.');
-            }
+            // no check for graphUri neccessary, because graph URI was either given as a Node, which checks that
+            // too or inside of the Statement, where the graph is also a Node.
 
             $statementIterator = new ArrayStatementIteratorImpl(array($Statement));
             $result = $this->query(
@@ -533,17 +531,16 @@ class Http extends AbstractSparqlStore
     public function openConnection()
     {
         $this->client = new Client();
+        
+        $adapterOptions = array_merge(array(
+            'authUrl' => '',
+            'password' => '',
+            'queryUrl' => '',
+            'username' => ''
+        ), $this->adapterOptions);
 
-        $this->client->setUrl($this->adapterOptions['authUrl']);
-        $this->client->sendDigestAuthentication(
-            $this->adapterOptions['username'],
-            $this->adapterOptions['password']
-        );
-
-        // validate CURL status
-        if (curl_errno($this->client->getClient()->curl)) {
-            throw new \Exception(curl_error($this->client->getClient()->error), 500);
-        }
+        $this->client->setUrl($adapterOptions['authUrl']);
+        $this->client->sendDigestAuthentication($adapterOptions['username'], $adapterOptions['password']);
 
         $curlInfo = curl_getinfo($this->client->getClient()->curl);
 
@@ -552,12 +549,12 @@ class Http extends AbstractSparqlStore
             // save name of the store which provides SPARQL endpoint
             $this->storeName = $this->determineStoreOnServer($this->client->getClient()->response_headers);
 
-            $this->client->setUrl($this->adapterOptions['queryUrl']);
+            $this->client->setUrl($adapterOptions['queryUrl']);
             return $this->client;
 
         // validate HTTP status code (user/password credential issues)
         } else {
-            throw new \Exception('Response with Status Code [' . $status_code . '].', 500);
+            throw new \Exception('Response with Status Code [' . $curlInfo['http_code'] . '].', 500);
         }
     }
 
@@ -615,7 +612,11 @@ class Http extends AbstractSparqlStore
                          * Literal (language'd)
                          */
                         case 'literal':
-                            $newEntry[$variable] = new LiteralImpl($part['value'], $part['xml:lang']);
+                            $newEntry[$variable] = new LiteralImpl(
+                                $part['value'],
+                                'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
+                                $part['xml:lang']
+                            );
 
                             break;
                         /**

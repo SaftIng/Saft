@@ -522,6 +522,20 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         $this->assertFalse($this->fixture->hasMatchingStatement($statement, $this->testGraph));
     }
 
+    public function testHasMatchingStatementNoGraphGiven()
+    {
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
+        
+        $statement = new StatementImpl(
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            $this->testGraph
+        );
+
+        $this->assertFalse($this->fixture->hasMatchingStatement($statement));
+    }
+
     public function testHasMatchingStatementWithSuccessor()
     {
         // 2 triples
@@ -587,7 +601,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new LiteralImpl('foobar')
+                new LiteralImpl('foobar', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString', 'en')
             ),
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
@@ -606,11 +620,11 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
         $setResultToCheckAgainst->setVariables(array('s', 'o'));
         $setResultToCheckAgainst->append(array(
             's' => new NamedNodeImpl('http://s/'),
-            'o' => new LiteralImpl('42')
+            'o' => new LiteralImpl('foobar', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString', 'en')
         ));
         $setResultToCheckAgainst->append(array(
             's' => new NamedNodeImpl('http://s/'),
-            'o' => new LiteralImpl('foobar')
+            'o' => new LiteralImpl('42')
         ));
         $setResultToCheckAgainst->append(array(
             's' => new NamedNodeImpl('http://s/'),
