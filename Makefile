@@ -33,6 +33,11 @@ apidoc:
 clean:
 	rm -r ./gen ./tmp
 
+commit:
+	make codebeautifier
+	make codesniffer
+	git-cola
+
 mrpropper: clean
 	rm -r ./vendor
 
