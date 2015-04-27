@@ -76,8 +76,8 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
     {
         $statement = $this->getTestStatementWithLiteral();
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-        $query = 'INSERT DATA { 
-            Graph <http://graph/> { 
+        $query = 'INSERT DATA {
+            Graph <http://graph/> {
                 '. $statement->getSubject()->toNQuads() .'
                 '. $statement->getPredicate()->toNQuads() .'
                 '. $statement->getObject()->toNQuads() .'

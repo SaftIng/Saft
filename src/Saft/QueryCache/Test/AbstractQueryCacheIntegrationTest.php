@@ -83,8 +83,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testAddStatementsNoSuccessor()
     {
         $this->setExpectedException('\Exception');
-        
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
+
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
 
         $this->fixture->addStatements($statementIterator);
@@ -178,7 +178,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testBuildPatternListByStatementOnlyVariables()
     {
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
-        
+
         $this->assertEquals(
             array(
                 $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
@@ -194,7 +194,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testBuildPatternListByTriplePattern()
     {
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
-        
+
         $this->assertEquals(
             array(
                 $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*',
@@ -266,7 +266,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         // build testdata
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
-        
+
         // assumption is that all given parameter will be returned
         $this->assertEquals(
             array($statement, $this->testGraph->getUri(), array(1)),
@@ -278,9 +278,9 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testDeleteMatchingStatementsNoSuccessor()
     {
         $this->setExpectedException('\Exception');
-        
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
-        
+
+
         $this->fixture->deleteMatchingStatements($statement);
     }
 
@@ -552,7 +552,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         // save result of the function call
         $result = $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options);
-        
+
         // query
         $queryObject = AbstractQuery::initByQueryString(
             'ASK FROM <'. $this->testGraph->getUri() .'> { ?s ?p ?o }'
@@ -913,7 +913,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetMatchingStatementsNoSuccessor()
     {
         $this->setExpectedException('\Exception');
-        
+
         // test data
         $statement = new StatementImpl(
             new NamedNodeImpl('http://s/'),
@@ -925,7 +925,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         $this->fixture->getMatchingStatements($statement, $this->testGraph, $options);
     }
-    
+
     public function testGetMatchingStatementsUseCachedResult()
     {
         // set basic store as successor
@@ -956,7 +956,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
             ),
             $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
         );
-        
+
         // check latest query cache container
         $this->assertEquals(
             array(
@@ -1000,7 +1000,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
             $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
         );
     }
-    
+
     /**
      * Tests getResult
      */
@@ -1010,7 +1010,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $queryObject = AbstractQuery::initByQueryString(
             'SELECT * FROM <http://graph/> WHERE {?s ?p ?o}'
         );
-        
+
         $this->assertNull($this->fixture->getResult($queryObject));
     }
 
@@ -1022,7 +1022,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetResultInvalidParameter()
     {
         $this->setExpectedException('\Exception');
-        
+
         $this->fixture->getResult(032);
     }
 
@@ -1108,10 +1108,10 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         // test data
         $statement = new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl());
-        
+
         $this->fixture->hasMatchingStatement($statement);
     }
-    
+
     public function testHasMatchingStatementOnlyVariables()
     {
         // set basic store as successor
@@ -1130,7 +1130,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
             $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options)
         );
     }
-    
+
     public function testHasMatchingStatementUseCachedResult()
     {
         // set basic store as successor
@@ -1148,7 +1148,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
             ),
             $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options)
         );
-        
+
         // call hasMatchingStatement again and see what happens
         $this->assertEquals(
             array(
@@ -1156,7 +1156,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
             ),
             $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options)
         );
-        
+
         // check latest query cache container
         $this->assertEquals(
             array(
