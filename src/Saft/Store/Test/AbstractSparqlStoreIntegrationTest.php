@@ -128,7 +128,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
     {
         // build statement iterator containing one statement which consists only of variables.
         $statements = new ArrayStatementIteratorImpl(array(
-            new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl())
+            new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl())
         ));
 
         // expect exception, because only concrete (no variable) statements are allowed
@@ -268,7 +268,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new VariableImpl()
+                new AnyPatternImpl()
             )
         );
     }
@@ -308,7 +308,7 @@ abstract class AbstractSparqlStoreIntegrationTest extends TestCase
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new VariableImpl(),
+                new AnyPatternImpl(),
                 $this->testGraph
             )
         );

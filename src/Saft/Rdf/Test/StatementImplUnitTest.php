@@ -1,13 +1,13 @@
 <?php
 namespace Saft\Rdf\Test;
 
+use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
-use Saft\Rdf\VariableImpl;
 
-class StatementImplUnitTest extends StatementAbstractTest
+class StatementImplUnitTest extends AbstractStatementTest
 {
 
     public function newLiteralInstance($value, $lang = null, $datatype = null)
@@ -20,9 +20,9 @@ class StatementImplUnitTest extends StatementAbstractTest
         return new NamedNodeImpl($uri);
     }
 
-    public function newVariableInstance($value)
+    public function newAnyPatternInstance($value)
     {
-        return new VariableImpl($value);
+        return new AnyPatternImpl($value);
     }
 
     public function newBlankNodeInstance($blankId)

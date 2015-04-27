@@ -3,11 +3,11 @@
 namespace Saft\QueryCache\Test;
 
 use Saft\TestCase;
+use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
-use Saft\Rdf\AnyPatternImpl;
 use Saft\Sparql\Query\AbstractQuery;
 use Symfony\Component\Yaml\Parser;
 
@@ -793,9 +793,9 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                         'queryObject' => $queryObject,
                         'result' => array(
                             new StatementImpl(
-                                new VariableImpl('?s'),
-                                new VariableImpl('?p'),
-                                new VariableImpl('?o')
+                                new AnyPatternImpl('?s'),
+                                new AnyPatternImpl('?p'),
+                                new AnyPatternImpl('?o')
                             ),
                             null,
                             array()
@@ -1326,7 +1326,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         $this->assertEquals(
             array(
-                new StatementImpl(new VariableImpl('?s'), new VariableImpl('?p'), new VariableImpl('?o')),
+                new StatementImpl(new AnyPatternImpl('?s'), new AnyPatternImpl('?p'), new AnyPatternImpl('?o')),
                 null,
                 $options
             ),

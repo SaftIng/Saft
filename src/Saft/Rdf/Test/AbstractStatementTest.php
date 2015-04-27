@@ -6,18 +6,18 @@ use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\LiteralImpl;
 
-abstract class StatementAbstractTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractStatementTest extends \PHPUnit_Framework_TestCase
 {
     abstract public function newLiteralInstance($value, $lang = null, $datatype = null);
     abstract public function newNamedNodeInstance($uri);
-    abstract public function newVariableInstance($value);
+    abstract public function newAnyPatternInstance($value);
     abstract public function newBlankNodeInstance($blankId);
 
     /**
-     * @param $subject
-     * @param $predicate
-     * @param $object
-     * @param null $graph
+     * @param Node $subject
+     * @param Node $predicate
+     * @param Node $object
+     * @param Node $graph optional
      * @return Statement
      */
     abstract public function newInstance($subject, $predicate, $object, $graph = null);

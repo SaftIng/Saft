@@ -1,7 +1,6 @@
 <?php
 namespace Saft\Rdf\Test;
 
-use Saft\Rdf\VariableImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\BlankNodeImpl;
 
