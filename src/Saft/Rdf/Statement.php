@@ -59,11 +59,6 @@ interface Statement
     public function toNQuads();
 
     /**
-     * @return string
-     */
-    public function toSparqlFormat();
-
-    /**
      * Get a string representation of the current statement. It should contain a human readable description of the parts
      * of the statement.
      *

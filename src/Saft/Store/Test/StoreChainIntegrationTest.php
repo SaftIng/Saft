@@ -11,6 +11,7 @@ use Saft\Rdf\StatementImpl;
 use Saft\Rdf\VariableImpl;
 use Saft\Store\StoreChain;
 use Saft\Store\Result\StatementResult;
+use Saft\Sparql\SparqlUtils;
 use Symfony\Component\Yaml\Parser;
 
 class StoreChainIntegrationTest extends TestCase
@@ -369,11 +370,10 @@ class StoreChainIntegrationTest extends TestCase
             new VariableImpl()
         );
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-        // TODO remove usage of StatementIterator::toSparqlFormat()
         $this->assertTrue(
             null === $chainEntries[0]->getCache()->get(
                 'SELECT * FROM <'. $this->testGraph->getUri() .'> '.
-                'WHERE {'. $statementIterator->toSparqlFormat($this->testGraph->getUri()) .'}'
+                'WHERE {'. SparqlUtils::statementIteratorToSparqlFormat($statementIterator, $this->testGraph) .'}'
             )
         );
 
@@ -452,7 +452,7 @@ class StoreChainIntegrationTest extends TestCase
         );
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $testQuery = 'SELECT * FROM <'. $this->testGraph->getUri() .'> '.
-                     'WHERE {'. $statementIterator->toSparqlFormat($this->testGraph->getUri()) .'}';
+                     'WHERE {'. SparqlUtils::statementIteratorToSparqlFormat($statementIterator, $this->testGraph) .'}';
         $this->assertTrue(null === $chainEntries[0]->getCache()->get($testQuery));
 
         $this->assertEquals(0, count($chainEntries[0]->getLatestQueryCacheContainer()));

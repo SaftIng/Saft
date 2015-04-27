@@ -8,6 +8,7 @@ use Saft\Rdf\AbstractNamedNode;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementIterator;
+use Saft\Sparql\SparqlUtils;
 
 /**
  * Predefined sparql Store. All Triple methods reroute to the query-method. In the specific sparql-Store those
@@ -187,9 +188,9 @@ abstract class AbstractSparqlStore implements Store
         }
 
         $query.= "SELECT * WHERE { ";
-        $query.= $this->getNodeInSparqlFormat($statement->getSubject(), "s") . " ";
-        $query.= $this->getNodeInSparqlFormat($statement->getPredicate(), "p") . " ";
-        $query.= $this->getNodeInSparqlFormat($statement->getObject(), "o") . " ";
+        $query.= SparqlUtils::getNodeInSparqlFormat($statement->getSubject(), "s") . " ";
+        $query.= SparqlUtils::getNodeInSparqlFormat($statement->getPredicate(), "p") . " ";
+        $query.= SparqlUtils::getNodeInSparqlFormat($statement->getObject(), "o") . " ";
         $query.= " }" . PHP_EOL;
 
         return $this->query($query, $options);
@@ -247,47 +248,6 @@ abstract class AbstractSparqlStore implements Store
      */
     protected function sparqlFormat(StatementIterator $statements, Node $graph = null)
     {
-        $query = '';
-        foreach ($statements as $statement) {
-            if ($statement instanceof Statement) {
-                $con = $this->getNodeInSparqlFormat($statement->getSubject()) . ' ' .
-                    $this->getNodeInSparqlFormat($statement->getPredicate()) . ' ' .
-                    $this->getNodeInSparqlFormat($statement->getObject()) . ' . ';
-
-                $graphToUse = $graph;
-                if ($graph == null && $statement->isQuad()) {
-                    $graphToUse = $statement->getGraph();
-                }
-
-                if (null !== $graphToUse) {
-                    $sparqlString = 'Graph '. $this->getNodeInSparqlFormat($graphToUse) .' {' . $con .'}';
-                } else {
-                    $sparqlString = $con;
-                }
-
-                $query .= $sparqlString .' ';
-            } else {
-                throw new \Exception('Not a Statement instance');
-            }
-        }
-        return $query;
-    }
-
-    /**
-     * Returns given Node instance in SPARQL format, which is in NQuads or as Variable
-     *
-     * @param Node $node Node instance to format.
-     * @param string $var The variablename, which should be used, if the node is not concrete
-     * @return string Either NQuad notation (if node is concrete) or as variable.
-     */
-    protected function getNodeInSparqlFormat(Node $node, $var = null)
-    {
-        if ($node->isConcrete()) {
-            return $node->toNQuads();
-        }
-        if ($var == null) {
-            $var = uniqid("tempVar");
-        }
-        return "?" . $var;
+        return SparqlUtils::statementIteratorToSparqlFormat($statements, $graph);
     }
 }

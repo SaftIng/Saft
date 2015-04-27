@@ -38,29 +38,12 @@ abstract class AbstractStatement implements Statement
                        $this->getObject()->toNQuads() . ' ' .
                        $this->getGraph()->toNQuads() . ' .';
             } else {
-                return $this->toSparqlFormat();
+                return $this->getSubject()->toNQuads() . ' ' .
+                       $this->getPredicate()->toNQuads() . ' ' .
+                       $this->getObject()->toNQuads() . ' .';
             }
         } else {
-            throw new \Exception('A statement has to be concrete in N-Quads.');
-        }
-    }
-
-    /**
-     * @return boolean
-     */
-    public function toSparqlFormat()
-    {
-        // if quad, integrate Graph, even it is null
-        if ($this->isQuad()) {
-            return 'Graph '. $this->getGraph()->toNQuads() .' {'.
-                   $this->getSubject()->toNQuads() .' '.
-                   $this->getPredicate()->toNQuads() .' '.
-                   $this->getObject()->toNQuads() .
-                   '}';
-        } else {
-            return $this->getSubject()->toNQuads() .' '.
-                   $this->getPredicate()->toNQuads() .' '.
-                   $this->getObject()->toNQuads() . ' .';
+            throw new \Exception('A Statement has to be concrete in N-Quads.');
         }
     }
 
