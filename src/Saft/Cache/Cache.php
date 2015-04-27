@@ -2,8 +2,9 @@
 
 namespace Saft\Cache;
 
+// TODO remove direct use commands for cache classes
 use Saft\Backend\MemcacheD\Cache\MemcacheD;
-use Saft\Backend\PhpArrayCache\Cache\PHPArray;
+use Saft\Cache\Test\PHPArrayCache;
 
 /**
  * Manages the cache itself.
@@ -65,9 +66,9 @@ class Cache
     /**
      * Returns the current active cache instance.
      *
-     * @return mixed Instance which implements \Saft\Cache\CacheInterface
+     * @return mixed Instance which implements CacheInterface
      */
-    public function getCacheObj()
+    public function getCacheObject()
     {
         return $this->cache;
     }
@@ -124,15 +125,17 @@ class Cache
                  * PHPArray
                  */
                 case 'phparray':
-                    $this->cache = new PHPArray();
+                    $this->cache = new PHPArrayCache();
                     $this->cache->setup($config);
                     break;
 
+                // unknown cache backend given
                 default:
                     throw new \Exception('Unknown cache backend.');
                     break;
             }
 
+        // No type key set
         } else {
             throw new \Exception('Unknown cache backend.');
         }
@@ -195,16 +198,21 @@ class Cache
                 if ('"' !== $value[$length - 2]) {
                     return false;
                 }
+                
             // boolean
             case 'b':
+            
             // integer
             case 'i':
+            
             // ?
             case 'd':
                 // This looks odd but it is quicker than isset()ing
                 $end .= ';';
+            
             // array
             case 'a':
+            
             // object
             case 'O':
                 $end .= '}';
@@ -214,22 +222,23 @@ class Cache
                 }
 
                 switch ($value[2]){
-                    case 0:
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 8:
-                    case 9:
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
                         break;
 
                     default:
                         return false;
                 }
-            // ?
+                
+            // null
             case 'N':
                 $end .= ';';
 
@@ -238,6 +247,7 @@ class Cache
                 }
                 break;
 
+            // unknown character at first position
             default:
                 return false;
         }

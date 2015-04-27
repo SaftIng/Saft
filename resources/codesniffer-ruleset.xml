@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<ruleset name="Saft">
+    <description>The Saft Coding Standard uses PSR-1 and PSR-2 with some additions.</description>
+
+    <rule ref="PSR1" />
+    <rule ref="PSR2">
+        <exclude name="PSR2.ControlStructures.ControlStructureSpacing.SpacingAfterOpenBrace"/>
+    </rule>
+    <!-- Generic sniffs -->
+    <rule ref="Generic.Files.ByteOrderMark" />
+    <rule ref="Generic.Files.EndFileNewline" />
+    <rule ref="Generic.Files.LineEndings">
+        <properties>
+            <property name="eolChar" value="\n"/>
+        </properties>
+    </rule>
+    <rule ref="Generic.Files.LineEndings.InvalidEOLChar">
+        <severity>3</severity>
+    </rule>
+    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace" />
+
+    <!-- Saft -->
+    <!--//
+    <rule ref="Saft.Commenting.FileComment.WrongFileCommentYear">
+        <severity>3</severity>
+    </rule>
+    //-->
+</ruleset>

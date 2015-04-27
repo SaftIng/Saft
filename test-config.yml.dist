@@ -23,6 +23,7 @@ virtuosoConfig: &virtuosoConfig
 # Cache related configurations.
 fileCacheConfig: &fileCacheConfig
     type: "file"
+    # cachePath: "/tmp/saft/"
 
 memcachedCacheConfig: &memcachedCacheConfig
     type: "memcached"

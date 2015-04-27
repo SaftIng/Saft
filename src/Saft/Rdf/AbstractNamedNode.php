@@ -26,6 +26,14 @@ abstract class AbstractNamedNode implements NamedNode
     }
 
     /**
+     * @see \Saft\Node
+     */
+    public function matches(Node $toMatch)
+    {
+        return $this->equals($toMatch);
+    }
+
+    /**
      * @return boolean
      */
     public function isConcrete()
@@ -71,27 +79,5 @@ abstract class AbstractNamedNode implements NamedNode
     public function toNQuads()
     {
         return '<' . $this->getUri() . '>';
-    }
-
-    /**
-     * A named node matches a another named node if there URIs are equals.
-     * {@inheritdoc}
-     */
-    public function matches(Node $pattern)
-    {
-        if (!$this->isConcrete()) {
-            throw new \LogicException('This have to be concrete');
-        }
-
-        if ($pattern->isConcrete()) {
-            if ($pattern instanceof NamedNode) {
-                return $this->getUri() === $pattern->getUri();
-            } else {
-                return false;
-            }
-        } else {
-            // All named nodes matches a variable/pattern
-            return true;
-        }
     }
 }

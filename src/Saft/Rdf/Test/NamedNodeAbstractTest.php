@@ -2,7 +2,7 @@
 namespace Saft\Rdf\Test;
 
 use Saft\Rdf\BlankNodeImpl;
-use Saft\Rdf\VariableImpl;
+use Saft\Rdf\AnyPatterImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\LiteralImpl;
 
@@ -13,6 +13,19 @@ abstract class NamedNodeAbstractTest extends \PHPUnit_Framework_TestCase
      * @todo The factory method approach could also be extended to use a factory object
      */
     abstract public function newInstance($uri);
+
+    public function testEquals()
+    {
+        $fixtureA = $this->newInstance('http://saft/test');
+        $fixtureB = $this->newInstance('http://saft/test');
+        $fixtureC = $this->newInstance('http://saft/testOther');
+
+        // TODO compare with literal, pattern, blanknode
+
+        $this->assertTrue($fixtureA->equals($fixtureA));
+        $this->assertTrue($fixtureA->equals($fixtureB));
+        $this->assertFalse($fixtureA->equals($fixtureC));
+    }
 
 
     /**
@@ -84,15 +97,5 @@ abstract class NamedNodeAbstractTest extends \PHPUnit_Framework_TestCase
     {
         $fixture = $this->newInstance('http://saft/test');
         $this->assertFalse($fixture->isVariable());
-    }
-
-    final public function testMatches()
-    {
-        $fixture = $this->newInstance('http://example.net');
-
-        $this->assertTrue($fixture->matches(new VariableImpl('?s')));
-        $this->assertTrue($fixture->matches(new NamedNodeImpl('http://example.net')));
-        $this->assertFalse($fixture->matches(new NamedNodeImpl('http://other.net')));
-        $this->assertFalse($fixture->matches(new LiteralImpl('example')));
     }
 }

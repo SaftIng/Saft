@@ -3,6 +3,7 @@
 namespace Saft\Cache\Test;
 
 use Saft\Cache\Cache;
+use Saft\Cache\CacheInterface;
 use Symfony\Component\Yaml\Parser;
 
 abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
@@ -54,6 +55,15 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * function checkRequirements
+     */
+
+    public function testCheckRequirements()
+    {
+        $this->assertTrue($this->fixture->getCacheObject()->checkRequirements());
+    }
+
+    /**
      * function clean
      */
 
@@ -98,6 +108,15 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $this->fixture->get('foo'));
     }
 
+    /**
+     * Tests getCacheObject
+     */
+
+    public function testGetCacheObject()
+    {
+        $this->assertTrue($this->fixture->getCacheObject() instanceof CacheInterface);
+    }
+    
     /**
      * tests getCompleteEntry
      */

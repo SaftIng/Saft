@@ -620,7 +620,11 @@ class Virtuoso extends AbstractSparqlStore
                              * Literal (language'd)
                              */
                             case 'literal':
-                                $newEntry[$variable] = new LiteralImpl($part['value'], $part['xml:lang']);
+                                $newEntry[$variable] = new LiteralImpl(
+                                    $part['value'],
+                                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
+                                    $part['xml:lang']
+                                );
 
                                 break;
                             /**
@@ -685,28 +689,6 @@ class Virtuoso extends AbstractSparqlStore
                 return new EmptyResult();
             }
         }
-    }
-
-    /**
-     * Returns the Statement-Data in SPARQL-format. It overrides the sparqlFormat method of AbstractSparqlStore,
-     * because Virtuoso does not support Graph in condition, so $graphUri will be ignored.
-     *
-     * @param StatementIterator $statements   List of statements to format as SPARQL string.
-     * @param Node              $graph        Will be ignored, because Virtuoso does not support Graph in
-     *                                        condition.
-     * @return string, part of query
-     */
-    protected function sparqlFormat(StatementIterator $statements, Node $graph = null)
-    {
-        $query = '';
-        foreach ($statements as $statement) {
-            if ($statement instanceof Statement) {
-                $query .= $sparqlString = $statement->toSparqlFormat() .' ';
-            } else {
-                throw new \Exception('sparqlFormat only accepts Statement instances.');
-            }
-        }
-        return $query;
     }
 
     /**

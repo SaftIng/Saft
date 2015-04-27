@@ -118,25 +118,8 @@ class Http extends AbstractSparqlStore
              * so we have to change it to:
              *
              *          INSERT INTO GRAPH <...> {<...> <...> <...>.}
-             */
-            foreach ($statements as $st) {
-                if ($st instanceof Statement && true === $st->isConcrete()) {
-                    // everything is fine
-
-                // non-Statement instances not allowed
-                } elseif (false === $st instanceof Statement) {
-                    throw new \Exception('addStatements does not accept non-Statement instances.');
-
-                // non-concrete Statement instances not allowed
-                } elseif ($st instanceof Statement && false === $st->isConcrete()) {
-                    throw new \Exception('At least one Statement is not concrete');
-
-                } else {
-                    throw new \Exception('Unknown error.');
-                }
-            }
-
-            /**
+             *
+             * 
              * Create batches out of given statements to improve statement throughput.
              */
             $counter = 0;
@@ -144,6 +127,14 @@ class Http extends AbstractSparqlStore
             $batchStatements = array();
 
             foreach ($statements as $statement) {
+                // we dont have to check, if $st is a valid Statement, because StatementIterator implementations
+                // dont allow non-Statement entries.
+                
+                // non-concrete Statement instances not allowed
+                if (false === $statement->isConcrete()) {
+                    throw new \Exception('At least one Statement is not concrete');
+                }
+                
                 // given $graphUri forces usage of it and not the graph from the statement instance
                 if (null !== $graphUri) {
                     $graphUriToUse = $graphUri;
@@ -269,8 +260,6 @@ class Http extends AbstractSparqlStore
              *      DELETE { <http://s/> <http://p/> ?o. }
              *      WHERE { <http://s/> <http://p/> ?o. }
              */
-            $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-
             if (null === $graphUri) {
                 $graphUri = $statement->getGraph();
             }
@@ -280,6 +269,7 @@ class Http extends AbstractSparqlStore
                 throw new \Exception('Neither $graphUri nor $statement graph were set.');
             }
 
+            $statementIterator = new ArrayStatementIteratorImpl(array($statement));
             $condition = $this->sparqlFormat($statementIterator);
             $query = 'WITH <'. $graphUri .'> DELETE {'. $condition .'} WHERE {'. $condition .'}';
             $this->query($query, $options);
@@ -351,16 +341,6 @@ class Http extends AbstractSparqlStore
         }
 
         return $graphs;
-    }
-
-    /**
-     * Returns the URI of which all the queries where send to.
-     *
-     * @return string URI on which all queries where send to.
-     */
-    public function getDsn()
-    {
-        return $this->client->getUri();
     }
 
     /**
@@ -453,7 +433,7 @@ class Http extends AbstractSparqlStore
 
     /**
      * @return array Empty
-     * @todo implement getStoreDescription
+     * TODO implement getStoreDescription
      */
     public function getStoreDescription()
     {
@@ -505,13 +485,11 @@ class Http extends AbstractSparqlStore
         if ('virtuoso' === $this->storeName) {
             // set graphUri, use that from the statement if $graphUri is null
             if (null === $graphUri) {
-                $graph = $Statement->getGraph();
-                $graphUri = $graph->getUri();
+                $graphUri = $Statement->getGraph()->getUri();
             }
 
-            if (false === NodeUtils::simpleCheckURI($graphUri)) {
-                throw new \Exception('Neither $Statement has a valid graph nor $graphUri is valid URI.');
-            }
+            // no check for graphUri neccessary, because graph URI was either given as a Node, which checks that
+            // too or inside of the Statement, where the graph is also a Node.
 
             $statementIterator = new ArrayStatementIteratorImpl(array($Statement));
             $result = $this->query(
@@ -553,17 +531,16 @@ class Http extends AbstractSparqlStore
     public function openConnection()
     {
         $this->client = new Client();
+        
+        $adapterOptions = array_merge(array(
+            'authUrl' => '',
+            'password' => '',
+            'queryUrl' => '',
+            'username' => ''
+        ), $this->adapterOptions);
 
-        $this->client->setUrl($this->adapterOptions['authUrl']);
-        $this->client->sendDigestAuthentication(
-            $this->adapterOptions['username'],
-            $this->adapterOptions['password']
-        );
-
-        // validate CURL status
-        if (curl_errno($this->client->getClient()->curl)) {
-            throw new \Exception(curl_error($this->client->getClient()->error), 500);
-        }
+        $this->client->setUrl($adapterOptions['authUrl']);
+        $this->client->sendDigestAuthentication($adapterOptions['username'], $adapterOptions['password']);
 
         $curlInfo = curl_getinfo($this->client->getClient()->curl);
 
@@ -572,12 +549,12 @@ class Http extends AbstractSparqlStore
             // save name of the store which provides SPARQL endpoint
             $this->storeName = $this->determineStoreOnServer($this->client->getClient()->response_headers);
 
-            $this->client->setUrl($this->adapterOptions['queryUrl']);
+            $this->client->setUrl($adapterOptions['queryUrl']);
             return $this->client;
 
         // validate HTTP status code (user/password credential issues)
         } else {
-            throw new \Exception('Response with Status Code [' . $status_code . '].', 500);
+            throw new \Exception('Response with Status Code [' . $curlInfo['http_code'] . '].', 500);
         }
     }
 
@@ -635,7 +612,11 @@ class Http extends AbstractSparqlStore
                          * Literal (language'd)
                          */
                         case 'literal':
-                            $newEntry[$variable] = new LiteralImpl($part['value'], $part['xml:lang']);
+                            $newEntry[$variable] = new LiteralImpl(
+                                $part['value'],
+                                'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
+                                $part['xml:lang']
+                            );
 
                             break;
                         /**
@@ -707,32 +688,5 @@ class Http extends AbstractSparqlStore
     public function setChainSuccessor(Store $successor)
     {
         $this->successor = $successor;
-    }
-
-    /**
-     * Returns the Statement-Data in SPARQL-format. It overrides the sparqlFormat method of AbstractSparqlStore,
-     * because Virtuoso does not support Graph in condition, so $graphUri will be ignored.
-     *
-     * @param StatementIterator $statements   List of statements to format as SPARQL string.
-     * @param Node              $graph        Will be ignored, because Virtuoso does not support Graph in
-     *                                        condition.
-     * @return string, part of query
-     */
-    protected function sparqlFormat(StatementIterator $statements, Node $graph = null)
-    {
-        if ('virtuoso' === $this->storeName) {
-            $query = '';
-            foreach ($statements as $statement) {
-                if ($statement instanceof Statement) {
-                    $query .= $sparqlString = $statement->toSparqlFormat() .' ';
-                } else {
-                    throw new \Exception('sparqlFormat only accepts Statement instances.');
-                }
-            }
-            return $query;
-
-        } else {
-            return parent::sparqlFormat($statements, $graph);
-        }
     }
 }

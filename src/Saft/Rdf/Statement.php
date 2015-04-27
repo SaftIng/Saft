@@ -59,11 +59,6 @@ interface Statement
     public function toNQuads();
 
     /**
-     * @return string
-     */
-    public function toSparqlFormat();
-
-    /**
      * Get a string representation of the current statement. It should contain a human readable description of the parts
      * of the statement.
      *
@@ -72,10 +67,15 @@ interface Statement
     public function __toString();
 
     /**
-     * Returns true, if this matches the given pattern. This have to be concrete.
+     * Returns true, if the given argument matches the is statement-pattern.
      *
-     * @param  Statement       $pattern
-     * @throws \LogicException If isConcrete() returns false.
+     * @param Statement $toCompare the statement to where this pattern shoul be applied to
      */
-    public function matches(Statement $pattern);
+    public function matches(Statement $toCompare);
+
+    /**
+     *
+     * @param Statement $toCompare the statement to compare with
+     */
+    public function equals(Statement $toCompare);
 }

@@ -1,11 +1,11 @@
 <?php
 
-namespace Saft\Backend\PhpArrayCache\Cache;
+namespace Saft\Cache\Test;
 
 use Saft\Cache\Cache;
 use Saft\Cache\CacheInterface;
 
-class PHPArray implements CacheInterface
+class PHPArrayCache implements CacheInterface
 {
     /**
      * Checks that all requirements for this adapter are fullfilled.

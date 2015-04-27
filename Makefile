@@ -4,6 +4,8 @@ PHPCBF = ./vendor/bin/phpcbf
 SAMI = ./vendor/bin/sami.php
 XSLTPROC = xsltproc
 
+PHPCS-RULES = resources/codesniffer-ruleset.xml
+
 default:
 	@echo ""
 	@echo "Saft - CLI"
@@ -22,16 +24,21 @@ test:
 	$(XSLTPROC) -o gen/test/report.html resources/phpunit-results.xsl gen/test/log.junit.xml
 
 codesniffer:
-	$(PHPCS) --standard=PSR1,PSR2 --extensions=php -p src/*
+	$(PHPCS) --standard=$(PHPCS-RULES) --extensions=php -p src/*
 
 codebeautifier:
-	$(PHPCBF) --standard=PSR1,PSR2 --extensions=php -p src/*
+	$(PHPCBF) --standard=$(PHPCS-RULES) --extensions=php -p src/*
 
 apidoc:
 	$(SAMI) update -n -v --force sami-config.php
 
 clean:
 	rm -r ./gen ./tmp
+
+commit:
+	make codebeautifier
+	make codesniffer
+	git-cola
 
 mrpropper: clean
 	rm -r ./vendor

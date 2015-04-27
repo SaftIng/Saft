@@ -20,6 +20,14 @@ abstract class AbstractBlankNode implements BlankNode
     }
 
     /**
+     * @see \Saft\Node
+     */
+    public function matches(Node $toMatch)
+    {
+        return $this->equals($toMatch);
+    }
+
+    /**
      * @return boolean
      */
     public function isConcrete()
@@ -65,28 +73,6 @@ abstract class AbstractBlankNode implements BlankNode
     public function toNQuads()
     {
         return '_:' . $this->getBlankId();
-    }
-
-    /**
-     * A blank node matches another blank node, if there blank ids are equal.
-     * {@inheritdoc}
-     */
-    public function matches(Node $pattern)
-    {
-        if (!$this->isConcrete()) {
-            throw new \LogicException('This have to be concrete');
-        }
-
-        if ($pattern->isConcrete()) {
-            if ($pattern instanceof BlankNode) {
-                return $this->getBlankId() === $pattern->getBlankId();
-            } else {
-                return false;
-            }
-        } else {
-            // All BlankNodes matches a variable/pattern
-            return true;
-        }
     }
 
     public function __toString()

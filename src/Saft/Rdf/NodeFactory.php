@@ -29,10 +29,10 @@ class NodeFactory
             return new NamedNodeImpl($value);
         
         /**
-         * Variable
+         * Any Pattern
          */
         } elseif ('var' == $type) {
-            return new VariableImpl('?' . str_replace('?', '', $value));
+            return new AnyPatternImpl('?' . str_replace('?', '', $value));
         
         /**
          * Typed Literal or Literal

@@ -8,9 +8,10 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
-use Saft\Rdf\VariableImpl;
+use Saft\Rdf\AnyPatternImpl;
 use Saft\Store\StoreChain;
 use Saft\Store\Result\StatementResult;
+use Saft\Sparql\SparqlUtils;
 use Symfony\Component\Yaml\Parser;
 
 class StoreChainIntegrationTest extends TestCase
@@ -126,7 +127,7 @@ class StoreChainIntegrationTest extends TestCase
         );
 
         $result = $this->fixture->getMatchingStatements(
-            new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
+            new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl()),
             $this->testGraph
         );
 
@@ -176,7 +177,7 @@ class StoreChainIntegrationTest extends TestCase
         $this->fixture->setupChain(array($this->config['queryCacheConfig']));
 
         $this->fixture->deleteMatchingStatements(
-            new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl())
+            new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl())
         );
     }
 
@@ -223,14 +224,14 @@ class StoreChainIntegrationTest extends TestCase
         $this->assertEquals(
             2,
             $this->fixture->getMatchingStatements(
-                new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
+                new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl()),
                 $this->testGraph
             )->getEntryCount()
         );
 
         // remove all statements
         $this->fixture->deleteMatchingStatements(
-            new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
+            new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl()),
             $this->testGraph
         );
 
@@ -241,7 +242,7 @@ class StoreChainIntegrationTest extends TestCase
         $this->assertEquals(
             $statementResult,
             $this->fixture->getMatchingStatements(
-                new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl()),
+                new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl()),
                 $this->testGraph
             )
         );
@@ -252,7 +253,7 @@ class StoreChainIntegrationTest extends TestCase
         $this->setExpectedException('\Exception');
 
         $this->fixture->deleteMatchingStatements(
-            new StatementImpl(new VariableImpl(), new VariableImpl(), new VariableImpl())
+            new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl())
         );
     }
 
@@ -318,7 +319,7 @@ class StoreChainIntegrationTest extends TestCase
         $statement = new StatementImpl(
             new NamedNodeImpl('http://s/'),
             new NamedNodeImpl('http://p/'),
-            new VariableImpl()
+            new AnyPatternImpl()
         );
         $this->fixture->getMatchingStatements($statement, $this->testGraph);
     }
@@ -366,14 +367,13 @@ class StoreChainIntegrationTest extends TestCase
         $statement = new StatementImpl(
             new NamedNodeImpl('http://s/'),
             new NamedNodeImpl('http://p/'),
-            new VariableImpl()
+            new AnyPatternImpl()
         );
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-        // TODO remove usage of StatementIterator::toSparqlFormat()
         $this->assertTrue(
             null === $chainEntries[0]->getCache()->get(
                 'SELECT * FROM <'. $this->testGraph->getUri() .'> '.
-                'WHERE {'. $statementIterator->toSparqlFormat($this->testGraph->getUri()) .'}'
+                'WHERE {'. SparqlUtils::statementIteratorToSparqlFormat($statementIterator, $this->testGraph) .'}'
             )
         );
 
@@ -448,11 +448,11 @@ class StoreChainIntegrationTest extends TestCase
         $statement = new StatementImpl(
             new NamedNodeImpl('http://s/'),
             new NamedNodeImpl('http://p/'),
-            new VariableImpl()
+            new AnyPatternImpl()
         );
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $testQuery = 'SELECT * FROM <'. $this->testGraph->getUri() .'> '.
-                     'WHERE {'. $statementIterator->toSparqlFormat($this->testGraph->getUri()) .'}';
+                     'WHERE {'. SparqlUtils::statementIteratorToSparqlFormat($statementIterator, $this->testGraph) .'}';
         $this->assertTrue(null === $chainEntries[0]->getCache()->get($testQuery));
 
         $this->assertEquals(0, count($chainEntries[0]->getLatestQueryCacheContainer()));
@@ -501,6 +501,8 @@ class StoreChainIntegrationTest extends TestCase
                 new LiteralImpl('test literal')
             )
         );
+        
+        $sep = $this->separator;
 
         // check result
         $this->assertEquals(
@@ -511,8 +513,8 @@ class StoreChainIntegrationTest extends TestCase
                                'WHERE { ?s ?p ?o FILTER (str(?s) = "http://s/") FILTER (str(?p) = "http://p/") }',
                     'result' => $statementResult,
                     'triple_pattern' => array(
-                        $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
-                            => $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
+                        $this->testGraph->getUri() . $sep .'*'. $sep .'*'. $sep .'*' =>
+                            $this->testGraph->getUri() . $sep .'*'. $sep .'*'. $sep .'*'
                     )
                 )
             ),
@@ -652,7 +654,7 @@ class StoreChainIntegrationTest extends TestCase
                 new StatementImpl(
                     new NamedNodeImpl('http://s/'),
                     new NamedNodeImpl('http://p/'),
-                    new VariableImpl()
+                    new AnyPatternImpl()
                 ),
                 $this->testGraph
             )

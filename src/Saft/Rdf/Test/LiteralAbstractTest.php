@@ -1,7 +1,6 @@
 <?php
 namespace Saft\Rdf\Test;
 
-use Saft\Rdf\VariableImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\BlankNodeImpl;
 
@@ -245,14 +244,15 @@ abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
 
     public function testMatches()
     {
-        $fixture = $this->newInstance('foo', null, 'en-US');
+        $fixtureA = $this->newInstance(true);
+        $fixtureB = $this->newInstance(true);
 
-        $this->assertTrue($fixture->matches(new VariableImpl('?o')));
-        $this->assertTrue($fixture->matches(new LiteralImpl('foo', null, 'en-US')));
-        $this->assertFalse($fixture->matches(new LiteralImpl('foo', null, 'de')));
-        $this->assertFalse($fixture->matches(new LiteralImpl('foo')));
-        $this->assertFalse($fixture->matches(new LiteralImpl('bar', null, 'en-US')));
-        $this->assertFalse($fixture->matches(new BlankNodeImpl('foo')));
+        $this->assertTrue($fixtureA->matches($fixtureB));
+
+        $fixtureE = $this->newInstance(1);
+        $fixtureF = $this->newInstance(1, 'http://www.w3.org/2001/XMLSchema#integer');
+
+        $this->assertFalse($fixtureE->matches($fixtureF));
     }
 
     public function testToString()

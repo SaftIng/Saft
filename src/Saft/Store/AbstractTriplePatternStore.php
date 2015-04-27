@@ -4,6 +4,7 @@ namespace Saft\Store;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\AbstractNamedNode;
+use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactory;
@@ -11,7 +12,6 @@ use Saft\Rdf\Node;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
-use Saft\Rdf\VariableImpl;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\Query;
 
