@@ -104,7 +104,7 @@ class AbstractSparqlStoreTest extends TestCase
         $this->mock->deleteMatchingStatements($this->getTestStatement());
     }
 
-    public function testhasMatchingStatement()
+    public function testHasMatchingStatement()
     {
         $query = 'ASK { Graph <http://saft/test/g1> { ';
         $query.= '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1> . } }';

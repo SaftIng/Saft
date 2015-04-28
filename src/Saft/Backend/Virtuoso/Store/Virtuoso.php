@@ -432,32 +432,35 @@ class Virtuoso extends AbstractSparqlStore
      */
     public function hasMatchingStatement(Statement $Statement, Node $graph = null, array $options = array())
     {
-        // TODO migrate code to new interface
-        $graphUri = null;
-        if ($graph !== null) {
-            $graphUri = $graph->getUri();
-        }
-
         // if successor is set, ask it too.
         if ($this->successor instanceof Store) {
             $this->successor->hasMatchingStatement($Statement, $graph, $options);
         }
-
-        // set graphUri, use that from the statement if $graphUri is null
-        if (null === $graphUri) {
+        
+        $graphUri = null;
+        if (null !== $graph) {
+            $graphUri = $graph->getUri();
+        } elseif (null !== $Statement->getGraph()) {
             $graph = $Statement->getGraph();
             $graphUri = $graph->getUri();
         }
 
-        if (false === NodeUtils::simpleCheckURI($graphUri)) {
+        if (null !== $graphUri && false === NodeUtils::simpleCheckURI($graph->getUri())) {
             throw new \Exception('Neither $Statement has a valid graph nor $graphUri is valid URI.');
         }
 
         $statementIterator = new ArrayStatementIteratorImpl(array($Statement));
-        $result = $this->query(
-            'ASK FROM <'. $graphUri .'> { '. $this->sparqlFormat($statementIterator) .'}',
-            $options
-        );
+        
+        /**
+         * Build query
+         */
+        $query = 'ASK ';
+        if (null !== $graphUri) {
+            $query .= 'FROM <'. $graphUri .'> ';
+        }
+        $query .= '{ '. $this->sparqlFormat($statementIterator) .'}';
+        
+        $result = $this->query($query, $options);
 
         if (true === is_object($result)) {
             return $result->getResultObject();
@@ -542,6 +545,14 @@ class Virtuoso extends AbstractSparqlStore
     {
         $queryObject = AbstractQuery::initByQueryString($query);
         $queryParts = $queryObject->getQueryParts();
+        
+        // if a non-graph query was given, we assume triples or quads. If neither quads nor triples were found,
+        // throw an exception.
+        if (false === $queryObject->isGraphQuery()
+            && false === isset($queryParts['triple_pattern'])
+            && false === isset($queryParts['quad_pattern'])) {
+            throw new \Exception('Non-graph queries must have triples or quads.');
+        }
 
         /**
          * SPARQL query (usually to fetch data)

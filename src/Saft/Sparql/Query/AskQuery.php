@@ -28,6 +28,7 @@ class AskQuery extends AbstractQuery
         $this->queryParts['graphs'] = $this->extractGraphs($prefixlessQuery);
         $this->queryParts['namespaces'] = $this->extractNamespacesFromQuery($this->queryParts['where']);
         $this->queryParts['prefixes'] = $this->extractPrefixesFromQuery($this->getQuery());
+        $this->queryParts['quad_pattern'] = $this->extractQuads($this->queryParts['where']);
         $this->queryParts['triple_pattern'] = $this->extractTriplePattern($this->queryParts['where']);
         $this->queryParts['variables'] = $this->extractVariablesFromQuery($this->getQuery());
         

@@ -1,23 +1,19 @@
 <?php
-
 namespace Saft\Store\Test;
 
 use Saft\TestCase;
+use Saft\Test\MockStore;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\Statement;
-use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Sparql\SparqlUtils;
 
-class AbstractTriplePatternStoreUnitTest extends TestCase
+class AbstractTriplePatternStoreTest extends TestCase
 {
-    protected function setUp()
+    public function setUp()
     {
-        parent::setUp();
-
         $this->fixture = new BasicTriplePatternStore();
     }
 
@@ -59,9 +55,6 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
         return new StatementImpl($subject2, $predicate2, $object2);
     }
 
-    /**
-     * Tests addStatements
-     */
 
     public function testAddStatementsNoTriplesAndQuads()
     {
@@ -75,7 +68,6 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
     public function testAddStatementsTriples()
     {
         $statement = $this->getTestStatementWithLiteral();
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $query = 'INSERT DATA {
             Graph <http://graph/> {
                 '. $statement->getSubject()->toNQuads() .'
@@ -84,7 +76,14 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
             }
         }';
 
+        $resultStatements = $this->fixture->getMatchingStatements($statement);
+        $this->assertEmpty($resultStatements->next());
+
         $this->assertTrue($this->fixture->query($query));
+
+        $resultStatements = $this->fixture->getMatchingStatements($statement);
+        $this->assertEquals($resultStatements->next(), $statement);
+        $this->assertEmpty($resultStatements->next());
     }
 
     /**

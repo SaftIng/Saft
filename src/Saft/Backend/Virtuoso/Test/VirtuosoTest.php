@@ -7,8 +7,9 @@ use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\StatementImpl;
 use Symfony\Component\Yaml\Parser;
 use Saft\Backend\Virtuoso\Store\Virtuoso;
+use Saft\Store\Test\StoreAbstractTest;
 
-class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
+class VirtuosoTest extends StoreAbstractTest
 {
     /**
      * @var Saft\Cache
@@ -74,22 +75,6 @@ class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * http://stackoverflow.com/a/12496979
-     * Fixes assertEquals in case of check array equality.
-     *
-     * @param array  $expected
-     * @param array  $actual
-     * @param string $message  optional
-     */
-    protected function assertEqualsArrays($expected, $actual, $message = "")
-    {
-        sort($expected);
-        sort($actual);
-
-        $this->assertEquals($expected, $actual, $message);
-    }
-
-    /**
      * Tests addGraph
      */
 
@@ -125,14 +110,6 @@ class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
             $this->fixture->isGraphAvailable($this->testGraph)
         );
-    }
-
-    /**
-     * Tests existence of Virtuoso class
-     */
-    public function testExistence()
-    {
-        $this->assertTrue(class_exists('\Saft\Backend\Virtuoso\Store\Virtuoso'));
     }
 
     /**
@@ -186,14 +163,5 @@ class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
 
         // graph has to contain 2 triples
         $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraph));
-    }
-
-    /**
-     * Tests getServiceDescription
-     */
-
-    public function testGetStoreDescription()
-    {
-        $this->assertEquals(array(), $this->fixture->getStoreDescription());
     }
 }
