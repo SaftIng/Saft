@@ -75,22 +75,6 @@ class VirtuosoTest extends StoreAbstractTest
     }
 
     /**
-     * http://stackoverflow.com/a/12496979
-     * Fixes assertEquals in case of check array equality.
-     *
-     * @param array  $expected
-     * @param array  $actual
-     * @param string $message  optional
-     */
-    protected function assertEqualsArrays($expected, $actual, $message = "")
-    {
-        sort($expected);
-        sort($actual);
-
-        $this->assertEquals($expected, $actual, $message);
-    }
-
-    /**
      * Tests addGraph
      */
 
@@ -126,14 +110,6 @@ class VirtuosoTest extends StoreAbstractTest
         $this->assertFalse(
             $this->fixture->isGraphAvailable($this->testGraph)
         );
-    }
-
-    /**
-     * Tests existence of Virtuoso class
-     */
-    public function testExistence()
-    {
-        $this->assertTrue(class_exists('\Saft\Backend\Virtuoso\Store\Virtuoso'));
     }
 
     /**
@@ -187,14 +163,5 @@ class VirtuosoTest extends StoreAbstractTest
 
         // graph has to contain 2 triples
         $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraph));
-    }
-
-    /**
-     * Tests getServiceDescription
-     */
-
-    public function testGetStoreDescription()
-    {
-        $this->assertEquals(array(), $this->fixture->getStoreDescription());
     }
 }

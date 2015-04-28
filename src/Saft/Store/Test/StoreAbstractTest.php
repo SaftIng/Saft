@@ -681,4 +681,12 @@ abstract class StoreAbstractTest extends TestCase
             $this->fixture->query($query)
         );
     }
+
+    /**
+     * Test if an array for the store description is returned
+     */
+    public function testGetStoreDescription()
+    {
+        $this->assertTrue(is_array($this->fixture->getStoreDescription()));
+    }
 }
