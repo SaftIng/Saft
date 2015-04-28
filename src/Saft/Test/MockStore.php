@@ -1,19 +1,18 @@
 <?php
 
-namespace Saft\QueryCache\Test;
+namespace Saft\Test;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Node;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
 use Saft\Store\AbstractTriplePatternStore;
-use Saft\Store\Store;
 
 /**
  * Basic class. Its purpose is to serve in test cases as a successor for a QueryCache instance. This implementation
  * assumes that all triple and query related methods of AbstractTriplePatternStore only return their parameter.
  */
-class BasicStore extends AbstractTriplePatternStore
+class MockStore extends AbstractTriplePatternStore
 {
     /**
      * Has no function and returns an empty array.
@@ -81,7 +80,7 @@ class BasicStore extends AbstractTriplePatternStore
      */
     public function getMatchingStatements(Statement $Statement, Node $graph = null, array $options = array())
     {
-        new ArrayStatementIteratorImpl([]);
+        return new ArrayStatementIteratorImpl([]);
     }
 
     /**

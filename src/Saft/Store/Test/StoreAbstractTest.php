@@ -11,8 +11,9 @@ use Saft\Store\Result\StatementResult;
 use Saft\Store\Result\SetResult;
 use Saft\Store\Result\ValueResult;
 use Symfony\Component\Yaml\Parser;
+use Saft\Sparql\SparqlUtils;
 
-abstract class SparqlStoreAbstractTest extends TestCase
+abstract class StoreAbstractTest extends TestCase
 {
     /**
      * @var Cache
@@ -59,7 +60,7 @@ abstract class SparqlStoreAbstractTest extends TestCase
     /**
      * Loads config.yml and return its content as array.
      */
-    public function getConfigContent()
+    protected function getConfigContent()
     {
         // set path to test dir
         $saftRootDir = dirname(__FILE__) . '/../../../../';
@@ -75,8 +76,47 @@ abstract class SparqlStoreAbstractTest extends TestCase
         return $yaml->parse(file_get_contents($configFilepath));
     }
 
-    /**
-     * function addStatements
+    protected function getTestQuad()
+    {
+        $subject1 = new NamedNodeImpl('http://saft/testquad/s1');
+        $predicate1 = new NamedNodeImpl('http://saft/testquad/p1');
+        $object1 = new NamedNodeImpl('http://saft/testquad/o1');
+        $graph1 = new NamedNodeImpl('http://saft/testquad/g1');
+        $quad = new StatementImpl($subject1, $predicate1, $object1, $graph1);
+
+        return new StatementImpl($subject1, $predicate1, $object1, $graph1);
+    }
+
+    protected function getTestTriple()
+    {
+        $subject2 = new NamedNodeImpl('http://saft/testtriple/s2');
+        $predicate2 = new NamedNodeImpl('http://saft/testtriple/p2');
+        $object2 = new NamedNodeImpl('http://saft/testtriple/o2');
+        $triple = new StatementImpl($subject2, $predicate2, $object2);
+
+        return new StatementImpl($subject2, $predicate2, $object2);
+    }
+
+    protected function getTestPatternStatement()
+    {
+        $subject1 = new AnyPatternImpl();
+        $predicate1 = new AnyPatternImpl();
+        $object1 = new AnyPatternImpl();
+
+        return new StatementImpl($subject1, $predicate1, $object1);
+    }
+
+    protected function getTestStatementWithLiteral()
+    {
+        $subject2 = new NamedNodeImpl('http://saft/test/s1');
+        $predicate2 = new NamedNodeImpl('http://saft/test/p2');
+        $object2 = new LiteralImpl('John');
+        return new StatementImpl($subject2, $predicate2, $object2);
+    }
+
+
+    /*
+     * Actual test methods
      */
 
     public function testAddStatements()
@@ -522,6 +562,123 @@ abstract class SparqlStoreAbstractTest extends TestCase
         $this->assertEquals(
             $setResult,
             $this->fixture->query('SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}')
+        );
+    }
+
+    /**
+     * Tests addStatements
+     */
+
+    public function testAddStatementsNoTriplesAndQuads()
+    {
+        // it throws an error because query contains NO triples or quads.
+        $this->setExpectedException('\Exception');
+
+        $query = 'INSERT DATA {  }';
+        $this->fixture->query($query);
+    }
+
+    public function testAddStatementsTriples()
+    {
+        $statement = $this->getTestStatementWithLiteral();
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $query = 'INSERT DATA {
+            Graph <http://graph/> {
+                '. $statement->getSubject()->toNQuads() .'
+                '. $statement->getPredicate()->toNQuads() .'
+                '. $statement->getObject()->toNQuads() .'
+            }
+        }';
+
+        $this->assertEquals(
+            array(
+                $statementIterator,
+                null,
+                array()
+            ),
+            $this->fixture->query($query)
+        );
+    }
+
+    /**
+     * Tests deleteMultipleStatements
+     */
+
+    public function testDeleteMultipleStatements()
+    {
+        $st = $this->getTestStatementWithLiteral();
+        $triple = $this->getTestTriple();
+
+        $graphPattern = SparqlUtils::statementsToSparqlFormat([$st, $triple]);
+        $query = 'DELETE DATA { ' . $graphPattern . '}';
+        $this->setExpectedException('\Exception');
+        $this->fixture->query($query);
+    }
+
+    public function testDeleteMultipleStatementsQuadRecognition()
+    {
+        $quad = $this->getTestQuad();
+        $graphPattern = SparqlUtils::statementsToSparqlFormat([$quad]);
+        $query = 'DELETE DATA { ' . $graphPattern . '}';
+
+        $this->assertEquals(
+            array(
+                $quad,
+                null,   // $graphUri
+                array() // $options
+            ),
+            $this->fixture->query($query)
+        );
+    }
+
+    public function testDeleteMultipleStatementsVariablePatterns()
+    {
+        $this->markTestSkipped("TODO implement test store which expects certain things on query");
+        $statement = $this->getTestPatternStatement();
+        $query = 'DELETE DATA { '. SparqlUtils::statementsToSparqlFormat([$statement]) .'}';
+
+        $this->assertEquals(
+            array(
+                $statement,
+                null,   // $graphUri
+                array() // $options
+            ),
+            $this->fixture->query($query)
+        );
+    }
+
+    public function testDeleteMultipleStatementsStatementsWithLiteral()
+    {
+        $statement = $this->getTestStatementWithLiteral();
+
+        $query = 'DELETE DATA { '. SparqlUtils::statementsToSparqlFormat([$statement]) .'}';
+
+        $this->assertEquals(
+            array(
+                $statement,
+                null,   // $graphUri
+                array() // $options
+            ),
+            $this->fixture->query($query)
+        );
+    }
+
+    /**
+     * Tests hasMatchingStatement > triple recognition
+     */
+
+    public function testHasMatchingStatementTripleRecognition()
+    {
+        $triple = $this->getTestTriple();
+        $query = 'ASK { '. SparqlUtils::statementsToSparqlFormat([$triple]) .'}';
+
+        $this->assertEquals(
+            array(
+                $triple,
+                null,   // $graphUri
+                array() // $options
+            ),
+            $this->fixture->query($query)
         );
     }
 }

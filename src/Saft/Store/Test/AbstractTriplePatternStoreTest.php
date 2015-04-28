@@ -1,24 +1,21 @@
 <?php
-
 namespace Saft\Store\Test;
 
 use Saft\TestCase;
+use Saft\Test\MockStore;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\Statement;
-use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Sparql\SparqlUtils;
 
-class AbstractTriplePatternStoreUnitTest extends TestCase
+class AbstractTriplePatternStoreTest extends TestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
 
-        $this->fixture = $this->getMockForAbstractClass('\Saft\Store\AbstractTriplePatternStore');
+    public function setUp()
+    {
+        $this->fixture = new MockStore();
     }
 
     protected function getTestQuad()
@@ -59,9 +56,6 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
         return new StatementImpl($subject2, $predicate2, $object2);
     }
 
-    /**
-     * Tests addStatements
-     */
 
     public function testAddStatementsNoTriplesAndQuads()
     {
@@ -75,7 +69,6 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
     public function testAddStatementsTriples()
     {
         $statement = $this->getTestStatementWithLiteral();
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $query = 'INSERT DATA {
             Graph <http://graph/> {
                 '. $statement->getSubject()->toNQuads() .'
@@ -84,14 +77,14 @@ class AbstractTriplePatternStoreUnitTest extends TestCase
             }
         }';
 
-        $this->assertEquals(
-            array(
-                $statementIterator,
-                null,
-                array()
-            ),
-            $this->fixture->query($query)
-        );
+        $resultStatements = $this->fixture->getMatchingStatements($statement);
+        $this->assertEmpty($resultStatements->next());
+
+        $this->fixture->query($query);
+
+        $resultStatements = $this->fixture->getMatchingStatements($statement);
+        $this->assertEquals($resultStatements->next(), $statement);
+        $this->assertEmpty($resultStatements->next());
     }
 
     /**

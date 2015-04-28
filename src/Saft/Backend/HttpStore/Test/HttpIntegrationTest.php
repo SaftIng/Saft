@@ -2,10 +2,10 @@
 
 namespace Saft\Backend\HttpStore\Test;
 
-use Saft\Store\Test\SparqlStoreAbstractTest;
+use Saft\Store\Test\StoreAbstractTest;
 use Saft\Backend\HttpStore\Store\Http;
 
-class HttpAbstractTest extends SparqlStoreAbstractTest
+class HttpAbstractTest extends StoreAbstractTest
 {
     public function setUp()
     {

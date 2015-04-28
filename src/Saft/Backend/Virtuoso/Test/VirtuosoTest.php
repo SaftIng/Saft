@@ -7,8 +7,9 @@ use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\StatementImpl;
 use Symfony\Component\Yaml\Parser;
 use Saft\Backend\Virtuoso\Store\Virtuoso;
+use Saft\Store\Test\StoreAbstractTest;
 
-class VirtuosoUnitTest extends \PHPUnit_Framework_TestCase
+class VirtuosoTest extends StoreAbstractTest
 {
     /**
      * @var Saft\Cache
