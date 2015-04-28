@@ -1,9 +1,10 @@
 <?php
+
 namespace Saft\Data;
 
 use Saft\Rdf\StatementIterator;
 
-class NQuadsSerializerImpl implements SerializerInterface
+class NQuadsSerializerImpl implements Serializer
 {
 
     /**

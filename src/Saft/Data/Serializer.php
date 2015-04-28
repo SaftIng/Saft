@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Data;
 
 use Saft\Rdf\StatementIterator;
