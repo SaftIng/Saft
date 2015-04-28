@@ -116,7 +116,7 @@ class AbstractSparqlStoreTest extends TestCase
         $this->assertTrue(is_bool($result));
     }
 
-    public function testMultipleVariatonOfObjects()
+    public function testAddStatementsMultipleVariatonOfObjects()
     {
         /**
          * object is a number
@@ -129,7 +129,7 @@ class AbstractSparqlStoreTest extends TestCase
         /**
          * object is a literal
          */
-        $object2 = new LiteralImpl('John');
+        $object2 = new LiteralImpl('John'); // will be handled as string, because no datatype given.
         $triple2 = new StatementImpl($subject1, $predicate1, $object2);
 
         // Setup array statement iterator
@@ -200,17 +200,6 @@ class AbstractSparqlStoreTest extends TestCase
         $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
 
         // use the given graphUri
-        $query = $this->mock->addStatements($statements, new NamedNodeImpl('http://saft/test/foograph'));
-
-        $this->markTestIncomplete("Im not sure if the following is valid");
-
-        $query = 'INSERT DATA { Graph ?foo {';
-        $query.= '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>. ';
-        $query.= '} }';
-
-        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
-
-        // use the given graphUri-variable
-        $query = $this->mock->addStatements($statements, '?foo');
+        $this->assertNull($this->mock->addStatements($statements, new NamedNodeImpl('http://saft/test/foograph')));
     }
 }

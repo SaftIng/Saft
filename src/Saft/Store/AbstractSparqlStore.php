@@ -29,29 +29,8 @@ abstract class AbstractSparqlStore implements Store
      */
     public function addStatements(StatementIterator $statements, Node $graph = null, array $options = array())
     {
-        // TODO migrate code to new interface
-        $graphUri = null;
-        if ($graph !== null) {
-            $graphUri = $graph->getUri();
-        }
-
-        foreach ($statements as $st) {
-            if ($st instanceof Statement && true === $st->isConcrete()) {
-                // everything is fine
-
-            // non-Statement instances not allowed
-            } elseif (false === $st instanceof Statement) {
-                throw new \Exception('addStatements does not accept non-Statement instances.');
-
-            // non-concrete Statement instances not allowed
-            } elseif ($st instanceof Statement && false === $st->isConcrete()) {
-                throw new \Exception('At least one Statement is not concrete');
-
-            } else {
-                throw new \Exception('Unknown error.');
-            }
-        }
-
+        $graphUriToUse = null;
+        
         /**
          * Create batches out of given statements to improve statement throughput.
          */
@@ -60,13 +39,24 @@ abstract class AbstractSparqlStore implements Store
         $batchStatements = array();
 
         foreach ($statements as $statement) {
-            // given $graphUri forces usage of it and not the graph from the statement instance
-            if (null !== $graphUri) {
-                $graphUriToUse = $graphUri;
+            // non-concrete Statement instances not allowed
+            if (false === $statement->isConcrete()) {
+                throw new \Exception('At least one Statement is not concrete');
+            }
+            
+            // given $graph forces usage of it and not the graph from the statement instance
+            if (null !== $graph) {
+                $graphUriToUse = $graph->getUri();
+                // reuse $graph instance later on.
 
             // use graphUri from statement
+            } elseif (null !== $statement->getGraph()) {
+                $graph = $statement->getGraph();
+                $graphUriToUse = $graph->getUri();
+            
+            // no graph instance was found
             } else {
-                $graphUriToUse = $statement->getGraph()->getUri();
+                throw new \Exception('Graph was not given, neither as parameter nor in statement.');
             }
 
             if (false === isset($batchStatements[$graphUriToUse])) {
@@ -82,11 +72,13 @@ abstract class AbstractSparqlStore implements Store
                  * statement instances.
                  */
                 foreach ($batchStatements as $graphUriToUse => $batch) {
-                    foreach ($batch as $batchStatements) {
-                        $this->query(
-                            'INSERT DATA {'. $this->sparqlFormat($batchStatements, $graphUriToUse) .'}',
-                            $options
+                    foreach ($batch as $batchEntries) {
+                        $content = $this->sparqlFormat(
+                            new ArrayStatementIteratorImpl(array($batchEntries)),
+                            $graph
                         );
+
+                        $this->query('INSERT DATA {'. $content .'}', $options);
                     }
                 }
 
@@ -109,15 +101,22 @@ abstract class AbstractSparqlStore implements Store
      */
     public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
-        // TODO migrate code to new interface
-        $graphUri = null;
-        if ($graph !== null) {
-            $graphUri = $graph->getUri();
+        // given $graph forces usage of it and not the graph from the statement instance
+        if (null !== $graph) {
+            $graphUriToUse = $graph->getUri();
+
+        // use graphUri from statement
+        } elseif (null !== $statement->getGraph()) {
+            $graph = $statement->getGraph();
+            $graphUriToUse = $graph->getUri();
+        
+        } else {
+            throw new \Exception('Graph was not given, neither as parameter nor in statement.');
         }
 
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
 
-        $query = 'DELETE DATA { '. $this->sparqlFormat($statementIterator, $graphUri) .'}';
+        $query = 'DELETE DATA { '. $this->sparqlFormat($statementIterator, $graph) .'}';
         return $this->query($query, $options);
     }
 
