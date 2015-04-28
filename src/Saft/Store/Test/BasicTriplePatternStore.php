@@ -1,6 +1,6 @@
 <?php
 
-namespace Saft\QueryCache\Test;
+namespace Saft\Store\Test;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Node;
@@ -10,10 +10,9 @@ use Saft\Store\AbstractTriplePatternStore;
 use Saft\Store\Store;
 
 /**
- * Basic class. Its purpose is to serve in test cases as a successor for a QueryCache instance. This implementation
- * assumes that all triple and query related methods of AbstractTriplePatternStore only return their parameter.
+ * Basic class. Its purpose is to serve in test cases.
  */
-class BasicStore extends AbstractTriplePatternStore
+class BasicTriplePatternStore extends AbstractTriplePatternStore
 {
     /**
      * Has no function and returns an empty array.
@@ -38,17 +37,18 @@ class BasicStore extends AbstractTriplePatternStore
     /**
      * Adds multiple Statements to (default-) graph.
      *
-     * @param  StatementIterator $statements StatementList instance must contain Statement instances
+     * @param  StatementIterator $statements          StatementList instance must contain Statement instances
      *                                                which are 'concret-' and not 'pattern'-statements.
-     * @param  Node $graph optional Overrides target graph. If set, all statements will
+     * @param  Node              $graph      optional Overrides target graph. If set, all statements will
      *                                                be add to that graph, if available.
-     * @param  array $options optional It contains key-value pairs and should provide additional
+     * @param  array             $options    optional It contains key-value pairs and should provide additional
      *                                                introductions for the store and/or its adapter(s).
      * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
      *                 will be thrown.
      */
     public function addStatements(StatementIterator $Statements, Node $graph = null, array $options = array())
     {
+        return true;
     }
 
     /**
@@ -59,11 +59,12 @@ class BasicStore extends AbstractTriplePatternStore
      *                                       that graph.
      * @param  array $options optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
-     * @return boolean Returns true, if function performed without errors. In case
-     *                 an error occur, an exception will be thrown.
+     * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
+     *                 will be thrown.
      */
     public function deleteMatchingStatements(Statement $Statement, Node $graph = null, array $options = array())
     {
+        return true;
     }
 
     /**
@@ -81,12 +82,11 @@ class BasicStore extends AbstractTriplePatternStore
      */
     public function getMatchingStatements(Statement $Statement, Node $graph = null, array $options = array())
     {
-        new ArrayStatementIteratorImpl([]);
+        return new ArrayStatementIteratorImpl(array());
     }
 
     /**
-     * Returns true or false depending on whether or not the statements pattern
-     * has any matches in the given graph.
+     * Returns true or false depending on whether or not the statements pattern has any matches in the given graph.
      *
      * @param  Statement $Statement It can be either a concrete or pattern-statement.
      * @param  Node $graph optional Overrides target graph.
@@ -96,5 +96,6 @@ class BasicStore extends AbstractTriplePatternStore
      */
     public function hasMatchingStatement(Statement $Statement, Node $graph = null, array $options = array())
     {
+        return true;
     }
 }

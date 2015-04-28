@@ -9,6 +9,7 @@ use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Sparql\Query\AbstractQuery;
+use Saft\Store\Test\BasicTriplePatternStore;
 use Symfony\Component\Yaml\Parser;
 
 /**
@@ -65,7 +66,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testAddStatements()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // build testdata
@@ -73,10 +74,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
 
         // assumption is that all given parameter will be returned
-        $this->assertEquals(
-            array($statementIterator, $this->testGraph, array(1)),
-            $this->fixture->addStatements($statementIterator, $this->testGraph, array(1))
-        );
+        $this->assertTrue($this->fixture->addStatements($statementIterator, $this->testGraph, array(1)));
     }
 
     // try to call function method without a successor set leads to an exception
@@ -261,17 +259,14 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testDeleteMatchingStatements()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // build testdata
         $statement = new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl());
 
         // assumption is that all given parameter will be returned
-        $this->assertEquals(
-            array($statement, $this->testGraph->getUri(), array(1)),
-            $this->fixture->deleteMatchingStatements($statement, $this->testGraph, array(1))
-        );
+        $this->assertTrue($this->fixture->deleteMatchingStatements($statement, $this->testGraph, array(1)));
     }
 
     // try to call function method without a successor set leads to an exception
@@ -291,7 +286,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetAvailableGraphs()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // assumption is that all given parameter will be returned
@@ -315,7 +310,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
     public function testGetAndSetChainSuccessor()
     {
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
 
         $this->fixture->setChainSuccessor($successor);
 
@@ -332,7 +327,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetLogAddStatements()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // build testdata
@@ -420,7 +415,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetLogDeleteMatchingStatements()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // build testdata
@@ -474,7 +469,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     {
         $this->markTestSkipped("We need variables for this");
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // build testdata
@@ -525,7 +520,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetLogGetStoreDescription()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         $this->fixture->getStoreDescription();
@@ -543,7 +538,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetLogHasMatchingStatement()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // build testdata
@@ -763,7 +758,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     {
         $this->markTestSkipped("We need variables for this");
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // build testdata
@@ -821,7 +816,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetMatchingStatementsNamedNodes()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -835,9 +830,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         // assumption is that all given parameter will be returned
         $this->assertEquals(
-            array(
-                $statement, $this->testGraph->getUri(), $options
-            ),
+            new ArrayStatementIteratorImpl(array()),
             $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
         );
 
@@ -852,7 +845,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                                     'FILTER (str(?p) = "'. $statement->getPredicate()->getUri() .'") '.
                                     'FILTER (str(?o) = "'. $statement->getObject()->getUri() .'") '.
                                 '}',
-                    'result' => array($statement, $this->testGraph->getUri(), $options),
+                    'result' => new ArrayStatementIteratorImpl(array()),
                     'triple_pattern' => array(
                         $this->testGraph->getUri() .
                         $this->separator .'*'. $this->separator .'*'. $this->separator .'*' =>
@@ -868,7 +861,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetMatchingStatementsNamedNodesLiteral()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -882,9 +875,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         // assumption is that all given parameter will be returned
         $this->assertEquals(
-            array(
-                $statement, $this->testGraph->getUri(), $options
-            ),
+            new ArrayStatementIteratorImpl(array()),
             $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
         );
 
@@ -899,7 +890,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                                     'FILTER (str(?p) = "'. $statement->getPredicate()->getUri() .'") '.
                                     'FILTER (str(?o) = "'. $statement->getObject()->getValue() .'") '.
                                 '}',
-                    'result' => array($statement, $this->testGraph->getUri(), $options),
+                    'result' => new ArrayStatementIteratorImpl(array()),
                     'triple_pattern' => array(
                         $this->testGraph->getUri() .
                         $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
@@ -931,7 +922,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetMatchingStatementsUseCachedResult()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -945,17 +936,13 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         // assumption is that all given parameter will be returned
         $this->assertEquals(
-            array(
-                $statement, $this->testGraph->getUri(), $options
-            ),
+            new ArrayStatementIteratorImpl(array()),
             $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
         );
 
         // call getMatchingStatements again and see what happens
         $this->assertEquals(
-            array(
-                $statement, $this->testGraph->getUri(), $options
-            ),
+            new ArrayStatementIteratorImpl(array()),
             $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
         );
 
@@ -971,7 +958,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                                     'FILTER (str(?p) = "'. $statement->getPredicate()->getUri() .'") '.
                                     'FILTER (str(?o) = "'. $statement->getObject()->getUri() .'") '.
                                 '}',
-                    'result' => array($statement, $this->testGraph->getUri(), $options),
+                    'result' => new ArrayStatementIteratorImpl(array()),
                     'triple_pattern' => array(
                         $this->testGraph->getUri() .
                         $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
@@ -987,7 +974,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetMatchingStatementsVariables()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -996,9 +983,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         // assumption is that all given parameter will be returned
         $this->assertEquals(
-            array(
-                $statement, $this->testGraph->getUri(), $options
-            ),
+            new ArrayStatementIteratorImpl(array()),
             $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
         );
     }
@@ -1035,7 +1020,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetStoreDescription()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // assumption is that all given parameter will be returned
@@ -1060,7 +1045,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testHasMatchingStatementNamedNodesLiteral()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -1072,18 +1057,13 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $options = array(1);
 
         // assumption is that all given parameter will be returned
-        $this->assertEquals(
-            array(
-                $statement, $this->testGraph->getUri(), $options
-            ),
-            $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options)
-        );
+        $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraph, $options));
     }
 
     public function testHasMatchingStatementOnlyNamedNodes()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -1095,12 +1075,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $options = array(1);
 
         // assumption is that all given parameter will be returned
-        $this->assertEquals(
-            array(
-                $statement, $this->testGraph->getUri(), $options
-            ),
-            $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options)
-        );
+        $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraph, $options));
     }
 
     // try to call function method without a successor set leads to an exception
@@ -1117,7 +1092,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testHasMatchingStatementOnlyVariables()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -1125,18 +1100,13 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $options = array(1);
 
         // assumption is that all given parameter will be returned
-        $this->assertEquals(
-            array(
-                $statement, $this->testGraph->getUri(), $options
-            ),
-            $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options)
-        );
+        $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraph, $options));
     }
 
     public function testHasMatchingStatementUseCachedResult()
     {
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -1144,20 +1114,10 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $options = array(1);
 
         // assumption is that all given parameter will be returned
-        $this->assertEquals(
-            array(
-                $statement, $this->testGraph->getUri(), $options
-            ),
-            $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options)
-        );
+        $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraph, $options));
 
-        // call hasMatchingStatement again and see what happens
-        $this->assertEquals(
-            array(
-                $statement, $this->testGraph->getUri(), $options
-            ),
-            $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options)
-        );
+        // call hasMatchingStatement again to later see how many query cache container were created.
+        $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraph, $options));
 
         // check latest query cache container
         $this->assertEquals(
@@ -1165,7 +1125,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                 array(
                     'graph_uris' => array($this->testGraph->getUri() => $this->testGraph->getUri()),
                     'query' => 'ASK FROM <http://localhost/Saft/TestGraph/> { ?s ?p ?o }',
-                    'result' => array($statement, $this->testGraph->getUri(), $options),
+                    'result' => true,
                     'triple_pattern' => array(
                         $this->testGraph->getUri() .
                         $this->separator .'*'. $this->separator .'*'. $this->separator .'*' =>
@@ -1317,7 +1277,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     {
         $this->markTestSkipped("We need variables for this");
         // set basic store as successor
-        $successor = new BasicStore();
+        $successor = new BasicTriplePatternStore();
         $this->fixture->setChainSuccessor($successor);
 
         // test data
