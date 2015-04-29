@@ -741,5 +741,4 @@ abstract class StoreAbstractTest extends TestCase
         // TODO actually assert, that the available graphs contain the testGraph
         $this->assertEqualsArrays($graphUris, [$this->testGraph]);
     }
-
 }
