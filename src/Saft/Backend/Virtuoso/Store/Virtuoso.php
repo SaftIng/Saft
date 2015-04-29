@@ -78,7 +78,7 @@ class Virtuoso extends AbstractSparqlStore
      * @param  Node $graphUri URI of the graph to create.
      * @throws \Exception
      */
-    public function addGraph(Node $graph)
+    public function createGraph(Node $graph, array $options = array())
     {
         $this->query('CREATE SILENT GRAPH <'. $graph->getUri() .'>');
     }
@@ -204,17 +204,6 @@ class Virtuoso extends AbstractSparqlStore
         }
 
         return true;
-    }
-
-    /**
-     * Deletes all triples of a graph.
-     *
-     * @throws TODO Exceptions
-     */
-    public function clearGraph(Node $graph)
-    {
-        $this->dropGraph($graph);
-        $this->addGraph($graph);
     }
 
     /**

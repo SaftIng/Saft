@@ -75,67 +75,6 @@ class VirtuosoTest extends StoreAbstractTest
     }
 
     /**
-     * Tests addGraph
-     */
-
-    public function testAddGraph()
-    {
-        $this->assertFalse($this->fixture->isGraphAvailable($this->testGraph));
-
-        $this->fixture->addGraph($this->testGraph);
-
-        $this->assertTrue($this->fixture->isGraphAvailable($this->testGraph));
-    }
-
-    /**
-     * function dropGraph
-     */
-
-    public function testDropGraph()
-    {
-        $this->fixture->dropGraph($this->testGraph);
-
-        $this->assertFalse(
-            $this->fixture->isGraphAvailable($this->testGraph)
-        );
-
-        $this->fixture->addGraph($this->testGraph);
-
-        $this->assertTrue(
-            $this->fixture->isGraphAvailable($this->testGraph)
-        );
-
-        $this->fixture->dropGraph($this->testGraph);
-
-        $this->assertFalse(
-            $this->fixture->isGraphAvailable($this->testGraph)
-        );
-    }
-
-    /**
-     * function getAvailableGraphs
-     */
-
-    public function testGetAvailableGraphs()
-    {
-        // get graph list
-        $graphUris = $this->fixture->getAvailableGraphs();
-
-        // alternative way to get the list
-        $query = $this->fixture->sqlQuery(
-            'SELECT ID_TO_IRI(REC_GRAPH_IID) as graph
-               FROM DB.DBA.RDF_EXPLICITLY_CREATED_GRAPH'
-        );
-
-        $graphsToCheck = array();
-        foreach ($query->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-            $graphsToCheck[$row['graph']] = $row['graph'];
-        }
-
-        $this->assertEqualsArrays($graphUris, $graphsToCheck);
-    }
-
-    /**
      * Tests getTripleCount
      */
 

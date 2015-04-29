@@ -83,7 +83,7 @@ class Http extends AbstractSparqlStore
      * @param  Node $graph URI of the graph to create
      * @throws \Exception
      */
-    public function addGraph(Node $graph)
+    public function createGraph(Node $graph, array $options = array())
     {
         $this->client->sendSparqlUpdateQuery('CREATE SILENT GRAPH <'. $graph->getUri() .'>');
     }
@@ -208,17 +208,6 @@ class Http extends AbstractSparqlStore
     }
 
     /**
-     * Deletes all triples of a graph.
-     *
-     * @param Node $graph URI of the graph to clear.
-     * @throw TODO Exceptions
-     */
-    public function clearGraph(Node $graph)
-    {
-        $this->query('CLEAR GRAPH <' . $graph->getUri() . '>');
-    }
-
-    /**
      * Closes a current connection.
      */
     public function closeConnection()
@@ -318,7 +307,7 @@ class Http extends AbstractSparqlStore
      * @param  Node $graph URI of the graph to remove
      * @throws \Exception
      */
-    public function dropGraph(Node $graph)
+    public function dropGraph(Node $graph, array $options = array())
     {
         $this->client->sendSparqlUpdateQuery('DROP SILENT GRAPH <'. $graph->getUri() .'>');
     }

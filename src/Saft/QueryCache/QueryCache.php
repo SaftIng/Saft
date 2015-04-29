@@ -907,4 +907,32 @@ class QueryCache implements Store, ChainableStore
     {
         $this->successor = $successor;
     }
+
+    /**
+     * Create a new graph with the URI given as Node. If the underlying store implementation doesn't support empty
+     * graphs this method will have no effect.
+     *
+     * @param Node $graph The graph name used for the newly created graph
+     * @param array $options optional additional key-value pairs passed to the store implementation
+     *
+     * @throws \Exception If the given graph could not be created
+     */
+    public function createGraph(Node $graph, array $options = array())
+    {
+        $this->getChainSuccessor()->createGraph($graph, $options);
+    }
+
+    /**
+     * Removes the given graph from the store.
+     *
+     * @param Node $graph The name of the graph to drop
+     * @param array $options optional additional key-value pairs passed to the store implementation
+     *
+     * @throws \Exception If the given graph could not be droped
+     */
+    public function dropGraph(Node $graph, array $options = array())
+    {
+        // TODO invalidate all entries for this graph
+        $this->getChainSuccessor()->dropGraph($graph, $options);
+    }
 }

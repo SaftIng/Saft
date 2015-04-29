@@ -339,7 +339,7 @@ class StoreChainIntegrationTest extends TestCase
          */
         $virtuoso = new Virtuoso($this->config['virtuosoConfig']);
         $virtuoso->dropGraph($this->testGraph);
-        $virtuoso->addGraph($this->testGraph);
+        $virtuoso->createGraph($this->testGraph);
         $virtuoso->addStatements(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
@@ -420,7 +420,7 @@ class StoreChainIntegrationTest extends TestCase
          */
         $virtuoso = new Virtuoso($this->config['virtuosoConfig']);
         $virtuoso->dropGraph($this->testGraph);
-        $virtuoso->addGraph($this->testGraph);
+        $virtuoso->createGraph($this->testGraph);
         $virtuoso->addStatements(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
@@ -614,7 +614,7 @@ class StoreChainIntegrationTest extends TestCase
         // drop and create test graph
         $virtuoso = new Virtuoso($this->config['virtuosoConfig']);
         $virtuoso->dropGraph($this->testGraph);
-        $virtuoso->addGraph($this->testGraph);
+        $virtuoso->createGraph($this->testGraph);
 
         $this->fixture->setupChain(array($this->config['queryCacheConfig'], $this->config['virtuosoConfig']));
 
@@ -693,7 +693,7 @@ class StoreChainIntegrationTest extends TestCase
          * Create test data
          */
         $virtuoso = new Virtuoso($this->config['virtuosoConfig']);
-        $virtuoso->addGraph($this->testGraph);
+        $virtuoso->createGraph($this->testGraph);
         $virtuoso->addStatements(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(

@@ -16,14 +16,6 @@ use Saft\Sparql\Result\Result;
 interface Store
 {
     /**
-     * Returns a list of all available graph URIs of the store.
-     * It can also respect access control, to only returned available graphs in the current context.
-     *
-     * @return array Simple array of graph URIs.
-     */
-    public function getAvailableGraphs();
-
-    /**
      * Adds multiple Statements to (default-) graph.
      *
      * @param  StatementIterator $statements          StatementList instance must contain Statement instances
@@ -77,12 +69,6 @@ interface Store
      */
     public function hasMatchingStatement(Statement $Statement, Node $graph = null, array $options = array());
 
-    /**
-     * Get information about the store and its features.
-     *
-     * @return array Array which contains information about the store and its features.
-     */
-    public function getStoreDescription();
 
     /**
      * This method sends a SPARQL query to the store.
@@ -92,8 +78,43 @@ interface Store
      *                                  introductions for the store and/or its adapter(s).
      * @return Result Returns result of the query. Depending on the query type, it returns either an instance
      *                of EmptyResult, ExceptionResult, SetResult, StatementResult or ValueResult.
-     * @throws \Exception If query is no string.
-     * @throws \Exception If query is malformed.
+     * @throws \Exception If query is no string, is malformed or an execution error occured.
      */
     public function query($query, array $options = array());
+
+    /**
+     * Get information about the store and its features.
+     *
+     * @return array Array which contains information about the store and its features.
+     */
+    public function getStoreDescription();
+
+    /**
+     * Returns a list of all available graph URIs of the store.
+     * It can also respect access control, to only returned available graphs in the current context.
+     *
+     * @return array Simple array of graph URIs.
+     */
+    public function getAvailableGraphs();
+
+    /**
+     * Create a new graph with the URI given as Node. If the underlying store implementation doesn't support empty
+     * graphs this method will have no effect.
+     *
+     * @param Node $graph The graph name used for the newly created graph
+     * @param array $options optional additional key-value pairs passed to the store implementation
+     *
+     * @throws \Exception If the given graph could not be created
+     */
+    public function createGraph(Node $graph, array $options = array());
+
+    /**
+     * Removes the given graph from the store.
+     *
+     * @param Node $graph The name of the graph to drop
+     * @param array $options optional additional key-value pairs passed to the store implementation
+     *
+     * @throws \Exception If the given graph could not be droped
+     */
+    public function dropGraph(Node $graph, array $options = array());
 }
