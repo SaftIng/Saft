@@ -4,7 +4,7 @@ namespace Saft\Data;
 
 use Saft\Rdf\StatementIterator;
 
-interface SerializerInterface
+interface Serializer
 {
     /**
      * Set the prefixes which the serializer can/should use when generating the serialization. Please keep in mind, that
