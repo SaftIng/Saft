@@ -75,12 +75,17 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * Adds a new empty and named graph.
      *
-     * @param  Node $graphUri URI of the graph to create.
-     * @throws \Exception
+     * @param  Node       $graphUri URI of the graph to create.
+     * @throws \Exception If given $graph is not a NamedNode.
      */
     public function createGraph(Node $graph, array $options = array())
     {
-        $this->query('CREATE SILENT GRAPH <'. $graph->getUri() .'>');
+        // if $graph was given and its a named node
+        if (null !== $graph && true === $graph->isNamed()) {
+            $this->query('CREATE SILENT GRAPH <'. $graph->getUri() .'>');
+        } else {
+            throw new \Exception('Given $graph is not a NamedNode.');
+        }
     }
 
     /**
@@ -94,31 +99,13 @@ class Virtuoso extends AbstractSparqlStore
      *                                                introductions for the store and/or its adapter(s).
      * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
      *                 will be thrown.
-     * @todo implement usage of graph inside the statement(s). create groups for each graph
+     * TODO implement rollback, if exception was thrown
      */
     public function addStatements(StatementIterator $statements, Node $graph = null, array $options = array())
     {
-        // TODO migrate code to new interface
-        $graphUri = null;
-        if ($graph !== null) {
-            $graphUri = $graph->getUri();
-        }
-
-        foreach ($statements as $st) {
-            if ($st instanceof Statement && true === $st->isConcrete()) {
-                // everything is fine
-
-            // non-Statement instances not allowed
-            } elseif (false === $st instanceof Statement) {
-                throw new \Exception('addStatements does not accept non-Statement instances.');
-
-            // non-concrete Statement instances not allowed
-            } elseif ($st instanceof Statement && false === $st->isConcrete()) {
-                throw new \Exception('At least one Statement is not concrete');
-
-            } else {
-                throw new \Exception('Unknown error.');
-            }
+        // if $graph was given, but its not a named node, set it to null.
+        if (null !== $graph && false === $graph->isNamed()) {
+            $graph = null;
         }
 
         /**
@@ -129,13 +116,23 @@ class Virtuoso extends AbstractSparqlStore
         $batchStatements = array();
 
         foreach ($statements as $statement) {
-            // given $graphUri forces usage of it and not the graph from the statement instance
-            if (null !== $graphUri) {
-                $graphUriToUse = $graphUri;
+            if (false === $statement->isConcrete()) {
+                throw new \Exception('At least one Statement is not concrete');
+            }
+            
+            // given $graph forces usage of it and not the graph from the statement instance
+            if (null !== $graph) {
+                $graphUriToUse = $graph->getUri();
 
-            // use graphUri from statement
-            } else {
+            // if graph was set in the statement and it is a named node and use it, if so.
+            } elseif (null === $graph
+                && null !== $statement->getGraph()
+                && true === $statement->getGraph()->isNamed()) {
                 $graphUriToUse = $statement->getGraph()->getUri();
+            
+            // stop further execution if no valid graph was found
+            } else {
+                throw new \Exception('Neither $graph was given nor a graph of type NamedNode was set in Statement.');
             }
 
             if (false === isset($batchStatements[$graphUriToUse])) {
@@ -227,10 +224,21 @@ class Virtuoso extends AbstractSparqlStore
      */
     public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
-        // TODO migrate code to new interface
-        $graphUri = null;
-        if ($graph !== null) {
-            $graphUri = $graph->getUri();
+        // if $graph was given, but its not a named node, set it to null.
+        if (null !== $graph && false === $graph->isNamed()) {
+            $graph = null;
+        }
+        
+        // otherwise check, if graph was set in the statement and it is a named node and use it, if so.
+        if (null === $graph
+            && null !== $statement->getGraph()
+            && true === $statement->getGraph()->isNamed()) {
+            $graph = $statement->getGraph();
+        }
+        
+        // we need a graph later on, so throw exception if no one was given
+        if (null === $graph) {
+            throw new \Exception('Neither $graph nor $statement graph were set.');
         }
 
         /**
@@ -248,15 +256,6 @@ class Virtuoso extends AbstractSparqlStore
          */
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
 
-        if (null === $graphUri) {
-            $graphUri = $statement->getGraph();
-        }
-
-        // if given graphUri and $statements graph are both null, throw exception
-        if (null === $graphUri) {
-            throw new \Exception('Neither $graphUri nor $statement graph were set.');
-        }
-
         $condition = $this->sparqlFormat($statementIterator);
         $query = 'WITH <'. $graphUri .'> DELETE {'. $condition .'} WHERE {'. $condition .'}';
 
@@ -273,14 +272,19 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * Drops an existing graph.
      *
-     * @param string $graphUri          URI of the graph to drop.
-     * @param array  $options  optional It contains key-value pairs and should provide additional introductions
-     *                                  for the store and/or its adapter(s).
-     * @throw \Exception
+     * @param  string $graphUri          URI of the graph to drop.
+     * @param  array  $options  optional It contains key-value pairs and should provide additional introductions
+     *                                   for the store and/or its adapter(s).
+     * @throws \Exception If given $graph is not a NamedNode.
      */
     public function dropGraph(Node $graph, array $options = array())
     {
-        $this->query('DROP SILENT GRAPH <'. $graph->getUri() .'>');
+        // if $graph was given and its a named node
+        if (null !== $graph && true === $graph->isNamed()) {
+            $this->query('DROP SILENT GRAPH <'. $graph->getUri() .'>');
+        } else {
+            throw new \Exception('Given $graph is not a NamedNode.');
+        }
     }
 
     /**
@@ -443,29 +447,27 @@ class Virtuoso extends AbstractSparqlStore
             $this->successor->hasMatchingStatement($Statement, $graph, $options);
         }
         
-        $graphUri = null;
-        if (null !== $graph) {
-            $graphUri = $graph->getUri();
-        } elseif (null !== $Statement->getGraph()) {
-            $graph = $Statement->getGraph();
-            $graphUri = $graph->getUri();
+        // if $graph was given, but its not a named node, set it to null.
+        if (null !== $graph && false === $graph->isNamed()) {
+            $graph = null;
         }
-
-        if (null !== $graphUri && false === NodeUtils::simpleCheckURI($graph->getUri())) {
-            throw new \Exception('Neither $Statement has a valid graph nor $graphUri is valid URI.');
-        }
-
-        $statementIterator = new ArrayStatementIteratorImpl(array($Statement));
         
+        // otherwise check, if graph was set in the statement and it is a named node and use it, if so.
+        if (null === $graph
+            && null !== $Statement->getGraph()
+            && true === $Statement->getGraph()->isNamed()) {
+            $graph = $Statement->getGraph();
+        }
+
+        if (null === $graph || false === $graph->isNamed()) {
+            throw new \Exception('Neither $Statement has a valid graph nor $graph is valid.');
+        }
+
         /**
          * Build query
          */
-        $query = 'ASK ';
-        if (null !== $graphUri) {
-            $query .= 'FROM <'. $graphUri .'> ';
-        }
-        $query .= '{ '. $this->sparqlFormat($statementIterator) .'}';
-        
+        $statementIterator = new ArrayStatementIteratorImpl(array($Statement));
+        $query = 'ASK FROM <'. $graph->getUri() .'> { '. $this->sparqlFormat($statementIterator) .'}';
         $result = $this->query($query, $options);
 
         if (true === is_object($result)) {
