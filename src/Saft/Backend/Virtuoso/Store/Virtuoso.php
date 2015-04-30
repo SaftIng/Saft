@@ -321,10 +321,16 @@ class Virtuoso extends AbstractSparqlStore
      */
     public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
-        // TODO migrate code to new interface
-        $graphUri = null;
-        if ($graph !== null) {
-            $graphUri = $graph->getUri();
+        // if $graph was given, but its not a named node, set it to null.
+        if (null !== $graph && false === $graph->isNamed()) {
+            $graph = null;
+        }
+        
+        // otherwise check, if graph was set in the statement and it is a named node and use it, if so.
+        if (null === $graph
+            && null !== $statement->getGraph()
+            && true === $statement->getGraph()->isNamed()) {
+            $graph = $statement->getGraph();
         }
 
         // if successor is set, ask it too.
@@ -332,12 +338,17 @@ class Virtuoso extends AbstractSparqlStore
             $this->successor->getMatchingStatements($statement, $graph, $options);
         }
 
-        // Remove, maybe available, graph from given statement and put it into an iterator.
-        // reason for the removal of the graph is to avoid quads in the query. Virtuoso wants the graph
-        // in the FROM part.
-        $query = 'SELECT ?s ?p ?o ' .
-            'FROM <'. $graphUri .'> '.
-            'WHERE { ?s ?p ?o ';
+        /**
+         * Remove graph, if available, from given statement and put it into an iterator. reason for the removal
+         * of the graph is to avoid quads in the query. Virtuoso wants the graph in the FROM part.
+         */
+        $query = 'SELECT ?s ?p ?o ';
+            
+        if (null !== $graph) {
+            $query .= 'FROM <'. $graph->getUri() .'> ';
+        }
+        
+        $query .= 'WHERE { ?s ?p ?o ';
 
         // create shortcuts for S, P and O
         $s = $statement->getSubject();
@@ -366,23 +377,29 @@ class Virtuoso extends AbstractSparqlStore
         $result = $this->query($query, $options);
 
         /**
-         * Transform SetResult into StatementResult
+         * Transform SetResult into StatementResult, if no exception result was returned by Virtuoso
          */
-        $statementResult = new StatementResult();
-        $statementResult->setVariables($result->getVariables());
+        if (false === $result->isExceptionResult()) {
+            $statementResult = new StatementResult();
+            $statementResult->setVariables($result->getVariables());
 
-        foreach ($result as $entry) {
-            $statementList = array();
-            $i = 0;
-            foreach ($result->getVariables() as $variable) {
-                $statementList[$i++] = $entry[$variable];
+            foreach ($result as $entry) {
+                $statementList = array();
+                $i = 0;
+                foreach ($result->getVariables() as $variable) {
+                    $statementList[$i++] = $entry[$variable];
+                }
+                $statementResult->append(
+                    new StatementImpl($statementList[0], $statementList[1], $statementList[2])
+                );
             }
-            $statementResult->append(
-                new StatementImpl($statementList[0], $statementList[1], $statementList[2])
-            );
-        }
+            
+            return $statementResult;
 
-        return $statementResult;
+        // return given ExceptionResult
+        } else {
+            return $result;
+        }
     }
 
     /**
