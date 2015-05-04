@@ -257,7 +257,7 @@ class Virtuoso extends AbstractSparqlStore
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
 
         $condition = $this->sparqlFormat($statementIterator);
-        $query = 'WITH <'. $graphUri .'> DELETE {'. $condition .'} WHERE {'. $condition .'}';
+        $query = 'WITH <'. $graph->getUri() .'> DELETE {'. $condition .'} WHERE {'. $condition .'}';
 
         $this->query($query, $options);
 
