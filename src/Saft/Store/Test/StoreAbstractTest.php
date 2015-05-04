@@ -731,8 +731,8 @@ abstract class StoreAbstractTest extends TestCase
 
     /**
      * function dropGraph
-     * 
-     * We can drop the graph and create a graph, but we can't asume any action since a store might not support 
+     *
+     * We can drop the graph and create a graph, but we can't asume any action since a store might not support
      * emtpy graphs.
      */
 

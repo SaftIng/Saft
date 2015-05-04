@@ -51,12 +51,12 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     /**
      * This assertion consumes the StatementIterator and counts its entries until it is empty. It automatically
      * calls assertTrue and -False on $statementIterator->valid() from time to time.
-     * 
+     *
      * @param int               $expectedCount
      * @param StatementIterator $statementIterator
      * @param string            $message
      */
-    public function assertCountStatementIterator($expectedCount, $statementIterator, $message = null) 
+    public function assertCountStatementIterator($expectedCount, $statementIterator, $message = null)
     {
         if (true == empty($message)) {
             $message = 'Assertion about count of statements.';
@@ -65,7 +65,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         for ($i = 0; $i < $expectedCount; ++$i) {
             $statementIterator->next();
             $this->assertTrue(
-                $statementIterator->valid(), 
+                $statementIterator->valid(),
                 $message .' Expected: '. $expectedCount .', Actual:'. $i
             );
         }
