@@ -262,6 +262,15 @@ class UpdateQueryUnitTest extends TestCase
         );
         $this->assertEqualsArrays(array('s', 'p', 'o', 'x', 'y'), $queryParts['variables']);
     }
+
+    public function testGetQueryPartsInsertDataMissingDataPart()
+    {
+        $this->fixture->init('INSERT DATA { }');
+        
+        // expects an exception because data part is empty
+        $this->setExpectedException('\Exception');
+        $this->fixture->getQueryParts();
+    }
     
     /**
      * Tests init

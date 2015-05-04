@@ -563,6 +563,7 @@ class Http extends AbstractSparqlStore
     public function query($query, array $options = array())
     {
         $queryObject = AbstractQuery::initByQueryString($query);
+        $queryParts = $queryObject->getQueryParts();
 
         /**
          * SPARQL query (usually to fetch data)
@@ -651,6 +652,7 @@ class Http extends AbstractSparqlStore
                 if (true === isset($askResult['boolean'])) {
                     $return = new ValueResult($askResult['boolean']);
 
+                // if result-string starts with Virtuoso, we assume an error occour.
                 } elseif ('Virtuoso' === substr($result, 0, 8)) {
                     $return = new ExceptionResult(new \Exception($result));
 

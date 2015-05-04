@@ -114,9 +114,9 @@ class UpdateQuery extends AbstractQuery
          * Save parts for INSERT DATA
          */
         if ('insertData' === $this->queryParts['sub_type']) {
-            preg_match('/INSERT\s+DATA\s+\{(.*)\}/si', $this->getQuery(), $matches);
+            preg_match('/INSERT\s+DATA\s+\{\s*(.*)\s*\}/si', $this->getQuery(), $matches);
             
-            if (true === isset($matches[1])) {
+            if (true === isset($matches[1]) && false === empty($matches[1])) {
                 $this->queryParts['insertData'] = trim($matches[1]);
                 $this->queryParts['deleteData'] = null;
                 $this->queryParts['deleteWhere'] = null;
