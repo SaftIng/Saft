@@ -123,10 +123,17 @@ abstract class StoreAbstractTest extends TestCase
     {
         // remove all triples from the test graph
         $this->fixture->query('CLEAR GRAPH <' . $this->testGraph->getUri() . '>');
+        
+        $anyStatement = new StatementImpl(
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
+        );
 
         // graph is empty
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(0, $statements);
+        $this->assertEquals(0, $statements->count());
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -147,7 +154,7 @@ abstract class StoreAbstractTest extends TestCase
 
         // graph has two entries
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(2, $statements);
+        $this->assertEquals(2, $statements->count());
     }
 
     public function testAddStatementsInvalidStatements()
@@ -173,7 +180,7 @@ abstract class StoreAbstractTest extends TestCase
         
         // graph is empty
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(0, $statements);
+        $this->assertEquals(0, $statements->count());
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -194,7 +201,7 @@ abstract class StoreAbstractTest extends TestCase
 
         // graph has now two entries
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(2, $statements);
+        $this->assertEquals(2, $statements->count());
     }
 
     public function testAddStatementsUseStatementGraph()
@@ -210,7 +217,7 @@ abstract class StoreAbstractTest extends TestCase
             new AnyPatternImpl()
         );
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(0, $statements);
+        $this->assertEquals(0, $statements->count());
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -233,7 +240,7 @@ abstract class StoreAbstractTest extends TestCase
 
         // graph has two entries
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(2, $statements);
+        $this->assertEquals(2, $statements->count());
     }
 
     /**
@@ -251,7 +258,7 @@ abstract class StoreAbstractTest extends TestCase
             new AnyPatternImpl()
         );
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(0, $statements);
+        $this->assertEquals(0, $statements->count());
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -272,7 +279,7 @@ abstract class StoreAbstractTest extends TestCase
 
         // count two triples
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(2, $statements);
+        $this->assertEquals(2, $statements->count());
 
         /**
          * drop all triples
@@ -284,7 +291,7 @@ abstract class StoreAbstractTest extends TestCase
 
         // count no triples
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(0, $statements);
+        $this->assertEquals(0, $statements->count());
     }
 
     public function testDeleteMatchingStatementsNoGraphGiven()
@@ -313,7 +320,7 @@ abstract class StoreAbstractTest extends TestCase
             new AnyPatternImpl()
         );
         $statements = $this->fixture->getMatchingStatements($anyStatement);
-        $this->assertCountStatementIterator(0, $statements);
+        $this->assertEquals(0, $statements->count());
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -336,7 +343,7 @@ abstract class StoreAbstractTest extends TestCase
 
         // count two triples
         $statements = $this->fixture->getMatchingStatements($anyStatement);
-        $this->assertCountStatementIterator(2, $statements);
+        $this->assertEquals(0, $statements->count());
 
         /**
          * drop all triples
@@ -352,7 +359,7 @@ abstract class StoreAbstractTest extends TestCase
 
         // count no triples
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(0, $statements);
+        $this->assertEquals(0, $statements->count());
     }
 
     /**
@@ -370,7 +377,7 @@ abstract class StoreAbstractTest extends TestCase
             new AnyPatternImpl()
         );
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(0, $statements);
+        $this->assertEquals(0, $statements->count());
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -391,7 +398,7 @@ abstract class StoreAbstractTest extends TestCase
 
         // count two triples
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(2, $statements);
+        $this->assertEquals(2, $statements->count());
 
         /**
          * drop all triples
@@ -403,7 +410,7 @@ abstract class StoreAbstractTest extends TestCase
 
         // count no triples
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(0, $statements);
+        $this->assertEquals(0, $statements->count());
     }
 
     /**
