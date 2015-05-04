@@ -170,6 +170,7 @@ abstract class StoreAbstractTest extends TestCase
             new AnyPatternImpl(),
             new AnyPatternImpl()
         );
+        
         // graph is empty
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
         $this->assertCountStatementIterator(0, $statements);
@@ -202,6 +203,12 @@ abstract class StoreAbstractTest extends TestCase
         $this->fixture->query('CLEAR GRAPH <' . $this->testGraph->getUri() . '>');
 
         // graph is empty
+        $anyStatement = new StatementImpl(
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
+        );
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
         $this->assertCountStatementIterator(0, $statements);
 
@@ -237,7 +244,12 @@ abstract class StoreAbstractTest extends TestCase
         /**
          * Create some test data
          */
-        // count no triples
+        $anyStatement = new StatementImpl(
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
+        );
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
         $this->assertCountStatementIterator(0, $statements);
 
@@ -294,7 +306,12 @@ abstract class StoreAbstractTest extends TestCase
         /**
          * Create some test data
          */
-        // count no triples
+        $anyStatement = new StatementImpl(
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
+        );
         $statements = $this->fixture->getMatchingStatements($anyStatement);
         $this->assertCountStatementIterator(0, $statements);
 
@@ -346,7 +363,12 @@ abstract class StoreAbstractTest extends TestCase
         /**
          * Create some test data
          */
-        // count no triples
+        $anyStatement = new StatementImpl(
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
+        );
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
         $this->assertCountStatementIterator(0, $statements);
 
@@ -709,14 +731,14 @@ abstract class StoreAbstractTest extends TestCase
 
     /**
      * function dropGraph
-     * We can drop the graph and create a graph, but we can't asume any action since a store might not support emtpy
-     * graphs.
+     * 
+     * We can drop the graph and create a graph, but we can't asume any action since a store might not support 
+     * emtpy graphs.
      */
 
     public function testDropGraph()
     {
         $this->fixture->dropGraph($this->testGraph);
-
 
         $this->fixture->createGraph($this->testGraph);
 
@@ -733,12 +755,10 @@ abstract class StoreAbstractTest extends TestCase
     {
         $this->fixture->createGraph($this->testGraph);
 
-        $statement = $this->getTestTriple();
-        $this->fixture->addStatements([$statement], $this->testGraph);
-        // get graph list
+        // FYI: $graphsUris is an array which contains graph URIs as keys and NamedNode instances as values
         $graphUris = $this->fixture->getAvailableGraphs();
-
-        // TODO actually assert, that the available graphs contain the testGraph
-        $this->assertEqualsArrays($graphUris, [$this->testGraph]);
+        
+        // check, that our test graph is part of the given list
+        $this->assertTrue(isset($graphUris[$this->testGraph->getUri()]));
     }
 }

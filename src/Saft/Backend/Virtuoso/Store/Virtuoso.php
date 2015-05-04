@@ -301,7 +301,7 @@ class Virtuoso extends AbstractSparqlStore
         $graphs = array();
 
         foreach ($query->fetchAll(\PDO::FETCH_ASSOC) as $graph) {
-            $graphs[$graph['graph']] = $graph['graph'];
+            $graphs[$graph['graph']] = new NamedNodeImpl($graph['graph']);
         }
         return $graphs;
     }
