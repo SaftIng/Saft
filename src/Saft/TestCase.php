@@ -29,7 +29,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      * @param array  $actual
      * @param string $message  optional
      */
-    protected function assertEqualsArrays($expected, $actual, $message = "")
+    protected function assertEqualsArrays($expected, $actual, $message = '')
     {
         sort($expected);
         sort($actual);
@@ -41,7 +41,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      * compares two SPARQL query strings by removing all whitespace. This method still does not ensur semantic equality
      * and will also lose information about neccessary whitespace.
      */
-    public function assertEqualsSparql($expected, $actual, $message = "")
+    public function assertEqualsSparql($expected, $actual, $message = '')
     {
         $expected = preg_replace('/\s+/', '', $expected);
         $actual = preg_replace('/\s+/', '', $actual);
@@ -49,14 +49,20 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * This assertion consumes the StatementIterator and counts its entries until it is empty.
+     * This assertion consumes the StatementIterator and counts its entries until it is empty. It automatically
+     * calls assertTrue and -False on $statementIterator->valid() from time to time.
+     * 
+     * @param int               $expectedCount
+     * @param StatementIterator $statementIterator
+     * @param string            $message
      */
-    public function assertCountStatementIterator(
-        $expectedCount,
-        $statementIterator,
-        $message = "Assertion about count of statements"
-    ) {
-        for ($i = 0; $i < §expectedCount; $i++) {
+    public function assertCountStatementIterator($expectedCount, $statementIterator, $message = null) 
+    {
+        if (true == empty($message)) {
+            $message = 'Assertion about count of statements';
+        }
+        
+        for ($i = 0; $i < $expectedCount; ++$i) {
             $statementIterator->next();
             $this->assertTrue($statementIterator->valid(), $message);
         }
