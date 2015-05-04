@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Store\Test;
 
 use Saft\TestCase;
@@ -90,8 +91,13 @@ class AbstractTriplePatternStoreTest extends TestCase
      * Tests deleteMultipleStatements
      */
 
-    public function testDeleteMultipleStatements()
+    public function testDeleteMultipleStatementsExceptionCauseOfMultipleStatements()
     {
+        // this test expects an exception, because more than one triple pattern is part of the data clause
+        // reason for that is, that the query function rerouts to the deleteMatchingStatements function 
+        // which wants only a Statement.
+        $this->setExpectedException('\Exception');
+        
         $st = $this->getTestStatementWithLiteral();
         $triple = $this->getTestTriple();
 
@@ -110,9 +116,18 @@ class AbstractTriplePatternStoreTest extends TestCase
         $this->assertTrue($this->fixture->query($query));
     }
 
+    public function testDeleteMultipleStatementsTripleRecognition()
+    {
+        $triple = $this->getTestTriple();
+        $graphPattern = SparqlUtils::statementsToSparqlFormat([$triple]);
+        $query = 'DELETE DATA { ' . $graphPattern . '}';
+
+        $this->assertTrue($this->fixture->query($query));
+    }
+
     public function testDeleteMultipleStatementsVariablePatterns()
     {
-        $this->markTestSkipped("TODO implement test store which expects certain things on query");
+        $this->markTestSkipped('TODO implement test store which expects certain things on query');
         $statement = $this->getTestPatternStatement();
         $query = 'DELETE DATA { '. SparqlUtils::statementsToSparqlFormat([$statement]) .'}';
 
