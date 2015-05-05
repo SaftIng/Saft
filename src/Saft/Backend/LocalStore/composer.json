@@ -12,12 +12,12 @@
     ],
     "require" : {
         "php" : ">=5.3.0",
-        "saft/saft-store" : "dev-master"
+        "saft/saft-store" : "dev-master",
+        "filicious/filicious" : "dev-master",
+        "monolog/monolog": "1.11.*"
     },
     "require-dev" : {
-        "phpunit/phpunit" : "4.5.*",
-        "monolog/monolog": "1.11.*",
-        "filicious/filicious" : "dev-master"
+        "phpunit/phpunit" : "4.5.*"
     },
     "autoload" : {
         "psr-4" : {
