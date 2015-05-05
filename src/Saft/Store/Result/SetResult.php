@@ -30,14 +30,6 @@ class SetResult extends Result implements \Iterator
     {
         $this->resultObject->append($entry);
     }
-    
-    /**
-     * @return int Number of items in this instance.
-     */
-    public function count()
-    {
-        return $this->resultObject->count();
-    }
 
     /**
      * @return mixed

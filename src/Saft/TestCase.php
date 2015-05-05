@@ -47,4 +47,29 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         $actual = preg_replace('/\s+/', '', $actual);
         $this->assertEquals($expected, $actual, $message);
     }
+
+    /**
+     * This assertion consumes the StatementIterator and counts its entries until it is empty. It automatically
+     * calls assertTrue and -False on $statementIterator->valid() from time to time.
+     *
+     * @param int               $expectedCount
+     * @param StatementIterator $statementIterator
+     * @param string            $message
+     */
+    public function assertCountStatementIterator($expectedCount, $statementIterator, $message = null)
+    {
+        if (true == empty($message)) {
+            $message = 'Assertion about count of statements.';
+        }
+        
+        for ($i = 0; $i < $expectedCount; ++$i) {
+            $statementIterator->next();
+            $this->assertTrue(
+                $statementIterator->valid(),
+                $message .' Expected: '. $expectedCount .', Actual:'. $i
+            );
+        }
+        $statementIterator->next();
+        $this->assertFalse($statementIterator->valid(), $message);
+    }
 }
