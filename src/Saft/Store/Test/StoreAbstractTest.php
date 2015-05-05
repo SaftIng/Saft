@@ -124,6 +124,13 @@ abstract class StoreAbstractTest extends TestCase
         // remove all triples from the test graph
         $this->fixture->query('CLEAR GRAPH <' . $this->testGraph->getUri() . '>');
 
+        $anyStatement = new StatementImpl(
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
+        );
+
         // graph is empty
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
         $this->assertCountStatementIterator(0, $statements);
