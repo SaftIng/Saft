@@ -42,7 +42,7 @@ abstract class StatementIteratorAbstractTest extends TestCase
         $this->assertEqualsArrays($statements, $actual);
     }
 
-    public function testCountAssertion()
+    public function testCountAssertionSome()
     {
         $statements = [
         new StatementImpl(
@@ -64,5 +64,14 @@ abstract class StatementIteratorAbstractTest extends TestCase
         $iterator = $this->createInstanceWithArray($statements);
 
         $this->assertCountStatementIterator(3, $iterator);
+    }
+
+    public function testCountAssertionNone()
+    {
+        $statements = [];
+
+        $iterator = $this->createInstanceWithArray($statements);
+
+        $this->assertCountStatementIterator(0, $iterator);
     }
 }
