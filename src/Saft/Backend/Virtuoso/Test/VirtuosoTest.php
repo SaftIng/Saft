@@ -5,6 +5,7 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\StatementImpl;
+use Saft\Rdf\AnyPatternImpl;
 use Symfony\Component\Yaml\Parser;
 use Saft\Backend\Virtuoso\Store\Virtuoso;
 use Saft\Store\Test\StoreAbstractTest;
@@ -80,8 +81,16 @@ class VirtuosoTest extends StoreAbstractTest
 
     public function testGetTripleCount()
     {
+        $anyStatement = new StatementImpl(
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
+        );
+
         // graph is empty
-        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
+        $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
+        $this->assertCountStatementIterator(0, $statements);
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(

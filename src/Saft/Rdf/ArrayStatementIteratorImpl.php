@@ -26,14 +26,6 @@ class ArrayStatementIteratorImpl extends AbstractStatementIterator
     }
 
     /**
-     * @return int
-     */
-    public function count()
-    {
-        return $this->arrayIterator->count();
-    }
-
-    /**
      * @return Statement
      */
     public function current()
