@@ -11,7 +11,7 @@ class File implements CacheInterface
      * @var string
      */
     protected $cachePath;
-    
+
     /**
      * Checks that all requirements for this adapter are fullfilled.
      *
@@ -81,23 +81,23 @@ class File implements CacheInterface
             $encodedContainer = file_get_contents($this->cachePath . $filename . '.cache');
 
             $container = json_decode($encodedContainer, true);
-            
+
             /**
              * Store meta data
              */
             ++$container['get_count'];
-            
+
             // save adapted $container
             $encodedContainer = json_encode($container);
             file_put_contents($this->cachePath . $filename .'.cache', $encodedContainer);
-            
+
             // unserialize value, if it is serialized
             if (true === Cache::isSerialized($container['value'])) {
                 $container['value'] = unserialize($container['value']);
             }
-            
+
             return $container;
-            
+
         } else {
             return null;
         }
@@ -136,15 +136,15 @@ class File implements CacheInterface
     public function set($key, $value)
     {
         $filename = hash('sha256', $key);
-        
+
         $value = serialize($value);
-        
+
         if (true === $this->isCached($key)) {
             $content = file_get_contents($this->cachePath . $filename . '.cache');
             $container = json_decode($content, true);
-            
+
             $container['value'] = $value;
-            
+
             ++$container['set_count'];
         } else {
             $container = array();
@@ -152,7 +152,7 @@ class File implements CacheInterface
             $container['set_count'] = 1;
             $container['value'] = $value;
         }
-        
+
         $encodedContainer = json_encode($container);
 
         file_put_contents($this->cachePath . $filename .'.cache', $encodedContainer);
@@ -172,7 +172,7 @@ class File implements CacheInterface
             $this->cachePath = sys_get_temp_dir() . '/saft/';
         } else {
             $this->cachePath = $config['cachePath'];
-            
+
             // check that there is a / at the end
             if ('/' !== substr($this->cachePath, strlen($this->cachePath)-1, 1)) {
                 $this->cachePath .= '/';

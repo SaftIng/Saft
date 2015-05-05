@@ -119,7 +119,7 @@ class Virtuoso extends AbstractSparqlStore
             if (false === $statement->isConcrete()) {
                 throw new \Exception('At least one Statement is not concrete');
             }
-            
+
             // given $graph forces usage of it and not the graph from the statement instance
             if (null !== $graph) {
                 $graphUriToUse = $graph->getUri();
@@ -129,7 +129,7 @@ class Virtuoso extends AbstractSparqlStore
                 && null !== $statement->getGraph()
                 && true === $statement->getGraph()->isNamed()) {
                 $graphUriToUse = $statement->getGraph()->getUri();
-            
+
             // stop further execution if no valid graph was found
             } else {
                 throw new \Exception('Neither $graph was given nor a graph of type NamedNode was set in Statement.');
@@ -228,14 +228,14 @@ class Virtuoso extends AbstractSparqlStore
         if (null !== $graph && false === $graph->isNamed()) {
             $graph = null;
         }
-        
+
         // otherwise check, if graph was set in the statement and it is a named node and use it, if so.
         if (null === $graph
             && null !== $statement->getGraph()
             && true === $statement->getGraph()->isNamed()) {
             $graph = $statement->getGraph();
         }
-        
+
         // we need a graph later on, so throw exception if no one was given
         if (null === $graph) {
             throw new \Exception('Neither $graph nor $statement graph were set.');
@@ -329,7 +329,7 @@ class Virtuoso extends AbstractSparqlStore
         if (null !== $graph && false === $graph->isNamed()) {
             $graph = null;
         }
-        
+
         // otherwise check, if graph was set in the statement and it is a named node and use it, if so.
         if (null === $graph
             && null !== $statement->getGraph()
@@ -347,11 +347,11 @@ class Virtuoso extends AbstractSparqlStore
          * of the graph is to avoid quads in the query. Virtuoso wants the graph in the FROM part.
          */
         $query = 'SELECT ?s ?p ?o ';
-            
+
         if (null !== $graph) {
             $query .= 'FROM <'. $graph->getUri() .'> ';
         }
-        
+
         $query .= 'WHERE { ?s ?p ?o ';
 
         // create shortcuts for S, P and O
@@ -397,7 +397,7 @@ class Virtuoso extends AbstractSparqlStore
                     new StatementImpl($statementList[0], $statementList[1], $statementList[2])
                 );
             }
-            
+
             return $statementResult;
 
         // return given ExceptionResult
@@ -446,12 +446,12 @@ class Virtuoso extends AbstractSparqlStore
         if ($this->successor instanceof Store) {
             $this->successor->hasMatchingStatement($Statement, $graph, $options);
         }
-        
+
         // if $graph was given, but its not a named node, set it to null.
         if (null !== $graph && false === $graph->isNamed()) {
             $graph = null;
         }
-        
+
         // otherwise check, if graph was set in the statement and it is a named node and use it, if so.
         if (null === $graph
             && null !== $Statement->getGraph()
@@ -553,7 +553,7 @@ class Virtuoso extends AbstractSparqlStore
     {
         $queryObject = AbstractQuery::initByQueryString($query);
         $queryParts = $queryObject->getQueryParts();
-        
+
         // if a non-graph query was given, we assume triples or quads. If neither quads nor triples were found,
         // throw an exception.
         if (false === $queryObject->isGraphQuery()
