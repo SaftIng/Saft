@@ -179,6 +179,10 @@ class File implements CacheInterface
             }
         }
 
+        if (!file_exists($this->cachePath)) {
+            mkdir($this->cachePath);
+        }
+
         // init, if requirements are fullfilled
         if (true === $this->checkRequirements()) {
             $this->config = $config;
