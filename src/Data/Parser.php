@@ -46,10 +46,11 @@ class Parser implements ParserInterface
     /**
      * @param $inputStream
      * @param $baseUri
+     * @param $serialization
      * @return StatementIterator
      * @throws Exception
      */
-    public function parseStreamToIterator ($inputStream, $baseUri)
+    public function parseStreamToIterator ($inputStream, $baseUri = null, $serialization = null)
     {
         $rdfUri = librdf_new_uri($this->world, $baseUri);
         if (!$rdfUri) {
@@ -86,5 +87,14 @@ class Parser implements ParserInterface
             }
         }
         return $this->prefixes;
+    }
+
+    /**
+     * @unstable
+     * @return array of supported mimetypes which are understood by this parser
+     */
+    public function getSupportedSerializations()
+    {
+        return [];
     }
 }
