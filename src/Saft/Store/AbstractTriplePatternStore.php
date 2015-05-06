@@ -16,6 +16,13 @@ use Saft\Sparql\Query\Query;
  */
 abstract class AbstractTriplePatternStore implements Store
 {
+    protected $nodeFactory;
+
+    public function __construct(NodeFactory $nodeFactory)
+    {
+        $this->nodeFactory = $nodeFactory;
+    }
+
     /**
      * @param  string     $query            SPARQL query string.
      * @param  string     $options optional Further configuration options.
@@ -79,7 +86,6 @@ abstract class AbstractTriplePatternStore implements Store
      */
     protected function getStatement(Query $queryObject)
     {
-        $nodeFactory = new NodeFactory();
         $queryParts = $queryObject->getQueryParts();
 
         $tupleInformaton = null;
@@ -108,34 +114,34 @@ abstract class AbstractTriplePatternStore implements Store
             );
         }
 
-        if (1 == count($tupleInformation)) {
-            /**
-             * Triple
-             */
-            if ('triple' == $tupleType) {
-                $subject = $nodeFactory->getInstance($tupleInformation[0]['s'], $tupleInformation[0]['s_type']);
-                $predicate = $nodeFactory->getInstance($tupleInformation[0]['p'], $tupleInformation[0]['p_type']);
-                $object = $nodeFactory->getInstance($tupleInformation[0]['o'], $tupleInformation[0]['o_type']);
-                $graph = null;
-
-            /**
-             * Quad
-             */
-            } elseif ('quad' == $tupleType) {
-                $subject = $nodeFactory->getInstance($tupleInformation[0]['s'], $tupleInformation[0]['s_type']);
-                $predicate = $nodeFactory->getInstance($tupleInformation[0]['p'], $tupleInformation[0]['p_type']);
-                $object = $nodeFactory->getInstance($tupleInformation[0]['o'], $tupleInformation[0]['o_type']);
-                $graph = $nodeFactory->getInstance($tupleInformation[0]['g'], 'uri');
-            }
-
-            // no else neccessary, because otherwise the upper exception would be thrown if tupleType is neither
-            // quad or triple.
-
-            return new StatementImpl($subject, $predicate, $object, $graph);
-
-        } else {
+        if (1 > count($tupleInformation)) {
             throw new \Exception('Query contains more than one triple- respectivly quad pattern.');
         }
+
+        /**
+         * Triple
+         */
+        if ('triple' == $tupleType) {
+            $subject = $this->createNodeByValueAndType($tupleInformation[0]['s'], $tupleInformation[0]['s_type']);
+            $predicate = $this->createNodeByValueAndType($tupleInformation[0]['p'], $tupleInformation[0]['p_type']);
+            $object = $this->createNodeByValueAndType($tupleInformation[0]['o'], $tupleInformation[0]['o_type']);
+            $graph = null;
+
+        /**
+         * Quad
+         */
+        } elseif ('quad' == $tupleType) {
+            $subject = $this->createNodeByValueAndType($tupleInformation[0]['s'], $tupleInformation[0]['s_type']);
+            $predicate = $this->createNodeByValueAndType($tupleInformation[0]['p'], $tupleInformation[0]['p_type']);
+            $object = $this->createNodeByValueAndType($tupleInformation[0]['o'], $tupleInformation[0]['o_type']);
+            $graph = $this->createNodeByValueAndType($tupleInformation[0]['g'], 'uri');
+        }
+
+        // no else neccessary, because otherwise the upper exception would be thrown if tupleType is neither
+        // quad or triple.
+
+        return new StatementImpl($subject, $predicate, $object, $graph);
+
     }
 
     /**
@@ -147,7 +153,6 @@ abstract class AbstractTriplePatternStore implements Store
     protected function getStatements(Query $queryObject)
     {
         $queryParts = $queryObject->getQueryParts();
-        $nodeFactory = new NodeFactory();
 
         $statements = new ArrayStatementIteratorImpl(array());
 
@@ -158,9 +163,9 @@ abstract class AbstractTriplePatternStore implements Store
                 /**
                  * Create Node instances for S, P and O to build a StatementImpl instance later on
                  */
-                $s = $nodeFactory->getInstance($pattern['s'], $pattern['s_type']);
-                $p = $nodeFactory->getInstance($pattern['p'], $pattern['p_type']);
-                $o = $nodeFactory->getInstance($pattern['o'], $pattern['o_type']);
+                $s = $this->createNodeByValueAndType($pattern['s'], $pattern['s_type']);
+                $p = $this->createNodeByValueAndType($pattern['p'], $pattern['p_type']);
+                $o = $this->createNodeByValueAndType($pattern['o'], $pattern['o_type']);
                 $g = null;
 
                 $statements->append(new StatementImpl($s, $p, $o, $g));
@@ -173,10 +178,10 @@ abstract class AbstractTriplePatternStore implements Store
                 /**
                  * Create Node instances for S, P and O to build a StatementImpl instance later on
                  */
-                $s = $nodeFactory->getInstance($pattern['s'], $pattern['s_type']);
-                $p = $nodeFactory->getInstance($pattern['p'], $pattern['p_type']);
-                $o = $nodeFactory->getInstance($pattern['o'], $pattern['o_type']);
-                $g = $nodeFactory->getInstance($pattern['g'], $pattern['g_type']);
+                $s = $this->createNodeByValueAndType($pattern['s'], $pattern['s_type']);
+                $p = $this->createNodeByValueAndType($pattern['p'], $pattern['p_type']);
+                $o = $this->createNodeByValueAndType($pattern['o'], $pattern['o_type']);
+                $g = $this->createNodeByValueAndType($pattern['g'], $pattern['g_type']);
 
                 $statements->append(new StatementImpl($s, $p, $o, $g));
             }
@@ -192,5 +197,33 @@ abstract class AbstractTriplePatternStore implements Store
         }
 
         return $statements;
+    }
+
+    protected function createNodeByValueAndType($value, $type)
+    {
+        /**
+         * URI
+         */
+        if ('uri' == $type) {
+            return $this->nodeFactory->createNamedNode($value);
+
+        /**
+         * Any Pattern
+         */
+        } elseif ('var' == $type) {
+            return $this->nodeFactory->createAnyPattern();
+
+        /**
+         * Typed Literal or Literal
+         */
+        } elseif ('typed-literal' == $type || 'literal' == $type) {
+            return $this->nodeFactory->createLiteral($value);
+
+        /**
+         * Unknown type
+         */
+        } else {
+            throw new \Exception('Unknown type given: '. $type);
+        }
     }
 }

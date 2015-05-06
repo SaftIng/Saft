@@ -2,49 +2,13 @@
 
 namespace Saft\Rdf;
 
-class NodeFactory
+interface NodeFactory
 {
-    /**
-     *
-     * @param
-     * @return
-     * @throws
-     */
-    public function __construct()
-    {
-    }
-    
-    /**
-     * @param string $value
-     * @param string $type
-     * @return Node
-     * @throws \Exception If unknown type was given
-     */
-    public function getInstance($value, $type)
-    {
-        /**
-         * URI
-         */
-        if ('uri' == $type) {
-            return new NamedNodeImpl($value);
-        
-        /**
-         * Any Pattern
-         */
-        } elseif ('var' == $type) {
-            return new AnyPatternImpl('?' . str_replace('?', '', $value));
-        
-        /**
-         * Typed Literal or Literal
-         */
-        } elseif ('typed-literal' == $type || 'literal' == $type) {
-            return new LiteralImpl($value);
-        
-        /**
-         * Unknown type
-         */
-        } else {
-            throw new \Exception('Unknown type given: '. $type);
-        }
-    }
+    public function createLiteral($value, $lang = null, $datatype = null);
+
+    public function createNamedNode($uri);
+
+    public function createBlankNode($blankId);
+
+    public function createAnyPattern();
 }

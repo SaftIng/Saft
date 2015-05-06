@@ -4,7 +4,6 @@ namespace Saft\Rdf\Test;
 use \Saft\Rdf\LiteralImpl;
 use \Saft\Rdf\NamedNodeImpl;
 use \Saft\Rdf\StatementImpl;
-use \Saft\Rdf\NodeFactory;
 use \Saft\TestCase;
 
 abstract class StatementIteratorAbstractTest extends TestCase

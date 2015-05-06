@@ -3,10 +3,10 @@
 namespace Saft\Store\Test;
 
 use Saft\TestCase;
-use Saft\Test\MockStore;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Sparql\SparqlUtils;
@@ -15,7 +15,7 @@ class AbstractTriplePatternStoreTest extends TestCase
 {
     public function setUp()
     {
-        $this->fixture = new BasicTriplePatternStore();
+        $this->fixture = new BasicTriplePatternStore(new NodeFactoryImpl());
     }
 
     protected function getTestQuad()
