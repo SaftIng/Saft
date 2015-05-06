@@ -26,10 +26,10 @@ abstract class AbstractTriplePatternStore implements Store
     {
         $queryObject = AbstractQuery::initByQueryString($query);
 
-        /**
-         * INSERT or DELETE query
-         */
         if ('updateQuery' == AbstractQuery::getQueryType($query)) {
+            /*
+             * INSERT or DELETE query
+             */
             $firstPart = substr($queryObject->getSubType(), 0, 6);
 
             // DELETE DATA query
@@ -49,25 +49,22 @@ abstract class AbstractTriplePatternStore implements Store
                     'Not yet implemented: WITH-DELETE-WHERE and WITH-DELETE-INSERT-WHERE queries are not supported yet.'
                 );
             }
-
-        /**
-         * ASK query
-         */
         } elseif ('askQuery' == AbstractQuery::getQueryType($query)) {
+            /*
+             * ASK query
+             */
             $statement = $this->getStatement($queryObject);
             return $this->hasMatchingStatement($statement);
-
-        /**
-         * SELECT query
-         */
         } elseif ('selectQuery' == AbstractQuery::getQueryType($query)) {
+            /*
+             * SELECT query
+             */
             $statement = $this->getStatement($queryObject);
             return $this->getMatchingStatements($statement);
-
-        /**
-         * Unsupported query
-         */
         } else {
+            /*
+             * Unsupported query
+             */
             throw new \Exception('Unsupported query was given: '. $query);
         }
     }
