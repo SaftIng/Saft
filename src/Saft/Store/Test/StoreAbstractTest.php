@@ -177,7 +177,7 @@ abstract class StoreAbstractTest extends TestCase
             new AnyPatternImpl(),
             new AnyPatternImpl()
         );
-        
+
         // graph is empty
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
         $this->assertCountStatementIterator(0, $statements);
@@ -764,7 +764,7 @@ abstract class StoreAbstractTest extends TestCase
 
         // FYI: $graphsUris is an array which contains graph URIs as keys and NamedNode instances as values
         $graphUris = $this->fixture->getAvailableGraphs();
-        
+
         // check, that our test graph is part of the given list
         $this->assertTrue(isset($graphUris[$this->testGraph->getUri()]));
     }

@@ -94,16 +94,16 @@ class AbstractTriplePatternStoreTest extends TestCase
     public function testDeleteMultipleStatementsExceptionCauseOfMultipleStatements()
     {
         // this test expects an exception, because more than one triple pattern is part of the data clause
-        // reason for that is, that the query function rerouts to the deleteMatchingStatements function 
+        // reason for that is, that the query function rerouts to the deleteMatchingStatements function
         // which wants only a Statement.
         $this->setExpectedException('\Exception');
-        
+
         $st = $this->getTestStatementWithLiteral();
         $triple = $this->getTestTriple();
 
         $graphPattern = SparqlUtils::statementsToSparqlFormat([$st, $triple]);
         $query = 'DELETE DATA { ' . $graphPattern . '}';
-        
+
         $this->fixture->query($query);
     }
 
