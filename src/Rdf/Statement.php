@@ -1,6 +1,7 @@
 <?php
 namespace Saft\Backend\Redland\Rdf;
 
+use \Saft\Rdf\Node;
 use \Saft\Rdf\AbstractStatement;
 
 class Statement extends AbstractStatement
@@ -10,9 +11,12 @@ class Statement extends AbstractStatement
      */
     protected $redlandStatement;
 
-    public function __construct($redlandStatement)
+    protected $graph;
+
+    public function __construct($redlandStatement, Node $graph = null)
     {
         $this->redlandStatement = $redlandStatement;
+        $this->graph = $graph;
     }
 
     /**
@@ -47,7 +51,7 @@ class Statement extends AbstractStatement
      */
     public function getGraph()
     {
-        return null;
+        return $this->graph;
     }
 
     /**
@@ -55,7 +59,11 @@ class Statement extends AbstractStatement
      */
     public function isQuad()
     {
-        return false;
+        if ($this->graph == null) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -3,7 +3,7 @@ namespace Saft\Backend\Redland\Rdf;
 
 use \Saft\Rdf\AbstractBlankNode;
 
-class Literal extends AbstractBlankNode
+class BlankNode extends AbstractBlankNode
 {
     /**
      * @var librdf_node the wrapped redland node
@@ -18,5 +18,10 @@ class Literal extends AbstractBlankNode
     public function getBlankId()
     {
         return librdf_node_get_blank_identifier($this->redlandNode);
+    }
+
+    public function getRedlandNode()
+    {
+        return $this->redlandNode;
     }
 }

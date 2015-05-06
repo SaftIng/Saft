@@ -1,14 +1,13 @@
 <?php
 namespace Saft\Backend\Redland\Tests\Rdf;
 
+use \Saft\Backend\Redland\Rdf\NodeFactory;
+
 class LiteralTest extends \Saft\Rdf\Test\LiteralAbstractTest
 {
-    public function __construct()
-    {
-        $this->factory = new \Saft\Backend\Redland\Rdf\RedlandLiteralFactory();
-    }
     public function newInstance($value, $datatype = null, $lang = null)
     {
-        return $this->factory->newInstance($value, $datatype, $lang);
+        $factory = new NodeFactory();
+        return $factory->createLiteral($value, $datatype, $lang);
     }
 }

@@ -10,19 +10,16 @@ class NamedNode extends AbstractNamedNode
      */
     protected $redlandNode;
 
-    public function __construct($value)
+    public function __construct($redlandNode)
     {
-        if ($value === null) {
+        if ($redlandNode === null) {
             throw new \Exception("Can't initialize node with null.");
         }
-        if (gettype($value) == "resource" && get_resource_type($value) == "_p_librdf_node_s") {
-            $this->redlandNode = $value;
-        } else {
-            // TODO catch invalid URIs
-            $world = librdf_new_world();
-            $uri = librdf_new_uri($world, $value);
-            $this->redlandNode = librdf_new_node_from_uri($world, $uri);
+        if (!gettype($redlandNode) == "resource" || !get_resource_type($redlandNode) == "_p_librdf_node_s") {
+            throw new \Exception("Redland NamedNodes have to be initialized with a Redland node.");
         }
+
+        $this->redlandNode = $redlandNode;
     }
 
     /**
@@ -31,5 +28,10 @@ class NamedNode extends AbstractNamedNode
     public function getUri()
     {
         return librdf_uri_to_string(librdf_node_get_uri($this->redlandNode));
+    }
+
+    public function getRedlandNode()
+    {
+        return $this->redlandNode;
     }
 }

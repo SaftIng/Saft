@@ -13,39 +13,17 @@ class Literal extends AbstractLiteral
      */
     protected $redlandNode;
 
-    public function __construct($value, $datatype = null, $lang = null)
+    public function __construct($redlandNode)
     {
-        if ($value === null) {
-            throw new \Exception("Can't initialize literal with null as value.");
+        if ($redlandNode === null) {
+            throw new \Exception("Can't initialize literal with null.");
         }
-        if (gettype($value) == "resource" && get_resource_type($value) == "_p_librdf_node_s") {
-            $this->redlandNode = $value;
-        } else {
 
-            if ($lang !== null && $datatype !== null && $datatype !== self::$rdfLangString) {
-                throw new \Exception(
-                    "Language tagged Literals must have " .
-                    "<" . self::$rdfLangString . "> " .
-                    "datatype."
-                );
-            }
-
-            $world = librdf_new_world();
-            if ($datatype !== null && $lang === null) {
-                // TODO catch invalid URIs
-                $datatypeUri = librdf_new_uri($world, $datatype);
-            } else {
-                $datatypeUri = null;
-            }
-
-            /*
-             * This redland method does only support either $lang or $datatypeUri or both null
-             */
-            $this->redlandNode = librdf_new_node_from_typed_literal($world, $value, $lang, $datatypeUri);
-            if ($this->redlandNode === null) {
-                throw new \Exception("Initialization of redland node failed");
-            }
+        if (!gettype($redlandNode) == "resource" || !get_resource_type($redlandNode) == "_p_librdf_node_s") {
+            throw new \Exception("Redland Literals have to be initialized with a Redland node.");
         }
+
+        $this->redlandNode = $redlandNode;
     }
 
     /**
@@ -78,5 +56,10 @@ class Literal extends AbstractLiteral
     public function getLanguage()
     {
         return librdf_node_get_literal_value_language($this->redlandNode);
+    }
+
+    public function getRedlandNode()
+    {
+        return $this->redlandNode;
     }
 }
