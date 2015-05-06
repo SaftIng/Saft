@@ -81,7 +81,7 @@ class Virtuoso extends AbstractSparqlStore
     public function createGraph(Node $graph, array $options = array())
     {
         // if $graph was given and its a named node
-        if (null !== $graph && true === $graph->isNamed()) {
+        if (null !== $graph && $graph->isNamed()) {
             $this->query('CREATE SILENT GRAPH <'. $graph->getUri() .'>');
         } else {
             throw new \Exception('Given $graph is not a NamedNode.');
@@ -127,7 +127,7 @@ class Virtuoso extends AbstractSparqlStore
             // if graph was set in the statement and it is a named node and use it, if so.
             } elseif (null === $graph
                 && null !== $statement->getGraph()
-                && true === $statement->getGraph()->isNamed()) {
+                && $statement->getGraph()->isNamed()) {
                 $graphUriToUse = $statement->getGraph()->getUri();
 
             // stop further execution if no valid graph was found
@@ -232,7 +232,7 @@ class Virtuoso extends AbstractSparqlStore
         // otherwise check, if graph was set in the statement and it is a named node and use it, if so.
         if (null === $graph
             && null !== $statement->getGraph()
-            && true === $statement->getGraph()->isNamed()) {
+            && $statement->getGraph()->isNamed()) {
             $graph = $statement->getGraph();
         }
 
@@ -280,7 +280,7 @@ class Virtuoso extends AbstractSparqlStore
     public function dropGraph(Node $graph, array $options = array())
     {
         // if $graph was given and its a named node
-        if (null !== $graph && true === $graph->isNamed()) {
+        if (null !== $graph && $graph->isNamed()) {
             $this->query('DROP SILENT GRAPH <'. $graph->getUri() .'>');
         } else {
             throw new \Exception('Given $graph is not a NamedNode.');
@@ -360,17 +360,17 @@ class Virtuoso extends AbstractSparqlStore
         $o = $statement->getObject();
 
         // add filter, if subject is a named node or literal
-        if (true === $s->isNamed() || true == $s->isLiteral()) {
+        if ($s->isNamed() || $s->isLiteral()) {
             $query .= 'FILTER (str(?s) = "'. $s->getUri() .'") ';
         }
 
         // add filter, if predicate is a named node or literal
-        if (true === $p->isNamed() || true == $p->isLiteral()) {
+        if ($p->isNamed() || $p->isLiteral()) {
             $query .= 'FILTER (str(?p) = "'. $p->getUri() .'") ';
         }
 
         // add filter, if predicate is a named node or literal
-        if (true === $o->isNamed() || true == $o->isLiteral()) {
+        if ($o->isNamed() || $o->isLiteral()) {
             $query .= 'FILTER (str(?o) = "'. $o->getValue() .'") ';
         }
 
@@ -380,30 +380,28 @@ class Virtuoso extends AbstractSparqlStore
         // TODO transform getMatchingStatements into lazy loading, so a batch loading is possible
         $result = $this->query($query, $options);
 
-        /**
-         * Transform SetResult into StatementResult, if no exception result was returned by Virtuoso
-         */
-        if (false === $result->isExceptionResult()) {
-            $statementResult = new StatementResult();
-            $statementResult->setVariables($result->getVariables());
-
-            foreach ($result as $entry) {
-                $statementList = array();
-                $i = 0;
-                foreach ($result->getVariables() as $variable) {
-                    $statementList[$i++] = $entry[$variable];
-                }
-                $statementResult->append(
-                    new StatementImpl($statementList[0], $statementList[1], $statementList[2])
-                );
-            }
-
-            return $statementResult;
-
-        // return given ExceptionResult
-        } else {
+        if ($result->isExceptionResult()) {
             return $result;
         }
+
+        /*
+         * Transform SetResult into StatementResult, if no exception result was returned by Virtuoso
+         */
+        $statementResult = new StatementResult();
+        $statementResult->setVariables($result->getVariables());
+
+        foreach ($result as $entry) {
+            $statementList = array();
+            $i = 0;
+            foreach ($result->getVariables() as $variable) {
+                $statementList[$i++] = $entry[$variable];
+            }
+            $statementResult->append(
+                new StatementImpl($statementList[0], $statementList[1], $statementList[2])
+            );
+        }
+
+        return $statementResult;
     }
 
     /**
@@ -455,7 +453,7 @@ class Virtuoso extends AbstractSparqlStore
         // otherwise check, if graph was set in the statement and it is a named node and use it, if so.
         if (null === $graph
             && null !== $Statement->getGraph()
-            && true === $Statement->getGraph()->isNamed()) {
+            && $Statement->getGraph()->isNamed()) {
             $graph = $Statement->getGraph();
         }
 
@@ -470,7 +468,7 @@ class Virtuoso extends AbstractSparqlStore
         $query = 'ASK FROM <'. $graph->getUri() .'> { '. $this->sparqlFormat($statementIterator) .'}';
         $result = $this->query($query, $options);
 
-        if (true === is_object($result)) {
+        if (is_object($result)) {
             return $result->getResultObject();
         } else {
             return $result;
@@ -487,7 +485,7 @@ class Virtuoso extends AbstractSparqlStore
     {
         $graphs = $this->getAvailableGraphs();
 
-        return true === isset($graphs[$graph->getUri()]);
+        return isset($graphs[$graph->getUri()]);
     }
 
     /**
