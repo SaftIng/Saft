@@ -3,7 +3,7 @@ namespace Saft\Rdf\Test;
 
 use Saft\Rdf\LiteralImpl;
 
-class LiteralImplUnitTest extends LiteralAbstractTest
+class LiteralImplTest extends LiteralAbstractTest
 {
     /**
      * Return a new instance of LiteralImpl

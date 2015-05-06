@@ -4,7 +4,7 @@ namespace Saft\Rdf\Test;
 
 use Saft\Rdf\NamedNodeImpl;
 
-class NamedNodeImplUnitTest extends NamedNodeAbstractTest
+class NamedNodeImplTest extends NamedNodeAbstractTest
 {
     /**
      * Return a new instance of NamedNodeImpl

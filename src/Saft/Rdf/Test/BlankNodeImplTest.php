@@ -3,7 +3,7 @@ namespace Saft\Rdf\Test;
 
 use Saft\Rdf\BlankNodeImpl;
 
-class BlankNodeImplUnitTest extends BlankNodeAbstractTest
+class BlankNodeImplTest extends BlankNodeAbstractTest
 {
     /**
      * {@inheritdoc}
