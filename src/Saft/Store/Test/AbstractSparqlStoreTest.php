@@ -6,9 +6,11 @@ use Saft\TestCase;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
+use Saft\Rdf\StatementFactoryImpl;
 use Saft\Test\EqualsSparqlConstraint;
 
 class AbstractSparqlStoreTest extends TestCase
@@ -24,7 +26,10 @@ class AbstractSparqlStoreTest extends TestCase
 
         $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
 
-        $this->mock = $this->getMockForAbstractClass('\Saft\Store\AbstractSparqlStore');
+        $this->mock = $this->getMockForAbstractClass(
+            '\Saft\Store\AbstractSparqlStore',
+            [new NodeFactoryImpl(), new StatementFactoryImpl()]
+        );
     }
 
     /*

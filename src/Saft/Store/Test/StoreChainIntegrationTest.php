@@ -7,7 +7,9 @@ use Saft\Backend\Virtuoso\Store\Virtuoso;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementImpl;
+use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Store\StoreChain;
 use Saft\Store\Result\StatementResult;
@@ -280,7 +282,7 @@ class StoreChainIntegrationTest extends TestCase
         /**
          * get available graphs of the chain
          */
-        $virtuoso = new Virtuoso($this->config['virtuosoConfig']);
+        $virtuoso = new Virtuoso(new NodeFactoryImpl(), new StatementFactoryImpl(), $this->config['virtuosoConfig']);
         $query = $virtuoso->sqlQuery(
             'SELECT ID_TO_IRI(REC_GRAPH_IID) AS graph FROM DB.DBA.RDF_EXPLICITLY_CREATED_GRAPH'
         );
@@ -337,7 +339,7 @@ class StoreChainIntegrationTest extends TestCase
         /**
          * Create test data
          */
-        $virtuoso = new Virtuoso($this->config['virtuosoConfig']);
+        $virtuoso = new Virtuoso(new NodeFactoryImpl(), new StatementFactoryImpl(), $this->config['virtuosoConfig']);
         $virtuoso->dropGraph($this->testGraph);
         $virtuoso->createGraph($this->testGraph);
         $virtuoso->addStatements(
@@ -418,7 +420,7 @@ class StoreChainIntegrationTest extends TestCase
         /**
          * Create test data
          */
-        $virtuoso = new Virtuoso($this->config['virtuosoConfig']);
+        $virtuoso = new Virtuoso(new NodeFactoryImpl(), new StatementFactoryImpl(), $this->config['virtuosoConfig']);
         $virtuoso->dropGraph($this->testGraph);
         $virtuoso->createGraph($this->testGraph);
         $virtuoso->addStatements(
@@ -501,7 +503,7 @@ class StoreChainIntegrationTest extends TestCase
                 new LiteralImpl('test literal')
             )
         );
-        
+
         $sep = $this->separator;
 
         // check result
@@ -612,7 +614,7 @@ class StoreChainIntegrationTest extends TestCase
         }
 
         // drop and create test graph
-        $virtuoso = new Virtuoso($this->config['virtuosoConfig']);
+        $virtuoso = new Virtuoso(new NodeFactoryImpl(), new StatementFactoryImpl(), $this->config['virtuosoConfig']);
         $virtuoso->dropGraph($this->testGraph);
         $virtuoso->createGraph($this->testGraph);
 
@@ -692,7 +694,7 @@ class StoreChainIntegrationTest extends TestCase
         /**
          * Create test data
          */
-        $virtuoso = new Virtuoso($this->config['virtuosoConfig']);
+        $virtuoso = new Virtuoso(new NodeFactoryImpl(), new StatementFactoryImpl(), $this->config['virtuosoConfig']);
         $virtuoso->createGraph($this->testGraph);
         $virtuoso->addStatements(
             new ArrayStatementIteratorImpl(array(

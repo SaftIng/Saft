@@ -6,6 +6,7 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\Statement;
+use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Store\AbstractTriplePatternStore;
 use Saft\Store\Store;
@@ -16,9 +17,9 @@ use Saft\Store\Store;
  */
 class BasicTriplePatternStore extends AbstractTriplePatternStore
 {
-    public function __construct(NodeFactory $nodeFactory)
+    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory)
     {
-        parent::__construct($nodeFactory);
+        parent::__construct($nodeFactory, $statementFactory);
     }
 
     /**

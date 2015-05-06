@@ -3,14 +3,12 @@
 namespace Saft\Backend\HttpStore\Store;
 
 use Saft\Backend\HttpStore\Net\Client;
-use Saft\Rdf\AbstractLiteral;
 use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Rdf\LiteralImpl;
-use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\Statement;
-use Saft\Rdf\StatementImpl;
+use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\Node;
+use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Store\AbstractSparqlStore;
@@ -54,12 +52,15 @@ class Http extends AbstractSparqlStore
      */
     protected $successor;
 
+    private $nodeFactory;
+    private $statementFactory;
+
     /**
      * Constructor.
      *
      * @param array $adapterOptions Array containing database credentials
      */
-    public function __construct(array $adapterOptions)
+    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory, array $adapterOptions)
     {
         $this->adapterOptions = $adapterOptions;
 
@@ -67,6 +68,11 @@ class Http extends AbstractSparqlStore
 
         // Open connection
         $this->openConnection();
+
+        $this->nodeFactory = $nodeFactory;
+        $this->statementFactory = $statementFactory;
+
+        parent::__construct($nodeFactory, $statementFactory);
     }
 
     /**
@@ -119,7 +125,7 @@ class Http extends AbstractSparqlStore
              *
              *          INSERT INTO GRAPH <...> {<...> <...> <...>.}
              *
-             * 
+             *
              * Create batches out of given statements to improve statement throughput.
              */
             $counter = 0;
@@ -129,12 +135,12 @@ class Http extends AbstractSparqlStore
             foreach ($statements as $statement) {
                 // we dont have to check, if $st is a valid Statement, because StatementIterator implementations
                 // dont allow non-Statement entries.
-                
+
                 // non-concrete Statement instances not allowed
                 if (false === $statement->isConcrete()) {
                     throw new \Exception('At least one Statement is not concrete');
                 }
-                
+
                 // given $graphUri forces usage of it and not the graph from the statement instance
                 if (null !== $graphUri) {
                     $graphUriToUse = $graphUri;
@@ -152,7 +158,7 @@ class Http extends AbstractSparqlStore
                  * Notice: add a triple to the batch, even a quad was given, because we dont want the quad
                  *         sparqlFormat call.
                  */
-                $batchStatements[$graphUriToUse]->append(new StatementImpl(
+                $batchStatements[$graphUriToUse]->append($this->statementFactory->createStatement(
                     $statement->getSubject(),
                     $statement->getPredicate(),
                     $statement->getObject()
@@ -409,7 +415,7 @@ class Http extends AbstractSparqlStore
                     $statementList[$i++] = $entry[$variable];
                 }
                 $statementResult->append(
-                    new StatementImpl($statementList[0], $statementList[1], $statementList[2])
+                    $this->statementFactory->createStatement($statementList[0], $statementList[1], $statementList[2])
                 );
             }
 
@@ -520,7 +526,7 @@ class Http extends AbstractSparqlStore
     public function openConnection()
     {
         $this->client = new Client();
-        
+
         $adapterOptions = array_merge(array(
             'authUrl' => '',
             'password' => '',
@@ -602,7 +608,7 @@ class Http extends AbstractSparqlStore
                          * Literal (language'd)
                          */
                         case 'literal':
-                            $newEntry[$variable] = new LiteralImpl(
+                            $newEntry[$variable] = $this->nodeFactory->createLiteral(
                                 $part['value'],
                                 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
                                 $part['xml:lang']
@@ -613,11 +619,9 @@ class Http extends AbstractSparqlStore
                          * Typed-Literal
                          */
                         case 'typed-literal':
-                            // get a value which has the same datatype as described in the given result
-                            // e.g. xsd:string => "foo" instead of only foo
-                            $newEntry[$variable] = NodeUtils::getRealValueBasedOnDatatype(
-                                $part['datatype'],
-                                $part['value']
+                            $newEntry[$variable] = $this->nodeFactory->createLiteral(
+                                $part['value'],
+                                $part['datatype']
                             );
 
                             break;
@@ -626,7 +630,7 @@ class Http extends AbstractSparqlStore
                          * NamedNode
                          */
                         case 'uri':
-                            $newEntry[$variable] = new NamedNodeImpl($part['value']);
+                            $newEntry[$variable] = $this->nodeFactory->createNamedNode($part['value']);
                             break;
 
                         default:

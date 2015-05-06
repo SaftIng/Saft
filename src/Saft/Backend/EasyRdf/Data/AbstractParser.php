@@ -4,10 +4,9 @@ namespace Saft\Backend\EasyRdf\Data;
 
 use Saft\Data\Parser;
 use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Rdf\LiteralImpl;
-use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
-use Saft\Rdf\StatementImpl;
+use Saft\Rdf\StatementFactory;
 
 abstract class AbstractParser implements Parser
 {
@@ -15,7 +14,16 @@ abstract class AbstractParser implements Parser
      * @var StatementIterator
      */
     protected $statementIterator;
-    
+
+    private $nodeFactory;
+    private $statementFactory;
+
+    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory)
+    {
+        $this->nodeFactory = $nodeFactory;
+        $this->statementFactory = $statementFactory;
+    }
+
     /**
      * @param  array             $rdfPhp
      * @return StatementIterator
@@ -23,7 +31,7 @@ abstract class AbstractParser implements Parser
     protected function rdfPhpToStatementIterator(array $rdfPhp)
     {
         $this->statementIterator = new ArrayStatementIteratorImpl(array());
-        
+
         // go through all subjects
         foreach ($rdfPhp as $subject => $predicates) {
             // predicates associated with the subject
@@ -34,37 +42,37 @@ abstract class AbstractParser implements Parser
                      * Create subject node
                      */
                     if (true === NodeUtils::simpleCheckURI($subject)) {
-                        $s = new NamedNodeImpl($subject);
+                        $s = $this->nodeFactory->createNamedNode($subject);
                     } else {
-                        $s = new LiteralImpl($subject);
+                        $s = $this->nodeFactory->createLiteral($subject);
                     }
-                    
+
                     /**
                      * Create predicate node
                      */
                     if (true === NodeUtils::simpleCheckURI($property)) {
-                        $p = new NamedNodeImpl($property);
+                        $p = $this->nodeFactory->createNamedNode($property);
                     } else {
-                        $p = new LiteralImpl($property);
+                        $p = $this->nodeFactory->createLiteral($property);
                     }
-                    
+
                     /**
                      * Create object node
                      */
                     if (true === NodeUtils::simpleCheckURI($object['value'])) {
-                        $o = new NamedNodeImpl($object['value']);
+                        $o = $this->nodeFactory->createNamedNode($object['value']);
                     } else {
-                        $o = new LiteralImpl($object['value']);
+                        $o = $this->nodeFactory->createLiteral($object['value']);
                     }
-                    
+
                     // build statement
-                    $newStatement = new StatementImpl($s, $p, $o);
-                    
+                    $newStatement = $this->statementFactory->createStatement($s, $p, $o);
+
                     $this->statementIterator->append($newStatement);
                 }
             }
         }
-        
+
         return $this->statementIterator;
     }
 }

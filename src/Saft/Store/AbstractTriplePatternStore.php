@@ -5,7 +5,7 @@ namespace Saft\Store;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\Statement;
-use Saft\Rdf\StatementImpl;
+use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\Query;
@@ -16,11 +16,13 @@ use Saft\Sparql\Query\Query;
  */
 abstract class AbstractTriplePatternStore implements Store
 {
-    protected $nodeFactory;
+    private $nodeFactory;
+    private $statementFactory;
 
-    public function __construct(NodeFactory $nodeFactory)
+    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory)
     {
         $this->nodeFactory = $nodeFactory;
+        $this->statementFactory = $statementFactory;
     }
 
     /**
@@ -140,8 +142,7 @@ abstract class AbstractTriplePatternStore implements Store
         // no else neccessary, because otherwise the upper exception would be thrown if tupleType is neither
         // quad or triple.
 
-        return new StatementImpl($subject, $predicate, $object, $graph);
-
+        return $this->statementFactory->createStatement($subject, $predicate, $object, $graph);
     }
 
     /**
@@ -154,21 +155,21 @@ abstract class AbstractTriplePatternStore implements Store
     {
         $queryParts = $queryObject->getQueryParts();
 
-        $statements = new ArrayStatementIteratorImpl(array());
+        $statementArray = array();
 
         // if only triples, but no quads
         if (true === isset($queryParts['triple_pattern'])
             && false === isset($queryParts['quad_pattern'])) {
             foreach ($queryParts['triple_pattern'] as $pattern) {
                 /**
-                 * Create Node instances for S, P and O to build a StatementImpl instance later on
+                 * Create Node instances for S, P and O to build a Statement instance later on
                  */
                 $s = $this->createNodeByValueAndType($pattern['s'], $pattern['s_type']);
                 $p = $this->createNodeByValueAndType($pattern['p'], $pattern['p_type']);
                 $o = $this->createNodeByValueAndType($pattern['o'], $pattern['o_type']);
                 $g = null;
 
-                $statements->append(new StatementImpl($s, $p, $o, $g));
+                $statementsArray[] = $this->statementFactory->createStatement($s, $p, $o, $g);
             }
 
         // if only quads, but not triples
@@ -176,14 +177,14 @@ abstract class AbstractTriplePatternStore implements Store
             && true === isset($queryParts['quad_pattern'])) {
             foreach ($queryParts['quad_pattern'] as $pattern) {
                 /**
-                 * Create Node instances for S, P and O to build a StatementImpl instance later on
+                 * Create Node instances for S, P and O to build a Statement instance later on
                  */
                 $s = $this->createNodeByValueAndType($pattern['s'], $pattern['s_type']);
                 $p = $this->createNodeByValueAndType($pattern['p'], $pattern['p_type']);
                 $o = $this->createNodeByValueAndType($pattern['o'], $pattern['o_type']);
                 $g = $this->createNodeByValueAndType($pattern['g'], $pattern['g_type']);
 
-                $statements->append(new StatementImpl($s, $p, $o, $g));
+                $statementsArray[] = $this->statementFactory->createStatement($s, $p, $o, $g);
             }
 
         // found quads and triples
@@ -196,7 +197,7 @@ abstract class AbstractTriplePatternStore implements Store
             throw new \Exception('Query contains neither quads nor triples.');
         }
 
-        return $statements;
+        return new ArrayStatementIteratorImpl($statementArray);
     }
 
     protected function createNodeByValueAndType($value, $type)

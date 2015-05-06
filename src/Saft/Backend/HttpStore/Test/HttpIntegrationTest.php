@@ -4,6 +4,8 @@ namespace Saft\Backend\HttpStore\Test;
 
 use Saft\Store\Test\StoreAbstractTest;
 use Saft\Backend\HttpStore\Store\Http;
+use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\StatementFactoryImpl;
 
 class HttpAbstractTest extends StoreAbstractTest
 {
@@ -14,10 +16,12 @@ class HttpAbstractTest extends StoreAbstractTest
         $this->config = $this->getConfigContent();
 
         if (true === isset($this->config['httpConfig'])) {
-            $this->fixture = new Http($this->config['httpConfig']);
+            $this->fixture = new Http(new NodeFactoryImpl(), new StatementFactoryImpl(), $this->config['httpConfig']);
         } elseif (true === isset($this->config['configuration']['standardStore'])
             && 'http' === $this->config['configuration']['standardStore']['type']) {
             $this->fixture = new Http(
+                new NodeFactoryImpl(),
+                new StatementFactoryImpl(),
                 $this->config['configuration']['standardStore']
             );
         } else {

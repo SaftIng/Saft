@@ -4,7 +4,9 @@ namespace Saft\Backend\HttpStore\Test;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementImpl;
+use Saft\Rdf\StatementFactoryImpl;
 use Symfony\Component\Yaml\Parser;
 use Saft\Cache\Cache;
 use Saft\Backend\HttpStore\Store\Http;
@@ -57,11 +59,13 @@ class HttpUnitTest extends \PHPUnit_Framework_TestCase
 
         // if httpConfig array is set
         if (true === isset($this->config['httpConfig'])) {
-            $this->fixture = new Http($this->config['httpConfig']);
+            $this->fixture = new Http(new NodeFactoryImpl(), new StatementFactoryImpl(), $this->config['httpConfig']);
 
         // if standard store is set to http
         } elseif ('http' === $this->config['configuration']['standardStore']['type']) {
             $this->fixture = new Http(
+                new NodeFactoryImpl(),
+                new StatementFactoryImpl(),
                 $this->config['configuration']['standardStore']
             );
 
@@ -205,8 +209,8 @@ class HttpUnitTest extends \PHPUnit_Framework_TestCase
     {
         // We expect that authentication fails, because the auth url is not valid
         $this->setExpectedException('\Exception');
-        
+
         $config = array('authUrl' => 'http://not existend');
-        new Http($config);
+        new Http(new NodeFactoryImpl(), new StatementFactoryImpl(), $config);
     }
 }

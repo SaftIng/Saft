@@ -6,7 +6,9 @@ use Saft\Backend\Virtuoso\Store\Virtuoso;
 use Saft\Cache\Cache;
 use Saft\QueryCache\QueryCache;
 use Saft\Rdf\Node;
+use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\Statement;
+use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Store\Result\Result;
 use Saft\Store\Result\EmptyResult;
@@ -268,7 +270,7 @@ class StoreChain implements Store
 
             switch ($configEntry['type']) {
                 case 'http':
-                    $chainEntry = new Http($configEntry);
+                    $chainEntry = new Http(new NodeFactoryImpl(), new StatementFactoryImpl(), $configEntry);
                     break;
 
                 case 'querycache':
@@ -280,7 +282,7 @@ class StoreChain implements Store
                     break;
 
                 case 'virtuoso':
-                    $chainEntry = new Virtuoso($configEntry);
+                    $chainEntry = new Virtuoso(new NodeFactoryImpl(), new StatementFactoryImpl(), $configEntry);
                     break;
 
                 default:

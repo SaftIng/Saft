@@ -93,37 +93,6 @@ class NodeUtils
     }
 
     /**
-     * It checks the given $datatype and casts the given value the right way.
-     * That is important if you want to keep the type of the data synchronized
-     * with PHP variable types.
-     *
-     * @param string $datatype
-     * @param scalar $value
-     * @return mixed
-     * @throws \Exception If an unknown datatype was given.
-     */
-    public static function getRealValueBasedOnDatatype($datatype, $value)
-    {
-        switch($datatype) {
-            // xsd:boolean
-            case 'http://www.w3.org/2001/XMLSchema#boolean':
-                return new LiteralImpl((boolean)$value);
-
-            // xsd:float
-            case 'http://www.w3.org/2001/XMLSchema#float':
-                return new LiteralImpl(floatval($value));
-
-            // xsd:integer
-            case 'http://www.w3.org/2001/XMLSchema#integer':
-                return new LiteralImpl((int)$value);
-
-            default:
-                return new LiteralImpl($value);
-        }
-    }
-
-
-    /**
      * Checks the general syntax of a given URI. Protocol-specific syntaxes are
      * not checked. Instead, only characters disallowed an all URIs lead to a
      * rejection of the check.

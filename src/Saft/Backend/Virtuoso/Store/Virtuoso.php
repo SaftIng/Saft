@@ -4,14 +4,13 @@ namespace Saft\Backend\Virtuoso\Store;
 
 use Saft\Rdf\AbstractLiteral;
 use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Rdf\LiteralImpl;
-use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\Node;
+use Saft\Rdf\NodeFactory;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\Statement;
-use Saft\Rdf\StatementImpl;
+use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\Triple;
-use Saft\Rdf\Node;
-use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Store;
@@ -54,7 +53,7 @@ class Virtuoso extends AbstractSparqlStore
      * @param  array $configuration Array containing database credentials
      * @throws \Exception In case the PHP's odbc or pdo_odbc extension is not available
      */
-    public function __construct(array $configuration)
+    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory, array $configuration)
     {
         $this->checkRequirements();
 
@@ -62,6 +61,11 @@ class Virtuoso extends AbstractSparqlStore
 
         // Open connection
         $this->openConnection();
+
+        $this->nodeFactory = $nodeFactory;
+        $this->statementFactory = $statementFactory;
+
+        parent::__construct($nodeFactory, $statementFactory);
     }
 
     /**
@@ -149,7 +153,7 @@ class Virtuoso extends AbstractSparqlStore
              *
              *          INSERT INTO GRAPH <> {<...> <...> <...>. ...}
              */
-            $batchStatements[$graphUriToUse]->append(new StatementImpl(
+            $batchStatements[$graphUriToUse]->append($this->statementFactory->createStatement(
                 $statement->getSubject(),
                 $statement->getPredicate(),
                 $statement->getObject()
@@ -301,7 +305,7 @@ class Virtuoso extends AbstractSparqlStore
         $graphs = array();
 
         foreach ($query->fetchAll(\PDO::FETCH_ASSOC) as $graph) {
-            $graphs[$graph['graph']] = new NamedNodeImpl($graph['graph']);
+            $graphs[$graph['graph']] = $this->nodeFactory->createNamedNode($graph['graph']);
         }
         return $graphs;
     }
@@ -397,7 +401,7 @@ class Virtuoso extends AbstractSparqlStore
                 $statementList[$i++] = $entry[$variable];
             }
             $statementResult->append(
-                new StatementImpl($statementList[0], $statementList[1], $statementList[2])
+                $this->statementFactory->createStatement($statementList[0], $statementList[1], $statementList[2])
             );
         }
 
@@ -637,7 +641,7 @@ class Virtuoso extends AbstractSparqlStore
                              * Literal (language'd)
                              */
                             case 'literal':
-                                $newEntry[$variable] = new LiteralImpl(
+                                $newEntry[$variable] = $this->nodeFactory->createLiteral(
                                     $part['value'],
                                     'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
                                     $part['xml:lang']
@@ -648,11 +652,9 @@ class Virtuoso extends AbstractSparqlStore
                              * Typed-Literal
                              */
                             case 'typed-literal':
-                                // interprete some datatypes to convert the value to the corresponding type
-                                // e.g. xsd:int => "5" will become a PHP-integer 5
-                                $newEntry[$variable] = NodeUtils::getRealValueBasedOnDatatype(
-                                    $part['datatype'],
-                                    $part['value']
+                                $newEntry[$variable] = $this->nodeFactory->createLiteral(
+                                    $part['value'],
+                                    $part['datatype']
                                 );
 
                                 break;
@@ -661,7 +663,7 @@ class Virtuoso extends AbstractSparqlStore
                              * NamedNode
                              */
                             case 'uri':
-                                $newEntry[$variable] = new NamedNodeImpl($part['value']);
+                                $newEntry[$variable] = $this->nodeFactory->createNamedNode($part['value']);
                                 break;
 
                             default:

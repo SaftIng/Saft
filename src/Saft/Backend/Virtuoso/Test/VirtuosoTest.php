@@ -3,8 +3,10 @@ namespace Saft\Backend\Virtuoso\Test;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\StatementImpl;
+use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\AnyPatternImpl;
 use Symfony\Component\Yaml\Parser;
 use Saft\Backend\Virtuoso\Store\Virtuoso;
@@ -52,10 +54,12 @@ class VirtuosoTest extends StoreAbstractTest
         $this->config = $yaml->parse(file_get_contents($configFilepath));
 
         if (true === isset($this->config['virtuosoConfig'])) {
-            $this->fixture = new Virtuoso($this->config['virtuosoConfig']);
+            $this->fixture = new Virtuoso(new NodeFactoryImpl(), new StatementFactoryImpl(), $this->config['virtuosoConfig']);
         } elseif (true === isset($this->config['configuration']['standardStore'])
             && 'virtuoso' === $this->config['configuration']['standardStore']['type']) {
             $this->fixture = new Virtuoso(
+                new NodeFactoryImpl(),
+                new StatementFactoryImpl(),
                 $this->config['configuration']['standardStore']
             );
         } else {

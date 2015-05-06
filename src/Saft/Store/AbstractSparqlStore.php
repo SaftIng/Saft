@@ -3,8 +3,10 @@
 namespace Saft\Store;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Rdf\Statement;
 use Saft\Rdf\Node;
+use Saft\Rdf\NodeFactory;
+use Saft\Rdf\Statement;
+use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\SparqlUtils;
 
@@ -14,6 +16,16 @@ use Saft\Sparql\SparqlUtils;
  */
 abstract class AbstractSparqlStore implements Store
 {
+
+    private $nodeFactory;
+    private $statementFactory;
+
+    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory)
+    {
+        $this->nodeFactory = $nodeFactory;
+        $this->statementFactory = $statementFactory;
+    }
+
     /**
      * Adds multiple Statements to (default-) graph.
      *
@@ -30,7 +42,7 @@ abstract class AbstractSparqlStore implements Store
     public function addStatements(StatementIterator $statements, Node $graph = null, array $options = array())
     {
         $graphUriToUse = null;
-        
+
         /**
          * Create batches out of given statements to improve statement throughput.
          */
@@ -43,7 +55,7 @@ abstract class AbstractSparqlStore implements Store
             if (false === $statement->isConcrete()) {
                 throw new \Exception('At least one Statement is not concrete');
             }
-            
+
             // given $graph forces usage of it and not the graph from the statement instance
             if (null !== $graph) {
                 $graphUriToUse = $graph->getUri();
@@ -53,7 +65,7 @@ abstract class AbstractSparqlStore implements Store
             } elseif (null !== $statement->getGraph()) {
                 $graph = $statement->getGraph();
                 $graphUriToUse = $graph->getUri();
-            
+
             // no graph instance was found
             } else {
                 throw new \Exception('Graph was not given, neither as parameter nor in statement.');
@@ -109,7 +121,7 @@ abstract class AbstractSparqlStore implements Store
         } elseif (null !== $statement->getGraph()) {
             $graph = $statement->getGraph();
             $graphUriToUse = $graph->getUri();
-        
+
         } else {
             throw new \Exception('Graph was not given, neither as parameter nor in statement.');
         }
