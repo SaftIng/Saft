@@ -41,15 +41,12 @@
         "saft/saft-cache-memcached": "self.version",
         "saft/saft-querycache": "self.version",
         "saft/saft-store-http": "self.version",
-        "saft/saft-store-virtuoso": "self.version",
-        "saft/saft-store-local": "self.version"
+        "saft/saft-store-virtuoso": "self.version"
     },
     "require": {
         "php": ">=5.3.3",
         "easyrdf/easyrdf": "*",
-        "php-curl-class/php-curl-class": "*",
-        "monolog/monolog": "1.11.*",
-        "filicious/filicious" : "dev-master"
+        "php-curl-class/php-curl-class": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "4.5.*",

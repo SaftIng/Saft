@@ -1,6 +1,0 @@
-{
-    "mapping": {
-        "http://localhost:8890/foaf": "foaf.nt",
-        "http://localhost:8890/foo": "/foo.nt"
-    }
-}
