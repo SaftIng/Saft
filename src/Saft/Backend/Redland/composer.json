@@ -1,9 +1,17 @@
 {
-    "description": "Redland backend for the Saft library.",
-    "keywords": ["Saft", "Linked Data", "Semantic Web", "Redland"],
-    "homepage": "https://safting.github.io",
-    "license": "GPL2",
     "name": "saft/saft-redland",
+    "description": "Redland backend for the Saft library.",
+    "keywords": ["Saft", "Linked Data", "Semantic Web", "Redland", "Parser", "RDF"],
+    "homepage": "https://safting.github.io/",
+    "license": "GPL2",
+    "authors": [
+        {
+            "name": "Natanael Arndt",
+            "homepage": "http://aksw.org/NatanaelArndt",
+            "email": "arndtn@gmail.com",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php": ">=5.3.3",
         "ext-redland": "*",
