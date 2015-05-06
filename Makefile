@@ -55,6 +55,7 @@ split-subtrees:
 	git subtree split -P src/Saft/Store -b saft.store
 	git subtree split -P src/Saft/Backend/HttpStore -b saft.store.http
 	git subtree split -P src/Saft/Backend/Virtuoso -b saft.store.virtuoso
+	git subtree split -P src/Saft/Backend/Redland -b saft.redland
 
 push-subtrees:
 	git push saft.cache saft.cache:master
@@ -67,3 +68,4 @@ push-subtrees:
 	git push saft.store saft.store:master
 	git push saft.store.http saft.store.http:master
 	git push saft.store.virtuoso saft.store.virtuoso:master
+	git push saft.redland saft.redland:master
