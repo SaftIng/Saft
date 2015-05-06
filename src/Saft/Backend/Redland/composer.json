@@ -18,16 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Saft\\Backend\\Redland\\": [
-                "src/"
-            ]
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Saft\\Backend\\Redland\\Tests\\": [
-                "test/"
-            ]
+            "Saft\\Backend\\Redland\\": "."
         }
     }
 }
