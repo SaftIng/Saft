@@ -48,7 +48,6 @@ split-subtrees:
 	git subtree split -P src/Saft/Cache -b saft.cache
 	git subtree split -P src/Saft/Backend/FileCache -b saft.cache.file
 	git subtree split -P src/Saft/Backend/MemcacheD -b saft.cache.memcached
-	git subtree split -P src/Saft/Backend/PhpArrayCache -b saft.cache.phparray
 	git subtree split -P src/Saft/Data -b saft.data
 	git subtree split -P src/Saft/QueryCache -b saft.querycache
 	git subtree split -P src/Saft/Rdf -b saft.rdf
@@ -61,7 +60,6 @@ push-subtrees:
 	git push saft.cache saft.cache:master
 	git push saft.cache.file saft.cache.file:master
 	git push saft.cache.memcached saft.cache.memcached:master
-	git push saft.cache.phparray saft.cache.phparray:master
 	git push saft.data saft.data:master
 	git push saft.querycache saft.querycache:master
 	git push saft.rdf saft.rdf:master
