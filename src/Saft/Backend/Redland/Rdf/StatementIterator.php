@@ -14,16 +14,19 @@ class StatementIterator implements SaftStatementIterator
     /**
      * @param $stream librdf_stream
      */
-    public function __construct ($stream) {
+    public function __construct($stream)
+    {
         $this->stream = $stream;
     }
 
-    public function current () {
+    public function current()
+    {
         $redlandStatement = librdf_stream_get_object($this->stream);
         return new Statement($redlandStatement);
     }
 
-    public function next () {
+    public function next()
+    {
         librdf_stream_next($this->stream);
     }
 
@@ -39,10 +42,10 @@ class StatementIterator implements SaftStatementIterator
 
     public function valid()
     {
-        if(librdf_stream_end ($this->stream)) {
+        if (librdf_stream_end($this->stream)) {
             return false;
-        } else {
-            return true;
         }
+
+        return true;
     }
 }

@@ -24,7 +24,7 @@ class Parser implements ParserInterface
      */
     protected $parser;
 
-    public function __construct ()
+    public function __construct()
     {
         if (!extension_loaded('redland')) {
             throw new Exception('Redland php5-librdf is required for this parser');
@@ -50,7 +50,7 @@ class Parser implements ParserInterface
      * @return StatementIterator
      * @throws Exception
      */
-    public function parseStringToIterator ($inputString, $baseUri = null, $serialization = null)
+    public function parseStringToIterator($inputString, $baseUri = null, $serialization = null)
     {
         $redlandStream = librdf_parser_parse_string_as_stream($this->parser, $data, $rdfUri);
         if (!$redlandStream) {
@@ -69,7 +69,7 @@ class Parser implements ParserInterface
      * @return StatementIterator
      * @throws Exception
      */
-    public function parseStreamToIterator ($inputStream, $baseUri = null, $serialization = null)
+    public function parseStreamToIterator($inputStream, $baseUri = null, $serialization = null)
     {
         $rdfUri = librdf_new_uri($this->world, $baseUri);
         if (!$rdfUri) {
@@ -83,7 +83,7 @@ class Parser implements ParserInterface
         return $this->parseStingToIterator($data, $baseUri, $serialization);
     }
 
-    public function getCurrentPrefixlist ()
+    public function getCurrentPrefixlist()
     {
         $prefixCount = count($this->prefixes);
         $parserPrefixCount = librdf_parser_get_namespaces_seen_count($this->parser);

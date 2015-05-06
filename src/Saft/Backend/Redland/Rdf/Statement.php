@@ -74,7 +74,8 @@ class Statement extends AbstractStatement
         return true;
     }
 
-    protected function getNodeForRedlandNode($redlandNode) {
+    protected function getNodeForRedlandNode($redlandNode)
+    {
         if (librdf_node_is_literal($redlandNode)) {
             return new Literal($redlandNode);
         } elseif (librdf_node_is_resource($redlandNode)) {

@@ -79,7 +79,11 @@ class NodeFactory implements SaftNodeFactory
         } elseif ($node->isNamed()) {
             return $this->createNamedNode($node->getUri())->getRedlandNode();
         } elseif ($node->isLiteral()) {
-            return $this->createLiteral($node->getValue(), $node->getDatatype(), $node->getLanguage())->getRedlandNode();
+            return $this->createLiteral(
+                $node->getValue(),
+                $node->getDatatype(),
+                $node->getLanguage()
+            )->getRedlandNode();
         } elseif ($node->isBlank()) {
             return $this->createBlankNode($node->getBlankId())->getRedlandNode();
         }

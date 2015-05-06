@@ -45,9 +45,9 @@ class Literal extends AbstractLiteral
             return librdf_uri_to_string($datatype);
         } elseif ($this->getLanguage() !== null) {
             return self::$rdfLangString;
-        } else {
-            return self::$xsdString;
         }
+
+        return self::$xsdString;
     }
 
     /**
