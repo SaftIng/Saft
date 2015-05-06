@@ -1,7 +1,7 @@
 <?php
 namespace Saft\Backend\Redland\Data;
 
-use \Saft\Data\ParserInterface;
+use \Saft\Data\Parser as ParserInterface;
 use \Saft\Backend\Redland\Rdf\StatementIterator;
 
 class Parser implements ParserInterface
@@ -44,6 +44,25 @@ class Parser implements ParserInterface
     }
 
     /**
+     * @param $inputString
+     * @param $baseUri
+     * @param $serialization
+     * @return StatementIterator
+     * @throws Exception
+     */
+    public function parseStringToIterator ($inputString, $baseUri = null, $serialization = null)
+    {
+        $redlandStream = librdf_parser_parse_string_as_stream($this->parser, $data, $rdfUri);
+        if (!$redlandStream) {
+            throw new Exception(
+                "Failed to parse RDF stream"
+            );
+        }
+
+        return new StatementIterator($redlandStream);
+    }
+
+    /**
      * @param $inputStream
      * @param $baseUri
      * @param $serialization
@@ -61,14 +80,7 @@ class Parser implements ParserInterface
 
         $data = file_get_contents($inputStream);
 
-        $redlandStream = librdf_parser_parse_string_as_stream($this->parser, $data, $rdfUri);
-        if (!$redlandStream) {
-            throw new Exception(
-                "Failed to parse RDF stream"
-            );
-        }
-
-        return new StatementIterator($redlandStream);
+        return $this->parseStingToIterator($data, $baseUri, $serialization);
     }
 
     public function getCurrentPrefixlist ()
