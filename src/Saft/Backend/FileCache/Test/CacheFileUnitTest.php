@@ -46,6 +46,7 @@ class CacheFileUnitTest extends TestCase
 
     public function testCheckRequirementsCacheFolderNotWriteable()
     {
+        $this->markTestSkipped("Please don't cause side effects with this test");
         // expect exception, because cache folder is invalid
         $this->setExpectedException('\Exception');
 
