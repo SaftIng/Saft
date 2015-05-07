@@ -35,6 +35,8 @@ class StoreChainIntegrationTest extends TestCase
      */
     public function setUp()
     {
+        $this->markTestSkipped('Ignore StoreChain as long its not removed.');
+
         parent::setUp();
 
         $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
@@ -283,20 +285,11 @@ class StoreChainIntegrationTest extends TestCase
          * get available graphs of the chain
          */
         $virtuoso = new Virtuoso(new NodeFactoryImpl(), new StatementFactoryImpl(), $this->config['virtuosoConfig']);
-        $query = $virtuoso->sqlQuery(
-            'SELECT ID_TO_IRI(REC_GRAPH_IID) AS graph FROM DB.DBA.RDF_EXPLICITLY_CREATED_GRAPH'
-        );
-
-        $graphs = array();
-
-        foreach ($query->fetchAll(\PDO::FETCH_ASSOC) as $graph) {
-            $graphs[$graph['graph']] = $graph['graph'];
-        }
 
         /**
          * check both results
          */
-        $this->assertEquals($graphs, $this->fixture->getAvailableGraphs());
+        $this->assertEquals($virtuoso->getAvailableGraphs(), $this->fixture->getAvailableGraphs());
     }
 
     /**
