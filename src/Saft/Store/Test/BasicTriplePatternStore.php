@@ -3,6 +3,7 @@
 namespace Saft\Store\Test;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\Statement;
@@ -111,12 +112,13 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
      * Create a new graph with the URI given as Node. If the underlying store implementation doesn't support empty
      * graphs this method will have no effect.
      *
-     * @param Node $graph The graph name used for the newly created graph
-     * @param array $options optional additional key-value pairs passed to the store implementation
-     *
-     * @throws \Exception If the given graph could not be created
+     * @param  NamedNode $graph            Instance of NamedNode containing the URI of the graph to create.
+     * @param  array     $options optional It contains key-value pairs and should provide additional introductions
+     *                                     for the store and/or its adapter(s).
+     * @throws \Exception If given $graph is not a NamedNode.
+     * @throws \Exception If the given graph could not be created.
      */
-    public function createGraph(Node $graph, array $options = array())
+    public function createGraph(NamedNode $graph, array $options = array())
     {
         // TODO: Implement createGraph() method.
     }
@@ -124,12 +126,13 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
     /**
      * Removes the given graph from the store.
      *
-     * @param Node $graph The name of the graph to drop
-     * @param array $options optional additional key-value pairs passed to the store implementation
-     *
+     * @param  NamedNode $graph            Instance of NamedNode containing the URI of the graph to drop.
+     * @param  array     $options optional It contains key-value pairs and should provide additional introductions
+     *                                     for the store and/or its adapter(s).
+     * @throws \Exception If given $graph is not a NamedNode.
      * @throws \Exception If the given graph could not be droped
      */
-    public function dropGraph(Node $graph, array $options = array())
+    public function dropGraph(NamedNode $graph, array $options = array())
     {
         // TODO: Implement dropGraph() method.
     }

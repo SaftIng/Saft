@@ -4,6 +4,7 @@ namespace Saft\QueryCache;
 
 use Saft\Cache\Cache;
 use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
@@ -454,7 +455,7 @@ class QueryCache implements Store, ChainableStore
 
         return $result;
     }
-    
+
     /**
      * Returns a prevoiusly stored result, if available.
      *
@@ -467,11 +468,11 @@ class QueryCache implements Store, ChainableStore
         // instance of Query was given
         if ($query instanceof Query) {
             return $this->cache->get((string)$query);
-            
+
         // string was given
         } elseif (true === is_string($query)) {
             return $this->cache->get($query);
-        
+
         // invalid $query parameter
         } else {
             throw new \Exception('Parameter $query is neither a string nor an instance of Query.');
@@ -909,30 +910,43 @@ class QueryCache implements Store, ChainableStore
     }
 
     /**
-     * Create a new graph with the URI given as Node. If the underlying store implementation doesn't support empty
-     * graphs this method will have no effect.
+     * Create a new graph with the URI given as Node, if the chain successor was set. QueryCache itself does not
+     * support graph management.
      *
-     * @param Node $graph The graph name used for the newly created graph
-     * @param array $options optional additional key-value pairs passed to the store implementation
-     *
-     * @throws \Exception If the given graph could not be created
+     * @param  NamedNode $graph            Instance of NamedNode containing the URI of the graph to create.
+     * @param  array     $options optional It contains key-value pairs and should provide additional introductions
+     *                                     for the store and/or its adapter(s).
+     * @throws \Exception If given $graph is not a NamedNode.
+     * @throws \Exception If the given graph could not be created.
+     * @throws \Exception If no chain successor set.
      */
-    public function createGraph(Node $graph, array $options = array())
+    public function createGraph(NamedNode $graph, array $options = array())
     {
-        $this->getChainSuccessor()->createGraph($graph, $options);
+        if ($this->getChainSuccessor() instanceof Store) {
+            $this->getChainSuccessor()->createGraph($graph, $options);
+        } else {
+            throw new \Exception('Can not create graph because no chain successor set.');
+        }
     }
 
     /**
-     * Removes the given graph from the store.
+     * Removes the given graph from the store, if the chain successor was set. QueryCache itself does not
+     * support graph management.
      *
-     * @param Node $graph The name of the graph to drop
-     * @param array $options optional additional key-value pairs passed to the store implementation
-     *
-     * @throws \Exception If the given graph could not be droped
+     * @param  NamedNode $graph            Instance of NamedNode containing the URI of the graph to drop.
+     * @param  array     $options optional It contains key-value pairs and should provide additional introductions
+     *                                     for the store and/or its adapter(s).
+     * @throws \Exception If given $graph is not a NamedNode.
+     * @throws \Exception If the given graph could not be droped.
+     * @throws \Exception If no chain successor set.
      */
-    public function dropGraph(Node $graph, array $options = array())
+    public function dropGraph(NamedNode $graph, array $options = array())
     {
         // TODO invalidate all entries for this graph
-        $this->getChainSuccessor()->dropGraph($graph, $options);
+        if ($this->getChainSuccessor() instanceof Store) {
+            $this->getChainSuccessor()->dropGraph($graph, $options);
+        } else {
+            throw new \Exception('Can not drop graph because no chain successor set.');
+        }
     }
 }

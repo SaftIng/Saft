@@ -5,6 +5,7 @@ use Saft\Backend\HttpStore\Store\Http;
 use Saft\Backend\Virtuoso\Store\Virtuoso;
 use Saft\Cache\Cache;
 use Saft\QueryCache\QueryCache;
+use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\Statement;
@@ -306,7 +307,7 @@ class StoreChain implements Store
      *
      * @throws \Exception If the given graph could not be created
      */
-    public function createGraph(Node $graph, array $options = array())
+    public function createGraph(NamedNode $graph, array $options = array())
     {
         // TODO: Implement createGraph() method.
     }
@@ -319,7 +320,7 @@ class StoreChain implements Store
      *
      * @throws \Exception If the given graph could not be droped
      */
-    public function dropGraph(Node $graph, array $options = array())
+    public function dropGraph(NamedNode $graph, array $options = array())
     {
         // TODO: Implement dropGraph() method.
     }

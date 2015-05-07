@@ -69,22 +69,6 @@ class Virtuoso extends AbstractSparqlStore
     }
 
     /**
-     * Adds a new empty and named graph.
-     *
-     * @param  Node       $graphUri URI of the graph to create.
-     * @throws \Exception If given $graph is not a NamedNode.
-     */
-    public function createGraph(Node $graph, array $options = array())
-    {
-        // if $graph was given and its a named node
-        if (null !== $graph && $graph->isNamed()) {
-            $this->query('CREATE SILENT GRAPH <'. $graph->getUri() .'>');
-        } else {
-            throw new \Exception('Given $graph is not a NamedNode.');
-        }
-    }
-
-    /**
      * Adds multiple Statements to (default-) graph.
      *
      * @param  StatementIterator $statements          StatementList instance must contain Statement instances
@@ -253,24 +237,6 @@ class Virtuoso extends AbstractSparqlStore
         $this->query($query, $options);
 
         return true;
-    }
-
-    /**
-     * Drops an existing graph.
-     *
-     * @param  string $graphUri          URI of the graph to drop.
-     * @param  array  $options  optional It contains key-value pairs and should provide additional introductions
-     *                                   for the store and/or its adapter(s).
-     * @throws \Exception If given $graph is not a NamedNode.
-     */
-    public function dropGraph(Node $graph, array $options = array())
-    {
-        // if $graph was given and its a named node
-        if (null !== $graph && $graph->isNamed()) {
-            $this->query('DROP SILENT GRAPH <'. $graph->getUri() .'>');
-        } else {
-            throw new \Exception('Given $graph is not a NamedNode.');
-        }
     }
 
     /**

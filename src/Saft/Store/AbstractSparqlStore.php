@@ -3,6 +3,7 @@
 namespace Saft\Store;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\Statement;
@@ -111,6 +112,25 @@ abstract class AbstractSparqlStore implements Store
     }
 
     /**
+     * Create a new graph with the URI given as Node. If the underlying store implementation doesn't support empty
+     * graphs this method will have no effect.
+     *
+     * @param  NamedNode $graph            Instance of NamedNode containing the URI of the graph to create.
+     * @param  array     $options optional It contains key-value pairs and should provide additional introductions
+     *                                     for the store and/or its adapter(s).
+     * @throws \Exception If given $graph is not a NamedNode.
+     * @throws \Exception If the given graph could not be created.
+     */
+    public function createGraph(NamedNode $graph, array $options = array())
+    {
+        if ($graph->isNamed()) {
+            $this->query('CREATE SILENT GRAPH <'. $graph->getUri() .'>');
+        } else {
+            throw new \Exception('Given $graph is not a NamedNode.');
+        }
+    }
+
+    /**
      * Removes all statements from a (default-) graph which match with given statement.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
@@ -140,6 +160,24 @@ abstract class AbstractSparqlStore implements Store
 
         $query = 'DELETE DATA { '. $this->sparqlFormat($statementIterator, $graph) .'}';
         return $this->query($query, $options);
+    }
+
+    /**
+     * Removes the given graph from the store.
+     *
+     * @param  NamedNode $graph            Instance of NamedNode containing the URI of the graph to drop.
+     * @param  array     $options optional It contains key-value pairs and should provide additional introductions
+     *                                     for the store and/or its adapter(s).
+     * @throws \Exception If given $graph is not a NamedNode.
+     * @throws \Exception If the given graph could not be droped
+     */
+    public function dropGraph(NamedNode $graph, array $options = array())
+    {
+        if ($graph->isNamed()) {
+            $this->query('DROP SILENT GRAPH <'. $graph->getUri() .'>');
+        } else {
+            throw new \Exception('Given $graph is not a NamedNode.');
+        }
     }
 
     /**

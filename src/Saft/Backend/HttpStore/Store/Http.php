@@ -83,17 +83,6 @@ class Http extends AbstractSparqlStore
     }
 
     /**
-     * Add a new empty and named graph.
-     *
-     * @param  Node $graph URI of the graph to create
-     * @throws \Exception
-     */
-    public function createGraph(Node $graph, array $options = array())
-    {
-        $this->client->sendSparqlUpdateQuery('CREATE SILENT GRAPH <'. $graph->getUri() .'>');
-    }
-
-    /**
      * Adds multiple Statements to (default-) graph.
      *
      * @param  StatementIterator $statements          StatementList instance must contain Statement instances
@@ -289,17 +278,6 @@ class Http extends AbstractSparqlStore
         }
 
         return $store;
-    }
-
-    /**
-     * Drops a graph.
-     *
-     * @param  Node $graph URI of the graph to remove
-     * @throws \Exception
-     */
-    public function dropGraph(Node $graph, array $options = array())
-    {
-        $this->client->sendSparqlUpdateQuery('DROP SILENT GRAPH <'. $graph->getUri() .'>');
     }
 
     /**
