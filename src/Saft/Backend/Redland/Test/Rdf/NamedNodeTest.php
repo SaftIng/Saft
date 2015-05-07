@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Backend\Redland\Tests\Rdf;
 
 class NamedNodeTest extends \Saft\Rdf\Test\NamedNodeAbstractTest

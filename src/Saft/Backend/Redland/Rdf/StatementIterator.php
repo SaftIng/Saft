@@ -1,11 +1,11 @@
 <?php
+
 namespace Saft\Backend\Redland\Rdf;
 
 use \Saft\Rdf\StatementIterator as SaftStatementIterator;
 
 class StatementIterator implements SaftStatementIterator
 {
-
     /**
      * @var librdf_stream the redland stream wrapped by this class
      */

@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Backend\Redland\Rdf;
 
 use \Saft\Rdf\Node;
@@ -6,24 +7,37 @@ use \Saft\Rdf\NodeFactory as SaftNodeFactory;
 
 class NodeFactory implements SaftNodeFactory
 {
-    protected static $xsdString = "http://www.w3.org/2001/XMLSchema#string";
-    protected static $rdfLangString = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString";
+    /**
+     * @var string
+     */
+    protected static $xsdString = 'http://www.w3.org/2001/XMLSchema#string';
 
+    /**
+     * @var string
+     */
+    protected static $rdfLangString = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString';
+
+    /**
+     * @param  mixed $value
+     * @param  string $datatype optional
+     * @param  string $lang     optional
+     * @return Literal
+     */
     public function createLiteral($value, $datatype = null, $lang = null)
     {
         if ($value === null) {
-            throw new \Exception("Can't initialize literal with null as value.");
+            throw new \Exception('Can\'t initialize literal with null as value.');
         }
 
         if ($lang !== null && $datatype !== null && $datatype !== self::$rdfLangString) {
-            throw new \Exception("Language tagged Literals must have <" . self::$rdfLangString . "> datatype.");
+            throw new \Exception('Language tagged Literals must have <' . self::$rdfLangString . '> datatype.');
         }
 
         $world = librdf_new_world();
 
         /*
-         * Make sure that the no language is set, since redland doesn't allow a language tag to be set if a datatype is
-         * given
+         * Make sure that the no language is set, since redland doesn't allow a language tag to be set if a 
+         * datatype is given.
          */
         if ($datatype !== null && $lang === null) {
             // TODO catch invalid URIs
@@ -38,16 +52,20 @@ class NodeFactory implements SaftNodeFactory
         $redlandNode = librdf_new_node_from_typed_literal($world, $value, $lang, $datatypeUri);
 
         if ($redlandNode === null) {
-            throw new \Exception("Initialization of redland node failed");
+            throw new \Exception('Initialization of redland node failed.');
         }
 
         return new Literal($redlandNode);
     }
 
+    /**
+     * @param  string $uri URI of the new named node.
+     * @return NamedNode
+     */
     public function createNamedNode($uri)
     {
         if ($uri === null) {
-            throw new \Exception("Can't initialize node with null.");
+            throw new \Exception('Can\'t initialize node with null.');
         }
 
         // TODO catch invalid URIs
@@ -56,7 +74,7 @@ class NodeFactory implements SaftNodeFactory
         $redlandNode = librdf_new_node_from_uri($world, $uri);
 
         if ($redlandNode === null) {
-            throw new \Exception("Initialization of redland node failed");
+            throw new \Exception('Initialization of redland node failed.');
         }
 
         return new NamedNode($redlandNode);

@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Backend\Redland\Data;
 
 use \Saft\Data\Parser as ParserInterface;
@@ -6,7 +7,6 @@ use \Saft\Backend\Redland\Rdf\StatementIterator;
 
 class Parser implements ParserInterface
 {
-
     /**
      * The redland world instance
      */
@@ -26,20 +26,17 @@ class Parser implements ParserInterface
 
     public function __construct()
     {
-        if (!extension_loaded('redland')) {
+        if (false === extension_loaded('redland')) {
             throw new Exception('Redland php5-librdf is required for this parser');
         }
-        // var_dump(get_extension_funcs('redland'));
 
         $format = 'turtle';
 
         $this->world = librdf_new_world();
         $this->parser = librdf_new_parser($this->world, $format, null, null);
 
-        if (!$this->parser) {
-            throw new Exception(
-                "Failed to create librdf_parser of type: $format"
-            );
+        if (false === $this->parser) {
+            throw new Exception('Failed to create librdf_parser of type: '. $format);
         }
     }
 
@@ -53,10 +50,8 @@ class Parser implements ParserInterface
     public function parseStringToIterator($inputString, $baseUri = null, $serialization = null)
     {
         $redlandStream = librdf_parser_parse_string_as_stream($this->parser, $data, $rdfUri);
-        if (!$redlandStream) {
-            throw new Exception(
-                "Failed to parse RDF stream"
-            );
+        if (false === $redlandStream) {
+            throw new Exception('Failed to parse RDF stream');
         }
 
         return new StatementIterator($redlandStream);
@@ -72,10 +67,9 @@ class Parser implements ParserInterface
     public function parseStreamToIterator($inputStream, $baseUri = null, $serialization = null)
     {
         $rdfUri = librdf_new_uri($this->world, $baseUri);
-        if (!$rdfUri) {
-            throw new Exception(
-                "Failed to create librdf_uri from: $baseUri"
-            );
+        
+        if (false === $rdfUri) {
+            throw new Exception('Failed to create librdf_uri from: '. $baseUri);
         }
 
         $data = file_get_contents($inputStream);
@@ -92,7 +86,7 @@ class Parser implements ParserInterface
          * Asumption, that redland internaly keeps a distinct list of prefixes
          */
         if ($prefixCount < $parserPrefixCount) {
-            for ($i = $prefixCount; $i < $parserPrefixCount; $i++) {
+            for ($i = $prefixCount; $i < $parserPrefixCount; ++$i) {
                 $prefix = librdf_parser_get_namespaces_seen_prefix($this->parser, $i);
                 $uri = librdf_parser_get_namespaces_seen_uri($this->parser, $i);
                 $this->prefixes[$prefix] = librdf_uri_as_string($uri);
@@ -107,6 +101,6 @@ class Parser implements ParserInterface
      */
     public function getSupportedSerializations()
     {
-        return [];
+        return array();
     }
 }

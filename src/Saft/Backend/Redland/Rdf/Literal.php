@@ -1,12 +1,13 @@
 <?php
+
 namespace Saft\Backend\Redland\Rdf;
 
 use \Saft\Rdf\AbstractLiteral;
 
 class Literal extends AbstractLiteral
 {
-    protected static $xsdString = "http://www.w3.org/2001/XMLSchema#string";
-    protected static $rdfLangString = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString";
+    protected static $xsdString = 'http://www.w3.org/2001/XMLSchema#string';
+    protected static $rdfLangString = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString';
 
     /**
      * @var librdf_node the wrapped redland node
@@ -16,11 +17,11 @@ class Literal extends AbstractLiteral
     public function __construct($redlandNode)
     {
         if ($redlandNode === null) {
-            throw new \Exception("Can't initialize literal with null.");
+            throw new \Exception('Can\'t initialize literal with null.');
         }
 
-        if (!gettype($redlandNode) == "resource" || !get_resource_type($redlandNode) == "_p_librdf_node_s") {
-            throw new \Exception("Redland Literals have to be initialized with a Redland node.");
+        if (!gettype($redlandNode) == 'resource' || !get_resource_type($redlandNode) == '_p_librdf_node_s') {
+            throw new \Exception('Redland Literals have to be initialized with a Redland node.');
         }
 
         $this->redlandNode = $redlandNode;

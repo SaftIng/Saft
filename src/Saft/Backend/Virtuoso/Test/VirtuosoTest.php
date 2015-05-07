@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Backend\Virtuoso\Test;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
@@ -54,7 +55,11 @@ class VirtuosoTest extends StoreAbstractTest
         $this->config = $yaml->parse(file_get_contents($configFilepath));
 
         if (true === isset($this->config['virtuosoConfig'])) {
-            $this->fixture = new Virtuoso(new NodeFactoryImpl(), new StatementFactoryImpl(), $this->config['virtuosoConfig']);
+            $this->fixture = new Virtuoso(
+                new NodeFactoryImpl(),
+                new StatementFactoryImpl(),
+                $this->config['virtuosoConfig']
+            );
         } elseif (true === isset($this->config['configuration']['standardStore'])
             && 'virtuoso' === $this->config['configuration']['standardStore']['type']) {
             $this->fixture = new Virtuoso(

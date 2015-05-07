@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Backend\Redland\Tests\Rdf;
 
 use \Saft\Backend\Redland\Rdf\NodeFactory;

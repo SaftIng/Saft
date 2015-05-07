@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Backend\Redland\Rdf;
 
 use \Saft\Rdf\AbstractNamedNode;
@@ -13,10 +14,10 @@ class NamedNode extends AbstractNamedNode
     public function __construct($redlandNode)
     {
         if ($redlandNode === null) {
-            throw new \Exception("Can't initialize node with null.");
+            throw new \Exception('Can\'t initialize node with null.');
         }
-        if (!gettype($redlandNode) == "resource" || !get_resource_type($redlandNode) == "_p_librdf_node_s") {
-            throw new \Exception("Redland NamedNodes have to be initialized with a Redland node.");
+        if (!gettype($redlandNode) == 'resource' || !get_resource_type($redlandNode) == '_p_librdf_node_s') {
+            throw new \Exception('Redland NamedNodes have to be initialized with a Redland node.');
         }
 
         $this->redlandNode = $redlandNode;

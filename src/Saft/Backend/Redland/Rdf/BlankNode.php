@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Backend\Redland\Rdf;
 
 use \Saft\Rdf\AbstractBlankNode;

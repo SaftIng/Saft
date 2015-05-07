@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Backend\Redland\Tests\Rdf;
 
 use \Saft\Rdf\AnyPatternImpl;
@@ -46,7 +47,7 @@ class StatementTest extends \Saft\Rdf\Test\StatementAbstractTest
             $statement = librdf_new_statement_from_nodes($world, $redlandSubject, $redlandPredicate, $redlandObject);
             return new Statement($statement, $graph);
         } catch (\Exception $e) {
-            $this->markTestSkipped("Can't execute this test because: " . $e->getMessage());
+            $this->markTestSkipped('Can\'t execute this test because: ' . $e->getMessage());
         }
     }
 
