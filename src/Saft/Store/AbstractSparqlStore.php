@@ -10,6 +10,9 @@ use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\SparqlUtils;
+use Saft\Store\Result\Result;
+use Saft\Store\Result\EmptyResult;
+use Saft\Store\Result\StatementResult;
 
 /**
  * Predefined sparql Store. All Triple methods reroute to the query-method. In the specific sparql-Store those
@@ -158,7 +161,7 @@ abstract class AbstractSparqlStore implements Store
 
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
 
-        $query = 'DELETE DATA { '. $this->sparqlFormat($statementIterator, $graph) .'}';
+        $query = 'DELETE WHERE { '. $this->sparqlFormat($statementIterator, $graph) .'}';
         return $this->query($query, $options);
     }
 
@@ -212,29 +215,82 @@ abstract class AbstractSparqlStore implements Store
      * @return StatementIterator It contains Statement instances  of all matching
      *                           statements of the given graph.
      * @todo FILTER select
+     * @todo check if graph URI is valid
+     * @todo make it possible to read graphUri from $statement, if given $graphUri is null
      */
     public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
-        // TODO migrate code to new interface
-        $graphUri = null;
-        if ($graph !== null) {
-            $graphUri = $graph->getUri();
+        // if $graph was given, but its not a named node, set it to null.
+        if (null !== $graph && false === $graph->isNamed()) {
+            $graph = null;
+        }
+        // otherwise check, if graph was set in the statement and it is a named node and use it, if so.
+        if (null === $graph
+            && null !== $statement->getGraph()
+            && true === $statement->getGraph()->isNamed()) {
+            $graph = $statement->getGraph();
         }
 
-        $query = "";
-        if ($graphUri !== null) {
-            $query = "FROM <" . $graphUri . ">" . PHP_EOL;
-        } elseif ($statement->isQuad() && $statement->getGraph()->isConcrete()) {
-            $query = "FROM <" . $statement->getGraph()->getUri() . ">" . PHP_EOL;
+        /*
+         * Build query
+         */
+        $query = 'SELECT ?s ?p ?o ';
+        if (null !== $graph) {
+            $query .= 'FROM <'. $graph->getUri() .'> ';
+        }
+        $query .= 'WHERE { ?s ?p ?o ';
+
+        // create shortcuts for S, P and O
+        $subject = $statement->getSubject();
+        $predicate = $statement->getPredicate();
+        $object = $statement->getObject();
+
+        // add filter, if subject is a named node or literal
+        if ($subject->isNamed()) {
+            $query .= 'FILTER (str(?s) = "'. $subject->getUri() .'") ';
         }
 
-        $query.= "SELECT * WHERE { ";
-        $query.= SparqlUtils::getNodeInSparqlFormat($statement->getSubject(), "s") . " ";
-        $query.= SparqlUtils::getNodeInSparqlFormat($statement->getPredicate(), "p") . " ";
-        $query.= SparqlUtils::getNodeInSparqlFormat($statement->getObject(), "o") . " ";
-        $query.= " }" . PHP_EOL;
+        // add filter, if predicate is a named node or literal
+        if ($predicate->isNamed()) {
+            $query .= 'FILTER (str(?p) = "'. $predicate->getUri() .'") ';
+        }
 
-        return $this->query($query, $options);
+        // add filter, if object is a named node or literal
+        if ($object->isNamed()) {
+            $query .= 'FILTER (str(?o) = "'. $object->getUri() .'") ';
+        } elseif ($object->isLiteral()) {
+            $query .= 'FILTER (str(?o) = "'. $object->getValue() .'") ';
+        }
+        $query .= '}';
+
+        // execute query and save result
+        // TODO transform getMatchingStatements into lazy loading, so a batch loading is possible
+        $result = $this->query($query, $options);
+
+        if (null === $result) {
+            return new EmptyResult();
+        }
+
+        if ($result->isExceptionResult()) {
+            return $result;
+        }
+
+        /*
+         * Transform SetResult into StatementResult, if no exception result was returned by Virtuoso
+         */
+        $statementResult = new StatementResult();
+        $statementResult->setVariables($result->getVariables());
+        foreach ($result as $entry) {
+            $statementList = array();
+            $i = 0;
+            foreach ($result->getVariables() as $variable) {
+                $statementList[$i++] = $entry[$variable];
+            }
+            $statementResult->append(
+                $this->statementFactory->createStatement($statementList[0], $statementList[1], $statementList[2])
+            );
+        }
+        return $statementResult;
     }
 
     /**
@@ -249,14 +305,19 @@ abstract class AbstractSparqlStore implements Store
      */
     public function hasMatchingStatement(Statement $statement, Node $graph = null, array $options = array())
     {
-        // TODO migrate code to new interface
-        $graphUri = null;
-        if ($graph !== null) {
-            $graphUri = $graph->getUri();
+        // if $graph was given, but its not a named node, set it to null.
+        if (null !== $graph && false === $graph->isNamed()) {
+            $graph = null;
+        }
+        // otherwise check, if graph was set in the statement and it is a named node and use it, if so.
+        if (null === $graph
+            && null !== $statement->getGraph()
+            && true === $statement->getGraph()->isNamed()) {
+            $graph = $statement->getGraph();
         }
 
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-        $result = $this->query('ASK { '. $this->sparqlFormat($statementIterator, $graphUri) .'}', $options);
+        $result = $this->query('ASK { '. $this->sparqlFormat($statementIterator, $graph) .'}', $options);
 
         if (true === is_object($result)) {
             return $result->getResultObject();

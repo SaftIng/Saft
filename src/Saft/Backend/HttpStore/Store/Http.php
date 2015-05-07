@@ -83,104 +83,6 @@ class Http extends AbstractSparqlStore
     }
 
     /**
-     * Adds multiple Statements to (default-) graph.
-     *
-     * @param  StatementIterator $statements          StatementList instance must contain Statement instances
-     *                                                which are 'concret-' and not 'pattern'-statements.
-     * @param  Node              $graph      optional Overrides target graph. If set, all statements will
-     *                                                be add to that graph, if available.
-     * @param  array             $options    optional It contains key-value pairs and should provide additional
-     *                                                introductions for the store and/or its adapter(s).
-     * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
-     *                 will be thrown.
-     * @todo implement usage of graph inside the statement(s). create groups for each graph
-     */
-    public function addStatements(StatementIterator $statements, Node $graph = null, array $options = array())
-    {
-        // TODO migrate code to new interface
-        $graphUri = null;
-        if ($graph !== null) {
-            $graphUri = $graph->getUri();
-        }
-
-        if ('virtuoso' == $this->storeName) {
-            /*
-             * Bcause Virtuoso wont accepts queries like:
-             *
-             *          INSERT DATA {Graph <...> {<...> <...> <...>}}
-             *
-             * so we have to change it to:
-             *
-             *          INSERT INTO GRAPH <...> {<...> <...> <...>.}
-             *
-             *
-             * Create batches out of given statements to improve statement throughput.
-             */
-            $counter = 0;
-            $batchSize = 100;
-            $batchStatements = array();
-
-            foreach ($statements as $statement) {
-                // we dont have to check, if $st is a valid Statement, because StatementIterator implementations
-                // dont allow non-Statement entries.
-
-                // non-concrete Statement instances not allowed
-                if (false === $statement->isConcrete()) {
-                    throw new \Exception('At least one Statement is not concrete');
-                }
-
-                // given $graphUri forces usage of it and not the graph from the statement instance
-                if (null !== $graphUri) {
-                    $graphUriToUse = $graphUri;
-
-                // use graphUri from statement
-                } else {
-                    $graphUriToUse = $statement->getGraph()->getUri();
-                }
-
-                if (false === isset($batchStatements[$graphUriToUse])) {
-                    $batchStatements[$graphUriToUse] = new ArrayStatementIteratorImpl(array());
-                }
-
-                /**
-                 * Notice: add a triple to the batch, even a quad was given, because we dont want the quad
-                 *         sparqlFormat call.
-                 */
-                $batchStatements[$graphUriToUse]->append($this->statementFactory->createStatement(
-                    $statement->getSubject(),
-                    $statement->getPredicate(),
-                    $statement->getObject()
-                ));
-
-                // after batch is full, execute collected statements all at once
-                if (0 === $counter % $batchSize) {
-                    /**
-                     * $batchStatements is an array with graphUri('s) as key(s) and ArrayStatementIteratorImpl
-                     * instances as value. Each entry is related to a certain graph and contains a bunch of
-                     * statement instances.
-                     */
-                    foreach ($batchStatements as $graphUriToUse => $statementBatch) {
-                        $this->query(
-                            'INSERT INTO GRAPH <'. $graphUriToUse .'> {'. $this->sparqlFormat($statementBatch) .'}',
-                            $options
-                        );
-                    }
-
-                    // re-init variables
-                    $batchStatements = array();
-                }
-            }
-
-            $result = true;
-
-        } else {
-            $result = parent::addStatements($statements, $graph, $options);
-        }
-
-        return $result;
-    }
-
-    /**
      * Checks that all requirements for queries via HTTP are fullfilled.
      *
      * @return boolean True, if all requirements are fullfilled.
@@ -205,82 +107,6 @@ class Http extends AbstractSparqlStore
     }
 
     /**
-     * Removes all statements from a (default-) graph which match with given statement.
-     *
-     * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  Node      $graph     optional Overrides target graph. If set, all statements will be delete in
-     *                                       that graph.
-     * @param  array     $options   optional It contains key-value pairs and should provide additional
-     *                                       introductions for the store and/or its adapter(s).
-     * @return boolean Returns true, if function performed without errors. In case
-     *                 an error occur, an exception will be thrown.
-     */
-    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
-    {
-        // TODO migrate code to new interface
-        $graphUri = null;
-        if ($graph !== null) {
-            $graphUri = $graph->getUri();
-        }
-
-        if ('virtuoso' == $this->storeName) {
-            /**
-             * To be compatible with Virtuoso 6.1.8+, adapt DELETE DATA query. Virtuoso does not understand
-             * DELETE DATA calls containing variables such as:
-             *
-             *      DELETE DATA {
-             *          Graph <http://localhost/Saft/TestGraph/> {<http://s/> <http://p/> ?o.}
-             *      }
-             *
-             * So we have to override this method to make it look like:
-             *
-             *      WITH <http://localhost/Saft/TestGraph/>
-             *      DELETE { <http://s/> <http://p/> ?o. }
-             *      WHERE { <http://s/> <http://p/> ?o. }
-             */
-            if (null === $graphUri) {
-                $graphUri = $statement->getGraph();
-            }
-
-            // if given graphUri and $statements graph are both null, throw exception
-            if (null === $graphUri) {
-                throw new \Exception('Neither $graphUri nor $statement graph were set.');
-            }
-
-            $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-            $condition = $this->sparqlFormat($statementIterator);
-            $query = 'WITH <'. $graphUri .'> DELETE {'. $condition .'} WHERE {'. $condition .'}';
-            $this->query($query, $options);
-
-            $result = true;
-
-        } else {
-            $result = parent::deleteMatchingStatements($statement, $graph, $options);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Determines store on the server.
-     *
-     * @return string Name of the store on the server. If not possible, returns null.
-     */
-    public function determineStoreOnServer($responseHeaders)
-    {
-        $store = null;
-
-        // Virtuoso usually set Server key in the response array with value such as:
-        //
-        //      Virtuoso/06.01.3127 (Linux) i686-pc-linux-gnu
-        if ('Virtuoso' === substr($responseHeaders['Server'], 0, 8)) {
-            $store = 'virtuoso';
-        }
-
-        return $store;
-    }
-
-    /**
      * Returns array with graphUri's which are available.
      *
      * @return array Array which contains graph URI's as values and keys.
@@ -298,89 +124,6 @@ class Http extends AbstractSparqlStore
         }
 
         return $graphs;
-    }
-
-    /**
-     * It gets all statements of a given graph which match the following conditions:
-     * - statement's subject is either equal to the subject of the same statement of the graph or it is null.
-     * - statement's predicate is either equal to the predicate of the same statement of the graph or it is null.
-     * - statement's object is either equal to the object of a statement of the graph or it is null.
-     *
-     * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  Node      $graph     optional Overrides target graph. If set, you will get all
-     *                                       matching statements of that graph.
-     * @param  array     $options   optional It contains key-value pairs and should provide additional
-     *                                       introductions for the store and/or its adapter(s).
-     * @return StatementIterator It contains Statement instances  of all matching
-     *                           statements of the given graph.
-     * @todo FILTER select
-     * @todo check if graph URI is valid
-     * @TODO make it dynamic to be able to do lazy loading
-     */
-    public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
-    {
-        // TODO migrate code to new interface
-        $graphUri = null;
-        if ($graph !== null) {
-            $graphUri = $graph->getUri();
-        }
-
-        if ('virtuoso' == $this->storeName) {
-            // Remove, maybe available, graph from given statement and put it into an iterator.
-            // reason for the removal of the graph is to avoid quads in the query. Virtuoso wants the graph
-            // in the FROM part.
-            $query = 'SELECT ?s ?p ?o ' .
-                'FROM <'. $graphUri .'> '.
-                'WHERE { ?s ?p ?o ';
-
-            // create shortcuts for S, P and O
-            $s = $statement->getSubject();
-            $p = $statement->getPredicate();
-            $o = $statement->getObject();
-
-            // add filter, if subject is a named node or literal
-            if (true === $s->isNamed() || true == $s->isLiteral()) {
-                $query .= 'FILTER (str(?s) = "'. $s->getUri() .'") ';
-            }
-
-            // add filter, if predicate is a named node or literal
-            if (true === $p->isNamed() || true == $p->isLiteral()) {
-                $query .= 'FILTER (str(?p) = "'. $p->getUri() .'") ';
-            }
-
-            // add filter, if predicate is a named node or literal
-            if (true === $o->isNamed() || true == $o->isLiteral()) {
-                $query .= 'FILTER (str(?o) = "'. $o->getValue() .'") ';
-            }
-
-            $query .= '}';
-
-            // execute query and save result
-            // TODO transform getMatchingStatements into lazy loading, so a batch loading is possible
-            $result = $this->query($query, $options);
-
-            /**
-             * Transform SetResult into StatementResult
-             */
-            $statementResult = new StatementResult();
-            $statementResult->setVariables($result->getVariables());
-
-            foreach ($result as $entry) {
-                $statementList = array();
-                $i = 0;
-                foreach ($result->getVariables() as $variable) {
-                    $statementList[$i++] = $entry[$variable];
-                }
-                $statementResult->append(
-                    $this->statementFactory->createStatement($statementList[0], $statementList[1], $statementList[2])
-                );
-            }
-
-            return $statementResult;
-
-        } else {
-            return parent::getMatchingStatements($statement, $graph, $options);
-        }
     }
 
     /**
@@ -405,57 +148,6 @@ class Http extends AbstractSparqlStore
         $result = $result->getResultObject();
 
         return $result[0]['count']->getValue();
-    }
-
-    /**
-     * Returns true or false depending on whether or not the statements pattern has any matches in the given
-     * graph. It overrides AbstractSparqlStore's hasMatchingStatement in case the target store needs a different
-     * query structure, such as Virtuoso.
-     *
-     * @param  Statement $Statement          It can be either a concrete or pattern-statement.
-     * @param  Node      $graph     optional Overrides target graph.
-     * @param  array     $options   optional It contains key-value pairs and should provide additional
-     *                                       introductions for the store and/or its adapter(s).
-     * @return boolean Returns true if at least one match was found, false otherwise.
-     */
-    public function hasMatchingStatement(Statement $Statement, Node $graph = null, array $options = array())
-    {
-        // TODO migrate code to new interface
-        $graphUri = null;
-        if ($graph !== null) {
-            $graphUri = $graph->getUri();
-        }
-
-        /**
-         * Virtuoso
-         */
-        if ('virtuoso' === $this->storeName) {
-            // set graphUri, use that from the statement if $graphUri is null
-            if (null === $graphUri) {
-                $graphUri = $Statement->getGraph()->getUri();
-            }
-
-            // no check for graphUri neccessary, because graph URI was either given as a Node, which checks that
-            // too or inside of the Statement, where the graph is also a Node.
-
-            $statementIterator = new ArrayStatementIteratorImpl(array($Statement));
-            $result = $this->query(
-                'ASK FROM <'. $graphUri .'> { '. $this->sparqlFormat($statementIterator) .'}',
-                $options
-            );
-
-            if (true === is_object($result)) {
-                return $result->getResultObject();
-            } else {
-                return $result;
-            }
-
-        /**
-         * Standard SPARQL
-         */
-        } else {
-            return parent::hasMatchingStatement($statement, $graph, $options);
-        }
     }
 
     /**
@@ -493,9 +185,6 @@ class Http extends AbstractSparqlStore
 
         // If status code is 200, means everything is OK
         if (200 === $curlInfo['http_code']) {
-            // save name of the store which provides SPARQL endpoint
-            $this->storeName = $this->determineStoreOnServer($this->client->getClient()->response_headers);
-
             $this->client->setUrl($adapterOptions['queryUrl']);
             return $this->client;
 
@@ -560,13 +249,19 @@ class Http extends AbstractSparqlStore
                          * Literal (language'd)
                          */
                         case 'literal':
+                            $lang = null;
+                            if (isset($part['xml:lang'])) {
+                                $lang = $part['xml:lang'];
+                            }
+
                             $newEntry[$variable] = $this->nodeFactory->createLiteral(
                                 $part['value'],
                                 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
-                                $part['xml:lang']
+                                $lang
                             );
 
                             break;
+
                         /**
                          * Typed-Literal
                          */
@@ -583,6 +278,13 @@ class Http extends AbstractSparqlStore
                          */
                         case 'uri':
                             $newEntry[$variable] = $this->nodeFactory->createNamedNode($part['value']);
+                            break;
+
+                        /**
+                         * BlankNode
+                         */
+                        case 'bnode':
+                            $newEntry[$variable] = $this->nodeFactory->createBlankNode($part['value']);
                             break;
 
                         default:

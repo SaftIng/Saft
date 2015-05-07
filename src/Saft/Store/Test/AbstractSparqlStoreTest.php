@@ -66,9 +66,12 @@ class AbstractSparqlStoreTest extends TestCase
 
     public function testGetMatchingStatements()
     {
-        $query = 'FROM <http://saft/test/g1> SELECT * WHERE { ';
-        $query.= ' <http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1> ';
-        $query.= '}';
+        $query  = 'SELECT ?s ?p ?o FROM <http://saft/test/g1> WHERE { ';
+        $query .= ' ?s ?p ?o ';
+        $query .= ' FILTER(str(?s)="http://saft/test/s1")';
+        $query .= ' FILTER(str(?p)="http://saft/test/p1")';
+        $query .= ' FILTER(str(?o)="http://saft/test/o1")';
+        $query .= '}';
 
         $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
 
@@ -117,8 +120,7 @@ class AbstractSparqlStoreTest extends TestCase
         $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
 
         $result = $this->mock->hasMatchingStatement($this->getTestStatement());
-
-        $this->assertTrue(is_bool($result));
+        $this->assertNull($result);
     }
 
     public function testAddStatementsMultipleVariatonOfObjects()
