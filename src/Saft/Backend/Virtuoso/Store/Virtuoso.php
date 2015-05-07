@@ -40,14 +40,6 @@ class Virtuoso extends AbstractSparqlStore
     protected $connection = null;
 
     /**
-     * If set, all statement- and query related operations have to be in close collaboration with the
-     * successor.
-     *
-     * @var instance which implements Saft\Store\StoreInterface.
-     */
-    protected $successor;
-
-    /**
      * Constructor.
      *
      * @param  array $configuration Array containing database credentials
@@ -178,11 +170,6 @@ class Virtuoso extends AbstractSparqlStore
             }
         }
 
-        // if successor is set, ask it too.
-        if ($this->successor instanceof Store) {
-            $this->successor->addStatements($statements, $graph, $options);
-        }
-
         return true;
     }
 
@@ -265,11 +252,6 @@ class Virtuoso extends AbstractSparqlStore
 
         $this->query($query, $options);
 
-        // if successor is set, ask it too.
-        if ($this->successor instanceof Store) {
-            $this->successor->deleteMatchingStatements($statement, $graph, $options);
-        }
-
         return true;
     }
 
@@ -339,11 +321,6 @@ class Virtuoso extends AbstractSparqlStore
             && null !== $statement->getGraph()
             && true === $statement->getGraph()->isNamed()) {
             $graph = $statement->getGraph();
-        }
-
-        // if successor is set, ask it too.
-        if ($this->successor instanceof Store) {
-            $this->successor->getMatchingStatements($statement, $graph, $options);
         }
 
         /**
@@ -444,11 +421,6 @@ class Virtuoso extends AbstractSparqlStore
      */
     public function hasMatchingStatement(Statement $Statement, Node $graph = null, array $options = array())
     {
-        // if successor is set, ask it too.
-        if ($this->successor instanceof Store) {
-            $this->successor->hasMatchingStatement($Statement, $graph, $options);
-        }
-
         // if $graph was given, but its not a named node, set it to null.
         if (null !== $graph && false === $graph->isNamed()) {
             $graph = null;
@@ -590,11 +562,6 @@ class Virtuoso extends AbstractSparqlStore
 
             } catch (\PDOException $e) {
                 return new ExceptionResult($e);
-            }
-
-            // if successor is set, ask it too.
-            if ($this->successor instanceof Store) {
-                $this->successor->query($query, $options);
             }
 
             $setResult = new SetResult();
