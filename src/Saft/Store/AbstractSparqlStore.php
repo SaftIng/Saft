@@ -16,10 +16,20 @@ use Saft\Sparql\SparqlUtils;
  */
 abstract class AbstractSparqlStore implements Store
 {
-
+    /**
+     * @var NodeFactory
+     */
     private $nodeFactory;
+
+    /**
+     * @var StatementFactory
+     */
     private $statementFactory;
 
+    /**
+     * @param NodeFactory $nodeFactory
+     * @param StatementFactory $statementFactory
+     */
     public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory)
     {
         $this->nodeFactory = $nodeFactory;
