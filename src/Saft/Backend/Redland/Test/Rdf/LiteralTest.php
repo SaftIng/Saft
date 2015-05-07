@@ -10,4 +10,16 @@ class LiteralTest extends \Saft\Rdf\Test\LiteralAbstractTest
         $factory = new NodeFactory();
         return $factory->createLiteral($value, $datatype, $lang);
     }
+
+    /**
+     * Check for reland extension to be installed before execute a test.
+     */
+    public function setUp()
+    {
+        if (false === function_exists('librdf_new_world')) {
+            $this->markTestSkipped('Can not find librdf_new_world function, so it seems Redland is not installed.');
+        }
+
+        parent::setUp();
+    }
 }
