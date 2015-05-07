@@ -18,7 +18,7 @@ class LiteralTest extends \Saft\Rdf\Test\LiteralAbstractTest
     public function setUp()
     {
         if (false === extension_loaded('redland')) {
-            $this->markTestSkipped('Can not find librdf_new_world function, so it seems Redland is not installed.');
+            $this->markTestSkipped('Extension redland is not loaded.');
         }
 
         parent::setUp();
