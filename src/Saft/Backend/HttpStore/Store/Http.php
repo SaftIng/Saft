@@ -45,14 +45,13 @@ class Http extends AbstractSparqlStore
     protected $storeName = '';
 
     /**
-     * If set, all statement- and query related operations have to be in close collaboration with the
-     * successor.
-     *
-     * @var instance which implements Saft\Store\StoreInterface.
+     * @var NodeFactory
      */
-    protected $successor;
-
     private $nodeFactory;
+
+    /**
+     * @var NodeFactory
+     */
     private $statementFactory;
 
     /**
@@ -189,11 +188,6 @@ class Http extends AbstractSparqlStore
             $result = parent::addStatements($statements, $graph, $options);
         }
 
-        // if successor is set, ask it too.
-        if ($this->successor instanceof Store) {
-            $this->successor->addStatements($statements, $graph, $options);
-        }
-
         return $result;
     }
 
@@ -269,20 +263,10 @@ class Http extends AbstractSparqlStore
             $query = 'WITH <'. $graphUri .'> DELETE {'. $condition .'} WHERE {'. $condition .'}';
             $this->query($query, $options);
 
-            // if successor is set, ask it too.
-            if ($this->successor instanceof Store) {
-                $this->successor->deleteMatchingStatements($statement, $graph, $options);
-            }
-
             $result = true;
 
         } else {
             $result = parent::deleteMatchingStatements($statement, $graph, $options);
-        }
-
-        // if successor is set, ask it too.
-        if ($this->successor instanceof Store) {
-            $this->successor->deleteMatchingStatements($statement, $graph, $options);
         }
 
         return $result;
@@ -361,11 +345,6 @@ class Http extends AbstractSparqlStore
         $graphUri = null;
         if ($graph !== null) {
             $graphUri = $graph->getUri();
-        }
-
-        // if successor is set, ask it too.
-        if ($this->successor instanceof Store) {
-            $this->successor->getMatchingStatements($statement, $graph, $options);
         }
 
         if ('virtuoso' == $this->storeName) {
@@ -467,11 +446,6 @@ class Http extends AbstractSparqlStore
         $graphUri = null;
         if ($graph !== null) {
             $graphUri = $graph->getUri();
-        }
-
-        // if successor is set, ask it too.
-        if ($this->successor instanceof Store) {
-            $this->successor->hasMatchingStatement($Statement, $graph, $options);
         }
 
         /**
@@ -669,19 +643,5 @@ class Http extends AbstractSparqlStore
         }
 
         return $return;
-    }
-
-    /**
-     * Set successor instance. This method is useful, if you wanna build chain of instances which implement
-     * StoreInterface. It sets another instance which will be later called, if a statement- or query-related
-     * function gets called.
-     * E.g. you chain a query cache and a virtuoso instance. In this example all queries will be handled by
-     * the query cache first, but if no cache entry was found, the virtuoso instance gets called.
-     *
-     * @return array Array which contains information about the store and its features.
-     */
-    public function setChainSuccessor(Store $successor)
-    {
-        $this->successor = $successor;
     }
 }
