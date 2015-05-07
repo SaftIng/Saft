@@ -56,7 +56,7 @@ class StatementTest extends \Saft\Rdf\Test\StatementAbstractTest
      */
     public function setUp()
     {
-        if (false === function_exists('librdf_new_world')) {
+        if (false === extension_loaded('redland')) {
             $this->markTestSkipped('Can not find librdf_new_world function, so it seems Redland is not installed.');
         }
 
