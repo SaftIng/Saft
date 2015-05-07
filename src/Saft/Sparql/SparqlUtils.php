@@ -73,8 +73,8 @@ class SparqlUtils
             return $node->toNQuads();
         }
         if ($var == null) {
-            $var = uniqid("tempVar");
+            $var = uniqid('tempVar');
         }
-        return "?" . $var;
+        return '?' . $var;
     }
 }

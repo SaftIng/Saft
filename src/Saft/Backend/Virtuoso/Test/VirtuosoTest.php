@@ -15,30 +15,10 @@ use Saft\Store\Test\StoreAbstractTest;
 
 class VirtuosoTest extends StoreAbstractTest
 {
-    /**
-     * @var Saft\Cache
-     */
-    protected $cache;
-
-    /**
-     * @var array
-     */
-    protected $config;
-
-    /**
-     * Contains an instance of the class to test.
-     *
-     * @var mixed
-     */
-    protected $fixture;
-
-    /**
-     * @var string
-     */
-    protected $testGraph;
-
     public function setUp()
     {
+        parent::setUp();
+
         $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
 
         // set path to test dir
