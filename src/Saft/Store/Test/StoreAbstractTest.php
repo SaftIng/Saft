@@ -150,7 +150,7 @@ abstract class StoreAbstractTest extends TestCase
         ));
 
         // add triples
-        $this->assertTrue($this->fixture->addStatements($statements, $this->testGraph));
+        $this->fixture->addStatements($statements, $this->testGraph);
 
         // graph has two entries
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
