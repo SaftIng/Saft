@@ -9,6 +9,7 @@ use Saft\Sparql\Query\AbstractQuery;
  * - INSERT DATA
  * - INSERT INTO GRAPH
  * - DELETE DATA
+ * - DELETE WHERE
  * - WITH ... DELETE ... WHERE
  * - WITH ... DELETE ... INSERT ... WHERE
  */
@@ -22,21 +23,21 @@ class UpdateQuery extends AbstractQuery
     public function extractGraphs($query)
     {
         $graphs = array();
-        
+
         /**
          * Matches the following pattern: Graph <http://uri/>
          */
         $result = preg_match_all('/GRAPH\s*\<([a-z0-9\:\/]+)\>/si', $query, $matches);
-        
+
         if (false !== $result && true === isset($matches[1])) {
             foreach ($matches[1] as $graph) {
                 $graphs[] = $graph;
             }
         }
-        
+
         return $graphs;
     }
-    
+
     /**
      *
      * @return string|null
@@ -47,29 +48,33 @@ class UpdateQuery extends AbstractQuery
          * First we get rid of all PREFIX information
          */
         $adaptedQuery = preg_replace('/PREFIX\s+[a-z0-9]+\:\s*\<[a-z0-9\:\/\.\#\-]+\>/si', '', $this->getQuery());
-        
+
         // remove trailing whitespaces
         $adaptedQuery = trim($adaptedQuery);
-        
+
         // only lower chars
         $adaptedQuery = strtolower($adaptedQuery);
-        
+
         $firstPart = substr($adaptedQuery, 0, 8);
-              
+
         // TODO make check more precise, because its possible that are more than one whitespace between keywords.
         switch($firstPart) {
             // DELETE DATA
             case 'delete d':
                 return 'deleteData';
-            
+
+            // DELETE WHERE
+            case 'delete w':
+                return 'deleteWhere';
+
             // INSERT DATA
             case 'insert d':
                 return 'insertData';
-            
+
             // INSERT INTO
             case 'insert i':
                 return 'insertInto';
-            
+
             default:
                 // check if query is of type: WITH <http:// ... > DELETE { ... } INSERT { ... } WHERE { ... }
                 // TODO make it more precise
@@ -78,7 +83,7 @@ class UpdateQuery extends AbstractQuery
                     && false !== strpos($adaptedQuery, 'insert')
                     && false !== strpos($adaptedQuery, 'where')) {
                     return 'withDeleteInsertWhere';
-                
+
                 // check if query is of type: WITH <http:// ... > DELETE { ... } WHERE { ... }
                 // TODO make it more precise
                 } elseif (false !== strpos($adaptedQuery, 'with')
@@ -87,10 +92,10 @@ class UpdateQuery extends AbstractQuery
                     return 'withDeleteWhere';
                 }
         }
-        
+
         return null;
     }
-    
+
     /**
      *
      * @return array
@@ -98,7 +103,7 @@ class UpdateQuery extends AbstractQuery
     public function getQueryParts()
     {
         $queryFromDelete = substr($this->getQuery(), strpos($this->getQuery(), 'DELETE'));
-        
+
         $this->queryParts = array(
             'filter_pattern' => $this->extractFilterPattern($this->getQuery()),
             'graphs' => $this->extractGraphs($this->getQuery()),
@@ -109,31 +114,31 @@ class UpdateQuery extends AbstractQuery
             'triple_pattern' => $this->extractTriplePattern($this->getQuery()),
             'variables' => $this->extractVariablesFromQuery($this->getQuery())
         );
-        
+
         /**
          * Save parts for INSERT DATA
          */
         if ('insertData' === $this->queryParts['sub_type']) {
             preg_match('/INSERT\s+DATA\s+\{\s*(.*)\s*\}/si', $this->getQuery(), $matches);
-            
+
             if (true === isset($matches[1]) && false === empty($matches[1])) {
                 $this->queryParts['insertData'] = trim($matches[1]);
                 $this->queryParts['deleteData'] = null;
                 $this->queryParts['deleteWhere'] = null;
-                
+
                 /**
                  * TODO extract graphs
                  */
             } else {
                 throw new \Exception('No triple part after INSERT DATA found.');
             }
-            
+
         /**
          * Save parts for INSERT INTO GRAPH <> {}
          */
         } elseif ('insertInto' === $this->queryParts['sub_type']) {
             preg_match('/INSERT\s+INTO\s+GRAPH\s*\<(.*)\>\s*\{(.*)\}/', $this->getQuery(), $matches);
-            
+
             if (true === isset($matches[1]) && true === isset($matches[2])) {
                 // graph
                 $this->queryParts['graphs'] = array(trim($matches[1]));
@@ -144,35 +149,52 @@ class UpdateQuery extends AbstractQuery
                     'There is either no triple part after INSERT INTO GRAPH or no graph set.'
                 );
             }
-            
+
         /**
          * Save parts for DELETE DATA {}
          */
         } elseif ('deleteData' === $this->queryParts['sub_type']) {
             preg_match('/DELETE\s+DATA\s*\{(.*)\}/s', $this->getQuery(), $matches);
-            
+
             if (true === isset($matches[1])) {
                 // triples
                 $this->queryParts['deleteData'] = trim($matches[1]);
-                
+
                 /**
                  * TODO extract graphs
                  */
             } else {
                 throw new \Exception('No triple part after DELETE DATA found.');
             }
-            
+
+        /**
+         * Save parts for DELETE WHERE {}
+         */
+        } elseif ('deleteWhere' === $this->queryParts['sub_type']) {
+            preg_match('/DELETE\s+WHERE\s*\{(.*)\}/s', $this->getQuery(), $matches);
+
+            if (true === isset($matches[1])) {
+                // matching clause
+                $this->queryParts['deleteWhere'] = trim($matches[1]);
+
+                /**
+                 * TODO extract graphs
+                 */
+            } else {
+                throw new \Exception('Where part after DELETE WHERE is empty.');
+            }
+
         /**
          * Save parts for WITH <> DELETE {} WHERE {}
          */
         } elseif ('withDeleteWhere' === $this->queryParts['sub_type']) {
             preg_match('/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/', $this->getQuery(), $matches);
-            
+
             if (true === isset($matches[1])) {
                 $this->queryParts['deleteData'] = trim($matches[2]);
                 $this->queryParts['deleteWhere'] = trim($matches[3]);
                 $this->queryParts['graphs'] = array(trim($matches[1]));
-                
+
                 /**
                  * TODO extract graphs
                  */
@@ -181,7 +203,7 @@ class UpdateQuery extends AbstractQuery
                     'No valid WITH <> DELETE {...} WHERE { ...} query given.'
                 );
             }
-            
+
         /**
          * Save parts for WITH <> DELETE {} INSERT {} WHERE {}
          */
@@ -191,14 +213,14 @@ class UpdateQuery extends AbstractQuery
                 $this->getQuery(),
                 $matches
             );
-            
+
             if (true === isset($matches[1])) {
                 $this->queryParts['deleteData'] = trim($matches[2]);
                 $this->queryParts['deleteWhere'] = trim($matches[4]);
                 $this->queryParts['insertData'] = trim($matches[3]);
-                
+
                 $this->queryParts['graphs'] = array(trim($matches[1]));
-                
+
                 /**
                  * TODO extract graphs
                  */
@@ -208,12 +230,12 @@ class UpdateQuery extends AbstractQuery
                 );
             }
         }
-        
+
         $this->unsetEmptyValues($this->queryParts);
 
         return $this->queryParts;
     }
-    
+
     /**
      * Init the query instance with a given SPARQL query string.
      *
@@ -223,52 +245,52 @@ class UpdateQuery extends AbstractQuery
     {
         $this->query = $query;
         $subType = $this->getSubType();
-        
+
         if (null !== $subType) {
             /**
              * Save parts for INSERT DATA
              */
             if ('insertData' === $subType) {
                 preg_match('/INSERT\s+DATA\s+\{(.*)\}/si', $query, $matches);
-                
+
                 if (false === isset($matches[1])) {
                     throw new \Exception('No triple part after INSERT DATA found.');
                 }
-                
+
             /**
              * Save parts for INSERT INTO GRAPH <> {}
              */
             } elseif ('insertInto' === $subType) {
                 preg_match('/INSERT\s+INTO\s+GRAPH\s+\<(.*)\>\s*\{(.*)\}/si', $query, $matches);
-                
+
                 if (false === isset($matches[1]) || false === isset($matches[2])) {
                     throw new \Exception(
                         'There is either no triple part after INSERT INTO GRAPH or no graph set.'
                     );
                 }
-                
+
             /**
              * Save parts for DELETE DATA {}
              */
             } elseif ('deleteData' === $subType) {
                 preg_match('/DELETE\s+DATA\s*\{(.*)\}/si', $query, $matches);
-                
+
                 if (false === isset($matches[1])) {
                     throw new \Exception('No triple part after DELETE DATA found.');
                 }
-                
+
             /**
              * Save parts for WITH <> DELETE {} WHERE {}
              */
             } elseif ('withDeleteWhere' === $subType) {
                 preg_match('/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/si', $query, $matches);
-                
+
                 if (false === isset($matches[1])) {
                     throw new \Exception(
                         'No valid WITH <> DELETE {...} WHERE { ...} query given.'
                     );
                 }
-                
+
             /**
              * Save parts for WITH <> DELETE {} INSERT {} WHERE {}
              */
@@ -278,19 +300,19 @@ class UpdateQuery extends AbstractQuery
                     $query,
                     $matches
                 );
-                
+
                 if (false === isset($matches[1])) {
                     throw new \Exception(
                         'No valid WITH <> DELETE {...} INSERT { ... } WHERE { ...} query given.'
                     );
                 }
             }
-            
+
         } else {
             throw new \Exception('Given query is not suitable for UpdateQuery: ' . $query);
         }
     }
-    
+
     /**
      * Is instance of AskQuery?
      *
@@ -300,7 +322,7 @@ class UpdateQuery extends AbstractQuery
     {
         return false;
     }
-    
+
     /**
      * Is instance of DescribeQuery?
      *
@@ -310,7 +332,7 @@ class UpdateQuery extends AbstractQuery
     {
         return false;
     }
-    
+
     /**
      * Is instance of GraphQuery?
      *
@@ -320,7 +342,7 @@ class UpdateQuery extends AbstractQuery
     {
         return false;
     }
-    
+
     /**
      * Is instance of SelectQuery?
      *
@@ -330,7 +352,7 @@ class UpdateQuery extends AbstractQuery
     {
         return false;
     }
-    
+
     /**
      * Is instance of UpdateQuery?
      *
