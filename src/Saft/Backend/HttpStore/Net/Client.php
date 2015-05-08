@@ -34,21 +34,16 @@ class Client
     }
 
     /**
+     * Send digest authentication to the server via GET.
      *
-     * @param
-     * @return
-     * @throw
+     * @param  string $username
+     * @param  string $password optional
+     * @return string
      */
-    public function sendDigestAuthentication($username, $password)
+    public function sendDigestAuthentication($username, $password = null)
     {
-        /**
-         * Change that, after the following pull request was merged:
-         * https://github.com/php-curl-class/php-curl-class/pull/142
-         */
+        $this->client->setDigestAuthentication($username, $password);
 
-        curl_setopt($this->client->curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
-        curl_setopt($this->client->curl, CURLOPT_USERPWD, $username . ":" . $password);
-        curl_setopt($this->client->curl, CURLOPT_RETURNTRANSFER, true);
         return $this->client->get($this->url);
     }
 
