@@ -100,6 +100,15 @@
 		        margin-bottom: 0.5em;
 		        font-family: verdana,arial,helvetica;
 		    }
+		    .Skipped {
+		        color:blue;
+		    }
+		    .Risky {
+		        color:orange;
+		    }
+		    .Incomplete {
+		        color:DeepPink;
+		    }
 		    .Error {
 		        font-weight:bold; color:red;
 		    }
@@ -367,7 +376,11 @@
     <tr valign="top">
         <xsl:attribute name="class">
             <xsl:choose>
-                <xsl:when test="failure | error">Error</xsl:when>
+                <xsl:when test="error[@type = 'PHPUnit_Framework_RiskyTestError']">Risky</xsl:when>
+                <xsl:when test="error[@type = 'PHPUnit_Framework_SkippedTestError']">Skipped</xsl:when>
+                <xsl:when test="error[@type = 'PHPUnit_Framework_IncompleteTestError']">Incomplete</xsl:when>
+                <xsl:when test="error">Error</xsl:when>
+                <xsl:when test="failure">Failure</xsl:when>
             </xsl:choose>
         </xsl:attribute>
         <td><xsl:value-of select="@name"/></td>
@@ -375,6 +388,18 @@
             <xsl:when test="failure">
                 <td>Failure</td>
                 <td><xsl:apply-templates select="failure"/></td>
+            </xsl:when>
+            <xsl:when test="error[@type = 'PHPUnit_Framework_RiskyTestError']">
+                <td>Risky</td>
+                <td><xsl:apply-templates select="error"/></td>
+            </xsl:when>
+            <xsl:when test="error[@type = 'PHPUnit_Framework_SkippedTestError']">
+                <td>Skipped</td>
+                <td><xsl:apply-templates select="error"/></td>
+            </xsl:when>
+            <xsl:when test="error[@type = 'PHPUnit_Framework_IncompleteTestError']">
+                <td>Incomplete</td>
+                <td><xsl:apply-templates select="error"/></td>
             </xsl:when>
             <xsl:when test="error">
                 <td>Error</td>
@@ -402,17 +427,29 @@
     <xsl:call-template name="display-failures"/>
 </xsl:template>
 
+<xsl:template match="error[@type = 'PHPUnit_Framework_RiskyTestError']">
+    <xsl:call-template name="display-failures"/>
+</xsl:template>
+
+<xsl:template match="error[@type = 'PHPUnit_Framework_SkippedTestError']">
+    <xsl:call-template name="display-failures"/>
+</xsl:template>
+
+<xsl:template match="error[@type = 'PHPUnit_Framework_IncompleteTestError']">
+    <xsl:call-template name="display-failures"/>
+</xsl:template>
+
 <!-- Style for the error and failure in the tescase template -->
 <xsl:template name="display-failures">
     <xsl:choose>
-        <xsl:when test="not(@message)">N/A</xsl:when>
-        <xsl:otherwise>
-            <xsl:value-of select="@message"/>
-        </xsl:otherwise>
+        <xsl:when test="not(@message)">
+            <p>
+                <xsl:value-of select="@message"/>
+            </p>
+        </xsl:when>
     </xsl:choose>
     <!-- display the stacktrace -->
     <code>
-        <br/><br/>
         <xsl:call-template name="br-replace">
             <xsl:with-param name="word" select="."/>
         </xsl:call-template>
