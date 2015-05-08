@@ -49,8 +49,6 @@ abstract class AbstractSparqlStore implements Store
      *                                                be add to that graph, if available.
      * @param  array             $options    optional It contains key-value pairs and should provide additional
      *                                                introductions for the store and/or its adapter(s).
-     * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
-     *                 will be thrown.
      * @todo implement usage of graph inside the statement(s). create groups for each graph
      */
     public function addStatements(StatementIterator $statements, Node $graph = null, array $options = array())
@@ -141,8 +139,6 @@ abstract class AbstractSparqlStore implements Store
      *                                       that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
-     * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
-     *                 will be thrown.
      */
     public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
@@ -161,8 +157,7 @@ abstract class AbstractSparqlStore implements Store
 
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
 
-        $query = 'DELETE WHERE { '. $this->sparqlFormat($statementIterator, $graph) .'}';
-        return $this->query($query, $options);
+        $this->query('DELETE WHERE { '. $this->sparqlFormat($statementIterator, $graph) .'}', $options);
     }
 
     /**
@@ -208,12 +203,11 @@ abstract class AbstractSparqlStore implements Store
      * - statement's object is either equal to the object of a statement of the graph or it is null.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  Node      $graph     optional Overrides target graph. If set, you will get all
-     *                                       matching statements of that graph.
+     * @param  Node      $graph     optional Overrides target graph. If set, you will get all matching statements
+     *                                       of that graph.
      * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
-     * @return StatementIterator It contains Statement instances  of all matching
-     *                           statements of the given graph.
+     * @return StatementIterator It contains Statement instances  of all matching statements of the given graph.
      * @todo FILTER select
      * @todo check if graph URI is valid
      * @todo make it possible to read graphUri from $statement, if given $graphUri is null
