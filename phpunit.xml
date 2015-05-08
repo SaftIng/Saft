@@ -5,6 +5,9 @@
     bootstrap="vendor/autoload.php"
     colors="true"
     verbose="true"
+    beStrictAboutTestsThatDoNotTestAnything="true"
+    checkForUnintentionallyCoveredCode="true"
+    beStrictAboutChangesToGlobalState="true"
     >
     <php>
         <ini name="error_reporting" value="-1" />
