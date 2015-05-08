@@ -2,11 +2,14 @@
 
 namespace Saft\Backend\Redland\Tests\Rdf;
 
+use Saft\Backend\Redland\Rdf\NodeFactory;
+
 class NamedNodeTest extends \Saft\Rdf\Test\NamedNodeAbstractTest
 {
     public function newInstance($uri)
     {
-        return new \Saft\Backend\Redland\Rdf\NamedNode($uri);
+        $nodeFactory = new NodeFactory();
+        return $nodeFactory->createNamedNode($uri);
     }
 
     /**
