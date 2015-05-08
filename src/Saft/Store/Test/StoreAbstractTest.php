@@ -550,7 +550,11 @@ abstract class StoreAbstractTest extends TestCase
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new LiteralImpl('foobar', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString', 'en')
+                new LiteralImpl(
+                    'foobar',
+                    new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'),
+                    'en'
+                )
             ),
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
@@ -567,10 +571,17 @@ abstract class StoreAbstractTest extends TestCase
          */
         $setResultToCheckAgainst = new SetResult();
         $setResultToCheckAgainst->setVariables(array('s', 'o'));
-        $setResultToCheckAgainst->append(array(
-            's' => new NamedNodeImpl('http://s/'),
-            'o' => new LiteralImpl('foobar', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString', 'en')
-        ));
+        $setResultToCheckAgainst->append(
+            array(
+                's' => new NamedNodeImpl('http://s/'),
+                'o' =>
+                new LiteralImpl(
+                    'foobar',
+                    new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'),
+                    'en'
+                )
+            )
+        );
         $setResultToCheckAgainst->append(array(
             's' => new NamedNodeImpl('http://s/'),
             'o' => new LiteralImpl('42')

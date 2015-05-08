@@ -2,25 +2,26 @@
 
 namespace Saft\Backend\Redland\Tests\Rdf;
 
-use \Saft\Backend\Redland\Rdf\NodeFactory;
+use Saft\Backend\Redland\Rdf\NodeFactory;
+use Saft\Rdf\Node;
 
+/**
+ *
+ * @requires extension redland
+ */
 class LiteralTest extends \Saft\Rdf\Test\LiteralAbstractTest
 {
-    public function newInstance($value, $datatype = null, $lang = null)
+    /**
+     * Return a new instance of redland Literal
+     */
+    public function newInstance($value, Node $datatype = null, $lang = null)
     {
         $factory = new NodeFactory();
         return $factory->createLiteral($value, $datatype, $lang);
     }
 
-    /**
-     * Check for reland extension to be installed before execute a test.
-     */
-    public function setUp()
+    public function getNodeFactory()
     {
-        if (false === extension_loaded('redland')) {
-            $this->markTestSkipped('Extension redland is not loaded.');
-        }
-
-        parent::setUp();
+        return new NodeFactory();
     }
 }

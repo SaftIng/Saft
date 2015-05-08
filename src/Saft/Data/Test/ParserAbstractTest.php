@@ -5,6 +5,7 @@ namespace Saft\Data\Test;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementImpl;
 
 abstract class ParserAbstractTest extends \PHPUnit_Framework_TestCase
@@ -23,6 +24,9 @@ abstract class ParserAbstractTest extends \PHPUnit_Framework_TestCase
 
     public function testParseString()
     {
+        $nodeFactory = new NodeFactoryImpl();
+        $xsdString = $nodeFactory->createNamedNode('http://www.w3.org/2001/XMLSchema#string');
+
         $fixture = $this->getParserInstance();
 
         $testString = '@prefix ex: <http://saft/example/> .
@@ -42,12 +46,12 @@ abstract class ParserAbstractTest extends \PHPUnit_Framework_TestCase
             new StatementImpl(
                 new NamedNodeImpl('http://saft/example/Foo'),
                 new NamedNodeImpl('http://saft/example/name'),
-                new LiteralImpl('Foo', 'http://www.w3.org/2001/XMLSchema#string')
+                new LiteralImpl('Foo', $xsdString)
             ),
             new StatementImpl(
                 new NamedNodeImpl('http://saft/example/Bar'),
                 new NamedNodeImpl('http://saft/example/name'),
-                new LiteralImpl('Bar', 'http://www.w3.org/2001/XMLSchema#string')
+                new LiteralImpl('Bar', $xsdString)
             ),
         ));
 

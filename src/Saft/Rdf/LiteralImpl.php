@@ -8,7 +8,7 @@ class LiteralImpl extends AbstractLiteral
      * @var string
      */
     protected static $xsdString = 'http://www.w3.org/2001/XMLSchema#string';
-    
+
     /**
      * @var string
      */
@@ -17,42 +17,50 @@ class LiteralImpl extends AbstractLiteral
     /**
      * @var string
      */
-    protected $lang;
-
-    /**
-     * @var string
-     */
     protected $value;
 
     /**
-     * @var string
+     * @var Node
      */
-    protected $datatype;
+    protected $datatype = null;
 
     /**
-     * @param mixed  $value    optional the Literal value
-     * @param string $datatype optional the datatype URI for the Literal
-     * @param string $lang     optional the language tag of the Literal (optional)
+     * @var string
      */
-    public function __construct($value, $datatype = null, $lang = null)
+    protected $lang = null;
+
+    /**
+     * @param string $value  The Literal value
+     * @param Node $datatype The datatype of the Literal (respectively defaults to xsd:string or rdf:langString)
+     * @param string $lang   The language tag of the Literal (optional)
+     */
+    public function __construct($value, Node $datatype = null, $lang = null)
     {
         if ($value === null) {
             throw new \Exception('Literal value can\'t be null. Please use AnyPattern if you need a variable.');
         }
 
-        $this->value = $value;
-        $this->lang = $lang;
+        $this->value = (string)$value;
 
-        if ($lang !== null && $datatype !== null && $datatype !== self::$rdfLangString) {
+        if ($lang !== null) {
+            $this->lang = (string)$lang;
+        }
+
+        if (
+            $lang !== null &&
+            $datatype !== null &&
+            $datatype->isNamed() &&
+            $datatype->getUri() !== self::$rdfLangString
+        ) {
             throw new \Exception('Language tagged Literals must have <'. self::$rdfLangString .'> datatype.');
         }
 
         if ($datatype !== null) {
             $this->datatype = $datatype;
         } elseif ($lang !== null) {
-            $this->datatype = self::$rdfLangString;
+            $this->datatype = new NamedNodeImpl(self::$rdfLangString);
         } else {
-            $this->datatype = self::$xsdString;
+            $this->datatype = new NamedNodeImpl(self::$xsdString);
         }
     }
 
@@ -65,12 +73,12 @@ class LiteralImpl extends AbstractLiteral
     }
 
     /**
-     * Get the datatype URI of the Literal. It can be one of the XML Schema
-     * datatypes (XSD) or anything else.
+     * Get the datatype of the Literal. It can be one of the XML Schema datatypes (XSD) or anything else. If the URI is
+     * needed it can be retrieved by calling ->getDatatype()->getUri().
      *
      * An overview about all XML Schema datatypes: {@url http://www.w3.org/TR/xmlschema-2/#built-in-datatypes}
      *
-     * @return string the URI of the datatype of the Literal
+     * @return Node the datatype of the Literal as named node
      */
     public function getDatatype()
     {

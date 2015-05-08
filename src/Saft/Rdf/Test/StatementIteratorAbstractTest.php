@@ -4,6 +4,7 @@ namespace Saft\Rdf\Test;
 
 use \Saft\Rdf\LiteralImpl;
 use \Saft\Rdf\NamedNodeImpl;
+use \Saft\Rdf\NodeFactoryImpl;
 use \Saft\Rdf\StatementImpl;
 use \Saft\TestCase;
 
@@ -13,6 +14,10 @@ abstract class StatementIteratorAbstractTest extends TestCase
 
     public function testIterationForeach()
     {
+        $nodeFactory = new NodeFactoryImpl();
+        $rdfLangString = $nodeFactory->createNamedNode(
+            'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'
+        );
         $statements = [
         new StatementImpl(
             new NamedNodeImpl('http://s/'),
@@ -22,7 +27,7 @@ abstract class StatementIteratorAbstractTest extends TestCase
         new StatementImpl(
             new NamedNodeImpl('http://s/'),
             new NamedNodeImpl('http://p/'),
-            new LiteralImpl('foobar', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString', 'en')
+            new LiteralImpl('foobar', $rdfLangString, 'en')
         ),
         new StatementImpl(
             new NamedNodeImpl('http://s/'),
@@ -44,6 +49,10 @@ abstract class StatementIteratorAbstractTest extends TestCase
 
     public function testCountAssertionSome()
     {
+        $nodeFactory = new NodeFactoryImpl();
+        $rdfLangString = $nodeFactory->createNamedNode(
+            'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'
+        );
         $statements = [
         new StatementImpl(
             new NamedNodeImpl('http://s/'),
@@ -53,7 +62,7 @@ abstract class StatementIteratorAbstractTest extends TestCase
         new StatementImpl(
             new NamedNodeImpl('http://s/'),
             new NamedNodeImpl('http://p/'),
-            new LiteralImpl('foobar', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString', 'en')
+            new LiteralImpl('foobar', $rdfLangString, 'en')
         ),
         new StatementImpl(
             new NamedNodeImpl('http://s/'),

@@ -19,7 +19,7 @@ interface Literal extends Node
     /**
      * Get the datatype URI of the Literal (this is always set according to the
      * standard).
-     * @return string the datatype URI of the Literal
+     * @return Node the datatype of the Literal
      */
     public function getDatatype();
 

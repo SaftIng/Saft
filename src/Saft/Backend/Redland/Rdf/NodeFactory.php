@@ -18,8 +18,8 @@ class NodeFactory implements SaftNodeFactory
     protected static $rdfLangString = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString';
 
     /**
-     * @param  mixed $value
-     * @param  string $datatype optional
+     * @param  string $value
+     * @param  Node|string $datatype optional
      * @param  string $lang     optional
      * @return Literal
      */
@@ -29,21 +29,30 @@ class NodeFactory implements SaftNodeFactory
             throw new \Exception('Can\'t initialize literal with null as value.');
         }
 
-        if ($lang !== null && $datatype !== null && $datatype !== self::$rdfLangString) {
-            throw new \Exception('Language tagged Literals must have <' . self::$rdfLangString . '> datatype.');
-        }
+        $datatypeUri = null;
 
         $world = librdf_new_world();
 
-        /*
-         * Make sure that the no language is set, since redland doesn't allow a language tag to be set if a 
-         * datatype is given.
-         */
-        if ($datatype !== null && $lang === null) {
-            // TODO catch invalid URIs
-            $datatypeUri = librdf_new_uri($world, $datatype);
-        } else {
-            $datatypeUri = null;
+        if ($datatype !== null) {
+            if (!$datatype instanceof Node) {
+                // Ensure valid Node creation
+                $datatype = $this->createNamedNode($datatype);
+            } elseif (!$datatype->isNamed()) {
+                throw new \Exception("Argument datatype has to be a named node.");
+            }
+
+            if ($lang !== null && $datatype->getUri() !== self::$rdfLangString) {
+                throw new \Exception('Language tagged Literals must have <' . self::$rdfLangString . '> datatype.');
+            }
+
+            /*
+             * Make sure that the no language is set, since redland doesn't allow a language tag to be set if a
+             * datatype is given.
+             */
+            if ($lang === null) {
+                // TODO catch invalid URIs
+                $datatypeUri = librdf_new_uri($world, $datatype->getUri());
+            }
         }
 
         /*

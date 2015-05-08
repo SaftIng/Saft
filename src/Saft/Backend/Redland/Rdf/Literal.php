@@ -28,7 +28,7 @@ class Literal extends AbstractLiteral
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getValue()
     {
@@ -41,14 +41,16 @@ class Literal extends AbstractLiteral
      */
     public function getDatatype()
     {
+        $nodeFactory = new NodeFactory();
+        $datatypeUri = self::$xsdString;
         $datatype = librdf_node_get_literal_value_datatype_uri($this->redlandNode);
         if ($datatype !== null) {
-            return librdf_uri_to_string($datatype);
+            $datatypeUri = librdf_uri_to_string($datatype);
         } elseif ($this->getLanguage() !== null) {
-            return self::$rdfLangString;
+            $datatypeUri = self::$rdfLangString;
         }
 
-        return self::$xsdString;
+        return $nodeFactory->createNamedNode($datatypeUri);
     }
 
     /**
