@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Store\Result;
 
 use Saft\Rdf\Statement;
@@ -15,12 +16,12 @@ class StatementResult extends SetResult
     {
         if ($statement instanceof Statement) {
             parent::append($statement);
-            
+
         } else {
             throw new \Exception('Its not allowed to append non-Statement instances.');
         }
     }
-    
+
     /**
      * @return boolean True
      */
@@ -28,7 +29,7 @@ class StatementResult extends SetResult
     {
         return false;
     }
-    
+
     /**
      * @return boolean False
      */
@@ -36,7 +37,7 @@ class StatementResult extends SetResult
     {
         return false;
     }
-    
+
     /**
      * @return boolean False
      */
@@ -44,7 +45,7 @@ class StatementResult extends SetResult
     {
         return false;
     }
-    
+
     /**
      * @return boolean True
      */
@@ -52,7 +53,7 @@ class StatementResult extends SetResult
     {
         return true;
     }
-    
+
     /**
      * @return boolean True
      */

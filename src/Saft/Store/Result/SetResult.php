@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Store\Result;
 
 /**
@@ -12,7 +13,7 @@ class SetResult extends Result implements \Iterator
      * @var array
      */
     protected $variables = array();
-    
+
     /**
      * Constructor.
      *
@@ -22,7 +23,7 @@ class SetResult extends Result implements \Iterator
     {
         $this->setResultObject($resultObject);
     }
-    
+
     /**
      * @param mixed $entry
      */
@@ -38,7 +39,7 @@ class SetResult extends Result implements \Iterator
     {
         return $this->resultObject->current();
     }
-    
+
     /**
      * Returns the number of stored entries.
      *
@@ -48,7 +49,7 @@ class SetResult extends Result implements \Iterator
     {
         return count($this->resultObject);
     }
-    
+
     /**
      *
      */
@@ -56,7 +57,7 @@ class SetResult extends Result implements \Iterator
     {
         return $this->variables;
     }
-    
+
     /**
      * @return boolean True
      */
@@ -64,7 +65,7 @@ class SetResult extends Result implements \Iterator
     {
         return false;
     }
-    
+
     /**
      * @return boolean False
      */
@@ -72,7 +73,7 @@ class SetResult extends Result implements \Iterator
     {
         return false;
     }
-    
+
     /**
      * @return boolean True
      */
@@ -80,7 +81,7 @@ class SetResult extends Result implements \Iterator
     {
         return true;
     }
-    
+
     /**
      * @return boolean False
      */
@@ -88,7 +89,7 @@ class SetResult extends Result implements \Iterator
     {
         return false;
     }
-    
+
     /**
      * @return boolean True
      */
@@ -113,7 +114,7 @@ class SetResult extends Result implements \Iterator
     {
         $this->resultObject->next();
     }
-    
+
     /**
      * @param mixed $resultObject Instance of a class which implements \Iterator interface.
      */
@@ -121,17 +122,17 @@ class SetResult extends Result implements \Iterator
     {
         if (null !== $resultObject && $resultObject instanceof \Iterator) {
             parent::setResultObject($resultObject);
-            
+
         } elseif (null === $resultObject) {
             // that means that the result will be filled with data later on. we only have to init an instance
             // of a class which implements the Iterator interface.
             parent::__construct(new \ArrayIterator());
-            
+
         } else {
             throw new \Exception('Parameter $resultObject must implement Iterator interface.');
         }
     }
-    
+
     /**
      *
      */
@@ -147,7 +148,7 @@ class SetResult extends Result implements \Iterator
     {
         $this->resultObject->rewind();
     }
-    
+
     /**
      * @return boolean
      */

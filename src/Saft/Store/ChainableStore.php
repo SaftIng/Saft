@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Store;
 
 interface ChainableStore

@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Store\Result;
 
 class ExceptionResult extends Result
@@ -10,7 +11,7 @@ class ExceptionResult extends Result
     {
         parent::__construct($exception);
     }
-    
+
     /**
      * @return boolean False
      */
@@ -18,7 +19,7 @@ class ExceptionResult extends Result
     {
         return false;
     }
-    
+
     /**
      * @return boolean True
      */
@@ -26,7 +27,7 @@ class ExceptionResult extends Result
     {
         return true;
     }
-    
+
     /**
      * @return boolean False
      */
@@ -34,7 +35,7 @@ class ExceptionResult extends Result
     {
         return false;
     }
-    
+
     /**
      * @return boolean False
      */
@@ -42,7 +43,7 @@ class ExceptionResult extends Result
     {
         return false;
     }
-    
+
     /**
      * @return boolean False
      */

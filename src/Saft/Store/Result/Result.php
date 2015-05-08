@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Store\Result;
 
 /**
@@ -7,7 +8,7 @@ namespace Saft\Store\Result;
 abstract class Result
 {
     protected $resultObject;
-    
+
     /**
      * @param mixed
      */
@@ -15,7 +16,7 @@ abstract class Result
     {
         $this->setResultObject($resultObject);
     }
-    
+
     /**
      *
      * @return mixed
@@ -24,32 +25,32 @@ abstract class Result
     {
         return $this->resultObject;
     }
-    
+
     /**
      * @return boolean True, if this instance is an EmptyResult
      */
     abstract public function isEmptyResult();
-    
+
     /**
      * @return boolean True, if this instance is an ExceptionResult
      */
     abstract public function isExceptionResult();
-    
+
     /**
      * @return boolean True, if this instance is a SetResult
      */
     abstract public function isSetResult();
-    
+
     /**
      * @return boolean True, if this instance is a StatementResult
      */
     abstract public function isStatementResult();
-    
+
     /**
      * @return boolean True, if this instance is a ValueResult
      */
     abstract public function isValueResult();
-    
+
     /**
      * @param mixed $resultObject
      */

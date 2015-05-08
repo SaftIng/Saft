@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Store\Test\Result;
 
 use Saft\Rdf\StatementImpl;

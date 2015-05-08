@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Rdf\Test;
 
 use \Saft\Rdf\ArrayStatementIteratorImpl;

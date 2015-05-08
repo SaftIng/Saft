@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Rdf;
 
 class StatementImpl extends AbstractStatement

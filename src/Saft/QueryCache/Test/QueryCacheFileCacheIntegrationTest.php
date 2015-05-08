@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\QueryCache\Test;
 
 use Saft\Cache\Cache;

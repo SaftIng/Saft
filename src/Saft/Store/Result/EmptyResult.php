@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Store\Result;
 
 /**
@@ -11,7 +12,7 @@ class EmptyResult extends Result
     public function __construct()
     {
     }
-    
+
     /**
      * @return boolean True
      */
@@ -19,7 +20,7 @@ class EmptyResult extends Result
     {
         return true;
     }
-    
+
     /**
      * @return boolean True
      */
@@ -27,7 +28,7 @@ class EmptyResult extends Result
     {
         return false;
     }
-    
+
     /**
      * @return boolean False
      */
@@ -35,7 +36,7 @@ class EmptyResult extends Result
     {
         return false;
     }
-    
+
     /**
      * @return boolean False
      */
@@ -43,7 +44,7 @@ class EmptyResult extends Result
     {
         return false;
     }
-    
+
     /**
      * @return boolean False
      */

@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Store;
 
 use Saft\Backend\HttpStore\Store\Http;

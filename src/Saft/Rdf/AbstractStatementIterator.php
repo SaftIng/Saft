@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Rdf;
 
 abstract class AbstractStatementIterator implements StatementIterator

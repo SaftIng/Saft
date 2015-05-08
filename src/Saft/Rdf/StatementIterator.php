@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Rdf;
 
 interface StatementIterator extends \Iterator

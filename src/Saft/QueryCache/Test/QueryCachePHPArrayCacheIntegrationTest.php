@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\QueryCache\Test;
 
 use Saft\Cache\Cache;
@@ -14,7 +15,7 @@ class QueryCachePHPArrayCacheIntegrationTest extends AbstractQueryCacheIntegrati
     public function setUp()
     {
         parent::setUp();
-        
+
         $this->cache = new Cache($this->config['phparrayCacheConfig']);
 
         $this->fixture = new QueryCache($this->cache);

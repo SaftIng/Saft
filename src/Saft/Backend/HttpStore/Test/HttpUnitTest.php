@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Backend\HttpStore\Test;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;

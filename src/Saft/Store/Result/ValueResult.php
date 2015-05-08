@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Store\Result;
 
 class ValueResult extends Result
@@ -10,7 +11,7 @@ class ValueResult extends Result
     {
         $this->setResultObject($scalar);
     }
-    
+
     /**
      * @return boolean True
      */
@@ -18,7 +19,7 @@ class ValueResult extends Result
     {
         return false;
     }
-    
+
     /**
      * @return boolean False
      */
@@ -26,7 +27,7 @@ class ValueResult extends Result
     {
         return false;
     }
-    
+
     /**
      * @return boolean False
      */
@@ -34,7 +35,7 @@ class ValueResult extends Result
     {
         return false;
     }
-    
+
     /**
      * @return boolean False
      */
@@ -42,7 +43,7 @@ class ValueResult extends Result
     {
         return false;
     }
-    
+
     /**
      * @return boolean True
      */
@@ -50,7 +51,7 @@ class ValueResult extends Result
     {
         return true;
     }
-    
+
     /**
      * @param mixed
      */
@@ -58,7 +59,7 @@ class ValueResult extends Result
     {
         if (true === is_scalar($resultObject)) {
             parent::setResultObject($resultObject);
-            
+
         } else {
             throw new \Exception('Parameter $resultObject must be a scalar.');
         }

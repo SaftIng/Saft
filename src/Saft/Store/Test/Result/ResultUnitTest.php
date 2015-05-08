@@ -1,4 +1,5 @@
 <?php
+
 namespace Saft\Store\Test\Result;
 
 use Saft\Store\Result\Result;
@@ -11,7 +12,7 @@ class ResultUnitTest extends \PHPUnit_Framework_TestCase
      * @var mixed
      */
     protected $fixture;
-    
+
     /**
      *
      */
@@ -19,11 +20,11 @@ class ResultUnitTest extends \PHPUnit_Framework_TestCase
     {
         $this->fixture = $this->getMockBuilder('Saft\Store\Result\Result')->getMock();
     }
-    
+
     /**
      * Tests getResultObject
      */
-     
+
     public function testGetResultObject()
     {
         $this->assertEquals(
