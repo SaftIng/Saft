@@ -40,6 +40,16 @@ class Virtuoso extends AbstractSparqlStore
     protected $connection = null;
 
     /**
+     * @var NodeFactory
+     */
+    private $nodeFactory = null;
+
+    /**
+     * @var statementFactory
+     */
+    private $statementFactory = null;
+
+    /**
      * Constructor.
      *
      * @param  array $configuration Array containing database credentials
