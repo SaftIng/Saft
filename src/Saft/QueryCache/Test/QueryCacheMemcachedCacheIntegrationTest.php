@@ -2,9 +2,9 @@
 
 namespace Saft\QueryCache\Test;
 
-use Saft\Cache\Cache;
-use Saft\QueryCache\Test\AbstractQueryCacheIntegrationTest;
+use Saft\Cache\CacheFactoryImpl;
 use Saft\QueryCache\QueryCache;
+use Saft\QueryCache\Test\AbstractQueryCacheIntegrationTest;
 
 class QueryCacheMemcacheDCacheIntegrationTest extends AbstractQueryCacheIntegrationTest
 {
@@ -16,7 +16,8 @@ class QueryCacheMemcacheDCacheIntegrationTest extends AbstractQueryCacheIntegrat
     {
         parent::setUp();
 
-        $this->cache = new Cache($this->config['memcachedCacheConfig']);
+        $cacheFactory = new CacheFactoryImpl();
+        $this->cache = $cacheFactory->createCache($this->config['memcachedCacheConfig']);
 
         $this->fixture = new QueryCache($this->cache);
         $this->fixture->getCache()->clean();

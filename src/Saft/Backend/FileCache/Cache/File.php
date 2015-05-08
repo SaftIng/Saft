@@ -3,14 +3,48 @@
 namespace Saft\Backend\FileCache\Cache;
 
 use Saft\Cache\Cache;
-use Saft\Cache\CacheInterface;
 
-class File implements CacheInterface
+class File implements Cache
 {
     /**
      * @var string
      */
     protected $cachePath;
+
+    /**
+     * @var array
+     */
+    private $config;
+
+    /**
+     * Setup cache adapter. All operations to establish a connection to the cache have to be done. It should
+     * call checkRequirements to be sure all requirements are fullfilled, before init anything.
+     *
+     * @param  array $config Array containing necessary parameter to setup the cache adapter.
+     * @throws \Exception If cache dir is not read- or writeable.
+     */
+    public function __construct(array $config)
+    {
+        // if cachePath key is not set, save reference to systems temp directory
+        if (false === isset($config['cachePath'])) {
+            $this->cachePath = sys_get_temp_dir() . '/saft/';
+        } else {
+            $this->cachePath = $config['cachePath'];
+
+            // check that there is a / at the end
+            if ('/' !== substr($this->cachePath, strlen($this->cachePath)-1, 1)) {
+                $this->cachePath .= '/';
+            }
+        }
+
+        if (false === file_exists($this->cachePath)) {
+            mkdir($this->cachePath);
+        }
+
+        $this->checkRequirements();
+
+        $this->config = $config;
+    }
 
     /**
      * Checks that all requirements for this adapter are fullfilled.
@@ -91,26 +125,13 @@ class File implements CacheInterface
             $encodedContainer = json_encode($container);
             file_put_contents($this->cachePath . $filename .'.cache', $encodedContainer);
 
-            // unserialize value, if it is serialized
-            if (true === Cache::isSerialized($container['value'])) {
-                $container['value'] = unserialize($container['value']);
-            }
+            $container['value'] = unserialize($container['value']);
 
             return $container;
 
         } else {
             return null;
         }
-    }
-
-    /**
-     * Returns the type of the cache adapter.
-     *
-     * @return string Type of the cache adapter.
-     */
-    public function getType()
-    {
-        return $this->config['type'];
     }
 
     /**
@@ -156,36 +177,5 @@ class File implements CacheInterface
         $encodedContainer = json_encode($container);
 
         file_put_contents($this->cachePath . $filename .'.cache', $encodedContainer);
-    }
-
-    /**
-     * Setup cache adapter. All operations to establish a connection to the cache have to be done. It should
-     * call checkRequirements to be sure all requirements are fullfilled, before init anything.
-     *
-     * @param array $config Array containing necessary parameter to setup a cache adapter.
-     * @throws \Exception If cache dir is not read- or writeable.
-     */
-    public function setup(array $config)
-    {
-        // if cachePath key is not set, save reference to systems temp directory
-        if (false === isset($config['cachePath'])) {
-            $this->cachePath = sys_get_temp_dir() . '/saft/';
-        } else {
-            $this->cachePath = $config['cachePath'];
-
-            // check that there is a / at the end
-            if ('/' !== substr($this->cachePath, strlen($this->cachePath)-1, 1)) {
-                $this->cachePath .= '/';
-            }
-        }
-
-        if (!file_exists($this->cachePath)) {
-            mkdir($this->cachePath);
-        }
-
-        // init, if requirements are fullfilled
-        if (true === $this->checkRequirements()) {
-            $this->config = $config;
-        }
     }
 }

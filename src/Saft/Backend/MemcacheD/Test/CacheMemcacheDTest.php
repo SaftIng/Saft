@@ -2,8 +2,8 @@
 
 namespace Saft\Backend\MemcacheD\Test;
 
+use Saft\Cache\CacheFactoryImpl;
 use Saft\Cache\Test\AbstractCacheTest;
-use Saft\Cache\Cache;
 
 class CacheMemcacheDTest extends AbstractCacheTest
 {
@@ -14,8 +14,7 @@ class CacheMemcacheDTest extends AbstractCacheTest
     {
         parent::setUp();
 
-        $this->cacheType = 'memcached';
-
-        $this->fixture = new Cache($this->config['memcachedCacheConfig']);
+        $cacheFactory = new CacheFactoryImpl();
+        $this->fixture = $cacheFactory->createCache($this->config['memcachedCacheConfig']);
     }
 }

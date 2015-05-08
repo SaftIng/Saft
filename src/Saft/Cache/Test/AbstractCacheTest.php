@@ -2,11 +2,12 @@
 
 namespace Saft\Cache\Test;
 
+use Saft\TestCase;
 use Saft\Cache\Cache;
-use Saft\Cache\CacheInterface;
+use Saft\Cache\CacheFactoryImpl;
 use Symfony\Component\Yaml\Parser;
 
-abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractCacheTest extends TestCase
 {
 
     /**
@@ -15,14 +16,7 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
      * @var mixed
      */
     protected $fixture;
-    
-    /**
-     * Saves the cache type.
-     *
-     * @var string
-     */
-    protected $cacheType;
-    
+
     /**
      *
      */
@@ -41,7 +35,7 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
         $yaml = new Parser();
         $this->config = $yaml->parse(file_get_contents($configFilepath));
     }
-    
+
     /**
      *
      */
@@ -50,7 +44,7 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
         if (null !== $this->fixture) {
             $this->fixture->clean();
         }
-        
+
         parent::tearDown();
     }
 
@@ -60,7 +54,7 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckRequirements()
     {
-        $this->assertTrue($this->fixture->getCacheObject()->checkRequirements());
+        $this->assertTrue($this->fixture->checkRequirements());
     }
 
     /**
@@ -114,9 +108,9 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCacheObject()
     {
-        $this->assertTrue($this->fixture->getCacheObject() instanceof CacheInterface);
+        $this->assertTrue($this->fixture instanceof Cache);
     }
-    
+
     /**
      * tests getCompleteEntry
      */
@@ -124,7 +118,7 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
     public function testGetCompleteEntry()
     {
         $this->fixture->set('foo', 'bar');
-        
+
         $this->assertEquals(
             array(
                 'get_count' => 1,
@@ -142,22 +136,20 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCompleteEntryCallMultipleTimes()
     {
-        $value = array(
-            'foo' => new Cache(array('type' => 'phparray'))
-        );
-        
+        $value = array('foo' => new \stdClass());
+
         $this->fixture->set('foo', $value);
-        
+
         $this->assertEquals(
             array('get_count' => 1, 'set_count' => 1, 'value' => $value),
             $this->fixture->getCompleteEntry('foo')
         );
-        
+
         $this->assertEquals(
             array('get_count' => 2, 'set_count' => 1, 'value' => $value),
             $this->fixture->getCompleteEntry('foo')
         );
-        
+
         $this->assertEquals(
             array('get_count' => 3, 'set_count' => 1, 'value' => $value),
             $this->fixture->getCompleteEntry('foo')
@@ -167,12 +159,12 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
     public function testGetCompleteEntryMultipleAccessesBefore()
     {
         $this->fixture->set('foo', 'bar');
-        
+
         // accessed 3 times
         $this->fixture->get('foo');
         $this->fixture->get('foo');
         $this->fixture->get('foo');
-        
+
         $this->assertEquals(
             array(
                 'get_count' => 4,
@@ -189,23 +181,25 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * function getType
+     * function constructor
      */
 
-    public function testGetType()
+    public function testInitInvalidClass()
     {
-        $this->assertEquals($this->cacheType, $this->fixture->getType());
-    }
-
-    /**
-     * function init
-     */
-
-    public function testInitInvalidType()
-    {
+        // expect exception, because an invalid class was given
         $this->setExpectedException('\Exception');
 
-        $this->fixture->init(array('type' => 'invalidType'));
+        $cacheFactory = new CacheFactoryImpl();
+        $this->fixture = $cacheFactory->createCache(array('class' => time()));
+    }
+
+    public function testInitNoClass()
+    {
+        // expect exception, because no class was given
+        $this->setExpectedException('\Exception');
+
+        $cacheFactory = new CacheFactoryImpl();
+        $this->fixture = $cacheFactory->createCache(array());
     }
 
     /**
@@ -217,7 +211,7 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
         // no special chars
         $this->fixture->set('testSet_normal', 1);
         $this->assertEquals(1, $this->fixture->get('testSet_normal'));
-        
+
         // special chars
         $this->fixture->set('testSet_üöäß', 1);
         $this->assertEquals(1, $this->fixture->get('testSet_üöäß'));
@@ -238,14 +232,11 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(array('foo')), $this->fixture->get('testSet_multidimarray'));
 
         // object instance
-        $this->fixture->set('testSet_object', new Cache(array('type' => 'phparray')));
-        $this->assertEquals(new Cache(array('type' => 'phparray')), $this->fixture->get('testSet_object'));
+        $this->fixture->set('testSet_object', new \stdClass());
+        $this->assertEquals(new \stdClass(), $this->fixture->get('testSet_object'));
 
         // object instance in array
-        $this->fixture->set('testSet_object', array('foo' => new Cache(array('type' => 'phparray'))));
-        $this->assertEquals(
-            array('foo' => new Cache(array('type' => 'phparray'))),
-            $this->fixture->get('testSet_object')
-        );
+        $this->fixture->set('testSet_object', array('foo' => new \stdClass()));
+        $this->assertEquals(array('foo' => new \stdClass()), $this->fixture->get('testSet_object'));
     }
 }

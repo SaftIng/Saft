@@ -2,9 +2,9 @@
 
 namespace Saft\Backend\MemcacheD\Cache;
 
-use Saft\Cache\CacheInterface;
+use Saft\Cache\Cache;
 
-class MemcacheD implements CacheInterface
+class MemcacheD implements Cache
 {
     /**
      * Instance of the MemcacheD class.
@@ -20,7 +20,37 @@ class MemcacheD implements CacheInterface
      * @var string
      */
     protected $keyPrefix = 'saft-memD--';
-    
+
+    /**
+     * SSetup cache adapter. All operations to establish a connection to the cache have to be done. It should
+     * call checkRequirements to be sure all requirements are fullfilled, before init anything.
+     *
+     * @param  array $config Array containing necessary parameter to setup the cache adapter.
+     * @throws \Exception If one requirement is not fullfilled.
+     */
+    public function __construct(array $config)
+    {
+        $this->checkRequirements();
+
+        $this->cache = new \Memcached('Saft\Cache');
+        $servers = $this->cache->getServerList();
+
+        // set default host and port
+        $config['host'] = true == isset($config['host']) ? $config['host'] : '127.0.0.1';
+        $config['port'] = 0 < (int)$config['port'] ? (int)$config['port'] : 11211;
+
+        // check if the host-port-combination is already in the server list, to avoid adding the same
+        // configuration multiple times
+        if (true === empty($servers)) {
+            $this->cache->setOption(\Memcached::OPT_RECV_TIMEOUT, 1000);
+            $this->cache->setOption(\Memcached::OPT_SEND_TIMEOUT, 3000);
+            $this->cache->setOption(\Memcached::OPT_TCP_NODELAY, true);
+            $this->cache->addServer($config['host'], $config['port']);
+        }
+
+        $this->config = $config;
+    }
+
     /**
      * Checks that all requirements for this adapter are fullfilled.
      *
@@ -54,7 +84,7 @@ class MemcacheD implements CacheInterface
     public function delete($key)
     {
         $hashedKey = hash('sha256', $key);
-        
+
         return $this->cache->delete($this->keyPrefix . $hashedKey);
     }
 
@@ -79,33 +109,23 @@ class MemcacheD implements CacheInterface
     public function getCompleteEntry($key)
     {
         $hashedKey = hash('sha256', $key);
-        
+
         if (true === $this->isCached($key)) {
             $container = $this->cache->get($this->keyPrefix . $hashedKey);
-        
+
             /**
              * Update meta data
              */
             ++$container['get_count'];
             $this->cache->set($this->keyPrefix . $hashedKey, $container);
-            
+
             return $container;
-            
+
         } else {
             return null;
         }
     }
 
-    /**
-     * Returns the type of the cache adapter.
-     *
-     * @return string Type of the cache.
-     */
-    public function getType()
-    {
-        return $this->config['type'];
-    }
-    
     /**
      * Checks if an entry is cached.
      *
@@ -127,11 +147,11 @@ class MemcacheD implements CacheInterface
     public function set($key, $value)
     {
         $hashedKey = hash('sha256', $key);
-        
+
         if (true === $this->isCached($key)) {
             $container = $this->cache->get($this->keyPrefix . $hashedKey);
             $container['value'] = $value;
-            
+
             ++$container['set_count'];
         } else {
             $container = array();
@@ -139,36 +159,7 @@ class MemcacheD implements CacheInterface
             $container['set_count'] = 1;
             $container['value'] = $value;
         }
-        
+
         $this->cache->set($this->keyPrefix . $hashedKey, $container);
-    }
-
-    /**
-     * Setup cache adapter. All operations to establish a connection to the cache have to be done.
-     *
-     * @param array $config Array containing necessary parameter to setup a cache adapter.
-     * @throws \Exception If one requirement is not fullfilled.
-     */
-    public function setup(array $config)
-    {
-        if (true === $this->checkRequirements()) {
-            $this->cache = new \Memcached('Saft\Cache');
-            $servers = $this->cache->getServerList();
-            
-            // set default host and port
-            $config['host'] = true == isset($config['host']) ? $config['host'] : '127.0.0.1';
-            $config['port'] = 0 < (int)$config['port'] ? (int)$config['port'] : 11211;
-
-            // check if the host-port-combination is already in the server list, to avoid adding the same
-            // configuration multiple times
-            if (true === empty($servers)) {
-                $this->cache->setOption(\Memcached::OPT_RECV_TIMEOUT, 1000);
-                $this->cache->setOption(\Memcached::OPT_SEND_TIMEOUT, 3000);
-                $this->cache->setOption(\Memcached::OPT_TCP_NODELAY, true);
-                $this->cache->addServer($config['host'], $config['port']);
-            }
-
-            $this->config = $config;
-        }
     }
 }

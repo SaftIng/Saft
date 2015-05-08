@@ -2,10 +2,11 @@
 
 namespace Saft\QueryCache\Test;
 
-use Saft\Cache\Cache;
+use Saft\Cache\CacheFactoryImpl;
 use Saft\QueryCache\QueryCache;
 use Saft\QueryCache\Test\AbstractQueryCacheIntegrationTest;
 
+// TODO remove that file and test QueryCache only with mock backend
 class QueryCacheFileCacheIntegrationTest extends AbstractQueryCacheIntegrationTest
 {
     /**
@@ -16,7 +17,8 @@ class QueryCacheFileCacheIntegrationTest extends AbstractQueryCacheIntegrationTe
     {
         parent::setUp();
 
-        $this->cache = new Cache($this->config['fileCacheConfig']);
+        $cacheFactory = new CacheFactoryImpl();
+        $this->cache = $cacheFactory->createCache($this->config['fileCacheConfig']);
 
         $this->fixture = new QueryCache($this->cache);
         $this->fixture->getCache()->clean();

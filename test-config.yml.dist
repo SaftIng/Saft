@@ -10,7 +10,7 @@ httpConfig: &httpConfig
     queryUrl: "http://localhost:8890/sparql"
     username: "dba"
     password: "dba"
-  
+
 queryCacheConfig: &queryCacheConfig
     type: "querycache"
 
@@ -22,24 +22,21 @@ virtuosoConfig: &virtuosoConfig
 
 # Cache related configurations.
 fileCacheConfig: &fileCacheConfig
-    type: "file"
+    class: "Saft\\Backend\\FileCache\\Cache\\File"
     # cachePath: "/tmp/saft/"
 
 memcachedCacheConfig: &memcachedCacheConfig
-    type: "memcached"
+    class: "Saft\\Backend\\MemcacheD\\Cache\\MemcacheD"
     host: "127.0.0.1"
     port: "11211"
-
-phparrayCacheConfig: &phparrayCacheConfig
-    type: "phparray"
 
 # Test configuration
 configuration:
     # Default cache
     # If a TestCase has to decide which cache backend to use, it uses this.
     standardCache:
-        <<: *phparrayCacheConfig
-        
+        <<: *fileCacheConfig
+
     # Default store
     # If a TestCase has to decide which store implementation to use, it uses this.
     standardStore:
