@@ -38,13 +38,6 @@ class Http extends AbstractSparqlStore
     protected $client = null;
 
     /**
-     * Name of the store, which runs on the server, e.g. virtuoso.
-     *
-     * @var string
-     */
-    protected $storeName = '';
-
-    /**
      * @var NodeFactory
      */
     private $nodeFactory;
@@ -205,7 +198,6 @@ class Http extends AbstractSparqlStore
      * @throws \Exception If query is no string.
      *                    If query is malformed.
      * @todo add support for DESCRIBE queries
-     * @todo current behavior only for Virtuoso, change that
      */
     public function query($query, array $options = array())
     {
@@ -310,8 +302,8 @@ class Http extends AbstractSparqlStore
                 if (true === isset($askResult['boolean'])) {
                     $return = new ValueResult($askResult['boolean']);
 
-                // if result-string starts with Virtuoso, we assume an error occour.
-                } elseif ('Virtuoso' === substr($result, 0, 8)) {
+                // assumption here is, if a string was returned, something went wrong.
+                } elseif (0 < strlen($result)) {
                     $return = new ExceptionResult(new \Exception($result));
 
                 } else {
