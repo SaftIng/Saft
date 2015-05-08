@@ -30,4 +30,17 @@ class HttpAbstractTest extends StoreAbstractTest
 
         $this->className = 'HttpIntegrationTest';
     }
+
+    /**
+     * Tests openConnection
+     */
+
+    public function testOpenConnectionInvalidUrl()
+    {
+        // We expect that authentication fails, because the auth url is not valid
+        $this->setExpectedException('\Exception');
+
+        $config = array('authUrl' => 'http://not existend');
+        new Http(new NodeFactoryImpl(), new StatementFactoryImpl(), $config);
+    }
 }
