@@ -5,7 +5,7 @@
     xmlns:date="http://exslt.org/dates-and-times"
     extension-element-prefixes="exsl str date">
 <xsl:include href="str.replace.function.xsl"/>
-<xsl:output method="html" indent="yes" encoding="US-ASCII"
+<xsl:output method="html" indent="yes" encoding="UTF-8"
   doctype-public="-//W3C//DTD HTML 4.01 Transitional//EN" />
 <xsl:decimal-format decimal-separator="." grouping-separator="," />
 <!--
@@ -23,22 +23,24 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  -->
- 
+
 <!--
- 
+
  Sample stylesheet to be used with Phing/PHPUnit output.
  Based on JUnit stylesheets from Apache Ant.
- 
+
  It creates a non-framed report that can be useful to send via
  e-mail or such.
- 
+
  @author Michiel Rook <a href="mailto:michiel.rook@gmail.com"/>
  @author Stephane Bailliez <a href="mailto:sbailliez@apache.org"/>
  @author Erik Hatcher <a href="mailto:ehatcher@apache.org"/>
- 
+
 -->
 <!--
+ Forked from phing
  Source: https://www.phing.info/trac/browser/etc/phpunit-noframes.xsl
+ @author Natanael Arndt <a href="mailto:arndtn@gmail.com" />
 -->
 <xsl:param name="output.sorttable" select="'.'"/>
 
@@ -68,7 +70,7 @@
 		    table.details tr td{
 		        background:#eeeee0;
 		    }
-		
+
 		    p {
 		        line-height:1.5em;
 		        margin-top:0.5em; margin-bottom:1.0em;
@@ -122,38 +124,38 @@
         </head>
         <body>
             <a name="top"></a>
-            <xsl:call-template name="pageHeader"/>  
-            
+            <xsl:call-template name="pageHeader"/>
+
             <!-- Summary part -->
             <xsl:call-template name="summary"/>
-            <hr size="1" width="95%" align="left"/>
-            
+            <hr size="1" width="100%" align="left"/>
+
             <!-- Package List part -->
             <xsl:call-template name="packagelist"/>
-            <hr size="1" width="95%" align="left"/>
-            
+            <hr size="1" width="100%" align="left"/>
+
             <!-- For each package create its part -->
             <xsl:call-template name="packages"/>
-            <hr size="1" width="95%" align="left"/>
-            
+            <hr size="1" width="100%" align="left"/>
+
             <!-- For each class create the  part -->
             <xsl:call-template name="classes"/>
-            
-            <xsl:call-template name="pageFooter"/>  
+
+            <xsl:call-template name="pageFooter"/>
         </body>
     </html>
 </xsl:template>
-    
-    
-    
+
+
+
     <!-- ================================================================== -->
     <!-- Write a list of all packages with an hyperlink to the anchor of    -->
     <!-- of the package name.                                               -->
     <!-- ================================================================== -->
-    <xsl:template name="packagelist">   
+    <xsl:template name="packagelist">
         <h2>Packages</h2>
         Note: package statistics are not computed recursively, they only sum up all of its testsuites numbers.
-        <table class="details sortable" border="0" cellpadding="5" cellspacing="2" width="95%">
+        <table class="details sortable" border="0" cellpadding="5" cellspacing="2" width="100%">
             <xsl:call-template name="testsuite.test.header"/>
             <!-- list all packages recursively -->
             <xsl:for-each select="./testsuite[not(./@package = preceding-sibling::testsuite/@package)]">
@@ -163,7 +165,7 @@
                 <xsl:variable name="errorCount" select="sum($testsuites-in-package/@errors)"/>
                 <xsl:variable name="failureCount" select="sum($testsuites-in-package/@failures)"/>
                 <xsl:variable name="timeCount" select="sum($testsuites-in-package/@time)"/>
-                
+
                 <!-- write a summary for the package -->
                 <tr valign="top">
                     <!-- set a nice color depending if there is an error/failure -->
@@ -184,10 +186,10 @@
                     </td>
                 </tr>
             </xsl:for-each>
-        </table>        
+        </table>
     </xsl:template>
-    
-    
+
+
     <!-- ================================================================== -->
     <!-- Write a package level report                                       -->
     <!-- It creates a table with values from the document:                  -->
@@ -199,10 +201,10 @@
             <xsl:sort select="@package"/>
                 <a name="{@package}"></a>
                 <h3>Package <xsl:value-of select="@package"/></h3>
-                
-                <table class="details sortable" border="0" cellpadding="5" cellspacing="2" width="95%">
+
+                <table class="details sortable" border="0" cellpadding="5" cellspacing="2" width="100%">
                     <xsl:call-template name="testsuite.test.header"/>
-            
+
                     <!-- match the testsuites of this package -->
                     <xsl:apply-templates select="/testsuites/testsuite[./@package = current()/@package]" mode="print.test"/>
                 </table>
@@ -211,15 +213,15 @@
                 <p/>
         </xsl:for-each>
     </xsl:template>
-    
+
     <xsl:template name="classes">
         <xsl:for-each select="testsuite/testsuite">
             <xsl:sort select="@name"/>
             <!-- create an anchor to this class name -->
             <a name="{@name}"></a>
             <h3>TestCase <xsl:value-of select="@name"/></h3>
-            
-            <table class="details sortable" border="0" cellpadding="5" cellspacing="2" width="95%">
+
+            <table class="details sortable" border="0" cellpadding="5" cellspacing="2" width="100%">
               <xsl:call-template name="testcase.test.header"/>
               <!--
               test can even not be started at all (failure to load the class)
@@ -233,11 +235,11 @@
                 <xsl:apply-templates select="./testcase | ./testsuite/testcase" mode="print.test"/>
             </table>
             <p/>
-            
+
             <a href="#top">Back to top</a>
         </xsl:for-each>
     </xsl:template>
-    
+
     <xsl:template name="summary">
         <h2>Summary</h2>
         <xsl:variable name="testCount" select="sum(testsuite/@tests)"/>
@@ -245,7 +247,7 @@
         <xsl:variable name="failureCount" select="sum(testsuite/@failures)"/>
         <xsl:variable name="timeCount" select="sum(testsuite/@time)"/>
         <xsl:variable name="successRate" select="($testCount - $failureCount - $errorCount) div $testCount"/>
-        <table class="details" border="0" cellpadding="5" cellspacing="2" width="95%">
+        <table class="details" border="0" cellpadding="5" cellspacing="2" width="100%">
         <tr valign="top">
             <th>Tests</th>
             <th>Failures</th>
@@ -276,7 +278,7 @@
 
         </tr>
         </table>
-        <table border="0" width="95%">
+        <table border="0" width="100%">
         <tr>
         <td style="text-align: justify;">
         Note: <i>failures</i> are anticipated and checked for with assertions while <i>errors</i> are unanticipated.
@@ -284,7 +286,7 @@
         </tr>
         </table>
     </xsl:template>
-      
+
 <!-- Page HEADER -->
 <xsl:template name="pageHeader">
     <h1>Unit Test Results</h1>
@@ -347,7 +349,7 @@
                 <xsl:when test="@errors[.&gt; 0]">Error</xsl:when>
             </xsl:choose>
         </xsl:attribute>
-    
+
         <!-- print testsuite information -->
         <td><a href="#{@name}"><xsl:value-of select="@name"/></a></td>
         <td><xsl:value-of select="@tests"/></td>
@@ -448,4 +450,3 @@
 </xsl:template>
 
 </xsl:stylesheet>
-
