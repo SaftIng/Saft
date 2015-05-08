@@ -189,12 +189,12 @@ abstract class StoreAbstractTest extends TestCase
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new LiteralImpl('test literal', 'en')
+                new LiteralImpl('test literal', null, 'en')
             ),
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new LiteralImpl('test literal', 'de')
+                new LiteralImpl('test literal', null, 'de')
             ),
         ));
 
