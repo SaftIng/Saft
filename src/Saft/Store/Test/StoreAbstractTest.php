@@ -669,19 +669,6 @@ abstract class StoreAbstractTest extends TestCase
      * Tests deleteMultipleStatements
      */
 
-    public function testDeleteMultipleStatementsNoGraphGiven()
-    {
-        $st = $this->getTestStatementWithLiteral();
-        $triple = $this->getTestTriple();
-
-        $graphPattern = SparqlUtils::statementsToSparqlFormat([$st, $triple]);
-        $query = 'DELETE DATA { ' . $graphPattern . '}';
-
-        // expect exception, because no graph was given
-        $this->setExpectedException('\Exception');
-        $this->fixture->query($query);
-    }
-
     public function testDeleteMultipleStatementsQuadRecognition()
     {
         $quad = $this->getTestQuad();
