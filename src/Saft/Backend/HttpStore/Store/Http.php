@@ -13,7 +13,6 @@ use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Store;
-use Saft\Store\Result\ExceptionResult;
 use Saft\Store\Result\EmptyResult;
 use Saft\Store\Result\StatementResult;
 use Saft\Store\Result\SetResult;
@@ -194,9 +193,10 @@ class Http extends AbstractSparqlStore
      * @param  array  $options optional It contains key-value pairs and should provide additional
      *                                  introductions for the store and/or its adapter(s).
      * @return Result Returns result of the query. Depending on the query type, it returns either an instance
-     *                of EmptyResult, ExceptionResult, SetResult, StatementResult or ValueResult.
-     * @throws \Exception If query is no string.
-     *                    If query is malformed.
+     *                of EmptyResult, SetResult, StatementResult or ValueResult.
+     * @throws \Exception     If query is no string.
+     * @throws \Exception     If query is malformed.
+     * @throws StoreException If server returned an error.
      * @todo add support for DESCRIBE queries
      */
     public function query($query, array $options = array())
@@ -304,7 +304,7 @@ class Http extends AbstractSparqlStore
 
                 // assumption here is, if a string was returned, something went wrong.
                 } elseif (0 < strlen($result)) {
-                    $return = new ExceptionResult(new \Exception($result));
+                    throw new StoreException($result);
 
                 } else {
                     $return = new EmptyResult();

@@ -267,10 +267,6 @@ abstract class AbstractSparqlStore implements Store
             return new EmptyResult();
         }
 
-        if ($result->isExceptionResult()) {
-            return $result;
-        }
-
         /*
          * Transform SetResult into StatementResult, if no exception result was returned by Virtuoso
          */

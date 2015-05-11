@@ -23,14 +23,6 @@ class ValueResult extends Result
     /**
      * @return boolean False
      */
-    public function isExceptionResult()
-    {
-        return false;
-    }
-
-    /**
-     * @return boolean False
-     */
     public function isSetResult()
     {
         return false;

@@ -22,14 +22,6 @@ class EmptyResult extends Result
     }
 
     /**
-     * @return boolean True
-     */
-    public function isExceptionResult()
-    {
-        return false;
-    }
-
-    /**
      * @return boolean False
      */
     public function isSetResult()

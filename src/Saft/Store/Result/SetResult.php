@@ -67,14 +67,6 @@ class SetResult extends Result implements \Iterator
     }
 
     /**
-     * @return boolean False
-     */
-    public function isExceptionResult()
-    {
-        return false;
-    }
-
-    /**
      * @return boolean True
      */
     public function isSetResult()

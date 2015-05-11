@@ -32,11 +32,6 @@ abstract class Result
     abstract public function isEmptyResult();
 
     /**
-     * @return boolean True, if this instance is an ExceptionResult
-     */
-    abstract public function isExceptionResult();
-
-    /**
      * @return boolean True, if this instance is a SetResult
      */
     abstract public function isSetResult();

@@ -59,15 +59,6 @@ class StatementResultUnitTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests isExceptionResult
-     */
-
-    public function testIsExceptionResult()
-    {
-        $this->assertFalse($this->fixture->isExceptionResult());
-    }
-
-    /**
      * Tests isSetResult
      */
 

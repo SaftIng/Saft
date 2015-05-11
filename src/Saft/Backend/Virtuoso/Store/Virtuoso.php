@@ -196,7 +196,7 @@ class Virtuoso extends AbstractSparqlStore
      * @param  array  $options optional It contains key-value pairs and should provide additional introductions
      *                                  for the store and/or its adapter(s).
      * @return Result Returns result of the query. Depending on the query type, it returns either an instance
-     *                of EmptyResult, ExceptionResult, SetResult, StatementResult or ValueResult.
+     *                of EmptyResult, SetResult, StatementResult or ValueResult.
      * @throws \Exception If query is no string.
      * @throws \Exception If query is malformed.
      * @throws \Exception If PDO query is false.
@@ -240,7 +240,7 @@ class Virtuoso extends AbstractSparqlStore
                 $pdoQuery->execute();
 
             } catch (\PDOException $e) {
-                return new ExceptionResult($e);
+                throw new StoreException($e->getMessage());
             }
 
             $setResult = new SetResult();

@@ -33,14 +33,6 @@ class StatementResult extends SetResult
     /**
      * @return boolean False
      */
-    public function isExceptionResult()
-    {
-        return false;
-    }
-
-    /**
-     * @return boolean False
-     */
     public function isSetResult()
     {
         return false;
