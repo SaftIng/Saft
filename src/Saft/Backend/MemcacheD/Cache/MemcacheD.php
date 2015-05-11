@@ -31,7 +31,7 @@ class MemcacheD implements Cache
     {
         $this->checkRequirements();
 
-        $this->cache = new \Memcached('Saft\Cache');
+        $this->cache = new \Memcached('Saft\\Backend\\Cache\\MemcacheD');
         $servers = $this->cache->getServerList();
 
         // set default host and port
@@ -52,6 +52,15 @@ class MemcacheD implements Cache
         // save key prefix if it was given
         if (isset($config['keyPrefix'])) {
             $this->keyPrefix = $config['keyPrefix'];
+        }
+
+        /*
+         * Checks, if we can set and get stuff from MemcacheD. If that does not work, throw an exception and
+         * stop working.
+         */
+        $this->cache->set($this->keyPrefix . 'memcached-test', true);
+        if (true !== $this->cache->get($this->keyPrefix . 'memcached-test')) {
+            throw new \Exception('MemcacheD requirements fullfilled, but it seems it can\'t set and get values.');
         }
     }
 

@@ -15,6 +15,11 @@ class CacheMemcacheDTest extends AbstractCacheTest
         parent::setUp();
 
         $cacheFactory = new CacheFactoryImpl();
-        $this->fixture = $cacheFactory->createCache($this->config['memcachedCacheConfig']);
+
+        try {
+            $this->fixture = $cacheFactory->createCache($this->config['memcachedCacheConfig']);
+        } catch (\Exception $e) {
+            $this->markTestSkipped($e->getMessage());
+        }
     }
 }
