@@ -14,8 +14,8 @@ use Saft\Rdf\Triple;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Store;
+use Saft\Store\Exception\StoreException;
 use Saft\Store\Result\EmptyResult;
-use Saft\Store\Result\ExceptionResult;
 use Saft\Store\Result\SetResult;
 use Saft\Store\Result\StatementResult;
 use Saft\Store\Result\ValueResult;
@@ -105,6 +105,23 @@ class Virtuoso extends AbstractSparqlStore
     protected function closeConnection()
     {
         $this->connection = null;
+    }
+
+    /**
+     * Returns array with graphUri's which are available.
+     *
+     * @return array Array which contains graph URI's as values and keys.
+     */
+    public function getAvailableGraphs()
+    {
+        $query = $this->sqlQuery(
+            'SELECT ID_TO_IRI(REC_GRAPH_IID) AS graph FROM DB.DBA.RDF_EXPLICITLY_CREATED_GRAPH'
+        );
+        $graphs = array();
+        foreach ($query->fetchAll(\PDO::FETCH_ASSOC) as $graph) {
+            $graphs[$graph['graph']] = $this->nodeFactory->createNamedNode($graph['graph']);
+        }
+        return $graphs;
     }
 
     /**
@@ -353,6 +370,25 @@ class Virtuoso extends AbstractSparqlStore
             } else {
                 return new EmptyResult();
             }
+        }
+    }
+
+    /**
+     * Executes a SQL query on the database.
+     *
+     * @param  string $queryString SPARQL- or SQL query to execute
+     * @return \PDOStatement
+     * @throws \Exception If $queryString is invalid
+     */
+    public function sqlQuery($queryString)
+    {
+        try {
+            // execute query
+            $query = $this->connection->prepare($queryString, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
+            $query->execute();
+            return $query;
+        } catch (\PDOException $e) {
+            throw new \Exception($e->getMessage());
         }
     }
 }
