@@ -14,12 +14,11 @@ class MemcacheD implements Cache
     protected $cache;
 
     /**
-     * The purpose of this string is to avoid collisions with other non-Enable
-     * related cache entries in MemcacheD.
+     * The purpose of this string is to avoid collisions with other non-Saft related cache entries in MemcacheD.
      *
      * @var string
      */
-    protected $keyPrefix = 'saft-memD--';
+    protected $keyPrefix = 'saft--';
 
     /**
      * SSetup cache adapter. All operations to establish a connection to the cache have to be done. It should
@@ -49,6 +48,11 @@ class MemcacheD implements Cache
         }
 
         $this->config = $config;
+
+        // save key prefix if it was given
+        if (isset($config['keyPrefix'])) {
+            $this->keyPrefix = $config['keyPrefix'];
+        }
     }
 
     /**
@@ -83,7 +87,7 @@ class MemcacheD implements Cache
      */
     public function delete($key)
     {
-        $hashedKey = hash('sha256', $key);
+        $hashedKey = $this->keyPrefix . hash('sha256', $key);
 
         return $this->cache->delete($this->keyPrefix . $hashedKey);
     }
@@ -108,7 +112,7 @@ class MemcacheD implements Cache
      */
     public function getCompleteEntry($key)
     {
-        $hashedKey = hash('sha256', $key);
+        $hashedKey = $this->keyPrefix . hash('sha256', $key);
 
         if (true === $this->isCached($key)) {
             $container = $this->cache->get($this->keyPrefix . $hashedKey);
@@ -134,7 +138,7 @@ class MemcacheD implements Cache
      */
     public function isCached($key)
     {
-        $hashedKey = hash('sha256', $key);
+        $hashedKey = $this->keyPrefix . hash('sha256', $key);
         return false !== $this->cache->get($this->keyPrefix . $hashedKey);
     }
 
@@ -146,7 +150,7 @@ class MemcacheD implements Cache
      */
     public function set($key, $value)
     {
-        $hashedKey = hash('sha256', $key);
+        $hashedKey = $this->keyPrefix . hash('sha256', $key);
 
         if (true === $this->isCached($key)) {
             $container = $this->cache->get($this->keyPrefix . $hashedKey);

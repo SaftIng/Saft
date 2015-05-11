@@ -17,6 +17,11 @@ class File implements Cache
     private $config;
 
     /**
+     * @var string
+     */
+    private $keyPrefix = '';
+
+    /**
      * Setup cache adapter. All operations to establish a connection to the cache have to be done. It should
      * call checkRequirements to be sure all requirements are fullfilled, before init anything.
      *
@@ -44,6 +49,11 @@ class File implements Cache
         $this->checkRequirements();
 
         $this->config = $config;
+
+        // save key prefix if it was given
+        if (isset($config['keyPrefix'])) {
+            $this->keyPrefix = $config['keyPrefix'];
+        }
     }
 
     /**
@@ -62,7 +72,7 @@ class File implements Cache
     }
 
     /**
-     * Removes all entries of the cache instance.
+     * Removes all entries that where created by the File.php.
      */
     public function clean()
     {
@@ -81,7 +91,7 @@ class File implements Cache
      */
     public function delete($key)
     {
-        $filename = hash('sha256', $key);
+        $filename = $this->keyPrefix . hash('sha256', $key);
 
         if (true === $this->isCached($key)) {
             unlink($this->cachePath . $filename .'.cache');
@@ -108,7 +118,7 @@ class File implements Cache
      */
     public function getCompleteEntry($key)
     {
-        $filename = hash('sha256', $key);
+        $filename = $this->keyPrefix . hash('sha256', $key);
 
         if (true === $this->isCached($key)) {
             // load content from cache file and decode it
@@ -142,7 +152,7 @@ class File implements Cache
      */
     public function isCached($key)
     {
-        $filename = hash('sha256', $key);
+        $filename = $this->keyPrefix . hash('sha256', $key);
 
         return true === file_exists($this->cachePath . $filename .'.cache');
     }
@@ -156,7 +166,7 @@ class File implements Cache
      */
     public function set($key, $value)
     {
-        $filename = hash('sha256', $key);
+        $filename = $this->keyPrefix . hash('sha256', $key);
 
         $value = serialize($value);
 
