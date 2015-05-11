@@ -30,7 +30,7 @@ abstract class AbstractParser implements Parser
      */
     protected function rdfPhpToStatementIterator(array $rdfPhp)
     {
-        $this->statementIterator = new ArrayStatementIteratorImpl(array());
+        $statements = array();
 
         // go through all subjects
         foreach ($rdfPhp as $subject => $predicates) {
@@ -65,14 +65,12 @@ abstract class AbstractParser implements Parser
                         $o = $this->nodeFactory->createLiteral($object['value']);
                     }
 
-                    // build statement
-                    $newStatement = $this->statementFactory->createStatement($s, $p, $o);
-
-                    $this->statementIterator->append($newStatement);
+                    // build and add statement
+                    $statements[] = $this->statementFactory->createStatement($s, $p, $o);
                 }
             }
         }
 
-        return $this->statementIterator;
+        return new ArrayStatementIteratorImpl($statements);
     }
 }

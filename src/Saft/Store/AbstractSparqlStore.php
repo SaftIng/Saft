@@ -83,10 +83,12 @@ abstract class AbstractSparqlStore implements Store
                 throw new \Exception('Graph was not given, neither as parameter nor in statement.');
             }
 
+            // init batch entry for the current graph URI, if not set yet.
             if (false === isset($batchStatements[$graphUriToUse])) {
-                $batchStatements[$graphUriToUse] = new ArrayStatementIteratorImpl(array());
+                $batchStatements[$graphUriToUse] = array();
             }
-            $batchStatements[$graphUriToUse]->append($statement);
+
+            $batchStatements[$graphUriToUse][] = $statement;
 
             // after batch is full, execute collected statements all at once
             if (0 === $counter % $batchSize) {
