@@ -3,16 +3,10 @@
 namespace Saft\Store\Test\Result;
 
 use Saft\Store\Result\ValueResult;
+use Saft\Test\TestCase;
 
-class ValueResultUnitTest extends \PHPUnit_Framework_TestCase
+class ValueResultUnitTest extends TestCase
 {
-    /**
-     * Contains an instance of the class to test.
-     *
-     * @var mixed
-     */
-    protected $fixture;
-
     /**
      *
      */

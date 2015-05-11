@@ -4,16 +4,10 @@ namespace Saft\Store\Test\Result;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Store\Result\SetResult;
+use Saft\Test\TestCase;
 
-class SetResultUnitTest extends \PHPUnit_Framework_TestCase
+class SetResultUnitTest extends TestCase
 {
-    /**
-     * Contains an instance of the class to test.
-     *
-     * @var mixed
-     */
-    protected $fixture;
-
     /**
      *
      */

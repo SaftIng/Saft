@@ -2,7 +2,6 @@
 
 namespace Saft\QueryCache\Test;
 
-use Saft\TestCase;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
@@ -12,6 +11,7 @@ use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Store\Test\BasicTriplePatternStore;
+use Saft\Test\TestCase;
 use Symfony\Component\Yaml\Parser;
 
 /**

@@ -2,22 +2,15 @@
 
 namespace Saft\Sparql\Test\Query;
 
-use Saft\TestCase;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Sparql\Query\SelectQuery;
+use Saft\Test\TestCase;
 
 class SelectQueryUnitTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    protected $testGraph;
-
     public function setUp()
     {
         parent::setUp();
-
-        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
 
         $this->fixture = new SelectQuery();
     }

@@ -2,7 +2,6 @@
 
 namespace Saft\Store\Test;
 
-use Saft\TestCase;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
@@ -13,36 +12,13 @@ use Saft\Store\Result\EmptyResult;
 use Saft\Store\Result\StatementResult;
 use Saft\Store\Result\SetResult;
 use Saft\Store\Result\ValueResult;
+use Saft\Test\TestCase;
 use Symfony\Component\Yaml\Parser;
 
 abstract class StoreAbstractTest extends TestCase
 {
-    /**
-     * @var Cache
-     */
-    protected $cache;
-
-    /**
-     * @var array
-     */
-    protected $config;
-
-    /**
-     * Contains an instance of the class to test.
-     *
-     * @var mixed
-     */
-    protected $fixture;
-
-    /**
-     * @var string
-     */
-    protected $testGraph;
-
     public function setUp()
     {
-        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
-
         parent::setUp();
 
         if (null !== $this->fixture) {

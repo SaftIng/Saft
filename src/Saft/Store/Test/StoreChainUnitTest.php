@@ -2,20 +2,14 @@
 
 namespace Saft\Store\Test;
 
-use Saft\QueryCache\QueryCache;
 use Saft\Backend\Virtuoso\Store\Virtuoso;
-use Symfony\Component\Yaml\Parser;
+use Saft\QueryCache\QueryCache;
 use Saft\Store\StoreChain;
+use Saft\Test\TestCase;
+use Symfony\Component\Yaml\Parser;
 
-class StoreChainUnitTest extends \PHPUnit_Framework_TestCase
+class StoreChainUnitTest extends TestCase
 {
-    /**
-     * Contains an instance of the class to test.
-     *
-     * @var mixed
-     */
-    protected $fixture;
-
     /**
      *
      */

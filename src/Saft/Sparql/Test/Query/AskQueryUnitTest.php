@@ -2,16 +2,18 @@
 
 namespace Saft\Sparql\Test\Query;
 
-use Saft\TestCase;
 use Saft\Sparql\Query\AskQuery;
+use Saft\Test\TestCase;
 
 class AskQueryUnitTest extends TestCase
 {
     public function setUp()
     {
+        parent::setUp();
+
         $this->fixture = new AskQuery();
     }
-    
+
     /**
      * Tests constructor
      */
@@ -19,13 +21,13 @@ class AskQueryUnitTest extends TestCase
     public function testConstructor()
     {
         $this->fixture = new AskQuery('ASK {?s ?p ?o.}');
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         $this->assertEquals('?s ?p ?o.', $queryParts['where']);
     }
-    
-        
+
+
     /**
      * Tests extractNamespacesFromQuery
      */
@@ -33,8 +35,8 @@ class AskQueryUnitTest extends TestCase
     public function testExtractNamespacesFromQuery2()
     {
         $this->fixture = new AskQuery(
-            'PREFIX foo: <http://bar.de> ASK WHERE { 
-                ?s <http://foobar/hey> ?o. ?s <http://foobar/ho> ?o. ?s <http://www.w3.org/2001/XMLSchema#> ?o 
+            'PREFIX foo: <http://bar.de> ASK WHERE {
+                ?s <http://foobar/hey> ?o. ?s <http://foobar/ho> ?o. ?s <http://www.w3.org/2001/XMLSchema#> ?o
              }'
         );
 
@@ -49,7 +51,7 @@ class AskQueryUnitTest extends TestCase
     public function testExtractNamespacesFromQueryNoNamespaces()
     {
         $this->fixture = new AskQuery('ASK WHERE { ?s ?p ?o }');
-        
+
         $queryParts = $this->fixture->getQueryParts();
 
         $this->assertFalse(isset($queryParts['namespaces']));
@@ -65,24 +67,24 @@ class AskQueryUnitTest extends TestCase
         $this->fixture = new AskQuery(
             'PREFIX foo: <http://bar.de> ASK { ?s ?p ?o }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         $this->assertEquals(array('foo' => 'http://bar.de'), $queryParts['prefixes']);
     }
-    
+
     public function testExtractPrefixesFromQueryNoPrefixes()
     {
         // assumption here is that fixture is of type
         $this->fixture = new AskQuery(
             'ASK WHERE { ?s ?p ?o }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         $this->assertFalse(isset($queryParts['prefixes']));
     }
-    
+
     /**
      * Tests getQueryParts
      */
@@ -90,11 +92,11 @@ class AskQueryUnitTest extends TestCase
     public function testGetQueryPartsEverything()
     {
         $this->fixture->init('PREFIX foo: <http://bar.de> ASK FROM <http://foobar/> { ?s ?p ?o. FILTER (?o < 40) }');
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         $this->assertEquals(6, count($queryParts));
-        
+
         $this->assertEquals(
             array(
                 array(
@@ -142,11 +144,11 @@ class AskQueryUnitTest extends TestCase
     public function testGetQueryPartsWithPrefixesTriplePatternVariables()
     {
         $this->fixture->init('PREFIX foo: <http://bar.de> ASK { ?s ?p ?o }');
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         $this->assertEquals(4, count($queryParts));
-        
+
         $this->assertEquals(array('foo' => 'http://bar.de'), $queryParts['prefixes']);
         $this->assertEquals(
             array(
@@ -166,69 +168,69 @@ class AskQueryUnitTest extends TestCase
         $this->assertEquals(array('s', 'p', 'o'), $queryParts['variables']);
         $this->assertEquals('?s ?p ?o', $queryParts['where']);
     }
-    
+
     /**
      * Tests init
      */
-     
+
     public function testInit()
     {
         $this->fixture = new AskQuery();
         $this->fixture->init('ASK {?s ?p ?o.}');
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         $this->assertEquals('?s ?p ?o.', $queryParts['where']);
     }
-    
+
     public function testInitNoWherePart()
     {
         $this->setExpectedException('\Exception');
-        
+
         $this->fixture = new AskQuery();
         $this->fixture->init('ASK {?s ?p ?o.');
     }
-    
+
     /**
      * Tests isAskQuery
      */
-     
+
     public function testIsAskQuery()
     {
         $this->assertTrue($this->fixture->isAskQuery());
     }
-    
+
     /**
      * Tests isDescribeQuery
      */
-     
+
     public function testIsDescribeQuery()
     {
         $this->assertFalse($this->fixture->isDescribeQuery());
     }
-    
+
     /**
      * Tests isGraphQuery
      */
-     
+
     public function testIsGraphQuery()
     {
         $this->assertFalse($this->fixture->isGraphQuery());
     }
-    
+
     /**
      * Tests isSelectQuery
      */
-     
+
     public function testIsSelectQuery()
     {
         $this->assertFalse($this->fixture->isSelectQuery());
     }
-    
+
     /**
      * Tests isUpdateQuery
      */
-     
+
     public function testIsUpdateQuery()
     {
         $this->assertFalse($this->fixture->isUpdateQuery());

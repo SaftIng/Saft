@@ -6,8 +6,9 @@ use Saft\Rdf\StatementImpl;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\LiteralImpl;
+use Saft\Test\TestCase;
 
-abstract class StatementAbstractTest extends \PHPUnit_Framework_TestCase
+abstract class StatementAbstractTest extends TestCase
 {
     abstract public function newLiteralInstance($value, $lang = null, $datatype = null);
     abstract public function newNamedNodeInstance($uri);

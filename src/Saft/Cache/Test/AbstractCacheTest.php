@@ -2,9 +2,9 @@
 
 namespace Saft\Cache\Test;
 
-use Saft\TestCase;
 use Saft\Cache\Cache;
 use Saft\Cache\CacheFactoryImpl;
+use Saft\Test\TestCase;
 use Symfony\Component\Yaml\Parser;
 
 abstract class AbstractCacheTest extends TestCase

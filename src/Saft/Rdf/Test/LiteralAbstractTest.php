@@ -5,13 +5,14 @@ namespace Saft\Rdf\Test;
 use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\Node;
+use Saft\Test\TestCase;
 
 /**
  * This abstract test checks classes implementing the Literal interface for conformity with RDF 1.1
  * {@url http://www.w3.org/TR/rdf11-concepts/#section-Graph-Literal}
  * @package Saft\Rdf\Test
  */
-abstract class LiteralAbstractTest extends \PHPUnit_Framework_TestCase
+abstract class LiteralAbstractTest extends TestCase
 {
     /**
      * An abstract method which returns the subject under test (SUT), in this case an instances of Literal

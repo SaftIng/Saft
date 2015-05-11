@@ -2,7 +2,6 @@
 
 namespace Saft\Store\Test;
 
-use Saft\TestCase;
 use Saft\Backend\Virtuoso\Store\Virtuoso;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
@@ -14,6 +13,7 @@ use Saft\Rdf\AnyPatternImpl;
 use Saft\Store\StoreChain;
 use Saft\Store\Result\StatementResult;
 use Saft\Sparql\SparqlUtils;
+use Saft\Test\TestCase;
 use Symfony\Component\Yaml\Parser;
 
 class StoreChainIntegrationTest extends TestCase
@@ -26,11 +26,6 @@ class StoreChainIntegrationTest extends TestCase
     protected $separator = '__.__';
 
     /**
-     * @var string
-     */
-    protected $testGraph;
-
-    /**
      *
      */
     public function setUp()
@@ -38,8 +33,6 @@ class StoreChainIntegrationTest extends TestCase
         $this->markTestSkipped('Ignore StoreChain as long its not removed.');
 
         parent::setUp();
-
-        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
 
         // set path to test dir
         $saftRootDir = dirname(__FILE__) . '/../../../../';

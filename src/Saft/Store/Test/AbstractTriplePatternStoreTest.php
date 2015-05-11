@@ -2,7 +2,6 @@
 
 namespace Saft\Store\Test;
 
-use Saft\TestCase;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
@@ -11,6 +10,7 @@ use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Sparql\SparqlUtils;
+use Saft\Test\TestCase;
 
 class AbstractTriplePatternStoreTest extends TestCase
 {

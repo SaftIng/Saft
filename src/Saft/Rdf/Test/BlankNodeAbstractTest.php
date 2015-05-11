@@ -3,8 +3,9 @@
 namespace Saft\Rdf\Test;
 
 use Saft\Rdf\BlankNodeImpl;
+use Saft\Test\TestCase;
 
-abstract class BlankNodeAbstractTest extends \PHPUnit_Framework_TestCase
+abstract class BlankNodeAbstractTest extends TestCase
 {
     /**
      * An abstract method which returns new instances of BlankNode

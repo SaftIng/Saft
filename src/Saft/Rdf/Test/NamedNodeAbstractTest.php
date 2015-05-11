@@ -6,8 +6,9 @@ use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\AnyPatterImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\LiteralImpl;
+use Saft\Test\TestCase;
 
-abstract class NamedNodeAbstractTest extends \PHPUnit_Framework_TestCase
+abstract class NamedNodeAbstractTest extends TestCase
 {
     /**
      * An abstract method which returns new instances of NamedNode

@@ -7,8 +7,9 @@ use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementImpl;
+use Saft\Test\TestCase;
 
-abstract class ParserAbstractTest extends \PHPUnit_Framework_TestCase
+abstract class ParserAbstractTest extends TestCase
 {
     abstract public function getParserInstance();
 

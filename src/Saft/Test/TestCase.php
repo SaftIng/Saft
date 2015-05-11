@@ -1,6 +1,8 @@
 <?php
 
-namespace Saft;
+namespace Saft\Test;
+
+use Saft\Rdf\NamedNodeImpl;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
@@ -20,6 +22,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      * @var mixed
      */
     protected $fixture;
+
+    /**
+     * @var NamedNode
+     */
+    protected $testGraph;
 
     /**
      * http://stackoverflow.com/a/12496979
@@ -71,5 +78,15 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         }
         $statementIterator->next();
         $this->assertFalse($statementIterator->valid(), sprintf($message, 'at least '. $i + 1));
+    }
+
+    /**
+     * Place to setup stuff for Saft related tests.
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
     }
 }

@@ -2,15 +2,16 @@
 
 namespace Saft\Backend\HttpStore\Test;
 
+use Saft\Cache\Cache;
+use Saft\Backend\HttpStore\Store\Http;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
+use Saft\Test\TestCase;
 use Symfony\Component\Yaml\Parser;
-use Saft\Cache\Cache;
-use Saft\Backend\HttpStore\Store\Http;
 
-class ClientUnitTest extends \PHPUnit_Framework_TestCase
+class ClientUnitTest extends TestCase
 {
     /**
      * Tests existence (simple)

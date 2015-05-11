@@ -2,17 +2,19 @@
 
 namespace Saft\Sparql\Test\Query;
 
-use Saft\TestCase;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\UpdateQuery;
+use Saft\Test\TestCase;
 
 class UpdateQueryUnitTest extends TestCase
 {
     public function setUp()
     {
+        parent::setUp();
+
         $this->fixture = new UpdateQuery();
     }
-    
+
     /**
      * Tests constructor
      */
@@ -23,14 +25,14 @@ class UpdateQueryUnitTest extends TestCase
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             WITH <http://graph/> DELETE { ?x foaf:name "Alice" } WHERE { ?s ?p ?o }'
         );
-        
+
         $this->assertEquals(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             WITH <http://graph/> DELETE { ?x foaf:name "Alice" } WHERE { ?s ?p ?o }',
             $this->fixture->getQuery()
         );
     }
-        
+
     /**
      * Tests extractGraphs
      */
@@ -39,12 +41,12 @@ class UpdateQueryUnitTest extends TestCase
     {
         $this->fixture = AbstractQuery::initByQueryString(
             'PREFIX dc: <http://foo/bar/>
-            DELETE DATA { 
+            DELETE DATA {
                 Graph <http://saft/test/g1> {<http://saft/test/s1> dc:p1 <http://saft/test/o1>}
                 Graph <http://saft/test/g2> {<http://saft/test/s1> dc:p1 <http://saft/test/o1>}
             }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
 
         $this->assertEquals(
@@ -61,12 +63,12 @@ class UpdateQueryUnitTest extends TestCase
                 <http://saft/test/s1> dc:p1 <http://saft/test/o1>}
             }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
 
         $this->assertEquals(array('http://saft/test/g1'), $queryParts['graphs']);
     }
-        
+
     /**
      * Tests extractNamespacesFromQuery
      */
@@ -77,7 +79,7 @@ class UpdateQueryUnitTest extends TestCase
             'PREFIX dc: <http://foo/bar/>
             DELETE DATA { GRAPH <http://> { ?s dc: ?o. ?s <http://foo/sss> ?o } }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
 
         $this->assertEquals(array('ns-0' => 'http://foo/'), $queryParts['namespaces']);
@@ -89,7 +91,7 @@ class UpdateQueryUnitTest extends TestCase
             'PREFIX dc: <http://foo/bar/>
             DELETE DATA { GRAPH <http://> { ?s ?p ?o } }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
 
         $this->assertFalse(isset($queryParts['namespaces']));
@@ -106,24 +108,24 @@ class UpdateQueryUnitTest extends TestCase
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             WITH <http://graph/> DELETE { ?x foaf:name "Alice" } WHERE { ?s ?p ?o }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         $this->assertEquals(array('foaf' => 'http://xmlns.com/foaf/0.1/'), $queryParts['prefixes']);
     }
-    
+
     public function testExtractPrefixesFromQueryNoPrefixes()
     {
         // assumption here is that fixture is of type
         $this->fixture = AbstractQuery::initByQueryString(
             'DELETE DATA { GRAPH <http://> { ?s ?p ?o } }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         $this->assertFalse(isset($queryParts['prefixes']));
     }
-    
+
     /**
      * Tests getQueryParts
      */
@@ -132,7 +134,7 @@ class UpdateQueryUnitTest extends TestCase
     {
         $this->fixture = new UpdateQuery('
             PREFIX dc: <http://foo/bar/> DELETE DATA { GRAPH <http://> { ?s ?p ?o } }');
-        
+
         $this->assertEquals('deleteData', $this->fixture->getSubType());
     }
 
@@ -141,7 +143,7 @@ class UpdateQueryUnitTest extends TestCase
         $this->fixture = new UpdateQuery(
             'PREFIX dc: <http://foo/bar/> INSERT DATA { GRAPH <http://> { ?s dc:foo "hi" } }'
         );
-        
+
         $this->assertEquals('insertData', $this->fixture->getSubType());
     }
 
@@ -150,7 +152,7 @@ class UpdateQueryUnitTest extends TestCase
         $this->fixture = new UpdateQuery(
             'PREFIX dc: <http://foo/bar/> INSERT INTO GRAPH <http://> { ?s dc:foo "hi" }'
         );
-        
+
         $this->assertEquals('insertInto', $this->fixture->getSubType());
     }
 
@@ -160,7 +162,7 @@ class UpdateQueryUnitTest extends TestCase
             'PREFIX dc: <http://foo/bar/>
              WITH <http://> DELETE { ?s dc:foo "hi" } INSERT { ?s dc:foo "ho" } WHERE { ?s dc:foo "hi" }'
         );
-        
+
         $this->assertEquals('withDeleteInsertWhere', $this->fixture->getSubType());
     }
 
@@ -169,10 +171,10 @@ class UpdateQueryUnitTest extends TestCase
         $this->fixture = new UpdateQuery(
             'PREFIX dc: <http://foo/bar/> WITH <http://> DELETE { ?s dc:foo "hi" } WHERE { ?s dc:foo "hi" }'
         );
-        
+
         $this->assertEquals('withDeleteWhere', $this->fixture->getSubType());
     }
-    
+
     /**
      * Tests getQueryParts
      */
@@ -181,15 +183,15 @@ class UpdateQueryUnitTest extends TestCase
     {
         $this->fixture->init(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-            WITH <http://graph/> 
-            DELETE { ?x foaf:name "Alice"^^<http://www.w3.org/2001/XMLSchema#string>. ?x <http://namespace/aa> ?y } 
+            WITH <http://graph/>
+            DELETE { ?x foaf:name "Alice"^^<http://www.w3.org/2001/XMLSchema#string>. ?x <http://namespace/aa> ?y }
             WHERE { ?s ?p ?o. FILTER(?o < 40) }'
         );
-        
+
         $queryParts = $this->fixture->getQueryParts();
-        
+
         $this->assertEquals(9, count($queryParts));
-        
+
         $this->assertEquals(
             '?x foaf:name "Alice"^^<http://www.w3.org/2001/XMLSchema#string>. ?x <http://namespace/aa> ?y',
             $queryParts['deleteData']
@@ -266,16 +268,16 @@ class UpdateQueryUnitTest extends TestCase
     public function testGetQueryPartsInsertDataMissingDataPart()
     {
         $this->fixture->init('INSERT DATA { }');
-        
+
         // expects an exception because data part is empty
         $this->setExpectedException('\Exception');
         $this->fixture->getQueryParts();
     }
-    
+
     /**
      * Tests init
      */
-     
+
     public function testInitDeleteData()
     {
         $this->fixture = new UpdateQuery();
@@ -283,54 +285,54 @@ class UpdateQueryUnitTest extends TestCase
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             DELETE DATA { ?x foaf:name "Alice" }'
         );
-        
+
         $this->assertEquals(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             DELETE DATA { ?x foaf:name "Alice" }',
             $this->fixture->getQuery()
         );
     }
-    
+
     /**
      * Tests isAskQuery
      */
-     
+
     public function testIsAskQuery()
     {
         $this->assertFalse($this->fixture->isAskQuery());
     }
-    
+
     /**
      * Tests isDescribeQuery
      */
-     
+
     public function testIsDescribeQuery()
     {
         $this->assertFalse($this->fixture->isDescribeQuery());
     }
-    
+
     /**
      * Tests isGraphQuery
      */
-     
+
     public function testIsGraphQuery()
     {
         $this->assertFalse($this->fixture->isGraphQuery());
     }
-    
+
     /**
      * Tests isSelectQuery
      */
-     
+
     public function testIsSelectQuery()
     {
         $this->assertFalse($this->fixture->isSelectQuery());
     }
-    
+
     /**
      * Tests isUpdateQuery
      */
-     
+
     public function testIsUpdateQuery()
     {
         $this->assertTrue($this->fixture->isUpdateQuery());

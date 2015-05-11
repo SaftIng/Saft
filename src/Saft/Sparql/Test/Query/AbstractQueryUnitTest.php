@@ -2,7 +2,6 @@
 
 namespace Saft\Sparql\Test\Query;
 
-use Saft\TestCase;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\AskQuery;
@@ -10,19 +9,13 @@ use Saft\Sparql\Query\DescribeQuery;
 use Saft\Sparql\Query\GraphQuery;
 use Saft\Sparql\Query\SelectQuery;
 use Saft\Sparql\Query\UpdateQuery;
+use Saft\Test\TestCase;
 
 class AbstractQueryUnitTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    protected $testGraph;
-
     public function setUp()
     {
         parent::setUp();
-
-        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
 
         $this->fixture = $this->getMockForAbstractClass('\Saft\Sparql\Query\AbstractQuery');
     }

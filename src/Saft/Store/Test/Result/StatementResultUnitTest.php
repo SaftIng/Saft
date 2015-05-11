@@ -5,16 +5,10 @@ namespace Saft\Store\Test\Result;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Store\Result\StatementResult;
+use Saft\Test\TestCase;
 
-class StatementResultUnitTest extends \PHPUnit_Framework_TestCase
+class StatementResultUnitTest extends TestCase
 {
-    /**
-     * Contains an instance of the class to test.
-     *
-     * @var mixed
-     */
-    protected $fixture;
-
     /**
      *
      */

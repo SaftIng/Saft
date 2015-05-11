@@ -3,8 +3,9 @@
 namespace Saft\Rdf\Test;
 
 use Saft\Rdf\NodeUtils;
+use Saft\Test\TestCase;
 
-class NodeUtilsTest extends \PHPUnit_Framework_TestCase
+class NodeUtilsTest extends TestCase
 {
     /**
      * Tests simpleCheckURI

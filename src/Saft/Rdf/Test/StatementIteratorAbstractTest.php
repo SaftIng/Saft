@@ -2,11 +2,11 @@
 
 namespace Saft\Rdf\Test;
 
-use \Saft\Rdf\LiteralImpl;
-use \Saft\Rdf\NamedNodeImpl;
-use \Saft\Rdf\NodeFactoryImpl;
-use \Saft\Rdf\StatementImpl;
-use \Saft\TestCase;
+use Saft\Rdf\LiteralImpl;
+use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\StatementImpl;
+use Saft\Test\TestCase;
 
 abstract class StatementIteratorAbstractTest extends TestCase
 {

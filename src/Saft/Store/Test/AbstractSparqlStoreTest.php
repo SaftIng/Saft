@@ -2,7 +2,6 @@
 
 namespace Saft\Store\Test;
 
-use Saft\TestCase;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
@@ -12,19 +11,13 @@ use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Test\EqualsSparqlConstraint;
+use Saft\Test\TestCase;
 
 class AbstractSparqlStoreTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    protected $testGraph;
-
     public function setUp()
     {
         parent::setUp();
-
-        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
 
         $this->mock = $this->getMockForAbstractClass(
             '\Saft\Store\AbstractSparqlStore',
