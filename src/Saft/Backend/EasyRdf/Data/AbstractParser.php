@@ -11,11 +11,13 @@ use Saft\Rdf\StatementFactory;
 abstract class AbstractParser implements Parser
 {
     /**
-     * @var StatementIterator
+     * @var NodeFactory
      */
-    protected $statementIterator;
-
     private $nodeFactory;
+
+    /**
+     * @var StatementFactory
+     */
     private $statementFactory;
 
     public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory)
