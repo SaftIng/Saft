@@ -9,26 +9,20 @@ use Symfony\Component\Yaml\Parser;
 
 abstract class AbstractCacheTest extends TestCase
 {
-
-    /**
-     * Contains an instance of the class to test.
-     *
-     * @var mixed
-     */
-    protected $fixture;
-
     /**
      *
      */
     public function setUp()
     {
+        parent::setUp();
+
         // set path to test dir
         $saftRootDir = dirname(__FILE__) . '/../../../../';
         $configFilepath = $saftRootDir . 'test-config.yml';
 
         // check for config file
         if (false === file_exists($configFilepath)) {
-            throw new \Exception('test-config.yml missing');
+            $this->markTestSkipped('File test-config.yml is missing.');
         }
 
         // parse YAML file
