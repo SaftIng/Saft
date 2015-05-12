@@ -11,8 +11,9 @@ use Saft\Sparql\ResultIterator;
 use Saft\Sparql\Result\Result;
 
 /**
- * Declaration of methods that any Store implementation must have, whether its
- * for a Triple- or Quad store.
+ * Declaration of methods that any Store implementation must have, whether its for a Triple- or Quad store.
+ *
+ * TODO specify how to init instance (using constructor or init-function?)
  */
 interface Store
 {
@@ -69,7 +70,6 @@ interface Store
      * @return boolean Returns true if at least one match was found, false otherwise.
      */
     public function hasMatchingStatement(Statement $Statement, Node $graph = null, array $options = array());
-
 
     /**
      * This method sends a SPARQL query to the store.
