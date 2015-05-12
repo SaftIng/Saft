@@ -45,7 +45,7 @@ class Virtuoso extends AbstractSparqlStore
     private $nodeFactory = null;
 
     /**
-     * @var statementFactory
+     * @var StatementFactory
      */
     private $statementFactory = null;
 
