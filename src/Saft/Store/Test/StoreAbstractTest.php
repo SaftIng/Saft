@@ -580,7 +580,16 @@ abstract class StoreAbstractTest extends TestCase
     {
         $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
 
-        $this->assertEquals(0, $this->fixture->getTripleCount($this->testGraph));
+        $anyStatement = new StatementImpl(
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            $this->testGraph
+        );
+
+        // graph is empty
+        $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
+        $this->assertCountStatementIterator(0, $statements);
 
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(

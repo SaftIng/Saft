@@ -11,8 +11,18 @@ httpConfig: &httpConfig
     username: "dba"
     password: "dba"
 
+arc2Config: &arc2Config
+    username: "root"
+    password: "root"
+    host: "localhost"
+    database: "biz_saft"
+    table-prefix: "saft"
+
 queryCacheConfig: &queryCacheConfig
     class: "Saft\\QueryCache\\QueryCache"
+    cacheConfig:
+        class: "Saft\\Backend\\FileCache\\Cache\\File"
+        cachePath: "/tmp/saft/"
 
 virtuosoConfig: &virtuosoConfig
     class: "Saft\\Backend\\Virtuoso\\Store\\Virtuoso"
@@ -23,7 +33,7 @@ virtuosoConfig: &virtuosoConfig
 # Cache related configurations.
 fileCacheConfig: &fileCacheConfig
     class: "Saft\\Backend\\FileCache\\Cache\\File"
-    # cachePath: "/tmp/saft/"
+    cachePath: "/tmp/saft/"
 
 memcachedCacheConfig: &memcachedCacheConfig
     class: "Saft\\Backend\\MemcacheD\\Cache\\MemcacheD"
