@@ -12,27 +12,6 @@ abstract class AbstractCacheTest extends TestCase
     /**
      *
      */
-    public function setUp()
-    {
-        parent::setUp();
-
-        // set path to test dir
-        $saftRootDir = dirname(__FILE__) . '/../../../../';
-        $configFilepath = $saftRootDir . 'test-config.yml';
-
-        // check for config file
-        if (false === file_exists($configFilepath)) {
-            $this->markTestSkipped('File test-config.yml is missing.');
-        }
-
-        // parse YAML file
-        $yaml = new Parser();
-        $this->config = $yaml->parse(file_get_contents($configFilepath));
-    }
-
-    /**
-     *
-     */
     public function tearDown()
     {
         if (null !== $this->fixture) {

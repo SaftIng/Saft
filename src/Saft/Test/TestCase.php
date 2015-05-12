@@ -3,6 +3,7 @@
 namespace Saft\Test;
 
 use Saft\Rdf\NamedNodeImpl;
+use Symfony\Component\Yaml\Parser;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
@@ -81,6 +82,28 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Loads configuration file test-config.yml. If the file does not exists, the according test will be
+     * marked as skipped with a short notification about that the file is missing.
+     *
+     * The content of the YAML-file will be transformed into an array and stored in $config property.
+     */
+    protected function loadTestConfiguration()
+    {
+        // set path to test dir
+        $saftRootDir = dirname(__FILE__) . '/../../../';
+        $configFilepath = $saftRootDir . 'test-config.yml';
+
+        // check that the config file exists
+        if (false === file_exists($configFilepath)) {
+            $this->markTestSkipped('File test-config.yml is missing.');
+        }
+
+        // parse YAML file
+        $yaml = new Parser();
+        $this->config = $yaml->parse(file_get_contents($configFilepath));
+    }
+
+    /**
      * Place to setup stuff for Saft related tests.
      */
     public function setUp()
@@ -88,5 +111,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
+
+        $this->loadTestConfiguration();
     }
 }
