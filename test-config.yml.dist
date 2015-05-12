@@ -1,21 +1,21 @@
 #
 # This file contains a list with different configurations for test cases which rely on store and cache.
 #
-# Feel free to copy it to config.yml and adapt. You can reuse existing configurations or you can use your own.
+# Feel free to copy it to test-config.yml and adapt. You can reuse existing configurations or you can use your own.
 
 # SparqlStore and TriplePatternStore related configurations
 httpConfig: &httpConfig
-    type: "http"
+    class: "Saft\\Backend\\HttpStore\\Store\\Http"
     authUrl: "http://localhost:8890/sparql-auth"
     queryUrl: "http://localhost:8890/sparql"
     username: "dba"
     password: "dba"
 
 queryCacheConfig: &queryCacheConfig
-    type: "querycache"
+    class: "Saft\\QueryCache\\QueryCache"
 
 virtuosoConfig: &virtuosoConfig
-    type: "virtuoso"
+    class: "Saft\\Backend\\Virtuoso\\Store\\Virtuoso"
     dsn: "VOS"
     username: "dba"
     password: "dba"

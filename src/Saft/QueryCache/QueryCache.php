@@ -2,11 +2,13 @@
 
 namespace Saft\QueryCache;
 
-use Saft\Cache\Cache;
+use Saft\Cache\CacheFactoryImpl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
+use Saft\Rdf\NodeFactory;
 use Saft\Rdf\Statement;
+use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Store\ChainableStore;
 use Saft\Store\Store;
@@ -64,11 +66,21 @@ class QueryCache implements Store, ChainableStore
     /**
      * Constructor
      *
-     * @param Cache $cache Initialized cache instance.
+     * @param array $config Configuration array.
      */
-    public function __construct(Cache $cache)
+    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory, array $config)
     {
-        $this->init($cache);
+        if (isset($config['cacheConfig']) && is_array($config['cacheConfig'])) {
+            // setup cache
+            $cacheFactory = new CacheFactoryImpl();
+            $this->cache = $cacheFactory->createCache($config['cacheConfig']);
+
+            $this->log = array();
+            $this->separator = '__.__';
+
+        } else {
+            throw new \Exception('No cacheConfig array inside the config given.');
+        }
     }
 
     /**
@@ -574,20 +586,6 @@ class QueryCache implements Store, ChainableStore
         } else {
             throw new \Exception('QueryCache does not support has matching statement calls, only by successor.');
         }
-    }
-
-    /**
-     * Initialize the QueryCache instance.
-     *
-     * @param Cache $cache
-     */
-    public function init(Cache $cache)
-    {
-        $this->cache = $cache;
-
-        $this->log = array();
-
-        $this->separator = '__.__';
     }
 
     /**
