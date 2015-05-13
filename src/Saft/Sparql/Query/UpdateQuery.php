@@ -281,7 +281,7 @@ class UpdateQuery extends AbstractQuery
              * Save parts for INSERT INTO GRAPH <> {} or INSERT INTO <> {}
              */
             } elseif ('insertInto' === $subType) {
-                preg_match('/INSERT\s+INTO\s+[GRAPH]{0,1}\s*\<(.*)\>\s*\{(.*)\}/si', $query, $matches);
+                preg_match('/INSERT\s+INTO\s+[GRAPH]{0,}\s*\<(.*)\>\s*\{(.*)\}/si', $query, $matches);
 
                 if (false === isset($matches[1]) || false === isset($matches[2])) {
                     throw new \Exception(
