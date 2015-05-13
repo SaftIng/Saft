@@ -589,7 +589,7 @@ abstract class StoreAbstractTest extends TestCase
         ));
 
         // check
-        $this->assertEquals(
+        $this->assertIteratorContent(
             $setResultToCheckAgainst,
             $this->fixture->query(
                 'SELECT ?s ?o FROM <' . $this->testGraph->getUri() . '> WHERE {?s ?p ?o.} ORDER BY ?o'
