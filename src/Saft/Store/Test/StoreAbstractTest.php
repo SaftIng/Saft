@@ -221,6 +221,30 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertCountStatementIterator(2, $statements);
     }
 
+    public function testAddStatementsNoTriplesAndQuads()
+    {
+        // it throws an error because query contains NO triples or quads.
+        $this->setExpectedException('\Exception');
+
+        $query = 'INSERT DATA {  }';
+        $this->fixture->query($query);
+    }
+
+    public function testAddStatementsTriples()
+    {
+        $statement = $this->getTestStatementWithLiteral();
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $query = 'INSERT DATA {
+            Graph <http://graph/> {
+                '. $statement->getSubject()->toNQuads() .'
+                '. $statement->getPredicate()->toNQuads() .'
+                '. $statement->getObject()->toNQuads() .'
+            }
+        }';
+
+        $this->assertEquals(new EmptyResult(), $this->fixture->query($query));
+    }
+
     /**
      * Tests deleteMatchingStatements
      */
@@ -620,34 +644,6 @@ abstract class StoreAbstractTest extends TestCase
             $setResult,
             $this->fixture->query('SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}')
         );
-    }
-
-    /**
-     * Tests addStatements
-     */
-
-    public function testAddStatementsNoTriplesAndQuads()
-    {
-        // it throws an error because query contains NO triples or quads.
-        $this->setExpectedException('\Exception');
-
-        $query = 'INSERT DATA {  }';
-        $this->fixture->query($query);
-    }
-
-    public function testAddStatementsTriples()
-    {
-        $statement = $this->getTestStatementWithLiteral();
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-        $query = 'INSERT DATA {
-            Graph <http://graph/> {
-                '. $statement->getSubject()->toNQuads() .'
-                '. $statement->getPredicate()->toNQuads() .'
-                '. $statement->getObject()->toNQuads() .'
-            }
-        }';
-
-        $this->assertEquals(new EmptyResult(), $this->fixture->query($query));
     }
 
     /**
