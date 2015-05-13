@@ -6,6 +6,7 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
+use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\Query\AbstractQuery;
@@ -181,6 +182,42 @@ class ARC2 extends AbstractSparqlStore
     }
 
     /**
+     * Removes all statements from a (default-) graph which match with given statement.
+     *
+     * @param  Statement $statement          It can be either a concrete or pattern-statement.
+     * @param  Node      $graph     optional Overrides target graph. If set, all statements will be delete in
+     *                                       that graph.
+     * @param  array     $options   optional It contains key-value pairs and should provide additional
+     *                                       introductions for the store and/or its adapter(s).
+     */
+    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
+    {
+        // given $graph forces usage of it and not the graph from the statement instance
+        if (null !== $graph) {
+            // use given $graph
+
+        // use graphUri from statement
+        } elseif (null === $graph && null !== $statement->getGraph()) {
+            $graph = $statement->getGraph();
+
+        } else {
+            throw new \Exception('Graph was not given, neither as parameter nor in statement.');
+        }
+
+        // create triple statement, because we have to handle the graph extra
+        $tripleStatement = $this->statementFactory->createStatement(
+            $statement->getSubject(),
+            $statement->getPredicate(),
+            $statement->getObject()
+        );
+
+        $statementIterator = new ArrayStatementIteratorImpl(array($tripleStatement));
+
+        $query = 'DELETE FROM <'. $graph->getUri() .'> {'. $this->sparqlFormat($statementIterator) .'}';
+
+        $this->query($query);
+    }
+
      * Empties all ARC2-related tables from the database.
      */
     public function emptyAllTables()
