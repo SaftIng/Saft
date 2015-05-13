@@ -63,6 +63,10 @@ class UpdateQuery extends AbstractQuery
             case 'delete d':
                 return 'deleteData';
 
+            // DELETE FROM (SPARQL+ from ARC2)
+            case 'delete f':
+                return 'deleteFrom';
+
             // DELETE WHERE
             case 'delete w':
                 return 'deleteWhere';
@@ -165,6 +169,22 @@ class UpdateQuery extends AbstractQuery
                  */
             } else {
                 throw new \Exception('No triple part after DELETE DATA found.');
+            }
+
+        /**
+         * Save parts for DELETE FROM <> {}
+         */
+        } elseif ('deleteFrom' === $this->queryParts['sub_type']) {
+            preg_match('/DELETE\s+FROM\s*\<(.*)\>\s*\{(.*)\}/si', $this->getQuery(), $matches);
+
+            if (true === isset($matches[1])) {
+                // graph
+                $this->queryParts['graphs'] = array(trim($matches[1]));
+                // triples
+                $this->queryParts['deleteData'] = trim($matches[2]);
+
+            } else {
+                throw new \Exception('No triple part after DELETE FROM <> found.');
             }
 
         /**
