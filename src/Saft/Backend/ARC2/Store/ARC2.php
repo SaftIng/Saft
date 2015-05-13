@@ -148,7 +148,6 @@ class ARC2 extends AbstractSparqlStore
      * @param  array     $options optional It contains key-value pairs and should provide additional introductions
      *                                     for the store and/or its adapter(s).
      * @throws \Exception If given $graph is not a NamedNode.
-     * @throws \Exception If the given graph could not be created.
      */
     public function createGraph(NamedNode $graph, array $options = array())
     {
@@ -218,6 +217,24 @@ class ARC2 extends AbstractSparqlStore
         $this->query($query);
     }
 
+    /**
+     * Removes the given graph from the store.
+     *
+     * @param  NamedNode $graph            Instance of NamedNode containing the URI of the graph to drop.
+     * @param  array     $options optional It contains key-value pairs and should provide additional introductions
+     *                                     for the store and/or its adapter(s).
+     * @throws \Exception If given $graph is not a NamedNode.
+     */
+    public function dropGraph(NamedNode $graph, array $options = array())
+    {
+        if ($graph->isNamed()) {
+            $this->store->queryDB('DELETE FROM <'. $graph->getUri() .'>', $this->store->getDBCon());
+        } else {
+            throw new \Exception('Given $graph is not a NamedNode.');
+        }
+    }
+
+    /**
      * Empties all ARC2-related tables from the database.
      */
     public function emptyAllTables()
