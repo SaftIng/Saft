@@ -82,6 +82,69 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Checks two lists which implements \Iterator interface, if they contain the same elements.
+     * The checks will be executed using PHPUnit's assert functions.
+     *
+     * @param Iterator $expected
+     * @param Iterator $actual
+     */
+    public function assertIteratorContent($expected, $actual)
+    {
+        $entriesToCheck = array();
+        $expectedCount = 0;
+        $notCheckedEntries = array();
+
+        // contains a list of all entries, which were not found in $expected.
+        $actualEntriesNotFound = array();
+        $actualCount = 0;
+
+        foreach ($expected as $entry) {
+            // serialize entry and hash it afterwards to use it as key for $entriesToCheck array.
+            // later on we only check the other list that each entry, serialized and hashed, has
+            // its equal key in the list.
+            $hashedEntry = hash('sha256', serialize($entry));
+            $entriesToCheck[$hashedEntry] = 'not checked';
+
+            ++$expectedCount;
+        }
+
+        foreach ($actual as $entry) {
+            $hashedEntry = hash('sha256', serialize($entry));
+
+            // if entry was found, mark it.
+            if (isset($entriesToCheck[$hashedEntry])) {
+                $entriesToCheck[$hashedEntry] = 'checked';
+
+            // entry was not found
+            } else {
+                $actualEntriesNotFound[] = $entry;
+            }
+
+            ++$actualCount;
+        }
+
+        // check that both lists contain the same amount of elements
+        $this->assertEquals(
+            $expectedCount,
+            $actualCount,
+            'Number of entries of both instances differ. Expected: '. $expectedCount .', Actual: '. $actualCount
+        );
+
+        // check that all entries from $expected were checked
+        foreach ($entriesToCheck as $entry) {
+            if ('not checked' === $entry) {
+                $notCheckedEntries[] = $entry;
+            }
+        }
+
+        $this->assertEquals(
+            array(),
+            $notCheckedEntries,
+            'The following entries are not part of $actual-iterator.'
+        );
+    }
+
+    /**
      * Loads configuration file test-config.yml. If the file does not exists, the according test will be
      * marked as skipped with a short notification about that the file is missing.
      *
