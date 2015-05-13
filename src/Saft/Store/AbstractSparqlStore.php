@@ -268,7 +268,7 @@ abstract class AbstractSparqlStore implements Store
         }
 
         /*
-         * Transform SetResult into StatementResult, if no exception result was returned by Virtuoso
+         * Transform SetResult into StatementResult
          */
         $statementResult = new StatementResult();
         $statementResult->setVariables($result->getVariables());
