@@ -630,7 +630,7 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertEquals(
             new ValueResult(true),
             $this->fixture->query(
-                'ASK { SELECT * FROM <'. $this->testGraph->getUri() . '> WHERE {<http://s/> <http://p/> ?o.}}'
+                'ASK FROM <'. $this->testGraph->getUri() . '> {<http://s/> <http://p/> ?o.}'
             )
         );
     }

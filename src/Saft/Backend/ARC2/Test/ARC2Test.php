@@ -42,7 +42,7 @@ class ARC2Test extends StoreAbstractTest
     public function tearDown()
     {
         if (null !== $this->fixture) {
-            $this->fixture->dropGraph($this->testGraph);
+            $this->fixture->emptyAllTables();
         }
 
         parent::tearDown();
@@ -78,6 +78,10 @@ class ARC2Test extends StoreAbstractTest
         $res = $this->fixture->query('SELECT DISTINCT ?g WHERE { GRAPH ?g {?s ?p ?o.} }');
         foreach ($res as $key => $value) {
             var_dump($value);
-        }*/
+        }
+
+                $this->fixture->createGraph($this->testGraph);
+                var_dump($this->fixture->getAvailableGraphs());
+        */
     }
 }

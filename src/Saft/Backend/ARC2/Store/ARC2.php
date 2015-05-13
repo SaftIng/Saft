@@ -3,6 +3,7 @@
 namespace Saft\Backend\ARC2\Store;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\StatementFactory;
@@ -12,6 +13,7 @@ use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Exception\StoreException;
 use Saft\Store\Result\EmptyResult;
 use Saft\Store\Result\SetResult;
+use Saft\Store\Result\ValueResult;
 
 class ARC2 extends AbstractSparqlStore
 {
@@ -138,6 +140,103 @@ class ARC2 extends AbstractSparqlStore
     }
 
     /**
+     * Create a new graph with the URI given as Node. If the underlying store implementation doesn't support empty
+     * graphs this method will have no effect.
+     *
+     * @param  NamedNode $graph            Instance of NamedNode containing the URI of the graph to create.
+     * @param  array     $options optional It contains key-value pairs and should provide additional introductions
+     *                                     for the store and/or its adapter(s).
+     * @throws \Exception If given $graph is not a NamedNode.
+     * @throws \Exception If the given graph could not be created.
+     */
+    public function createGraph(NamedNode $graph, array $options = array())
+    {
+        if ($graph->isNamed()) {
+            // table names
+            $g2t = $this->configuration['table-prefix'] . '_g2t';
+            $id2val = $this->configuration['table-prefix'] . '_id2val';
+
+            /*
+             * for id2val table
+             */
+            // generate new id based on the number of existing rows + 1
+            // TODO change that to be more save: create pull request to ARC2 with:
+            // - either add primary key auto increment
+            // - or change table type to innodb to have lock-on-write
+            $newIdid2val = 1 + $this->getRowCount($id2val);
+
+            $query = 'INSERT INTO '. $id2val .' (id, val) VALUES('. $newIdid2val .', "'. $graph->getUri() .'")';
+            $this->store->queryDB($query, $this->store->getDBCon());
+
+            /*
+             * for id2val table
+             */
+            $newIdg2t = 1 + $this->getRowCount($g2t);
+            $query = 'INSERT INTO '. $g2t .' (g, t) VALUES('. $newIdg2t .', "'. $newIdid2val .'")';
+            $this->store->queryDB($query, $this->store->getDBCon());
+
+        } else {
+            throw new \Exception('Given $graph is not a NamedNode.');
+        }
+    }
+
+    /**
+     * Empties all ARC2-related tables from the database.
+     */
+    public function emptyAllTables()
+    {
+        $this->store->reset();
+    }
+
+    /**
+     * Returns array with graphUri's which are available.
+     *
+     * @return array Array which contains graph URI's as values and keys.
+     */
+    public function getAvailableGraphs()
+    {
+        $g2t = $this->configuration['table-prefix'] . '_g2t';
+        $id2val = $this->configuration['table-prefix'] . '_id2val';
+
+        // collects all values which have an ID (column g) in the g2t table.
+        $query = 'SELECT id2val.val AS graphUri
+            FROM '. $g2t .' g2t
+            LEFT JOIN '. $id2val .' id2val ON g2t.g = id2val.id
+            GROUP BY g';
+
+        // send SQL query
+        $result = $this->store->queryDB($query, $this->store->getDBCon());
+
+        $graphs = array();
+
+        // collect graph URI's
+        while ($row = $result->fetch_assoc()) {
+            $graphs[$row['graphUri']] = $this->nodeFactory->createNamedNode($row['graphUri']);
+        }
+
+        return $graphs;
+    }
+
+    /**
+     * Helper function to get the number of rows in a table.
+     */
+    protected function getRowCount($tableName)
+    {
+        $result = $this->store->queryDB('SELECT COUNT(*) as count FROM '. $tableName, $this->store->getDBCon());
+        $row = $result->fetch_assoc();
+        return $row['count'];
+    }
+
+    /**
+     * @return array Empty array
+     * @todo implement getStoreDescription
+     */
+    public function getStoreDescription()
+    {
+        return array();
+    }
+
+    /**
      * Creates and sets up an instance of ARC2_Store.
      */
     public function openConnection()
@@ -159,15 +258,6 @@ class ARC2 extends AbstractSparqlStore
             'db_pwd' => $this->configuration['password'],
             'store_name' => $this->configuration['table-prefix']
         ));
-    }
-
-    /**
-     * @return array Empty array
-     * @todo implement getStoreDescription
-     */
-    public function getStoreDescription()
-    {
-        return array();
     }
 
     /**
@@ -261,9 +351,17 @@ class ARC2 extends AbstractSparqlStore
                             $newEntry[$variable] = $this->nodeFactory->createNamedNode($row[$variable]);
                             break;
                     }
-
-                    $finalResult->append($newEntry);
                 }
+
+                $finalResult->append($newEntry);
+            }
+
+        } else {
+            if ('askQuery' === AbstractQuery::getQueryType($query)) {
+                return new ValueResult($result['result']);
+
+            } else {
+                return new EmptyResult();
             }
         }
 
