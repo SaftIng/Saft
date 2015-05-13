@@ -212,7 +212,8 @@ class ARC2 extends AbstractSparqlStore
 
         $statementIterator = new ArrayStatementIteratorImpl(array($tripleStatement));
 
-        $query = 'DELETE FROM <'. $graph->getUri() .'> {'. $this->sparqlFormat($statementIterator) .'}';
+        $triple = $this->sparqlFormat($statementIterator);
+        $query = 'DELETE FROM <'. $graph->getUri() .'> {'. $triple .'} WHERE {'. $triple .'}';
 
         $this->query($query);
     }

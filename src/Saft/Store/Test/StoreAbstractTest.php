@@ -364,9 +364,6 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertCountStatementIterator(0, $statements);
     }
 
-    /**
-     * Tests deleteMatchingStatements
-     */
     public function testDeleteMatchingStatementsWithVariables()
     {
         /**
