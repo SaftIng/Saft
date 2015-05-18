@@ -120,5 +120,4 @@ class QueryFactoryImpl implements QueryFactory
 
         throw new \Exception('Unknown query type: '. $firstPart);
     }
-
 }

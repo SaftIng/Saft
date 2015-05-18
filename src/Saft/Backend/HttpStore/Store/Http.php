@@ -11,6 +11,7 @@ use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\AbstractQuery;
+use Saft\Sparql\Query\QueryFactory;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Store;
 use Saft\Store\Result\EmptyResult;
@@ -42,7 +43,12 @@ class Http extends AbstractSparqlStore
     private $nodeFactory;
 
     /**
-     * @var NodeFactory
+     * @var QueryFactory
+     */
+    private $queryFactory;
+
+    /**
+     * @var StatementFactory
      */
     private $statementFactory;
 
@@ -51,8 +57,12 @@ class Http extends AbstractSparqlStore
      *
      * @param array $adapterOptions Array containing database credentials
      */
-    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory, array $adapterOptions)
-    {
+    public function __construct(
+        NodeFactory $nodeFactory,
+        StatementFactory $statementFactory,
+        QueryFactory $queryFactory,
+        array $adapterOptions
+    ) {
         $this->adapterOptions = $adapterOptions;
 
         $this->checkRequirements();
@@ -62,8 +72,9 @@ class Http extends AbstractSparqlStore
 
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
+        $this->queryFactory = $queryFactory;
 
-        parent::__construct($nodeFactory, $statementFactory);
+        parent::__construct($nodeFactory, $statementFactory, $queryFactory);
     }
 
     /**
@@ -201,7 +212,7 @@ class Http extends AbstractSparqlStore
      */
     public function query($query, array $options = array())
     {
-        $queryObject = AbstractQuery::initByQueryString($query);
+        $queryObject = $this->queryFactory->createInstanceByQueryString($query);
         $queryParts = $queryObject->getQueryParts();
 
         /**

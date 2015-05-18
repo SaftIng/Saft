@@ -10,6 +10,7 @@ use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\Query\AbstractQuery;
+use Saft\Sparql\Query\QueryFactory;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Exception\StoreException;
 use Saft\Store\Result\EmptyResult;
@@ -31,6 +32,11 @@ class ARC2 extends AbstractSparqlStore
     private $nodeFactory = null;
 
     /**
+     * @var QueryFactory
+     */
+    private $queryFactory = null;
+
+    /**
      * @var StatementFactory
      */
     private $statementFactory = null;
@@ -45,8 +51,12 @@ class ARC2 extends AbstractSparqlStore
      *
      * @param  array $configuration Array containing database credentials
      */
-    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory, array $configuration)
-    {
+    public function __construct(
+        NodeFactory $nodeFactory,
+        StatementFactory $statementFactory,
+        QueryFactory $queryFactory,
+        array $configuration
+    ) {
         $this->configuration = $configuration;
 
         // Open connection
@@ -59,6 +69,7 @@ class ARC2 extends AbstractSparqlStore
 
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
+        $this->queryFactory = $queryFactory;
 
         parent::__construct($nodeFactory, $statementFactory);
     }
@@ -329,7 +340,7 @@ class ARC2 extends AbstractSparqlStore
      */
     public function query($query, array $options = array())
     {
-        $queryObject = AbstractQuery::initByQueryString($query);
+        $queryObject = $this->queryFactory->createInstanceByQueryString($query);
         $queryParts = $queryObject->getQueryParts();
 
         // if a non-graph query was given, we assume triples or quads. If neither quads nor triples were found,

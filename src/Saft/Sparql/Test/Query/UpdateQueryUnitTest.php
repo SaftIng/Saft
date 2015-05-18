@@ -3,16 +3,23 @@
 namespace Saft\Sparql\Test\Query;
 
 use Saft\Sparql\Query\AbstractQuery;
+use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Sparql\Query\UpdateQuery;
 use Saft\Test\TestCase;
 
 class UpdateQueryUnitTest extends TestCase
 {
+    /**
+     * @var QueryFactory
+     */
+    protected $queryFactory;
+
     public function setUp()
     {
         parent::setUp();
 
         $this->fixture = new UpdateQuery();
+        $this->queryFactory = new QueryFactoryImpl();
     }
 
     /**
@@ -39,7 +46,7 @@ class UpdateQueryUnitTest extends TestCase
 
     public function testExtractGraphsDeleteData()
     {
-        $this->fixture = AbstractQuery::initByQueryString(
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
             'PREFIX dc: <http://foo/bar/>
             DELETE DATA {
                 Graph <http://saft/test/g1> {<http://saft/test/s1> dc:p1 <http://saft/test/o1>}
@@ -57,7 +64,7 @@ class UpdateQueryUnitTest extends TestCase
 
     public function testExtractGraphsInsertIntoGraph()
     {
-        $this->fixture = AbstractQuery::initByQueryString(
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
             'PREFIX dc: <http://foo/bar/>
             INSERT DATA { Graph <http://saft/test/g1> {
                 <http://saft/test/s1> dc:p1 <http://saft/test/o1>}
@@ -75,7 +82,7 @@ class UpdateQueryUnitTest extends TestCase
 
     public function testExtractNamespacesFromQuery()
     {
-        $this->fixture = AbstractQuery::initByQueryString(
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
             'PREFIX dc: <http://foo/bar/>
             DELETE DATA { GRAPH <http://> { ?s dc: ?o. ?s <http://foo/sss> ?o } }'
         );
@@ -87,7 +94,7 @@ class UpdateQueryUnitTest extends TestCase
 
     public function testExtractNamespacesFromQueryNoNamespaces()
     {
-        $this->fixture = AbstractQuery::initByQueryString(
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
             'PREFIX dc: <http://foo/bar/>
             DELETE DATA { GRAPH <http://> { ?s ?p ?o } }'
         );
@@ -104,7 +111,7 @@ class UpdateQueryUnitTest extends TestCase
     public function testExtractPrefixesFromQuery()
     {
         // assumption here is that fixture is of type
-        $this->fixture = AbstractQuery::initByQueryString(
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             WITH <http://graph/> DELETE { ?x foaf:name "Alice" } WHERE { ?s ?p ?o }'
         );
@@ -117,7 +124,7 @@ class UpdateQueryUnitTest extends TestCase
     public function testExtractPrefixesFromQueryNoPrefixes()
     {
         // assumption here is that fixture is of type
-        $this->fixture = AbstractQuery::initByQueryString(
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
             'DELETE DATA { GRAPH <http://> { ?s ?p ?o } }'
         );
 

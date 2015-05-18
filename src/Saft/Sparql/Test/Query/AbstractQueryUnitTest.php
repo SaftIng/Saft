@@ -7,15 +7,23 @@ use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\AskQuery;
 use Saft\Sparql\Query\DescribeQuery;
 use Saft\Sparql\Query\GraphQuery;
+use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Sparql\Query\SelectQuery;
 use Saft\Sparql\Query\UpdateQuery;
 use Saft\Test\TestCase;
 
 class AbstractQueryUnitTest extends TestCase
 {
+    /**
+     * @var QueryFactory
+     */
+    protected $queryFactory;
+
     public function setUp()
     {
         parent::setUp();
+
+        $this->queryFactory = new QueryFactoryImpl();
 
         $this->fixture = $this->getMockForAbstractClass('\Saft\Sparql\Query\AbstractQuery');
     }
@@ -121,7 +129,7 @@ class AbstractQueryUnitTest extends TestCase
 
     public function testExtractFilterPatternRegex()
     {
-        $this->fixture = AbstractQuery::initByQueryString(
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
             'PREFIX foo: <http://bar.de> SELECT ?s FROM <http://foo> WHERE {
                 ?s <http://foobar/hey> ?o. FILTER regex(?g, "aar", "i")
              }'
@@ -161,7 +169,7 @@ class AbstractQueryUnitTest extends TestCase
 
     public function testExtractFilterPatternRelation()
     {
-        $this->fixture = AbstractQuery::initByQueryString(
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
             'PREFIX foo: <http://bar.de> SELECT ?s FROM <http://foo> WHERE {
                 ?s <http://foobar/hey> ?o. FILTER (?o < 40)
              }'
@@ -200,7 +208,7 @@ class AbstractQueryUnitTest extends TestCase
 
     public function testExtractNamespacesFromQuery()
     {
-        $this->fixture = AbstractQuery::initByQueryString(
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
             'PREFIX foo: <http://bar.de> SELECT ?s FROM <http://foo> WHERE {
                 ?s <http://foobar/hey> ?o. ?s <http://foobar.de> ?o. ?s <http://www.w3.org/2001/XMLSchema#> ?o
              }'
@@ -222,7 +230,7 @@ class AbstractQueryUnitTest extends TestCase
 
     public function testExtractNamespacesFromQueryNoNamespaces()
     {
-        $this->fixture = AbstractQuery::initByQueryString(
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
             'SELECT ?s FROM <http://foo> WHERE { ?s ?p ?o }'
         );
 
@@ -238,7 +246,7 @@ class AbstractQueryUnitTest extends TestCase
     public function testExtractPrefixesFromQueryNoPrefixes()
     {
         // assumption here is that fixture is of type
-        $this->fixture = AbstractQuery::initByQueryString(
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
             'SELECT ?s FROM <http://foo> WHERE { ?s ?p ?o }'
         );
 
@@ -250,7 +258,7 @@ class AbstractQueryUnitTest extends TestCase
     public function testExtractProloguePrefixesFromQuery()
     {
         // assumption here is that fixture is of type
-        $this->fixture = AbstractQuery::initByQueryString(
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
             'PREFIX foo: <http://bar.de> SELECT ?s FROM <http://foo> WHERE { ?s ?p ?o }'
         );
 
@@ -266,7 +274,7 @@ class AbstractQueryUnitTest extends TestCase
     public function testExtractQuads()
     {
         // assumption here is that fixture is of type
-        $this->fixture = AbstractQuery::initByQueryString(
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
             'PREFIX dc: <http://foo/bar/>
             INSERT DATA {
                 Graph <http://saft/test/g1> { <http://saft/test/s1> dc:p1 <http://saft/test/o1>}

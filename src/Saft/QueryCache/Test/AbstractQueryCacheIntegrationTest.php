@@ -29,12 +29,24 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     protected $className = '';
 
     /**
+     * @var QueryFactory
+     */
+    protected $queryFactory;
+
+    /**
      * Used in pattern key's as seperator. Here an example for _:
      * http://localhost/Saft/TestGraph/_http://a_*_*
      *
      * @var string
      */
     protected $separator = '__.__';
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->queryFactory = new QueryFactoryImpl();
+    }
 
     /**
      * Tests addStatements
@@ -479,7 +491,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $options = array(1);
 
         $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }';
-        $queryObject = AbstractQuery::initByQueryString($query);
+        $queryObject = $this->queryFactory->createInstanceByQueryString($query);
         $queryObject->getQueryParts();
 
         $this->fixture->getMatchingStatements($statement, $this->testGraph, $options);
@@ -559,7 +571,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $result = $this->fixture->hasMatchingStatement($statement, $this->testGraph, $options);
 
         // query
-        $queryObject = AbstractQuery::initByQueryString(
+        $queryObject = $this->queryFactory->createInstanceByQueryString(
             'ASK FROM <'. $this->testGraph->getUri() .'> { ?s ?p ?o }'
         );
         $queryObject->getQueryParts();
@@ -600,7 +612,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          * First create test data and save it via saveResult
          */
         $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }';
-        $queryObject = AbstractQuery::initByQueryString($query);
+        $queryObject = $this->queryFactory->createInstanceByQueryString($query);
 
         $result = array(1, 2, 3);
 
@@ -636,7 +648,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                 array(
                     'method' => 'invalidateByQuery',
                     'parameter' => array(
-                        'queryObject' => AbstractQuery::initByQueryString($query)
+                        'queryObject' => $this->queryFactory->createInstanceByQueryString($query)
                     )
                 )
             ),
@@ -650,7 +662,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         /**
          * First create test data and save it via saveResult
          */
-        $queryObject = AbstractQuery::initByQueryString(
+        $queryObject = $this->queryFactory->createInstanceByQueryString(
             'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }'
         );
 
@@ -698,7 +710,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          * First create test data and save it via saveResult
          */
         $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }';
-        $queryObject = AbstractQuery::initByQueryString($query);
+        $queryObject = $this->queryFactory->createInstanceByQueryString($query);
 
         $result = array(1, 2, 3);
 
@@ -754,7 +766,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                 array(
                     'method' => 'invalidateByQuery',
                     'parameter' => array(
-                        'queryObject' => AbstractQuery::initByQueryString($query)
+                        'queryObject' => $this->queryFactory->createInstanceByQueryString($query)
                     )
                 ),
             ),
@@ -772,7 +784,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         // build testdata
         $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }';
-        $queryObject = AbstractQuery::initByQueryString($query);
+        $queryObject = $this->queryFactory->createInstanceByQueryString($query);
         $queryObject->getQueryParts();
 
         $options = array();
@@ -1019,7 +1031,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
     public function testGetResultQueryObject()
     {
-        $queryObject = AbstractQuery::initByQueryString(
+        $queryObject = $this->queryFactory->createInstanceByQueryString(
             'SELECT * FROM <http://graph/> WHERE {?s ?p ?o}'
         );
 
@@ -1191,7 +1203,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         /**
          * First create test data and save it via saveResult
          */
-        $queryObject = AbstractQuery::initByQueryString(
+        $queryObject = $this->queryFactory->createInstanceByQueryString(
             'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }'
         );
 
@@ -1233,7 +1245,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         /**
          * First create test data and save it via saveResult
          */
-        $queryObject = AbstractQuery::initByQueryString(
+        $queryObject = $this->queryFactory->createInstanceByQueryString(
             'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }'
         );
 
@@ -1276,7 +1288,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         /**
          * First create test data and save it via saveResult
          */
-        $queryObject = AbstractQuery::initByQueryString(
+        $queryObject = $this->queryFactory->createInstanceByQueryString(
             'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }'
         );
 
@@ -1351,7 +1363,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
      */
     public function testSaveResultCacheEntries()
     {
-        $queryObject = AbstractQuery::initByQueryString(
+        $queryObject = $this->queryFactory->createInstanceByQueryString(
             'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }'
         );
 

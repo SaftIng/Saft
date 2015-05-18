@@ -2,16 +2,17 @@
 
 namespace Saft\Backend\Virtuoso\Test;
 
+use Saft\Backend\Virtuoso\Store\Virtuoso;
+use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
-use Saft\Rdf\AnyPatternImpl;
-use Symfony\Component\Yaml\Parser;
-use Saft\Backend\Virtuoso\Store\Virtuoso;
+use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Store\Test\StoreAbstractTest;
+use Symfony\Component\Yaml\Parser;
 
 class VirtuosoTest extends StoreAbstractTest
 {
@@ -38,6 +39,7 @@ class VirtuosoTest extends StoreAbstractTest
             $this->fixture = new Virtuoso(
                 new NodeFactoryImpl(),
                 new StatementFactoryImpl(),
+                new QueryFactoryImpl(),
                 $this->config['virtuosoConfig']
             );
         } elseif (true === isset($this->config['configuration']['standardStore'])
@@ -45,6 +47,7 @@ class VirtuosoTest extends StoreAbstractTest
             $this->fixture = new Virtuoso(
                 new NodeFactoryImpl(),
                 new StatementFactoryImpl(),
+                new QueryFactoryImpl(),
                 $this->config['configuration']['standardStore']
             );
         } else {
