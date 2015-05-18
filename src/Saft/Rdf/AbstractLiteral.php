@@ -20,7 +20,7 @@ abstract class AbstractLiteral implements Literal
     public function equals(Node $toCompare)
     {
         // Only compare, if given instance is a literal
-        if ($toCompare->isLiteral() && $this->getDatatype() == $toCompare->getDatatype()) {
+        if ($toCompare->isLiteral() && $this->getDatatype()->equals($toCompare->getDatatype())) {
             return $this->getValue() == $toCompare->getValue();
         }
         return false;
