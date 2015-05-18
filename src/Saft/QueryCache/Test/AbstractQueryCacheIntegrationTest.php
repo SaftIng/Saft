@@ -10,6 +10,7 @@ use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Sparql\Query\AbstractQuery;
+use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Store\Test\BasicTriplePatternStore;
 use Saft\Test\TestCase;
 use Symfony\Component\Yaml\Parser;
@@ -42,7 +43,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testAddStatements()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // build testdata
@@ -235,7 +240,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testDeleteMatchingStatements()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // build testdata
@@ -262,7 +271,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetAvailableGraphs()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // assumption is that all given parameter will be returned
@@ -286,7 +299,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
     public function testGetAndSetChainSuccessor()
     {
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
 
         $this->fixture->setChainSuccessor($successor);
 
@@ -303,7 +320,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetLogAddStatements()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // build testdata
@@ -391,7 +412,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetLogDeleteMatchingStatements()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // build testdata
@@ -496,7 +521,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetLogGetStoreDescription()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         $this->fixture->getStoreDescription();
@@ -514,7 +543,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetLogHasMatchingStatement()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // build testdata
@@ -792,7 +825,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetMatchingStatementsNamedNodes()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -837,7 +874,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetMatchingStatementsNamedNodesLiteral()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -898,7 +939,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetMatchingStatementsUseCachedResult()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -950,7 +995,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetMatchingStatementsVariables()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -996,7 +1045,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testGetStoreDescription()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // assumption is that all given parameter will be returned
@@ -1021,7 +1074,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testHasMatchingStatementNamedNodesLiteral()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -1039,7 +1096,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testHasMatchingStatementOnlyNamedNodes()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -1068,7 +1129,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testHasMatchingStatementOnlyVariables()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -1082,7 +1147,11 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     public function testHasMatchingStatementUseCachedResult()
     {
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // test data

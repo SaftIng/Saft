@@ -10,13 +10,18 @@ use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Sparql\SparqlUtils;
+use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Test\TestCase;
 
 class AbstractTriplePatternStoreTest extends TestCase
 {
     public function setUp()
     {
-        $this->fixture = new BasicTriplePatternStore(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $this->fixture = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl()
+        );
     }
 
     protected function getTestQuad()

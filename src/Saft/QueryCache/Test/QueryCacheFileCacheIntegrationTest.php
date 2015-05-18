@@ -2,9 +2,10 @@
 
 namespace Saft\QueryCache\Test;
 
+use Saft\Cache\CacheFactoryImpl;
 use Saft\QueryCache\QueryCache;
 use Saft\QueryCache\Test\AbstractQueryCacheIntegrationTest;
-use Saft\Store\StoreFactoryImpl;
+use Saft\Sparql\Query\QueryFactoryImpl;
 
 // TODO remove that file and test QueryCache only with mock backend
 class QueryCacheFileCacheIntegrationTest extends AbstractQueryCacheIntegrationTest
@@ -17,8 +18,11 @@ class QueryCacheFileCacheIntegrationTest extends AbstractQueryCacheIntegrationTe
     {
         parent::setUp();
 
-        $storeFactory = new StoreFactoryImpl();
-        $this->fixture = $storeFactory->createInstance($this->config['queryCacheConfig']);
+        $this->fixture = new QueryCache(
+            new CacheFactoryImpl(),
+            new QueryFactoryImpl(),
+            $this->config['queryCacheConfig']
+        );
         $this->fixture->getCache()->clean();
     }
 }

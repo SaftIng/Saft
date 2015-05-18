@@ -9,6 +9,7 @@ use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\Query;
+use Saft\Sparql\Query\QueryFactory;
 
 /**
  * Predefined Pattern-statement Store. The Triple-methods need to be implemented in the specific statement-store.
@@ -16,16 +17,34 @@ use Saft\Sparql\Query\Query;
  */
 abstract class AbstractTriplePatternStore implements Store
 {
+    /**
+     * @var NodeFactory
+     */
     private $nodeFactory;
+
+    /**
+     * @var QueryFactory
+     */
+    private $queryFactory;
+
+    /**
+     * @var StatementFactory
+     */
     private $statementFactory;
 
-    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory)
-    {
+    public function __construct(
+        NodeFactory $nodeFactory,
+        StatementFactory $statementFactory,
+        QueryFactory $queryFactory
+    ) {
         $this->nodeFactory = $nodeFactory;
+        $this->queryFactory = $queryFactory;
         $this->statementFactory = $statementFactory;
     }
 
     /**
+     * Execute a given query on the store.
+     *
      * @param  string     $query            SPARQL query string.
      * @param  string     $options optional Further configuration options.
      * @throws \Exception If unsupported query was given or if WITH-DELETE-WHERE and WITH-DELETE-INSERT-WHERE query was
@@ -33,7 +52,7 @@ abstract class AbstractTriplePatternStore implements Store
      */
     public function query($query, array $options = array())
     {
-        $queryObject = AbstractQuery::initByQueryString($query);
+        $queryObject = $this->queryFactory->createInstanceByQueryString($query);
 
         if ('updateQuery' == AbstractQuery::getQueryType($query)) {
             /*

@@ -2,18 +2,17 @@
 
 namespace Saft\QueryCache;
 
-use Saft\Cache\CacheFactoryImpl;
+use Saft\Cache\CacheFactory;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
-use Saft\Rdf\NodeFactory;
 use Saft\Rdf\Statement;
-use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Store\ChainableStore;
 use Saft\Store\Store;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\Query;
+use Saft\Sparql\Query\QueryFactory;
 
 /**
  * This class implements a SPARQL query cache, which was described in the following paper:
@@ -39,6 +38,11 @@ class QueryCache implements Store, ChainableStore
     protected $cache;
 
     /**
+     * @var CacheFactory
+     */
+    private $cacheFactory;
+
+    /**
      * @var array
      */
     protected $latestQueryCacheContainer = array();
@@ -49,6 +53,11 @@ class QueryCache implements Store, ChainableStore
      * @var
      */
     protected $log;
+
+    /**
+     * @var QueryFactory
+     */
+    private $queryFactory;
 
     /**
      * Used in pattern key's as seperator. Here an example for _:
@@ -66,13 +75,17 @@ class QueryCache implements Store, ChainableStore
     /**
      * Constructor
      *
+     * @param NodeFactory $nodeFactory
+     * @param StatementFactory $statementFactory
+     * @param QueryFactory $queryFactory
      * @param array $config Configuration array.
      */
-    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory, array $config)
+    public function __construct(CacheFactory $cacheFactory, QueryFactory $queryFactory, array $config)
     {
         if (isset($config['cacheConfig']) && is_array($config['cacheConfig'])) {
-            // setup cache
-            $cacheFactory = new CacheFactoryImpl();
+            $this->cacheFactory = $cacheFactory;
+            $this->queryFactory = $queryFactory;
+
             $this->cache = $cacheFactory->createCache($config['cacheConfig']);
 
             $this->log = array();
@@ -458,7 +471,7 @@ class QueryCache implements Store, ChainableStore
         } elseif ($this->successor instanceof Store) {
             $result = $this->successor->getMatchingStatements($statement, $graph, $options);
 
-            $this->saveResult(AbstractQuery::initByQueryString($query), $result);
+            $this->saveResult($this->queryFactory->createInstanceByQueryString($query), $result);
 
         // dont run command by myself
         } else {
@@ -579,7 +592,7 @@ class QueryCache implements Store, ChainableStore
         // if successor is set, ask it first before run the command yourself.
         } elseif ($this->successor instanceof Store) {
             $result = $this->successor->hasMatchingStatement($statement, $graph, $options);
-            $this->saveResult(AbstractQuery::initByQueryString($query), $result);
+            $this->saveResult($this->queryFactory->createInstanceByQueryString($query), $result);
             return $result;
 
         // dont run command by myself
@@ -609,7 +622,7 @@ class QueryCache implements Store, ChainableStore
         // if a cache entry for this graph URI was found.
         if (null !== $queryList) {
             foreach ($queryList as $query) {
-                $this->invalidateByQuery(AbstractQuery::initByQueryString($query));
+                $this->invalidateByQuery($this->queryFactory->createInstanceByQueryString($query));
             }
         }
     }
@@ -729,7 +742,7 @@ class QueryCache implements Store, ChainableStore
             $queryList = $this->cache->get($pattern);
             if (null !== $queryList) {
                 foreach ($queryList as $query) {
-                    $this->invalidateByQuery(AbstractQuery::initByQueryString($query));
+                    $this->invalidateByQuery($this->queryFactory->createInstanceByQueryString($query));
                 }
             }
         }
@@ -774,7 +787,7 @@ class QueryCache implements Store, ChainableStore
             // if successor is set, ask it and remember its result
             if ($this->successor instanceof Store) {
                 $result = $this->successor->query($query, $options);
-                $this->saveResult(AbstractQuery::initByQueryString($query), $result);
+                $this->saveResult($this->queryFactory->createInstanceByQueryString($query), $result);
 
             // if successor is not set, throw exception
             } else {

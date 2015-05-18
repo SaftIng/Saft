@@ -5,24 +5,17 @@ namespace Saft\Store\Test;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
-use Saft\Rdf\NodeFactory;
 use Saft\Rdf\Statement;
-use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Store\AbstractTriplePatternStore;
 use Saft\Store\Store;
 
 /**
- * This is a basic resp. simple implementation of the Store interface using the AbstractTriplePatternStore. Its purpose
- * is to serve as mock store in test cases.
+ * This is a basic resp. simple implementation of the Store interface using the AbstractTriplePatternStore.
+ * Its purpose is to serve as mock store in test cases.
  */
 class BasicTriplePatternStore extends AbstractTriplePatternStore
 {
-    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory)
-    {
-        parent::__construct($nodeFactory, $statementFactory);
-    }
-
     /**
      * Has no function and returns an empty array.
      *
