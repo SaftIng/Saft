@@ -12,10 +12,10 @@ httpConfig: &httpConfig
     password: "dba"
 
 arc2Config: &arc2Config
-    username: "root"
-    password: "root"
+    username: "saft"
+    password: "saft"
     host: "localhost"
-    database: "biz_saft"
+    database: "saft"
     table-prefix: "saft"
 
 queryCacheConfig: &queryCacheConfig
