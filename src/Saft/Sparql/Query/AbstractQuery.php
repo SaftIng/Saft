@@ -745,35 +745,6 @@ abstract class AbstractQuery implements Query
     }
 
     /**
-     * Creates an instance of a subclass of AbstractQuery for the given query.
-     *
-     * @param string $query SPARQL query string.
-     * @return Query Instance of a subclass of AbstractQuery which represents the query type.
-     */
-    public static function initByQueryString($query)
-    {
-        switch(self::getQueryType($query)) {
-            case 'askQuery':
-                return new AskQuery($query);
-
-            case 'describeQuery':
-                return new DescribeQuery($query);
-
-            case 'graphQuery':
-                return new GraphQuery($query);
-
-            case 'selectQuery':
-                return new SelectQuery($query);
-
-            case 'updateQuery':
-                return new UpdateQuery($query);
-
-            default:
-                throw new \Exception('Unknown query type: '. $query);
-        }
-    }
-
-    /**
      * Replaces the prefix in a string with the original URI
      *
      * @param  string $prefixedString String to adapt.
