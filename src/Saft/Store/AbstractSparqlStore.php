@@ -10,9 +10,10 @@ use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\SparqlUtils;
+use Saft\Sparql\Query\QueryFactory;
 use Saft\Store\Result\Result;
 use Saft\Store\Result\EmptyResult;
-use Saft\Store\Result\StatementResult;
+use Saft\Store\Result\ResultFactory;
 
 /**
  * Predefined sparql Store. All Triple methods reroute to the query-method. In the specific sparql-Store those
@@ -26,6 +27,16 @@ abstract class AbstractSparqlStore implements Store
     private $nodeFactory;
 
     /**
+     * @var QueryFactory
+     */
+    private $queryFactory;
+
+    /**
+     * @var ResultFactory
+     */
+    private $resultFactory;
+
+    /**
      * @var StatementFactory
      */
     private $statementFactory;
@@ -33,11 +44,18 @@ abstract class AbstractSparqlStore implements Store
     /**
      * @param NodeFactory $nodeFactory
      * @param StatementFactory $statementFactory
+     * @param ResultFactory $resultFactory
      */
-    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory)
-    {
+    public function __construct(
+        NodeFactory $nodeFactory,
+        StatementFactory $statementFactory,
+        QueryFactory $queryFactory,
+        ResultFactory $resultFactory
+    ) {
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
+        $this->queryFactory = $queryFactory;
+        $this->resultFactory = $resultFactory;
     }
 
     /**
@@ -264,24 +282,29 @@ abstract class AbstractSparqlStore implements Store
         $result = $this->query($query, $options);
 
         if (null === $result) {
-            return new EmptyResult();
+            return $this->resultFactory->createEmptyResult();
         }
 
         /*
-         * Transform SetResult into StatementResult
+         * Transform SetResult entries to Statement instances.
          */
-        $statementResult = new StatementResult();
-        $statementResult->setVariables($result->getVariables());
+        $entries = array();
         foreach ($result as $entry) {
             $statementList = array();
             $i = 0;
             foreach ($result->getVariables() as $variable) {
                 $statementList[$i++] = $entry[$variable];
             }
-            $statementResult->append(
-                $this->statementFactory->createStatement($statementList[0], $statementList[1], $statementList[2])
+            $entries[] = $this->statementFactory->createStatement(
+                $statementList[0],
+                $statementList[1],
+                $statementList[2]
             );
         }
+
+        // return a StatementResult which contains the fresh created Statement instances-
+        $statementResult = $this->resultFactory->createStatementResult($entries);
+        $statementResult->setVariables($result->getVariables());
         return $statementResult;
     }
 
@@ -312,7 +335,7 @@ abstract class AbstractSparqlStore implements Store
         $result = $this->query('ASK { '. $this->sparqlFormat($statementIterator, $graph) .'}', $options);
 
         if (true === is_object($result)) {
-            return $result->getResultObject();
+            return $result->getValue();
         } else {
             return $result;
         }

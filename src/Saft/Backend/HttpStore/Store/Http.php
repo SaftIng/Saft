@@ -14,10 +14,7 @@ use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Store;
-use Saft\Store\Result\EmptyResult;
-use Saft\Store\Result\StatementResult;
-use Saft\Store\Result\SetResult;
-use Saft\Store\Result\ValueResult;
+use Saft\Store\Result\ResultFactory;
 
 /**
  * SparqlStore implementation of a client which handles store operations via HTTP. It is able to determine some
@@ -48,6 +45,11 @@ class Http extends AbstractSparqlStore
     private $queryFactory;
 
     /**
+     * @var ResultFactory
+     */
+    private $resultFactory;
+
+    /**
      * @var StatementFactory
      */
     private $statementFactory;
@@ -61,6 +63,7 @@ class Http extends AbstractSparqlStore
         NodeFactory $nodeFactory,
         StatementFactory $statementFactory,
         QueryFactory $queryFactory,
+        ResultFactory $resultFactory,
         array $adapterOptions
     ) {
         $this->adapterOptions = $adapterOptions;
@@ -73,8 +76,9 @@ class Http extends AbstractSparqlStore
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
         $this->queryFactory = $queryFactory;
+        $this->resultFactory = $resultFactory;
 
-        parent::__construct($nodeFactory, $statementFactory, $queryFactory);
+        parent::__construct($nodeFactory, $statementFactory, $queryFactory, $resultFactory);
     }
 
     /**
@@ -117,7 +121,6 @@ class Http extends AbstractSparqlStore
     public function getAvailableGraphs()
     {
         $result = $this->query('SELECT DISTINCT ?g WHERE { GRAPH ?g {?s ?p ?o.} }');
-        $result = $result->getResultObject();
 
         $graphs = array();
 
@@ -220,9 +223,7 @@ class Http extends AbstractSparqlStore
          */
         if ('selectQuery' == AbstractQuery::getQueryType($query)) {
             $resultArray = json_decode($this->client->sendSparqlSelectQuery($query), true);
-
-            $setResult = new SetResult();
-            $setResult->setVariables($resultArray['head']['vars']);
+            $entries = array();
 
             /**
              * go through all bindings and create according objects for SetResult instance.
@@ -296,10 +297,11 @@ class Http extends AbstractSparqlStore
                     }
                 }
 
-                $setResult->append($newEntry);
+                $entries[] = $newEntry;
             }
 
-            $return = $setResult;
+            $return = $this->resultFactory->createSetResult($entries);
+            $return->setVariables($resultArray['head']['vars']);
 
         /**
          * SPARPQL Update query
@@ -311,17 +313,17 @@ class Http extends AbstractSparqlStore
                 $askResult = json_decode($result, true);
 
                 if (true === isset($askResult['boolean'])) {
-                    $return = new ValueResult($askResult['boolean']);
+                    $return = $this->resultFactory->createValueResult($askResult['boolean']);
 
                 // assumption here is, if a string was returned, something went wrong.
                 } elseif (0 < strlen($result)) {
                     throw new StoreException($result);
 
                 } else {
-                    $return = new EmptyResult();
+                    $return = $this->resultFactory->createEmptyResult();
                 }
             } else {
-                $return = new EmptyResult();
+                $return = $this->resultFactory->createEmptyResult();
             }
         }
 

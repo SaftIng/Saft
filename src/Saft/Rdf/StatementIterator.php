@@ -20,7 +20,7 @@ interface StatementIterator extends \Iterator
     public function next();
 
     /**
-     * May not be implemented
+     * Reset the iterator. Be aware, it may not be implemented!
      */
     public function rewind();
 

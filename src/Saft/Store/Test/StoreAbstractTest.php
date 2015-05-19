@@ -9,9 +9,10 @@ use Saft\Rdf\StatementImpl;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Sparql\SparqlUtils;
 use Saft\Store\Result\EmptyResult;
-use Saft\Store\Result\StatementResult;
-use Saft\Store\Result\SetResult;
-use Saft\Store\Result\ValueResult;
+use Saft\Store\Result\EmptyResultImpl;
+use Saft\Store\Result\StatementSetResultImpl;
+use Saft\Store\Result\SetResultImpl;
+use Saft\Store\Result\ValueResultImpl;
 use Saft\Test\TestCase;
 use Symfony\Component\Yaml\Parser;
 
@@ -37,25 +38,6 @@ abstract class StoreAbstractTest extends TestCase
         }
 
         parent::tearDown();
-    }
-
-    /**
-     * Loads config.yml and return its content as array.
-     */
-    protected function getConfigContent()
-    {
-        // set path to test dir
-        $saftRootDir = dirname(__FILE__) . '/../../../../';
-        $configFilepath = $saftRootDir . 'test-config.yml';
-
-        // check for config file
-        if (false === file_exists($configFilepath)) {
-            throw new \Exception('test-config.yml missing');
-        }
-
-        // parse YAML file
-        $yaml = new Parser();
-        return $yaml->parse(file_get_contents($configFilepath));
     }
 
     protected function getTestQuad()
@@ -242,7 +224,7 @@ abstract class StoreAbstractTest extends TestCase
             }
         }';
 
-        $this->assertEquals(new EmptyResult(), $this->fixture->query($query));
+        $this->assertEquals(new EmptyResultImpl(), $this->fixture->query($query));
     }
 
     /**
@@ -444,22 +426,19 @@ abstract class StoreAbstractTest extends TestCase
         /**
          * Build SetResult instance to check against
          */
-        $statementResultToCheckAgainst = new StatementResult();
-        $statementResultToCheckAgainst->setVariables(array('s', 'p', 'o'));
-        $statementResultToCheckAgainst->append(
+        $statementResultToCheckAgainst = new StatementSetResultImpl(array(
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
                 new NamedNodeImpl('http://o/')
-            )
-        );
-        $statementResultToCheckAgainst->append(
+            ),
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
                 new LiteralImpl('test literal')
             )
-        );
+        ));
+        $statementResultToCheckAgainst->setVariables(array('s', 'p', 'o'));
 
         $this->assertEquals(
             $statementResultToCheckAgainst,
@@ -471,7 +450,7 @@ abstract class StoreAbstractTest extends TestCase
     {
         $statement = new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl());
 
-        $statementResult = new StatementResult();
+        $statementResult = new StatementSetResultImpl(array());
         $statementResult->setVariables(array('s', 'p', 'o'));
 
         $this->assertEquals(
@@ -566,27 +545,30 @@ abstract class StoreAbstractTest extends TestCase
         /**
          * Build SetResult instance to check against
          */
-        $setResultToCheckAgainst = new SetResult();
-        $setResultToCheckAgainst->setVariables(array('s', 'o'));
-        $setResultToCheckAgainst->append(
-            array(
-                's' => new NamedNodeImpl('http://s/'),
-                'o' =>
-                new LiteralImpl(
-                    'foobar',
-                    new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'),
-                    'en'
+        $setResultToCheckAgainst = new SetResultImpl(
+            new \ArrayIterator(
+                array(
+                    array(
+                        's' => new NamedNodeImpl('http://s/'),
+                        'o' =>
+                        new LiteralImpl(
+                            'foobar',
+                            new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'),
+                            'en'
+                        )
+                    ),
+                    array(
+                        's' => new NamedNodeImpl('http://s/'),
+                        'o' => new LiteralImpl('42')
+                    ),
+                    array(
+                        's' => new NamedNodeImpl('http://s/'),
+                        'o' => new NamedNodeImpl('http://o/')
+                    )
                 )
             )
         );
-        $setResultToCheckAgainst->append(array(
-            's' => new NamedNodeImpl('http://s/'),
-            'o' => new LiteralImpl('42')
-        ));
-        $setResultToCheckAgainst->append(array(
-            's' => new NamedNodeImpl('http://s/'),
-            'o' => new NamedNodeImpl('http://o/')
-        ));
+        $setResultToCheckAgainst->setVariables(array('s', 'o'));
 
         // check
         $this->assertIteratorContent(
@@ -625,7 +607,7 @@ abstract class StoreAbstractTest extends TestCase
         $this->fixture->addStatements($statements, $this->testGraph);
 
         $this->assertEquals(
-            new ValueResult(true),
+            new ValueResultImpl(true),
             $this->fixture->query(
                 'ASK FROM <'. $this->testGraph->getUri() . '> {<http://s/> <http://p/> ?o.}'
             )
@@ -634,7 +616,7 @@ abstract class StoreAbstractTest extends TestCase
 
     public function testQueryEmptyResult()
     {
-        $setResult = new SetResult();
+        $setResult = new SetResultImpl(new \ArrayIterator());
         $setResult->setVariables(array('s', 'p', 'o'));
 
         $this->assertEquals(
@@ -653,7 +635,7 @@ abstract class StoreAbstractTest extends TestCase
         $graphPattern = SparqlUtils::statementsToSparqlFormat([$quad]);
         $query = 'DELETE DATA { ' . $graphPattern . '}';
 
-        $this->assertEquals(new EmptyResult(), $this->fixture->query($query));
+        $this->assertTrue($this->fixture->query($query) instanceof EmptyResult);
     }
 
     public function testDeleteMultipleStatementsVariablePatterns()
@@ -675,7 +657,7 @@ abstract class StoreAbstractTest extends TestCase
         $query = 'DELETE DATA { '. SparqlUtils::statementsToSparqlFormat([$statement]) .'}';
 
         $this->assertEquals(
-            new EmptyResult(),
+            new EmptyResultImpl(),
             $this->fixture->query($query)
         );
     }
@@ -690,7 +672,7 @@ abstract class StoreAbstractTest extends TestCase
         $query = 'ASK { '. SparqlUtils::statementsToSparqlFormat([$triple]) .'}';
 
         $this->assertEquals(
-            new ValueResult(false),
+            new ValueResultImpl(false),
             $this->fixture->query($query)
         );
     }

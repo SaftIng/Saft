@@ -2,6 +2,7 @@
 
 namespace Saft\Rdf\Test;
 
+use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
@@ -10,7 +11,15 @@ use Saft\Test\TestCase;
 
 abstract class StatementIteratorAbstractTest extends TestCase
 {
+    /**
+     * @param  array $statements
+     * @return StatementIterator
+     */
     abstract public function createInstanceWithArray(array $statements);
+
+    /*
+     * Tests iteration
+     */
 
     public function testIterationForeach()
     {
@@ -46,6 +55,33 @@ abstract class StatementIteratorAbstractTest extends TestCase
 
         $this->assertEqualsArrays($statements, $actual);
     }
+
+    /*
+     * Tests constructor
+     */
+
+    public function testConstructorValidList()
+    {
+        // empty array must be fine
+        $this->fixture = $this->createInstanceWithArray(array());
+
+        // array with Statement instance must be fine
+        $this->fixture = $this->createInstanceWithArray(
+            array(new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl()))
+        );
+    }
+
+    public function testConstructorInvalidList()
+    {
+        // expect exception, because array contains non-Statement instance
+        $this->setExpectedException('\Exception');
+
+        $this->fixture = $this->createInstanceWithArray(array(1));
+    }
+
+    /*
+     * Tests count
+     */
 
     public function testCountAssertionSome()
     {

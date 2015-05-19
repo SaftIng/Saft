@@ -2,17 +2,23 @@
 
 namespace Saft\Store\Test\Result;
 
-use Saft\Store\Result\ValueResult;
+use Saft\Store\Result\ValueResultImpl;
 use Saft\Test\TestCase;
 
-class ValueResultUnitTest extends TestCase
+abstract class ValueResultAbstractTest extends TestCase
 {
+    /**
+     * @param  $mixed $scalar
+     * @return Result An instance Of ValueResult
+     */
+    abstract public function newInstance($scalar);
+
     /**
      *
      */
     public function setUp()
     {
-        $this->fixture = new ValueResult(0);
+        $this->fixture = new ValueResultImpl(0);
     }
 
     /**
@@ -21,22 +27,14 @@ class ValueResultUnitTest extends TestCase
 
     public function testConstructor()
     {
-        $this->fixture = new ValueResult(0);
+        $this->fixture = new ValueResultImpl(0);
     }
 
     public function testConstructorNonScalarParameter()
     {
         $this->setExpectedException('Exception');
 
-        $this->fixture = new ValueResult(array());
-    }
-
-    /**
-     * Tests that class exists
-     */
-    public function testExistense()
-    {
-        $this->assertTrue(class_exists('\Saft\Store\Result\ValueResult'));
+        $this->fixture = new ValueResultImpl(array());
     }
 
     /**
@@ -49,12 +47,12 @@ class ValueResultUnitTest extends TestCase
     }
 
     /**
-     * Tests isStatementResult
+     * Tests isStatementSetResult
      */
 
-    public function testIsStatementResult()
+    public function testisStatementSetResult()
     {
-        $this->assertFalse($this->fixture->isStatementResult());
+        $this->assertFalse($this->fixture->isStatementSetResult());
     }
 
     /**

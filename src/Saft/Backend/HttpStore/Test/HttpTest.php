@@ -6,6 +6,7 @@ use Saft\Backend\HttpStore\Store\Http;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Store\Result\ResultFactoryImpl;
 use Saft\Store\Test\StoreAbstractTest;
 
 class HttpAbstractTest extends StoreAbstractTest
@@ -14,13 +15,14 @@ class HttpAbstractTest extends StoreAbstractTest
     {
         parent::setUp();
 
-        $this->config = $this->getConfigContent();
+        $this->loadTestConfiguration();
 
         if (true === isset($this->config['httpConfig'])) {
             $this->fixture = new Http(
                 new NodeFactoryImpl(),
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
+                new ResultFactoryImpl(),
                 $this->config['httpConfig']
             );
         } elseif (true === isset($this->config['configuration']['standardStore'])
@@ -29,6 +31,7 @@ class HttpAbstractTest extends StoreAbstractTest
                 new NodeFactoryImpl(),
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
+                new ResultFactoryImpl(),
                 $this->config['configuration']['standardStore']
             );
         } else {
@@ -48,6 +51,12 @@ class HttpAbstractTest extends StoreAbstractTest
         $this->setExpectedException('\Exception');
 
         $config = array('authUrl' => 'http://not existend');
-        new Http(new NodeFactoryImpl(), new StatementFactoryImpl(), new QueryFactoryImpl(), $config);
+        new Http(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl(),
+            new ResultFactoryImpl(),
+            $config
+        );
     }
 }

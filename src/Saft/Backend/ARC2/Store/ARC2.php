@@ -14,6 +14,7 @@ use Saft\Sparql\Query\QueryFactory;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Exception\StoreException;
 use Saft\Store\Result\EmptyResult;
+use Saft\Store\Result\ResultFactory;
 use Saft\Store\Result\SetResult;
 use Saft\Store\Result\ValueResult;
 
@@ -55,6 +56,7 @@ class ARC2 extends AbstractSparqlStore
         NodeFactory $nodeFactory,
         StatementFactory $statementFactory,
         QueryFactory $queryFactory,
+        ResultFactory $resultFactory,
         array $configuration
     ) {
         $this->configuration = $configuration;
@@ -70,8 +72,9 @@ class ARC2 extends AbstractSparqlStore
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
         $this->queryFactory = $queryFactory;
+        $this->resultFactory = $resultFactory;
 
-        parent::__construct($nodeFactory, $statementFactory);
+        parent::__construct($nodeFactory, $statementFactory, $queryFactory, $resultFactory);
     }
 
     /**
@@ -353,7 +356,6 @@ class ARC2 extends AbstractSparqlStore
 
         // execute query on the store
         $result = $this->store->query($query);
-        $finalResult = null;
 
         if ('selectQuery' === AbstractQuery::getQueryType($query)) {
             /**
@@ -373,8 +375,7 @@ class ARC2 extends AbstractSparqlStore
              *                  'o datatype' => "http://www.w3.org/2001/XMLSchema#string"
              *              )
              */
-            $finalResult = new SetResult();
-            $finalResult->setVariables($result['result']['variables']);
+            $entries = array();
 
             // go through all rows
             foreach ($result['result']['rows'] as $row) {
@@ -419,18 +420,21 @@ class ARC2 extends AbstractSparqlStore
                     }
                 }
 
-                $finalResult->append($newEntry);
+                $entries[] = $newEntry;
             }
+
+            // Create and fill SetResult instance
+            $setResult = $this->resultFactory->createSetResult($entries);
+            $setResult->setVariables($result['result']['variables']);
+            return $setResult;
 
         } else {
             if ('askQuery' === AbstractQuery::getQueryType($query)) {
-                return new ValueResult($result['result']);
+                return $this->resultFactory->createValueResult($result['result']);
 
             } else {
-                return new EmptyResult();
+                return $this->resultFactory->createEmptyResult();
             }
         }
-
-        return $finalResult;
     }
 }

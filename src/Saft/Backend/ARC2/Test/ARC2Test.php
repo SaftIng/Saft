@@ -11,6 +11,7 @@ use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Store\Result\ResultFactoryImpl;
 use Saft\Store\Test\StoreAbstractTest;
 use Symfony\Component\Yaml\Parser;
 
@@ -25,6 +26,7 @@ class ARC2Test extends StoreAbstractTest
                 new NodeFactoryImpl(),
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
+                new ResultFactoryImpl(),
                 $this->config['arc2Config']
             );
         } elseif (true === isset($this->config['configuration']['standardStore'])) {
@@ -32,6 +34,7 @@ class ARC2Test extends StoreAbstractTest
                 new NodeFactoryImpl(),
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
+                new ResultFactoryImpl(),
                 $this->config['configuration']['standardStore']
             );
         } else {

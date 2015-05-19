@@ -5,14 +5,8 @@ namespace Saft\Store\Result;
 /**
  * Represents an empty result, usually after an INSERT or UPDATE SPARQL query.
  */
-class EmptyResult extends Result
+class EmptyResultImpl implements Result
 {
-    /**
-     */
-    public function __construct()
-    {
-    }
-
     /**
      * @return boolean True
      */
@@ -32,7 +26,7 @@ class EmptyResult extends Result
     /**
      * @return boolean False
      */
-    public function isStatementResult()
+    public function isStatementSetResult()
     {
         return false;
     }

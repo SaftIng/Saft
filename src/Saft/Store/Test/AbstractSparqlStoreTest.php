@@ -10,6 +10,9 @@ use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
+use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Store\Result\EmptyResult;
+use Saft\Store\Result\ResultFactoryImpl;
 use Saft\Test\EqualsSparqlConstraint;
 use Saft\Test\TestCase;
 
@@ -21,7 +24,12 @@ class AbstractSparqlStoreTest extends TestCase
 
         $this->mock = $this->getMockForAbstractClass(
             '\Saft\Store\AbstractSparqlStore',
-            [new NodeFactoryImpl(), new StatementFactoryImpl()]
+            array(
+                new NodeFactoryImpl(),
+                new StatementFactoryImpl(),
+                new QueryFactoryImpl(),
+                new ResultFactoryImpl()
+            )
         );
     }
 
@@ -70,7 +78,7 @@ class AbstractSparqlStoreTest extends TestCase
 
         $result = $this->mock->getMatchingStatements($this->getTestStatement());
 
-        // TODO Assert to check if result is a StatementIterator
+        $this->assertTrue($result->isEmptyResult());
     }
 
     public function testAddStatements()

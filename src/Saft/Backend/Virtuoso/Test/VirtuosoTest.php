@@ -11,6 +11,7 @@ use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Store\Result\ResultFactoryImpl;
 use Saft\Store\Test\StoreAbstractTest;
 use Symfony\Component\Yaml\Parser;
 
@@ -40,6 +41,7 @@ class VirtuosoTest extends StoreAbstractTest
                 new NodeFactoryImpl(),
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
+                new ResultFactoryImpl(),
                 $this->config['virtuosoConfig']
             );
         } elseif (true === isset($this->config['configuration']['standardStore'])
@@ -48,6 +50,7 @@ class VirtuosoTest extends StoreAbstractTest
                 new NodeFactoryImpl(),
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
+                new ResultFactoryImpl(),
                 $this->config['configuration']['standardStore']
             );
         } else {
@@ -65,43 +68,5 @@ class VirtuosoTest extends StoreAbstractTest
         }
 
         parent::tearDown();
-    }
-
-    /**
-     * Tests getTripleCount
-     */
-
-    public function testGetTripleCount()
-    {
-        $anyStatement = new StatementImpl(
-            new AnyPatternImpl(),
-            new AnyPatternImpl(),
-            new AnyPatternImpl(),
-            new AnyPatternImpl()
-        );
-
-        // graph is empty
-        $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(0, $statements);
-
-        // 2 triples
-        $statements = new ArrayStatementIteratorImpl(array(
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/'),
-                new NamedNodeImpl('http://o/')
-            ),
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/'),
-                new LiteralImpl('test literal')
-            ),
-        ));
-
-        // add triples
-        $this->fixture->addStatements($statements, $this->testGraph);
-
-        // graph has to contain 2 triples
-        $this->assertEquals(2, $this->fixture->getTripleCount($this->testGraph));
     }
 }

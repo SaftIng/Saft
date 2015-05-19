@@ -74,7 +74,8 @@ abstract class AbstractTriplePatternStore implements Store
             // WITH ... DELETE ... INSERT ... WHERE queries
             } else {
                 throw new \Exception(
-                    'Not yet implemented: WITH-DELETE-WHERE and WITH-DELETE-INSERT-WHERE queries are not supported yet.'
+                    'Not yet implemented: WITH-DELETE-WHERE and WITH-DELETE-INSERT-WHERE queries are not '.
+                    'supported yet.'
                 );
             }
         } elseif ('askQuery' == AbstractQuery::getQueryType($query)) {

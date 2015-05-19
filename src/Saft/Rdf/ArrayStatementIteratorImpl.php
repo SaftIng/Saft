@@ -2,9 +2,8 @@
 
 namespace Saft\Rdf;
 
-class ArrayStatementIteratorImpl extends AbstractStatementIterator
+class ArrayStatementIteratorImpl implements StatementIterator
 {
-
     /**
      * @var \ArrayIterator over the statements array
      */
@@ -12,9 +11,17 @@ class ArrayStatementIteratorImpl extends AbstractStatementIterator
 
     /**
      * @param array $statements array of instances of Statement
+     * @throws \Exception If $statements does contain at least one non-Statement instance.
      */
     public function __construct(array $statements)
     {
+        // check that each entry of the array is of type Statement
+        foreach ($statements as $statement) {
+            if (false === $statement instanceof Statement) {
+                throw new \Exception('Parameter $statements must contain Statement instances.');
+            }
+        }
+
         $this->arrayIterator = new \ArrayIterator($statements);
     }
 
@@ -51,7 +58,7 @@ class ArrayStatementIteratorImpl extends AbstractStatementIterator
     }
 
     /**
-     * Implement rewind, because we can
+     *
      */
     public function rewind()
     {

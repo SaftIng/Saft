@@ -17,6 +17,7 @@ use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Store;
 use Saft\Store\Exception\StoreException;
 use Saft\Store\Result\EmptyResult;
+use Saft\Store\Result\ResultFactory;
 use Saft\Store\Result\SetResult;
 use Saft\Store\Result\StatementResult;
 use Saft\Store\Result\ValueResult;
@@ -65,6 +66,7 @@ class Virtuoso extends AbstractSparqlStore
         NodeFactory $nodeFactory,
         StatementFactory $statementFactory,
         QueryFactory $queryFactory,
+        ResultFactory $resultFactory,
         array $configuration
     ) {
         $this->checkRequirements();
@@ -77,8 +79,9 @@ class Virtuoso extends AbstractSparqlStore
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
         $this->queryFactory = $queryFactory;
+        $this->resultFactory = $resultFactory;
 
-        parent::__construct($nodeFactory, $statementFactory, $queryFactory);
+        parent::__construct($nodeFactory, $statementFactory, $queryFactory, $resultFactory);
     }
 
     /**
@@ -271,7 +274,7 @@ class Virtuoso extends AbstractSparqlStore
                 throw new StoreException($e->getMessage());
             }
 
-            $setResult = new SetResult();
+            $entries = array();
 
             // transform result to array in case we fired a non-UPDATE query
             if (false !== $pdoQuery) {
@@ -284,8 +287,6 @@ class Virtuoso extends AbstractSparqlStore
                 if (0 == count($variables)) {
                     $variables = $queryParts['variables'];
                 }
-
-                $setResult->setVariables($variables);
 
                 /**
                  * go through all bindings and create according objects for SetResult instance.
@@ -346,9 +347,11 @@ class Virtuoso extends AbstractSparqlStore
                         }
                     }
 
-                    $setResult->append($newEntry);
+                    $entries[] = $newEntry;
                 }
 
+                $setResult = $this->resultFactory->createSetResult(new \ArrayIterator($entries));
+                $setResult->setVariables($variables);
                 return $setResult;
 
             } else {
@@ -377,9 +380,9 @@ class Virtuoso extends AbstractSparqlStore
             // ask result
             if ('askQuery' === AbstractQuery::getQueryType($query)) {
                 $pdoResult = $pdoQuery->fetchAll(\PDO::FETCH_ASSOC);
-                return new ValueResult(true !== empty($pdoResult));
+                return $this->resultFactory->createValueResult(true !== empty($pdoResult));
             } else {
-                return new EmptyResult();
+                return $this->resultFactory->createEmptyResult();
             }
         }
     }
