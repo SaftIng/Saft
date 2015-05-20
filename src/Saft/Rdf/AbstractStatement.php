@@ -27,7 +27,9 @@ abstract class AbstractStatement implements Statement
     }
 
     /**
-     * @return boolean
+     * Transforms content of the Statement to n-quads form.
+     *
+     * @return string
      */
     public function toNQuads()
     {
@@ -44,6 +46,22 @@ abstract class AbstractStatement implements Statement
             }
         } else {
             throw new \Exception('A Statement has to be concrete in N-Quads.');
+        }
+    }
+
+    /**
+     * Transforms content of the Statement to n-triples form.
+     *
+     * @return string
+     */
+    public function toNTriples()
+    {
+        if ($this->isConcrete()) {
+            return $this->getSubject()->toNQuads() . ' ' .
+                   $this->getPredicate()->toNQuads() . ' ' .
+                   $this->getObject()->toNQuads() . ' .';
+        } else {
+            throw new \Exception('A Statement has to be concrete in N-Triples.');
         }
     }
 
