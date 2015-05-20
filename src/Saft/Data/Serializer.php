@@ -7,30 +7,29 @@ use Saft\Rdf\StatementIterator;
 interface Serializer
 {
     /**
-     * Set the prefixes which the serializer can/should use when generating the serialization. Please keep in mind, that
-     * some serializations don't support prefixes at all or that some implementations might ignore them.
-     * @param $prefixes array An associative array with a prefix mapping of the prefixes. The key will be the prefix,
-     *                        while the values contains the according namespace URI.
-     * @return void
+     * Set the prefixes which the serializer can/should use when generating the serialization.
+     * Please keep in mind, that some serializations don't support prefixes at all or that some
+     * implementations might ignore them.
+     *
+     * @param array $prefixes An associative array with a prefix mapping of the prefixes. The key
+     *                        will be the prefix, while the values contains the according namespace URI.
      */
     public function setPrefixes(array $prefixes);
 
     /**
-     * @unstable
-     * @param $outputStream string filename of the stream to where the serialization should be written
-     *                             {@url http://php.net/manual/en/book.stream.php}
-     * @param $statements StatementIterator The StatementIterator containing all the Statements which should be
-     *                                      serialized by the serializer.
-     * @param $serialization string the serialization which should be used. If null is given the serializer will either
-     *                              apply some default serialization, or the only one it is supporting, or will throw an
-     *                              Exception.
-     * @return void
+     * @param StatementIterator $statements   The StatementIterator containing all the Statements which should be
+     *                                        serialized by the serializer.
+     * @param string            $outputStream filename of the stream to where the serialization should be written.
+     * @param string            $format       The serialization which should be used. If null is given the
+     *                                        serializer will either apply some default serialization, or
+     *                                        the only one it is supporting, or will throw an Exception.
      */
-    public function serializeIteratorToStream($outputStream, StatementIterator $statements, $serialization = null);
+    public function serializeIteratorToStream(StatementIterator $statements, $outputStream, $format = null);
 
     /**
-     * @unstable
-     * @return array of supported mime types which can be used by this serializer
+     * Returns a list of all supported serialization types.
+     *
+     * @return array Array of supported serialization types which can be used by this serializer.
      */
     public function getSupportedSerializations();
 }
