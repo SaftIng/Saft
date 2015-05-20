@@ -17,9 +17,12 @@ interface Serializer
     public function setPrefixes(array $prefixes);
 
     /**
-     * @param StatementIterator $statements   The StatementIterator containing all the Statements which should be
-     *                                        serialized by the serializer.
-     * @param string            $outputStream filename of the stream to where the serialization should be written.
+     * Transforms the statements of a StatementIterator instance into a stream, a file for instance.
+     *
+     * @param StatementIterator $statements   The StatementIterator containing all the Statements which
+     *                                        should be serialized by the serializer.
+     * @param string            $outputStream filename of the stream to where the serialization should be
+     *                                        written.
      * @param string            $format       The serialization which should be used. If null is given the
      *                                        serializer will either apply some default serialization, or
      *                                        the only one it is supporting, or will throw an Exception.
