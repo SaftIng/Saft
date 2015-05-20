@@ -41,6 +41,7 @@
     "require": {
         "php": ">=5.3.3",
         "easyrdf/easyrdf": "*",
+        "fzaninotto/Streamer": "*",
         "semsol/arc2": "*@dev",
         "php-curl-class/php-curl-class": "*",
         "ext-memcached": "*",

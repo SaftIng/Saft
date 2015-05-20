@@ -3,43 +3,54 @@
 namespace Saft\Data;
 
 use Saft\Rdf\StatementIterator;
+use Streamer\Stream;
 
 class NQuadsSerializerImpl implements Serializer
 {
 
     /**
-     * Prefixes are ignored in the NQuads serialization
-     * @param $prefixes array will be ignored
-     * @return void
+     * Set the prefixes which the serializer can/should use when generating the serialization.
+     * Prefixes are ignored here.
+     *
+     * @param array $prefixes An associative array with a prefix mapping of the prefixes. The key
+     *                        will be the prefix, while the values contains the according namespace URI.
      */
     public function setPrefixes(array $prefixes)
     {
     }
 
     /**
-     * @unstable
-     * @param $outputStream string filename of the stream to where the serialization should be written
-     *                             {@url http://php.net/manual/en/book.stream.php}
-     * @param $statements StatementIterator The StatementIterator containing all the Statements which should be
-     *                                      serialized by the serializer.
-     * @param $serialization string the serialization which should be used. If null N-Quads serialization will be used.
-     * @return void
+     * Transforms the statements of a StatementIterator instance into a stream, a file for instance.
+     *
+     * @param StatementIterator $statements   The StatementIterator containing all the Statements which
+     *                                        should be serialized by the serializer.
+     * @param string            $outputStream filename of the stream to where the serialization should be
+     *                                        written.
+     * @param string            $format       The serialization which should be used. If null is given the
+     *                                        serializer will either apply some default serialization, or
+     *                                        the only one it is supporting, or will throw an Exception.
      */
-    public function serializeIteratorToStream($outputStream, StatementIterator $statements, $serialization = null)
+    public function serializeIteratorToStream(StatementIterator $statements, $outputStream, $format = null)
     {
-        $handler = fopen($outputStream, 'a');
+        $stream = new Stream(fopen($outputStream, 'w'));
+
+        // TODO add switch for different formats
+        $function = 'toNQuads';
+
         foreach ($statements as $statement) {
-            fwrite($handler, $statement->toNQuads() . PHP_EOL);
+            $stream->write($statement->$function() . PHP_EOL);
         }
-        fclose($handler);
+
+        $stream->close();
     }
 
     /**
-     * @unstable
-     * @return array of supported mime types which can be used by this serializer
+     * Returns a list of all supported serialization types.
+     *
+     * @return array Array of supported serialization types which can be used by this serializer.
      */
     public function getSupportedSerializations()
     {
-        return ["application/n-triples", "application/n-quads"];
+        return array('n-triples', 'n-quads');
     }
 }

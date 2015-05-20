@@ -20,7 +20,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-
+        "fzaninotto/Streamer": "*",
         "saft/saft-rdf": "dev-master"
     },
     "require-dev": {
