@@ -27,6 +27,11 @@ abstract class SerializerAbstractTest extends TestCase
                 new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
                 new NamedNodeImpl('http://saft/example/Foo')
             ),
+            new StatementImpl(
+                new NamedNodeImpl('http://saft/example/2'),
+                new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                new NamedNodeImpl('http://saft/example/Foo')
+            ),
         ));
 
         $testFile = sys_get_temp_dir() .'/saft/serialize.ttl';
@@ -47,8 +52,10 @@ abstract class SerializerAbstractTest extends TestCase
         // check
         $this->assertEquals(
             '<http://saft/example/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> '.
-            '<http://saft/example/Foo> .'. PHP_EOL,
-            $string
+            '<http://saft/example/Foo> .'. PHP_EOL .
+            '<http://saft/example/2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> '.
+            '<http://saft/example/Foo> .',
+            trim($string)
         );
     }
 
@@ -57,6 +64,11 @@ abstract class SerializerAbstractTest extends TestCase
         $iterator = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
                 new NamedNodeImpl('http://saft/example/'),
+                new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                new NamedNodeImpl('http://saft/example/Foo')
+            ),
+            new StatementImpl(
+                new NamedNodeImpl('http://saft/example/2'),
                 new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
                 new NamedNodeImpl('http://saft/example/Foo')
             ),
@@ -80,8 +92,10 @@ abstract class SerializerAbstractTest extends TestCase
         // check
         $this->assertEquals(
             '<http://saft/example/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> '.
-            '<http://saft/example/Foo> .'. PHP_EOL,
-            $string
+            '<http://saft/example/Foo> .'. PHP_EOL .
+            '<http://saft/example/2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> '.
+            '<http://saft/example/Foo> .',
+            trim($string)
         );
     }
 }
