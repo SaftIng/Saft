@@ -39,16 +39,16 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
     /**
      * Adds multiple Statements to (default-) graph.
      *
-     * @param  StatementIterator $statements          StatementList instance must contain Statement instances
+     * @param  StatementIterator|array $statements    StatementList instance must contain Statement instances
      *                                                which are 'concret-' and not 'pattern'-statements.
-     * @param  Node              $graph      optional Overrides target graph. If set, all statements will
+     * @param  Node                    $graph         optional Overrides target graph. If set, all statements will
      *                                                be add to that graph, if available.
-     * @param  array             $options    optional It contains key-value pairs and should provide additional
+     * @param  array                   $options       optional It contains key-value pairs and should provide additional
      *                                                introductions for the store and/or its adapter(s).
      * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
      *                 will be thrown.
      */
-    public function addStatements(StatementIterator $Statements, Node $graph = null, array $options = array())
+    public function addStatements($statements, Node $graph = null, array $options = array())
     {
         return true;
     }
@@ -64,7 +64,7 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
      * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
      *                 will be thrown.
      */
-    public function deleteMatchingStatements(Statement $Statement, Node $graph = null, array $options = array())
+    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
         return true;
     }
@@ -82,7 +82,7 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
      *                                       introductions for the store and/or its adapter(s).
      * @return StatementIterator It contains Statement instances  of all matching statements of the given graph.
      */
-    public function getMatchingStatements(Statement $Statement, Node $graph = null, array $options = array())
+    public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
         return new ArrayStatementIteratorImpl(array());
     }
@@ -96,7 +96,7 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
      *                                       introductions for the store and/or its adapter(s).
      * @return boolean Returns true if at least one match was found, false otherwise.
      */
-    public function hasMatchingStatement(Statement $Statement, Node $graph = null, array $options = array())
+    public function hasMatchingStatement(Statement $statement, Node $graph = null, array $options = array())
     {
         return true;
     }

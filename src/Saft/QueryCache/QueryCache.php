@@ -99,16 +99,16 @@ class QueryCache implements Store, ChainableStore
     /**
      * Adds multiple Statements to (default-) graph.
      *
-     * @param  StatementIterator $statements          StatementList instance must contain Statement instances
-     *                                                which are 'concret-' and not 'pattern'-statements.
-     * @param  Node              $graph      optional Overrides target graph. If set, all statements will
-     *                                                be add to that graph, if available.
-     * @param  array             $options    optional It contains key-value pairs and should provide additional
-     *                                                introductions for the store and/or its adapter(s).
+     * @param  StatementIterator|array $statements StatementList instance must contain Statement instances
+     *                                             which are 'concret-' and not 'pattern'-statements.
+     * @param  Node                    $graph      optional Overrides target graph. If set, all statements will
+     *                                             be add to that graph, if available.
+     * @param  array                   $options    optional It contains key-value pairs and should provide additional
+     *                                             introductions for the store and/or its adapter(s).
      * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
      *                 will be thrown.
      */
-    public function addStatements(StatementIterator $statements, Node $graph = null, array $options = array())
+    public function addStatements($statements, Node $graph = null, array $options = array())
     {
         // TODO migrate code to new interface
         $graphUri = null;

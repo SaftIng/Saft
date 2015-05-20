@@ -61,15 +61,15 @@ abstract class AbstractSparqlStore implements Store
     /**
      * Adds multiple Statements to (default-) graph.
      *
-     * @param  StatementIterator $statements          StatementList instance must contain Statement instances
+     * @param  StatementIterator|array $statements    StatementList instance must contain Statement instances
      *                                                which are 'concret-' and not 'pattern'-statements.
-     * @param  Node              $graph      optional Overrides target graph. If set, all statements will
+     * @param  Node                    $graph         optional Overrides target graph. If set, all statements will
      *                                                be add to that graph, if available.
-     * @param  array             $options    optional It contains key-value pairs and should provide additional
+     * @param  array                   $options       optional It contains key-value pairs and should provide additional
      *                                                introductions for the store and/or its adapter(s).
      * @todo implement usage of graph inside the statement(s). create groups for each graph
      */
-    public function addStatements(StatementIterator $statements, Node $graph = null, array $options = array())
+    public function addStatements($statements, Node $graph = null, array $options = array())
     {
         $graphUriToUse = null;
 
