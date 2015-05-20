@@ -117,6 +117,42 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertCountStatementIterator(2, $statements);
     }
 
+
+    public function testAddAndDeleteStatementsOnDefaultGraph()
+    {
+        $stmtOne = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new NamedNodeImpl('http://o/')
+        );
+        $stmtTwo = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new LiteralImpl('test literal')
+        );
+
+        if ($this->fixture->hasMatchingStatement($stmtOne) || $this->fixture->hasMatchingStatement($stmtTwo)) {
+            $this->markTestSkipped("Skip this test, because one of our test triples already exists");
+        }
+
+        // 2 triples
+        $statements = new ArrayStatementIteratorImpl([$stmtOne, $stmtTwo]);
+
+        // add triples
+        $this->fixture->addStatements($statements);
+
+        // graph has the two entries
+        $this->assertTrue($this->fixture->hasMatchingStatement($stmtOne));
+        $this->assertTrue($this->fixture->hasMatchingStatement($stmtTwo));
+
+        $this->fixture->deleteMatchingStatements($stmtOne);
+        $this->fixture->deleteMatchingStatements($stmtTwo);
+
+        // graph has the two entries
+        $this->assertFalse($this->fixture->hasMatchingStatement($stmtOne));
+        $this->assertFalse($this->fixture->hasMatchingStatement($stmtTwo));
+    }
+
     public function testAddStatementsWithArray()
     {
         $anyStatement = new StatementImpl(
