@@ -21,6 +21,8 @@ interface Parser
      *                                        parser will either apply some standard serialization, or the
      *                                        only one it is supporting, or will try to guess the correct
      *                                        serialization, or will throw an Exception.
+     *                                        Supported formats are a subset of the following:
+     *                                        json, rdfxml, sparql-xml, rdfa, turtle, ntriples, n3
      * @return StatementIterator StatementIterator instaince containing all the Statements parsed by the
      *                           parser to far
      * @throws \Exception        If the base URI $baseUri is no valid URI.
@@ -39,6 +41,8 @@ interface Parser
      *                                        parser will either apply some standard serialization, or the
      *                                        only one it is supporting, or will try to guess the correct
      *                                        serialization, or will throw an Exception.
+     *                                        Supported formats are a subset of the following:
+     *                                        json, rdfxml, sparql-xml, rdfa, turtle, ntriples, n3
      * @return StatementIterator A StatementIterator containing all the Statements parsed by the parser to
      *                           far.
      * @throws \Exception        If the base URI $baseUri is no valid URI.

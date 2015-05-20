@@ -1,0 +1,16 @@
+@base <http://saft/example/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://saft/example/> .
+
+<> a ex:Foo ;
+    rdfs:label "RDFS label" .
+
+ex:Foobar a ex:Bar ;
+    rdfs:label "RDFS label with language tag"@en ;
+    rdfs:comment """
+    Multi line comment
+    """ ;
+    ex:component ex:geo,
+                 ex:time .
+
+ex:dataset rdfs:label "RDFS label with datatype"^^<http://www.w3.org/2001/XMLSchema#string>.
