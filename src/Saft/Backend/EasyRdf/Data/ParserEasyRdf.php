@@ -43,7 +43,8 @@ class ParserEasyRdf implements Parser
      */
     public function getCurrentPrefixList()
     {
-        // TODO
+        // TODO implement a way to get a list of all namespaces used in the last parsed datastring/file.
+        return array();
     }
 
     /**
