@@ -2,16 +2,16 @@
 
 namespace Saft\Sparql\Test\Query;
 
-use Saft\Sparql\Query\AskQuery;
+use Saft\Sparql\Query\AskQueryImpl;
 use Saft\Test\TestCase;
 
-class AskQueryUnitTest extends TestCase
+class AskQueryImplTest extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
 
-        $this->fixture = new AskQuery();
+        $this->fixture = new AskQueryImpl();
     }
 
     /**
@@ -20,7 +20,7 @@ class AskQueryUnitTest extends TestCase
 
     public function testConstructor()
     {
-        $this->fixture = new AskQuery('ASK {?s ?p ?o.}');
+        $this->fixture = new AskQueryImpl('ASK {?s ?p ?o.}');
 
         $queryParts = $this->fixture->getQueryParts();
 
@@ -34,7 +34,7 @@ class AskQueryUnitTest extends TestCase
 
     public function testExtractNamespacesFromQuery2()
     {
-        $this->fixture = new AskQuery(
+        $this->fixture = new AskQueryImpl(
             'PREFIX foo: <http://bar.de> ASK WHERE {
                 ?s <http://foobar/hey> ?o. ?s <http://foobar/ho> ?o. ?s <http://www.w3.org/2001/XMLSchema#> ?o
              }'
@@ -50,7 +50,7 @@ class AskQueryUnitTest extends TestCase
 
     public function testExtractNamespacesFromQueryNoNamespaces()
     {
-        $this->fixture = new AskQuery('ASK WHERE { ?s ?p ?o }');
+        $this->fixture = new AskQueryImpl('ASK WHERE { ?s ?p ?o }');
 
         $queryParts = $this->fixture->getQueryParts();
 
@@ -64,7 +64,7 @@ class AskQueryUnitTest extends TestCase
     public function testExtractPrefixesFromQuery()
     {
         // assumption here is that fixture is of type
-        $this->fixture = new AskQuery(
+        $this->fixture = new AskQueryImpl(
             'PREFIX foo: <http://bar.de> ASK { ?s ?p ?o }'
         );
 
@@ -76,7 +76,7 @@ class AskQueryUnitTest extends TestCase
     public function testExtractPrefixesFromQueryNoPrefixes()
     {
         // assumption here is that fixture is of type
-        $this->fixture = new AskQuery(
+        $this->fixture = new AskQueryImpl(
             'ASK WHERE { ?s ?p ?o }'
         );
 
@@ -175,7 +175,7 @@ class AskQueryUnitTest extends TestCase
 
     public function testInit()
     {
-        $this->fixture = new AskQuery();
+        $this->fixture = new AskQueryImpl();
         $this->fixture->init('ASK {?s ?p ?o.}');
 
         $queryParts = $this->fixture->getQueryParts();
@@ -187,7 +187,7 @@ class AskQueryUnitTest extends TestCase
     {
         $this->setExpectedException('\Exception');
 
-        $this->fixture = new AskQuery();
+        $this->fixture = new AskQueryImpl();
         $this->fixture->init('ASK {?s ?p ?o.');
     }
 

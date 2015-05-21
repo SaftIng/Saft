@@ -2,8 +2,6 @@
 
 namespace Saft\Sparql\Query;
 
-use Dice\Dice;
-
 class QueryFactoryImpl implements QueryFactory
 {
     /**
@@ -16,19 +14,19 @@ class QueryFactoryImpl implements QueryFactory
     {
         switch($this->getQueryType($query)) {
             case 'askQuery':
-                return new AskQuery($query);
+                return new AskQueryImpl($query);
 
             case 'describeQuery':
-                return new DescribeQuery($query);
+                return new DescribeQueryImpl($query);
 
             case 'graphQuery':
-                return new GraphQuery($query);
+                return new GraphQueryImpl($query);
 
             case 'selectQuery':
-                return new SelectQuery($query);
+                return new SelectQueryImpl($query);
 
             case 'updateQuery':
-                return new UpdateQuery($query);
+                return new UpdateQueryImpl($query);
 
             default:
                 throw new \Exception('Unknown query type: '. $query);

@@ -4,10 +4,10 @@ namespace Saft\Sparql\Test\Query;
 
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactoryImpl;
-use Saft\Sparql\Query\UpdateQuery;
+use Saft\Sparql\Query\UpdateQueryImpl;
 use Saft\Test\TestCase;
 
-class UpdateQueryUnitTest extends TestCase
+class UpdateQueryImplTest extends TestCase
 {
     /**
      * @var QueryFactory
@@ -18,7 +18,7 @@ class UpdateQueryUnitTest extends TestCase
     {
         parent::setUp();
 
-        $this->fixture = new UpdateQuery();
+        $this->fixture = new UpdateQueryImpl();
         $this->queryFactory = new QueryFactoryImpl();
     }
 
@@ -28,7 +28,7 @@ class UpdateQueryUnitTest extends TestCase
 
     public function testConstructor()
     {
-        $this->fixture = new UpdateQuery(
+        $this->fixture = new UpdateQueryImpl(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             WITH <http://graph/> DELETE { ?x foaf:name "Alice" } WHERE { ?s ?p ?o }'
         );
@@ -139,7 +139,7 @@ class UpdateQueryUnitTest extends TestCase
 
     public function testGetSubTypeDeleteData()
     {
-        $this->fixture = new UpdateQuery('
+        $this->fixture = new UpdateQueryImpl('
             PREFIX dc: <http://foo/bar/> DELETE DATA { GRAPH <http://> { ?s ?p ?o } }');
 
         $this->assertEquals('deleteData', $this->fixture->getSubType());
@@ -147,7 +147,7 @@ class UpdateQueryUnitTest extends TestCase
 
     public function testGetSubTypeInsertData()
     {
-        $this->fixture = new UpdateQuery(
+        $this->fixture = new UpdateQueryImpl(
             'PREFIX dc: <http://foo/bar/> INSERT DATA { GRAPH <http://> { ?s dc:foo "hi" } }'
         );
 
@@ -156,7 +156,7 @@ class UpdateQueryUnitTest extends TestCase
 
     public function testGetSubTypeInsertInto()
     {
-        $this->fixture = new UpdateQuery(
+        $this->fixture = new UpdateQueryImpl(
             'PREFIX dc: <http://foo/bar/> INSERT INTO GRAPH <http://> { ?s dc:foo "hi" }'
         );
 
@@ -165,7 +165,7 @@ class UpdateQueryUnitTest extends TestCase
 
     public function testGetSubTypeWithDeleteInsertWhere()
     {
-        $this->fixture = new UpdateQuery(
+        $this->fixture = new UpdateQueryImpl(
             'PREFIX dc: <http://foo/bar/>
              WITH <http://> DELETE { ?s dc:foo "hi" } INSERT { ?s dc:foo "ho" } WHERE { ?s dc:foo "hi" }'
         );
@@ -175,7 +175,7 @@ class UpdateQueryUnitTest extends TestCase
 
     public function testGetSubTypeWithDeleteWhere()
     {
-        $this->fixture = new UpdateQuery(
+        $this->fixture = new UpdateQueryImpl(
             'PREFIX dc: <http://foo/bar/> WITH <http://> DELETE { ?s dc:foo "hi" } WHERE { ?s dc:foo "hi" }'
         );
 
@@ -287,7 +287,7 @@ class UpdateQueryUnitTest extends TestCase
 
     public function testInitDeleteData()
     {
-        $this->fixture = new UpdateQuery();
+        $this->fixture = new UpdateQueryImpl();
         $this->fixture->init(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             DELETE DATA { ?x foaf:name "Alice" }'

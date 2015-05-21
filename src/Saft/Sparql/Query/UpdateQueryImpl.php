@@ -13,7 +13,7 @@ use Saft\Sparql\Query\AbstractQuery;
  * - WITH ... DELETE ... WHERE
  * - WITH ... DELETE ... INSERT ... WHERE
  */
-class UpdateQuery extends AbstractQuery
+class UpdateQueryImpl extends AbstractQuery
 {
     /**
      *

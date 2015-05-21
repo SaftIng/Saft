@@ -5,7 +5,7 @@ namespace Saft\Sparql\Query;
 /**
  * Represents a SELECT query.
  */
-class SelectQuery extends AbstractQuery
+class SelectQueryImpl extends AbstractQuery
 {
     /**
      */
@@ -51,7 +51,7 @@ class SelectQuery extends AbstractQuery
 
         return $queryString;
     }
-    
+
     /**
      * Return parts of the query on which this instance based on.
      *
@@ -68,9 +68,9 @@ class SelectQuery extends AbstractQuery
         $this->queryParts['result_variables'] = $this->extractVariablesFromQuery($this->queryParts['select']);
         $this->queryParts['triple_pattern'] = $this->extractTriplePattern($this->queryParts['where']);
         $this->queryParts['variables'] = $this->extractVariablesFromQuery($this->getQuery());
-        
+
         $this->unsetEmptyValues($this->queryParts);
-        
+
         return $this->queryParts;
     }
 
@@ -86,7 +86,7 @@ class SelectQuery extends AbstractQuery
         if (true === empty($query) || null === $query || false === is_string($query)) {
             throw new \Exception('Parameter $query is empty, null or not a string.');
         }
-        
+
         $this->query = $query;
 
         $parts = array(
@@ -182,7 +182,7 @@ class SelectQuery extends AbstractQuery
     {
         return false;
     }
-    
+
     /**
      * Is instance of DescribeQuery?
      *
@@ -192,7 +192,7 @@ class SelectQuery extends AbstractQuery
     {
         return false;
     }
-    
+
     /**
      * Is instance of GraphQuery?
      *
@@ -202,7 +202,7 @@ class SelectQuery extends AbstractQuery
     {
         return false;
     }
-    
+
     /**
      * Is instance of SelectQuery?
      *
@@ -212,7 +212,7 @@ class SelectQuery extends AbstractQuery
     {
         return true;
     }
-    
+
     /**
      * Is instance of UpdateQuery?
      *

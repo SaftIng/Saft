@@ -2,16 +2,16 @@
 
 namespace Saft\Sparql\Test\Query;
 
-use Saft\Sparql\Query\DescribeQuery;
+use Saft\Sparql\Query\DescribeQueryImpl;
 use Saft\Test\TestCase;
 
-class DescribeQueryUnitTest extends TestCase
+class DescribeQueryImplTest extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
 
-        $this->fixture = new DescribeQuery();
+        $this->fixture = new DescribeQueryImpl();
     }
 
     /**
@@ -20,7 +20,7 @@ class DescribeQueryUnitTest extends TestCase
 
     public function testConstructor()
     {
-        $this->fixture = new DescribeQuery(
+        $this->fixture = new DescribeQueryImpl(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             DESCRIBE ?x
             FROM <http://foobar/>
@@ -43,7 +43,7 @@ class DescribeQueryUnitTest extends TestCase
 
     public function testExtractNamespacesFromQuery()
     {
-        $this->fixture = new DescribeQuery(
+        $this->fixture = new DescribeQueryImpl(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             DESCRIBE ?x
             FROM <http://foo/bar/>
@@ -60,7 +60,7 @@ class DescribeQueryUnitTest extends TestCase
 
     public function testExtractNamespacesFromQueryNoNamespaces()
     {
-        $this->fixture = new DescribeQuery(
+        $this->fixture = new DescribeQueryImpl(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             DESCRIBE ?x
             FROM <http://foobar/>
@@ -79,7 +79,7 @@ class DescribeQueryUnitTest extends TestCase
     public function testExtractPrefixesFromQuery()
     {
         // assumption here is that fixture is of type
-        $this->fixture = new DescribeQuery(
+        $this->fixture = new DescribeQueryImpl(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             DESCRIBE ?x
             FROM <http://foo/bar/>
@@ -97,7 +97,7 @@ class DescribeQueryUnitTest extends TestCase
     public function testExtractPrefixesFromQueryNoPrefixes()
     {
         // assumption here is that fixture is of type
-        $this->fixture = new DescribeQuery(
+        $this->fixture = new DescribeQueryImpl(
             'DESCRIBE ?x
             FROM <http://foo/bar/>
             WHERE { ?x <http://foobar/name> "Alice" }'
@@ -178,7 +178,7 @@ class DescribeQueryUnitTest extends TestCase
 
     public function testInit()
     {
-        $this->fixture = new DescribeQuery();
+        $this->fixture = new DescribeQueryImpl();
         $this->fixture->init(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             DESCRIBE ?x

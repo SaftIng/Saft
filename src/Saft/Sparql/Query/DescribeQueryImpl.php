@@ -7,9 +7,8 @@ use Saft\Sparql\Query\AbstractQuery;
 /**
  * Represents a DESCRIBE query.
  */
-class DescribeQuery extends AbstractQuery
+class DescribeQueryImpl extends AbstractQuery
 {
-
     /**
      * Return parts of the query on which this instance based on.
      *
@@ -19,7 +18,7 @@ class DescribeQuery extends AbstractQuery
     {
         // extract the part before {
         $partBeforeBrace = substr($this->query, 0, strpos($this->query, '{'));
-        
+
         $this->queryParts = array(
             'filter_pattern' => $this->extractFilterPattern($this->queryParts['where']),
             'graphs' => $this->extractGraphs($this->getQuery()),
@@ -31,12 +30,12 @@ class DescribeQuery extends AbstractQuery
             'triple_pattern' => $this->extractTriplePattern($this->queryParts['where']),
             'variables' => $this->extractVariablesFromQuery($this->getQuery())
         );
-        
+
         $this->unsetEmptyValues($this->queryParts);
-        
+
         return $this->queryParts;
     }
-    
+
     /**
      *
      * @param string       $query
@@ -45,24 +44,24 @@ class DescribeQuery extends AbstractQuery
     public function determineSubType($query)
     {
         $query = strtolower($query);
-        
+
         if (false !== strpos($query, 'describe')) {
             // Check for e.g. DESCRIBE ?x WHERE { ... }
             if (false !== strpos($query, 'where')
                 && false !== strpos($query, '{')
                 && false !== strpos($query, '}')) {
                 return 'describeWhere';
-                
+
             // Assume its just e.g. DESCRIBE ?x
             } else {
                 return 'describe';
             }
-            
+
         } else {
             return null;
         }
     }
-    
+
     /**
      * Init the query instance with a given SPARQL query string.
      *
@@ -72,7 +71,7 @@ class DescribeQuery extends AbstractQuery
     public function init($query)
     {
         $this->query = $query;
-        
+
         /**
          * Set where part
          */
@@ -81,9 +80,9 @@ class DescribeQuery extends AbstractQuery
             $this->queryParts['where'] = trim($match[1]);
         }
     }
-    
+
     /**
-     * Is instance of AskQuery?
+     * Represents it an Ask Query?
      *
      * @return boolean False
      */
@@ -91,9 +90,9 @@ class DescribeQuery extends AbstractQuery
     {
         return false;
     }
-    
+
     /**
-     * Is instance of DescribeQuery?
+     * Represents it a Describe Query?
      *
      * @return boolean True
      */
@@ -101,9 +100,9 @@ class DescribeQuery extends AbstractQuery
     {
         return true;
     }
-    
+
     /**
-     * Is instance of GraphQuery?
+     * Represents it a Graph Query?
      *
      * @return boolean False
      */
@@ -111,9 +110,9 @@ class DescribeQuery extends AbstractQuery
     {
         return false;
     }
-    
+
     /**
-     * Is instance of SelectQuery?
+     * Represents it a Select Query?
      *
      * @return boolean False
      */
@@ -121,9 +120,9 @@ class DescribeQuery extends AbstractQuery
     {
         return false;
     }
-    
+
     /**
-     * Is instance of UpdateQuery?
+     * Represents it an Update Query?
      *
      * @return boolean False
      */

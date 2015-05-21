@@ -3,16 +3,16 @@
 namespace Saft\Sparql\Test\Query;
 
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Sparql\Query\SelectQuery;
+use Saft\Sparql\Query\SelectQueryImpl;
 use Saft\Test\TestCase;
 
-class SelectQueryUnitTest extends TestCase
+class SelectQueryImplTest extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
 
-        $this->fixture = new SelectQuery();
+        $this->fixture = new SelectQueryImpl();
     }
 
     /**
@@ -21,12 +21,12 @@ class SelectQueryUnitTest extends TestCase
 
     public function testConstructor()
     {
-        $instanceToCheckAgainst = new SelectQuery();
+        $instanceToCheckAgainst = new SelectQueryImpl();
         $instanceToCheckAgainst->init('SELECT ?x FROM <'. $this->testGraph->getUri() .'> WHERE {?x ?y ?z}');
 
         $this->assertEquals(
             $instanceToCheckAgainst,
-            new SelectQuery('SELECT ?x FROM <'. $this->testGraph->getUri() .'> WHERE {?x ?y ?z}')
+            new SelectQueryImpl('SELECT ?x FROM <'. $this->testGraph->getUri() .'> WHERE {?x ?y ?z}')
         );
     }
 
@@ -234,7 +234,7 @@ class SelectQueryUnitTest extends TestCase
      */
     public function testInit()
     {
-        $this->fixture = new SelectQuery();
+        $this->fixture = new SelectQueryImpl();
         $this->fixture->init(
             'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}'
         );
@@ -253,7 +253,7 @@ class SelectQueryUnitTest extends TestCase
 
     public function testInitWithLimit()
     {
-        $this->fixture = new SelectQuery();
+        $this->fixture = new SelectQueryImpl();
         $this->fixture->init(
             'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} LIMIT 10'
         );
@@ -266,7 +266,7 @@ class SelectQueryUnitTest extends TestCase
 
     public function testInitWithOffset()
     {
-        $this->fixture = new SelectQuery();
+        $this->fixture = new SelectQueryImpl();
         $this->fixture->init(
             'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} Offset 5'
         );
@@ -279,7 +279,7 @@ class SelectQueryUnitTest extends TestCase
 
     public function testInitWithLimitOffset()
     {
-        $this->fixture = new SelectQuery();
+        $this->fixture = new SelectQueryImpl();
         $this->fixture->init(
             'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} LIMIT 10 OFFSET 5'
         );

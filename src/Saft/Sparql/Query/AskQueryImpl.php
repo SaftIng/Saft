@@ -7,7 +7,7 @@ use Saft\Sparql\Query\AbstractQuery;
 /**
  * Represents an ASK query.
  */
-class AskQuery extends AbstractQuery
+class AskQueryImpl extends AbstractQuery
 {
 
     /**
@@ -23,7 +23,7 @@ class AskQuery extends AbstractQuery
             '',
             $this->getQuery()
         );
-        
+
         $this->queryParts['filter_pattern'] = $this->extractFilterPattern($this->queryParts['where']);
         $this->queryParts['graphs'] = $this->extractGraphs($prefixlessQuery);
         $this->queryParts['namespaces'] = $this->extractNamespacesFromQuery($this->queryParts['where']);
@@ -31,12 +31,12 @@ class AskQuery extends AbstractQuery
         $this->queryParts['quad_pattern'] = $this->extractQuads($this->queryParts['where']);
         $this->queryParts['triple_pattern'] = $this->extractTriplePattern($this->queryParts['where']);
         $this->queryParts['variables'] = $this->extractVariablesFromQuery($this->getQuery());
-        
+
         $this->unsetEmptyValues($this->queryParts);
-        
+
         return $this->queryParts;
     }
-    
+
     /**
      * Init the query instance with a given SPARQL query string.
      *
@@ -46,7 +46,7 @@ class AskQuery extends AbstractQuery
     public function init($query)
     {
         $this->query = $query;
-        
+
         /**
          * Set where part
          */
@@ -57,9 +57,9 @@ class AskQuery extends AbstractQuery
             throw new \Exception('No where part found in query: '. $query);
         }
     }
-    
+
     /**
-     * Is instance of AskQuery?
+     * Represents it an ASK query?
      *
      * @return boolean True
      */
@@ -67,9 +67,9 @@ class AskQuery extends AbstractQuery
     {
         return true;
     }
-    
+
     /**
-     * Is instance of DescribeQuery?
+     * Represents it a Describe Query?
      *
      * @return boolean False
      */
@@ -77,9 +77,9 @@ class AskQuery extends AbstractQuery
     {
         return false;
     }
-    
+
     /**
-     * Is instance of GraphQuery?
+     * Represents it a Graph Query?
      *
      * @return boolean False
      */
@@ -87,9 +87,9 @@ class AskQuery extends AbstractQuery
     {
         return false;
     }
-    
+
     /**
-     * Is instance of SelectQuery?
+     * Represents it a Select Query?
      *
      * @return boolean False
      */
@@ -97,9 +97,9 @@ class AskQuery extends AbstractQuery
     {
         return false;
     }
-    
+
     /**
-     * Is instance of UpdateQuery?
+     * Represents it an Update Query?
      *
      * @return boolean False
      */

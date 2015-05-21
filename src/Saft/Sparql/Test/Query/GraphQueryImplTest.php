@@ -3,16 +3,16 @@
 namespace Saft\Sparql\Test\Query;
 
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Sparql\Query\GraphQuery;
+use Saft\Sparql\Query\GraphQueryImpl;
 use Saft\Test\TestCase;
 
-class GraphQueryUnitTest extends TestCase
+class GraphQueryImplTest extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
 
-        $this->fixture = new GraphQuery();
+        $this->fixture = new GraphQueryImpl();
     }
 
     /**
@@ -21,7 +21,7 @@ class GraphQueryUnitTest extends TestCase
 
     public function testConstructor()
     {
-        $this->fixture = new GraphQuery('CREATE GRAPH <'. $this->testGraph->getUri() .'>');
+        $this->fixture = new GraphQueryImpl('CREATE GRAPH <'. $this->testGraph->getUri() .'>');
 
         $this->assertEquals('CREATE GRAPH <'. $this->testGraph->getUri() .'>', $this->fixture->getQuery());
     }
@@ -129,7 +129,7 @@ class GraphQueryUnitTest extends TestCase
 
     public function testInit()
     {
-        $this->fixture = new GraphQuery();
+        $this->fixture = new GraphQueryImpl();
         $this->fixture->init('CREATE GRAPH <'. $this->testGraph->getUri() .'>');
 
         $this->assertEquals('CREATE GRAPH <'. $this->testGraph->getUri() .'>', $this->fixture->getQuery());
