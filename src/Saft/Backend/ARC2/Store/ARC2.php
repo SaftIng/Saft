@@ -82,14 +82,14 @@ class ARC2 extends AbstractSparqlStore
      * supports SPARQL+ and not SPARQL Update 1.1, which means an INSERT INTO query has to look like:
      * INSERT INTO <http://graph/> { triple ... }.
      *
-     * @param  StatementIterator $statements          StatementList instance must contain Statement instances
-     *                                                which are 'concret-' and not 'pattern'-statements.
-     * @param  Node              $graph      optional Overrides target graph. If set, all statements will
-     *                                                be add to that graph, if available.
-     * @param  array             $options    optional It contains key-value pairs and should provide additional
-     *                                                introductions for the store and/or its adapter(s).
+     * @param  StatementIterator|array $statements  StatementList instance must contain Statement instances
+     *                                              which are 'concret-' and not 'pattern'-statements.
+     * @param  Node                    $graph       optional Overrides target graph. If set, all statements will
+     *                                              be add to that graph, if available.
+     * @param  array                   $options     optional It contains key-value pairs and should provide additional
+     *                                              introductions for the store and/or its adapter(s).
      */
-    public function addStatements(StatementIterator $statements, Node $graph = null, array $options = array())
+    public function addStatements($statements, Node $graph = null, array $options = array())
     {
         $graphUriToUse = null;
 
