@@ -9,7 +9,7 @@ use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Store\Result\ResultFactoryImpl;
 use Saft\Store\Test\StoreAbstractTest;
 
-class HttpAbstractTest extends StoreAbstractTest
+class HttpTest extends StoreAbstractTest
 {
     public function setUp()
     {
