@@ -53,41 +53,4 @@ class ARC2Test extends StoreAbstractTest
 
         parent::tearDown();
     }
-
-    public function testARC2Query()
-    {
-        /*
-        $this->fixture->query('INSERT INTO <'. $this->testGraph->getUri() .'> {
-            <http://example/book1> <http://example/title> "A new book" ;
-                                   <http://example/creator> "A.N.Other" .
-        }');
-
-        // 2 triples
-        $statements = new ArrayStatementIteratorImpl(array(
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/'),
-                new NamedNodeImpl('http://o/')
-            ),
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/'),
-                new LiteralImpl('test literal')
-            ),
-        ));
-
-        // add triples
-        // $this->fixture->addStatements($statements, $this->testGraph);
-
-        // $this->fixture->query('SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}');
-
-        $res = $this->fixture->query('SELECT DISTINCT ?g WHERE { GRAPH ?g {?s ?p ?o.} }');
-        foreach ($res as $key => $value) {
-            var_dump($value);
-        }
-
-                $this->fixture->createGraph($this->testGraph);
-                var_dump($this->fixture->getAvailableGraphs());
-        */
-    }
 }
