@@ -22,28 +22,31 @@ class NQuadsSerializerImpl implements Serializer
     /**
      * Transforms the statements of a StatementIterator instance into a stream, a file for instance.
      *
-     * @param  StatementIterator $statements   The StatementIterator containing all the Statements which
-     *                                         should be serialized by the serializer.
-     * @param  string            $outputStream filename of the stream to where the serialization should be
-     *                                         written.
-     * @param  string            $format       The serialization which should be used. If null is given the
-     *                                         serializer will either apply some default serialization, or
-     *                                         the only one it is supporting, or will throw an Exception.
+     * @param  StatementIterator $statements    The StatementIterator containing all the Statements which
+     *                                          should be serialized by the serializer.
+     * @param  string            $outputStream  filename of the stream to where the serialization should be
+     *                                          written.
+     * @param  string            $serialization The serialization which should be used. If null is given
+     *                                          the serializer will either apply some default serialization,
+     *                                          or the only one it is supporting, or will throw an Exception.
      * @throws \Exception If unknown format was given.
      */
-    public function serializeIteratorToStream(StatementIterator $statements, $outputStream, $format = null)
-    {
+    public function serializeIteratorToStream(
+        StatementIterator $statements,
+        $outputStream,
+        $serialization = null
+    ) {
         $stream = new Stream(fopen($outputStream, 'w'));
 
         /*
          * Handle format
          */
-        if ('nquads' == $format) {
+        if ('nquads' == $serialization) {
             $function = 'toNQuads';
-        } elseif ('ntriples' == $format) {
+        } elseif ('ntriples' == $serialization) {
             $function = 'toNTriples';
         } else {
-            throw new \Exception('Unknown format given: '. $format);
+            throw new \Exception('Unknown format given: '. $serialization);
         }
 
         foreach ($statements as $statement) {

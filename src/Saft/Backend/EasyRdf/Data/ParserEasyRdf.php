@@ -61,34 +61,37 @@ class ParserEasyRdf implements Parser
      * Parses a given string and returns an iterator containing Statement instances representing the
      * previously read data.
      *
-     * @param  string            $inputString Data string containing RDF serialized data.
-     *                                        {@url http://php.net/manual/en/book.stream.php}
-     * @param  string            $baseUri     The base URI of the parsed content. If this URI is null the
-     *                                        inputStreams URL is taken as base URI.
-     * @param  string            $format      The serialization of the inputStream. If null is given the
-     *                                        parser will either apply some standard serialization, or the
-     *                                        only one it is supporting, or will try to guess the correct
-     *                                        serialization, or will throw an Exception.
-     *                                        Supported formats are a subset of the following:
-     *                                        json, rdfxml, sparql-xml, rdfa, turtle, ntriples, n3
+     * @param  string            $inputString   Data string containing RDF serialized data.
+     * @param  string            $baseUri       The base URI of the parsed content. If this URI is null the
+     *                                          inputStreams URL is taken as base URI.
+     * @param  string            $serialization The serialization of the inputStream. If null is given the
+     *                                          parser will either apply some standard serialization, or the
+     *                                          only one it is supporting, or will try to guess the correct
+     *                                          serialization, or will throw an Exception.
+     *                                          Supported formats are a subset of the following:
+     *                                          json, rdfxml, sparql-xml, rdfa, turtle, ntriples, n3
      * @return StatementIterator StatementIterator instaince containing all the Statements parsed by the
      *                           parser to far
      * @throws \Exception        If the base URI $baseUri is no valid URI.
      */
-    public function parseStringToIterator($inputString, $baseUri = null, $format = null)
+    public function parseStringToIterator($inputString, $baseUri = null, $serialization = null)
     {
         $graph = new EasyRdf_Graph();
 
         // let EasyRdf guess the format
-        if ($format === null) {
-            $format = EasyRdf_Format::guessFormat($inputString);
+        if ($serialization === null) {
+            $serialization = EasyRdf_Format::guessFormat($inputString);
 
         } else {
-            // TODO implement creation of format
-            $format = null;
+            $serialization = EasyRdf_Format::getFormat($serialization);
         }
 
-        $graph->parse($inputString, $format->getName());
+        // if format is still null, throw exception, because we dont know what format the given stream is
+        if (null === $serialization) {
+            throw new Exception('Either given $serialization is unknown or i could not guess format.');
+        }
+
+        $graph->parse($inputString, $serialization->getName());
 
         // transform parsed data to PHP array
         return $this->rdfPhpToStatementIterator($graph->toRdfPhp());
@@ -98,42 +101,42 @@ class ParserEasyRdf implements Parser
      * Parses a given stream and returns an iterator containing Statement instances representing the
      * previously read data. The stream parses the data not as a whole but in chunks.
      *
-     * @param  string            $inputStream Filename of the stream to parse which contains RDF serialized
-     *                                        data.
-     * @param  string            $baseUri     The base URI of the parsed content. If this URI is null
-     *                                        the inputStreams URL is taken as base URI.
-     * @param  string            $format      The serialization of the inputStream. If null is given the
-     *                                        parser will either apply some standard serialization, or the
-     *                                        only one it is supporting, or will try to guess the correct
-     *                                        serialization, or will throw an Exception.
-     *                                        Supported formats are a subset of the following:
-     *                                        json, rdfxml, sparql-xml, rdfa, turtle, ntriples, n3
+     * @param  string            $inputStream   Filename of the stream to parse which contains RDF
+     *                                          serialized data.
+     * @param  string            $baseUri       The base URI of the parsed content. If this URI is null
+     *                                          the inputStreams URL is taken as base URI.
+     * @param  string            $serialization The serialization of the inputStream. If null is given
+     *                                          the parser will either apply some standard serialization,
+     *                                          or the only one it is supporting, or will try to guess
+     *                                          the correct serialization, or will throw an Exception.
+     *                                          Supported formats are a subset of the following:
+     *                                          json, rdfxml, sparql-xml, rdfa, turtle, ntriples, n3
      * @return StatementIterator A StatementIterator containing all the Statements parsed by the parser to
      *                           far.
      * @throws \Exception        If the base URI $baseUri is no valid URI.
      */
-    public function parseStreamToIterator($inputStream, $baseUri = null, $format = null)
+    public function parseStreamToIterator($inputStream, $baseUri = null, $serialization = null)
     {
         $graph = new EasyRdf_Graph();
 
         // let EasyRdf guess the format
-        if ($format === null) {
+        if ($serialization === null) {
             // use PHP's file:// stream, if its a local file
             if (false === strpos($inputStream, '://')) {
                 $inputStream = 'file://'. $inputStream;
             }
-            $format = EasyRdf_Format::guessFormat(file_get_contents($inputStream));
+            $serialization = EasyRdf_Format::guessFormat(file_get_contents($inputStream));
 
         } else {
-            $format = EasyRdf_Format::getFormat($format);
+            $serialization = EasyRdf_Format::getFormat($serialization);
         }
 
         // if format is still null, throw exception, because we dont know what format the given stream is
-        if (null === $format) {
+        if (null === $serialization) {
             throw new Exception('Either given $format is unknown or i could not guess format.');
         }
 
-        $graph->parseFile($inputStream, $format->getName());
+        $graph->parseFile($inputStream, $serialization->getName());
 
         // transform parsed data to PHP array
         return $this->rdfPhpToStatementIterator($graph->toRdfPhp());
