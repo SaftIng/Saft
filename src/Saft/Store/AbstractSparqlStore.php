@@ -83,6 +83,7 @@ abstract class AbstractSparqlStore implements Store
         foreach ($statements as $statement) {
             // non-concrete Statement instances not allowed
             if (false === $statement->isConcrete()) {
+                // We would need a rollback here, but we don't have any transactions so far
                 throw new \Exception('At least one Statement is not concrete');
             }
 
