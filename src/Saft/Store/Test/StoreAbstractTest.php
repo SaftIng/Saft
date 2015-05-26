@@ -298,9 +298,39 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertEquals(new EmptyResultImpl(), $this->fixture->query($query));
     }
 
-    /**
+    /*
+     * Tests createGraph
+     */
+
+    public function testCreateGraph()
+    {
+        $this->fixture->createGraph($this->testGraph);
+
+        // TODO try to add Triples
+    }
+
+    /*
+     * function dropGraph
+     *
+     * We can drop the graph and create a graph, but we can't asume any action since a store might
+     * not support empty graphs.
+     */
+
+    public function testDropGraph()
+    {
+        $this->fixture->dropGraph($this->testGraph);
+
+        $this->fixture->createGraph($this->testGraph);
+
+        // TODO add Triples to the graph but expect Exception
+
+        $this->fixture->dropGraph($this->testGraph);
+    }
+
+    /*
      * Tests deleteMatchingStatements
      */
+
     public function testDeleteMatchingStatements2()
     {
         /**
@@ -465,7 +495,59 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertCountStatementIterator(0, $statements);
     }
 
+    /*
+     * Tests deleteMultipleStatements
+     */
+
+    public function testDeleteMultipleStatementsQuadRecognition()
+    {
+        $quad = $this->getTestQuad();
+        $graphPattern = SparqlUtils::statementsToSparqlFormat([$quad]);
+        $query = 'DELETE DATA { ' . $graphPattern . '}';
+
+        $this->assertTrue($this->fixture->query($query) instanceof EmptyResult);
+    }
+
+    public function testDeleteMultipleStatementsVariablePatterns()
+    {
+        $this->markTestSkipped("TODO implement test store which expects certain things on query");
+        $statement = $this->getTestPatternStatement();
+        $query = 'DELETE DATA { '. SparqlUtils::statementsToSparqlFormat([$statement]) .'}';
+
+        $this->assertEquals(
+            new EmptyResult(),
+            $this->fixture->query($query)
+        );
+    }
+
+    public function testDeleteMultipleStatementsStatementsWithLiteral()
+    {
+        $statement = $this->getTestStatementWithLiteral();
+
+        $query = 'DELETE DATA { '. SparqlUtils::statementsToSparqlFormat([$statement]) .'}';
+
+        $this->assertEquals(
+            new EmptyResultImpl(),
+            $this->fixture->query($query)
+        );
+    }
+
     /**
+     * function getAvailableGraphs
+     */
+
+    public function testGetAvailableGraphs()
+    {
+        $this->fixture->createGraph($this->testGraph);
+
+        // FYI: $graphsUris is an array which contains graph URIs as keys and NamedNode instances as values
+        $graphUris = $this->fixture->getAvailableGraphs();
+
+        // check, that our test graph is part of the given list
+        $this->assertTrue(isset($graphUris[$this->testGraph->getUri()]));
+    }
+
+    /*
      * Tests getMatchingStatements
      */
 
@@ -531,8 +613,19 @@ abstract class StoreAbstractTest extends TestCase
     }
 
     /**
+     * Tests getStoreDescription
+     */
+
+    // Test if an array for the store description is returned
+    public function testGetStoreDescription()
+    {
+        $this->assertTrue(is_array($this->fixture->getStoreDescription()));
+    }
+
+    /*
      * Tests hasMatchingStatements
      */
+
     public function testHasMatchingStatement()
     {
         // 2 triples
@@ -580,9 +673,22 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertFalse($this->fixture->hasMatchingStatement($statement));
     }
 
-    /**
+    // triple recognition
+    public function testHasMatchingStatementTripleRecognition()
+    {
+        $triple = $this->getTestTriple();
+        $query = 'ASK { '. SparqlUtils::statementsToSparqlFormat([$triple]) .'}';
+
+        $this->assertEquals(
+            new ValueResultImpl(false),
+            $this->fixture->query($query)
+        );
+    }
+
+    /*
      * Tests query
      */
+
     public function testQuery()
     {
         $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
@@ -696,11 +802,7 @@ abstract class StoreAbstractTest extends TestCase
         );
     }
 
-    /**
-     * Tests deleteMultipleStatements
-     */
-
-    public function testDeleteMultipleStatementsQuadRecognition()
+    public function testQueryDeleteMultipleStatementsQuadRecognition()
     {
         $quad = $this->getTestQuad();
         $graphPattern = SparqlUtils::statementsToSparqlFormat([$quad]);
@@ -709,7 +811,7 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertTrue($this->fixture->query($query) instanceof EmptyResult);
     }
 
-    public function testDeleteMultipleStatementsVariablePatterns()
+    public function testQueryDeleteMultipleStatementsVariablePatterns()
     {
         $this->markTestSkipped("TODO implement test store which expects certain things on query");
         $statement = $this->getTestPatternStatement();
@@ -721,7 +823,7 @@ abstract class StoreAbstractTest extends TestCase
         );
     }
 
-    public function testDeleteMultipleStatementsStatementsWithLiteral()
+    public function testQueryDeleteMultipleStatementsStatementsWithLiteral()
     {
         $statement = $this->getTestStatementWithLiteral();
 
@@ -731,72 +833,5 @@ abstract class StoreAbstractTest extends TestCase
             new EmptyResultImpl(),
             $this->fixture->query($query)
         );
-    }
-
-    /**
-     * Tests hasMatchingStatement > triple recognition
-     */
-
-    public function testHasMatchingStatementTripleRecognition()
-    {
-        $triple = $this->getTestTriple();
-        $query = 'ASK { '. SparqlUtils::statementsToSparqlFormat([$triple]) .'}';
-
-        $this->assertEquals(
-            new ValueResultImpl(false),
-            $this->fixture->query($query)
-        );
-    }
-
-    /**
-     * Test if an array for the store description is returned
-     */
-    public function testGetStoreDescription()
-    {
-        $this->assertTrue(is_array($this->fixture->getStoreDescription()));
-    }
-
-    /**
-     * Tests createGraph
-     */
-
-    public function testCreateGraph()
-    {
-        $this->fixture->createGraph($this->testGraph);
-
-        // TODO try to add Triples
-    }
-
-    /**
-     * function dropGraph
-     *
-     * We can drop the graph and create a graph, but we can't asume any action since a store might not support
-     * emtpy graphs.
-     */
-
-    public function testDropGraph()
-    {
-        $this->fixture->dropGraph($this->testGraph);
-
-        $this->fixture->createGraph($this->testGraph);
-
-        // TODO add Triples to the graph but expect Exception
-
-        $this->fixture->dropGraph($this->testGraph);
-    }
-
-    /**
-     * function getAvailableGraphs
-     */
-
-    public function testGetAvailableGraphs()
-    {
-        $this->fixture->createGraph($this->testGraph);
-
-        // FYI: $graphsUris is an array which contains graph URIs as keys and NamedNode instances as values
-        $graphUris = $this->fixture->getAvailableGraphs();
-
-        // check, that our test graph is part of the given list
-        $this->assertTrue(isset($graphUris[$this->testGraph->getUri()]));
     }
 }

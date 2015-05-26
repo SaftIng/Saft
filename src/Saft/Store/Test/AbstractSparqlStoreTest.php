@@ -64,24 +64,8 @@ class AbstractSparqlStoreTest extends TestCase
     }
 
     /*
-     * Actual test methods
+     * Tests addStatements
      */
-
-    public function testGetMatchingStatements()
-    {
-        $query  = 'SELECT ?s ?p ?o FROM <http://saft/test/g1> WHERE { ';
-        $query .= ' ?s ?p ?o ';
-        $query .= ' FILTER(str(?s)="http://saft/test/s1")';
-        $query .= ' FILTER(str(?p)="http://saft/test/p1")';
-        $query .= ' FILTER(str(?o)="http://saft/test/o1")';
-        $query .= '}';
-
-        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
-
-        $result = $this->mock->getMatchingStatements($this->getTestStatement());
-
-        $this->assertTrue($result->isEmptyResult());
-    }
 
     public function testAddStatements()
     {
@@ -103,27 +87,6 @@ class AbstractSparqlStoreTest extends TestCase
 
         $this->setExpectedException('\Exception');
         $this->mock->addStatements($statements);
-    }
-
-    public function testDeleteMatchingStatements()
-    {
-        $query = 'DELETE DATA { Graph <http://saft/test/g1> ';
-        $query.= '{<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.} }';
-
-        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
-
-        $this->mock->deleteMatchingStatements($this->getTestStatement());
-    }
-
-    public function testHasMatchingStatement()
-    {
-        $query = 'ASK { Graph <http://saft/test/g1> { ';
-        $query.= '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1> . } }';
-
-        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
-
-        $result = $this->mock->hasMatchingStatement($this->getTestStatement());
-        $this->assertNull($result);
     }
 
     public function testAddStatementsMultipleVariatonOfObjects()
@@ -157,6 +120,72 @@ class AbstractSparqlStoreTest extends TestCase
         // add test statements
         $this->mock->addStatements($statements, $this->testGraph);
     }
+
+    // test if given graphUri is preferred.
+    public function testAddStatementsWithGraphUri()
+    {
+        // Setup array statement iterator
+        $statements = new ArrayStatementIteratorImpl(array($this->getTestStatement()));
+
+        $query = 'INSERT DATA { Graph <http://saft/test/foograph> {';
+        $query.= '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>. ';
+        $query.= '} }';
+
+        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
+
+        // use the given graphUri
+        $this->assertNull($this->mock->addStatements($statements, new NamedNodeImpl('http://saft/test/foograph')));
+    }
+
+    /*
+     * Tests deleteMatchingStatements
+     */
+
+    public function testDeleteMatchingStatements()
+    {
+        $query = 'DELETE DATA { Graph <http://saft/test/g1> ';
+        $query.= '{<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.} }';
+
+        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
+
+        $this->mock->deleteMatchingStatements($this->getTestStatement());
+    }
+
+    /*
+     * Tests getMatchingStatements
+     */
+
+    public function testGetMatchingStatements()
+    {
+        $query  = 'SELECT ?s ?p ?o FROM <http://saft/test/g1> WHERE { ';
+        $query .= ' ?s ?p ?o ';
+        $query .= ' FILTER(str(?s)="http://saft/test/s1")';
+        $query .= ' FILTER(str(?p)="http://saft/test/p1")';
+        $query .= ' FILTER(str(?o)="http://saft/test/o1")';
+        $query .= '}';
+
+        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
+
+        $result = $this->mock->getMatchingStatements($this->getTestStatement());
+
+        $this->assertTrue($result->isEmptyResult());
+    }
+
+    /*
+     * Tests hasMatchingStatement
+     */
+
+    public function testHasMatchingStatement()
+    {
+        $query = 'ASK { Graph <http://saft/test/g1> { ';
+        $query.= '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1> . } }';
+
+        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
+
+        $result = $this->mock->hasMatchingStatement($this->getTestStatement());
+        $this->assertNull($result);
+    }
+
 
     /**
      * test if pattern-variable is recognized properly.
@@ -193,23 +222,5 @@ class AbstractSparqlStoreTest extends TestCase
         $result = $this->mock->hasMatchingStatement($statement);
 
         $this->assertTrue(is_bool($result));
-    }
-
-    /**
-     * test if given graphUri is preferred.
-     */
-    public function testAddStatementsWithGraphUri()
-    {
-        // Setup array statement iterator
-        $statements = new ArrayStatementIteratorImpl(array($this->getTestStatement()));
-
-        $query = 'INSERT DATA { Graph <http://saft/test/foograph> {';
-        $query.= '<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>. ';
-        $query.= '} }';
-
-        $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
-
-        // use the given graphUri
-        $this->assertNull($this->mock->addStatements($statements, new NamedNodeImpl('http://saft/test/foograph')));
     }
 }

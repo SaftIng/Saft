@@ -64,6 +64,9 @@ class AbstractTriplePatternStoreTest extends TestCase
         return new StatementImpl($subject2, $predicate2, $object2);
     }
 
+    /*
+     * Tests addStatements
+     */
 
     public function testAddStatementsNoTriplesAndQuads()
     {
@@ -95,7 +98,7 @@ class AbstractTriplePatternStoreTest extends TestCase
         $this->assertEmpty($resultStatements->next());
     }
 
-    /**
+    /*
      * Tests deleteMultipleStatements
      */
 
@@ -151,10 +154,11 @@ class AbstractTriplePatternStoreTest extends TestCase
         $this->assertTrue($this->fixture->query($query));
     }
 
-    /**
-     * Tests hasMatchingStatement > triple recognition
+    /*
+     * Tests hasMatchingStatement
      */
 
+    // triple recognition
     public function testHasMatchingStatementTripleRecognition()
     {
         $triple = $this->getTestTriple();
