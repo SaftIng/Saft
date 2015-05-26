@@ -806,9 +806,9 @@ abstract class StoreAbstractTest extends TestCase
     {
         $quad = $this->getTestQuad();
         $graphPattern = SparqlUtils::statementsToSparqlFormat([$quad]);
-        $query = 'DELETE DATA { ' . $graphPattern . '}';
+        $query = 'DELETE DATA {' . $graphPattern . '}';
 
-        $this->assertTrue($this->fixture->query($query) instanceof EmptyResult);
+        $this->assertEquals(new EmptyResultImpl(), $this->fixture->query($query));
     }
 
     public function testQueryDeleteMultipleStatementsVariablePatterns()
