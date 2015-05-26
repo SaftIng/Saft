@@ -15,13 +15,6 @@ interface Query
     public function getQueryParts();
 
     /**
-     * Init the query instance with a given SPARQL query string.
-     *
-     * @param string $query Query to use for initialization.
-     */
-    public function init($query);
-
-    /**
      * Is instance of AskQuery?
      *
      * @return boolean

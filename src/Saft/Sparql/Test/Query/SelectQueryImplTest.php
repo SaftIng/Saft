@@ -21,13 +21,80 @@ class SelectQueryImplTest extends TestCase
 
     public function testConstructor()
     {
-        $instanceToCheckAgainst = new SelectQueryImpl();
-        $instanceToCheckAgainst->init('SELECT ?x FROM <'. $this->testGraph->getUri() .'> WHERE {?x ?y ?z}');
+        $this->fixture = new SelectQueryImpl(
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}'
+        );
+
+        $queryParts = $this->fixture->getQueryParts();
+
+        // select
+        $this->assertEquals('SELECT ?s ?p ?o', $queryParts['select']);
+
+        // from
+        $this->assertEquals(array($this->testGraph->getUri()), $queryParts['graphs']);
+
+        // where
+        $this->assertEquals('WHERE {?s ?p ?o.}', $queryParts['where']);
+    }
+
+    public function testConstructorNotAllVariablesUsed()
+    {
+        $instanceToCheckAgainst = new SelectQueryImpl(
+            'SELECT ?x FROM <'. $this->testGraph->getUri() .'> WHERE {?x ?y ?z}'
+        );
 
         $this->assertEquals(
             $instanceToCheckAgainst,
             new SelectQueryImpl('SELECT ?x FROM <'. $this->testGraph->getUri() .'> WHERE {?x ?y ?z}')
         );
+    }
+
+    public function testConstructorWithLimit()
+    {
+        $this->fixture = new SelectQueryImpl(
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} LIMIT 10'
+        );
+
+        $queryParts = $this->fixture->getQueryParts();
+
+        // limit
+        $this->assertEquals('10', $queryParts['limit']);
+    }
+
+    public function testConstructorWithOffset()
+    {
+        $this->fixture = new SelectQueryImpl(
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} Offset 5'
+        );
+
+        $queryParts = $this->fixture->getQueryParts();
+
+        // offset
+        $this->assertEquals('5', $queryParts['offset']);
+    }
+
+    public function testConstructorWithLimitOffset()
+    {
+        $this->fixture = new SelectQueryImpl(
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} LIMIT 10 OFFSET 5'
+        );
+
+        $queryParts = $this->fixture->getQueryParts();
+
+        // select
+        $this->assertEquals('SELECT ?s ?p ?o', $queryParts['select']);
+
+        // from
+        $this->assertEquals(array($this->testGraph->getUri()), $queryParts['graphs']);
+
+        // where
+        $this->assertEquals('WHERE {?s ?p ?o.}', $queryParts['where']);
+
+        // limit
+        $this->assertEquals('10', $queryParts['limit']);
+
+        // offset
+        $this->assertEquals('5', $queryParts['offset']);
     }
 
     /**
@@ -36,7 +103,7 @@ class SelectQueryImplTest extends TestCase
 
     public function testGetQueryParts()
     {
-        $this->fixture->init(
+        $this->fixture = new SelectQueryImpl(
             'PREFIX foo: <http://bar.de/>
              SELECT ?s ?p ?o
                FROM <http://foo/bar/>
@@ -227,79 +294,6 @@ class SelectQueryImplTest extends TestCase
          * variables
          */
         $this->assertEquals(array('s', 'p', 'o', 'foo', 'g'), $queryParts['variables']);
-    }
-
-    /**
-     * Tests init
-     */
-    public function testInit()
-    {
-        $this->fixture = new SelectQueryImpl();
-        $this->fixture->init(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}'
-        );
-
-        $queryParts = $this->fixture->getQueryParts();
-
-        // select
-        $this->assertEquals('SELECT ?s ?p ?o', $queryParts['select']);
-
-        // from
-        $this->assertEquals(array($this->testGraph->getUri()), $queryParts['graphs']);
-
-        // where
-        $this->assertEquals('WHERE {?s ?p ?o.}', $queryParts['where']);
-    }
-
-    public function testInitWithLimit()
-    {
-        $this->fixture = new SelectQueryImpl();
-        $this->fixture->init(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} LIMIT 10'
-        );
-
-        $queryParts = $this->fixture->getQueryParts();
-
-        // limit
-        $this->assertEquals('10', $queryParts['limit']);
-    }
-
-    public function testInitWithOffset()
-    {
-        $this->fixture = new SelectQueryImpl();
-        $this->fixture->init(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} Offset 5'
-        );
-
-        $queryParts = $this->fixture->getQueryParts();
-
-        // offset
-        $this->assertEquals('5', $queryParts['offset']);
-    }
-
-    public function testInitWithLimitOffset()
-    {
-        $this->fixture = new SelectQueryImpl();
-        $this->fixture->init(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} LIMIT 10 OFFSET 5'
-        );
-
-        $queryParts = $this->fixture->getQueryParts();
-
-        // select
-        $this->assertEquals('SELECT ?s ?p ?o', $queryParts['select']);
-
-        // from
-        $this->assertEquals(array($this->testGraph->getUri()), $queryParts['graphs']);
-
-        // where
-        $this->assertEquals('WHERE {?s ?p ?o.}', $queryParts['where']);
-
-        // limit
-        $this->assertEquals('10', $queryParts['limit']);
-
-        // offset
-        $this->assertEquals('5', $queryParts['offset']);
     }
 
     /**

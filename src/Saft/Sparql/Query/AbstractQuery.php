@@ -73,14 +73,16 @@ abstract class AbstractQuery implements Query
     /**
      * Constructor.
      *
-     * @param string $query optional SPARQL query string to initialize this instance.
-     * @throws \Exception If $query is empty
+     * @param  string     optional $query SPARQL query string to initialize this instance.
+     * @throws \Exception If parameter $query is empty, null or not a string.
      */
     public function __construct($query = '')
     {
-        if (false === empty($query)) {
-            $this->init($query);
+        if (true === empty($query) || null === $query || false === is_string($query)) {
+            return;
         }
+
+        $this->query = $query;
     }
 
     /**

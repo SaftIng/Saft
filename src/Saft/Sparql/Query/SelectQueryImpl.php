@@ -8,86 +8,17 @@ namespace Saft\Sparql\Query;
 class SelectQueryImpl extends AbstractQuery
 {
     /**
-     */
-    public function __construct($queryString = '')
-    {
-        if (false === empty($queryString)) {
-            $this->init($queryString);
-        }
-    }
-
-    /**
+     * Constructor.
      *
+     * @param  string optional $query SPARQL query string to initialize this instance.
      */
-    public function __toString()
+    public function __construct($query = '')
     {
-        $queryString = $this->queryParts['select'] .' '. PHP_EOL;
+        parent::__construct($query);
 
-        if (true === isset($this->queryParts['graphs'])) {
-            foreach (array_unique($this->queryParts['graphs']) as $graphUri) {
-                $queryString .= 'FROM <' . $graphUri . '>' . PHP_EOL;
-            }
+        if (null === $this->query) {
+            return;
         }
-
-        if (true === isset($this->queryParts['named_graphs'])) {
-            foreach (array_unique($this->queryParts['named_graphs']) as $graphUri) {
-                $queryString .= 'FROM NAMED <' . $graphUri . '>' . PHP_EOL;
-            }
-        }
-
-        $queryString .= $this->queryParts['where'] . ' ';
-
-        if (true === isset($this->queryParts['order'])) {
-            $queryString .= 'ORDER BY ' . $this->queryParts['order'] . PHP_EOL;
-        }
-
-        if (true === isset($this->queryParts['limit'])) {
-            $queryString .= 'LIMIT ' . $this->queryParts['limit'] . PHP_EOL;
-        }
-
-        if (true === isset($this->queryParts['offset'])) {
-            $queryString .= 'OFFSET ' . $this->queryParts['offset'] . PHP_EOL;
-        }
-
-        return $queryString;
-    }
-
-    /**
-     * Return parts of the query on which this instance based on.
-     *
-     * @return array $queryParts Query parts; parts which have no elements will be unset.
-    */
-    public function getQueryParts()
-    {
-        $this->queryParts['filter_pattern'] = $this->extractFilterPattern($this->queryParts['where']);
-        $this->queryParts['graphs'] = $this->extractGraphs($this->getQuery());
-        $this->queryParts['named_graphs'] = $this->extractNamedGraphs($this->getQuery());
-        $this->queryParts['namespaces'] = $this->extractNamespacesFromQuery($this->queryParts['where']);
-        $this->queryParts['prefixes'] = $this->extractPrefixesFromQuery($this->getQuery());
-        // extract variables only from SELECT part
-        $this->queryParts['result_variables'] = $this->extractVariablesFromQuery($this->queryParts['select']);
-        $this->queryParts['triple_pattern'] = $this->extractTriplePattern($this->queryParts['where']);
-        $this->queryParts['variables'] = $this->extractVariablesFromQuery($this->getQuery());
-
-        $this->unsetEmptyValues($this->queryParts);
-
-        return $this->queryParts;
-    }
-
-    /**
-     * Init Query instance with a SPARQL query string. This function tries to parse the query and use as much
-     * information as possible. But unfortunately not every SPARQL 1.0/1.1 aspect is supported.
-     *
-     * @param  string     $query
-     * @throws \Exception If $query is empty.
-     */
-    public function init($query)
-    {
-        if (true === empty($query) || null === $query || false === is_string($query)) {
-            throw new \Exception('Parameter $query is empty, null or not a string.');
-        }
-
-        $this->query = $query;
 
         $parts = array(
             'select'     => array(),
@@ -171,6 +102,64 @@ class SelectQueryImpl extends AbstractQuery
         if (isset($parts['offset'][1][0])) {
             $this->queryParts['offset'] = $parts['offset'][1][0];
         }
+    }
+
+    /**
+     *
+     */
+    public function __toString()
+    {
+        $queryString = $this->queryParts['select'] .' '. PHP_EOL;
+
+        if (true === isset($this->queryParts['graphs'])) {
+            foreach (array_unique($this->queryParts['graphs']) as $graphUri) {
+                $queryString .= 'FROM <' . $graphUri . '>' . PHP_EOL;
+            }
+        }
+
+        if (true === isset($this->queryParts['named_graphs'])) {
+            foreach (array_unique($this->queryParts['named_graphs']) as $graphUri) {
+                $queryString .= 'FROM NAMED <' . $graphUri . '>' . PHP_EOL;
+            }
+        }
+
+        $queryString .= $this->queryParts['where'] . ' ';
+
+        if (true === isset($this->queryParts['order'])) {
+            $queryString .= 'ORDER BY ' . $this->queryParts['order'] . PHP_EOL;
+        }
+
+        if (true === isset($this->queryParts['limit'])) {
+            $queryString .= 'LIMIT ' . $this->queryParts['limit'] . PHP_EOL;
+        }
+
+        if (true === isset($this->queryParts['offset'])) {
+            $queryString .= 'OFFSET ' . $this->queryParts['offset'] . PHP_EOL;
+        }
+
+        return $queryString;
+    }
+
+    /**
+     * Return parts of the query on which this instance based on.
+     *
+     * @return array $queryParts Query parts; parts which have no elements will be unset.
+    */
+    public function getQueryParts()
+    {
+        $this->queryParts['filter_pattern'] = $this->extractFilterPattern($this->queryParts['where']);
+        $this->queryParts['graphs'] = $this->extractGraphs($this->getQuery());
+        $this->queryParts['named_graphs'] = $this->extractNamedGraphs($this->getQuery());
+        $this->queryParts['namespaces'] = $this->extractNamespacesFromQuery($this->queryParts['where']);
+        $this->queryParts['prefixes'] = $this->extractPrefixesFromQuery($this->getQuery());
+        // extract variables only from SELECT part
+        $this->queryParts['result_variables'] = $this->extractVariablesFromQuery($this->queryParts['select']);
+        $this->queryParts['triple_pattern'] = $this->extractTriplePattern($this->queryParts['where']);
+        $this->queryParts['variables'] = $this->extractVariablesFromQuery($this->getQuery());
+
+        $this->unsetEmptyValues($this->queryParts);
+
+        return $this->queryParts;
     }
 
     /**

@@ -27,6 +27,12 @@ class AskQueryImplTest extends TestCase
         $this->assertEquals('?s ?p ?o.', $queryParts['where']);
     }
 
+    public function testConstructorNoWherePart()
+    {
+        $this->setExpectedException('\Exception');
+
+        $this->fixture = new AskQueryImpl('ASK {?s ?p ?o.');
+    }
 
     /**
      * Tests extractNamespacesFromQuery
@@ -91,7 +97,9 @@ class AskQueryImplTest extends TestCase
 
     public function testGetQueryPartsEverything()
     {
-        $this->fixture->init('PREFIX foo: <http://bar.de> ASK FROM <http://foobar/> { ?s ?p ?o. FILTER (?o < 40) }');
+        $this->fixture = new AskQueryImpl(
+            'PREFIX foo: <http://bar.de> ASK FROM <http://foobar/> { ?s ?p ?o. FILTER (?o < 40) }'
+        );
 
         $queryParts = $this->fixture->getQueryParts();
 
@@ -143,7 +151,7 @@ class AskQueryImplTest extends TestCase
 
     public function testGetQueryPartsWithPrefixesTriplePatternVariables()
     {
-        $this->fixture->init('PREFIX foo: <http://bar.de> ASK { ?s ?p ?o }');
+        $this->fixture = new AskQueryImpl('PREFIX foo: <http://bar.de> ASK { ?s ?p ?o }');
 
         $queryParts = $this->fixture->getQueryParts();
 
@@ -167,28 +175,6 @@ class AskQueryImplTest extends TestCase
         );
         $this->assertEquals(array('s', 'p', 'o'), $queryParts['variables']);
         $this->assertEquals('?s ?p ?o', $queryParts['where']);
-    }
-
-    /**
-     * Tests init
-     */
-
-    public function testInit()
-    {
-        $this->fixture = new AskQueryImpl();
-        $this->fixture->init('ASK {?s ?p ?o.}');
-
-        $queryParts = $this->fixture->getQueryParts();
-
-        $this->assertEquals('?s ?p ?o.', $queryParts['where']);
-    }
-
-    public function testInitNoWherePart()
-    {
-        $this->setExpectedException('\Exception');
-
-        $this->fixture = new AskQueryImpl();
-        $this->fixture->init('ASK {?s ?p ?o.');
     }
 
     /**

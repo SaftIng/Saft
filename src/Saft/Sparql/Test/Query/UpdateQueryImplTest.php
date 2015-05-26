@@ -40,6 +40,20 @@ class UpdateQueryImplTest extends TestCase
         );
     }
 
+    public function testConstructorDeleteData()
+    {
+        $this->fixture = new UpdateQueryImpl(
+            'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+            DELETE DATA { ?x foaf:name "Alice" }'
+        );
+
+        $this->assertEquals(
+            'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+            DELETE DATA { ?x foaf:name "Alice" }',
+            $this->fixture->getQuery()
+        );
+    }
+
     /**
      * Tests extractGraphs
      */
@@ -188,7 +202,7 @@ class UpdateQueryImplTest extends TestCase
 
     public function testGetQueryPartsEverything()
     {
-        $this->fixture->init(
+        $this->fixture = new UpdateQueryImpl(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             WITH <http://graph/>
             DELETE { ?x foaf:name "Alice"^^<http://www.w3.org/2001/XMLSchema#string>. ?x <http://namespace/aa> ?y }
@@ -274,30 +288,11 @@ class UpdateQueryImplTest extends TestCase
 
     public function testGetQueryPartsInsertDataMissingDataPart()
     {
-        $this->fixture->init('INSERT DATA { }');
+        $this->fixture = new UpdateQueryImpl('INSERT DATA { }');
 
         // expects an exception because data part is empty
         $this->setExpectedException('\Exception');
         $this->fixture->getQueryParts();
-    }
-
-    /**
-     * Tests init
-     */
-
-    public function testInitDeleteData()
-    {
-        $this->fixture = new UpdateQueryImpl();
-        $this->fixture->init(
-            'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-            DELETE DATA { ?x foaf:name "Alice" }'
-        );
-
-        $this->assertEquals(
-            'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-            DELETE DATA { ?x foaf:name "Alice" }',
-            $this->fixture->getQuery()
-        );
     }
 
     /**

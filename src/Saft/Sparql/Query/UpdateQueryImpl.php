@@ -16,6 +16,95 @@ use Saft\Sparql\Query\AbstractQuery;
 class UpdateQueryImpl extends AbstractQuery
 {
     /**
+     * Constructor.
+     *
+     * @param  string     $query SPARQL query string to initialize this instance.
+     * @throws \Exception If no where part was found in query.
+     * @throws \Exception If given query is not suitable for UpdateQuery.
+     * @throws \Exception If no triple part after INSERT DATA found.
+     * @throws \Exception If no triple part after DELETE DATA found.
+     * @throws \Exception If no valid WITH <> DELETE {...} WHERE { ...} query given.
+     * @throws \Exception If no valid WITH <> DELETE {...} INSERT { ... } WHERE { ...} query given.
+     * @throws \Exception If there is either no triple part after INSERT INTO GRAPH or no graph set.
+     */
+    public function __construct($query = '')
+    {
+        parent::__construct($query);
+
+        if (null == $this->query) {
+            return;
+        }
+
+        $subType = $this->getSubType();
+
+        if (null !== $subType) {
+            /**
+             * Save parts for INSERT DATA
+             */
+            if ('insertData' === $subType) {
+                preg_match('/INSERT\s+DATA\s+\{(.*)\}/si', $query, $matches);
+
+                if (false === isset($matches[1])) {
+                    throw new \Exception('No triple part after INSERT DATA found.');
+                }
+
+            /**
+             * Save parts for INSERT INTO GRAPH <> {} or INSERT INTO <> {}
+             */
+            } elseif ('insertInto' === $subType) {
+                preg_match('/INSERT\s+INTO\s+[GRAPH]{0,}\s*\<(.*)\>\s*\{(.*)\}/si', $query, $matches);
+
+                if (false === isset($matches[1]) || false === isset($matches[2])) {
+                    throw new \Exception(
+                        'There is either no triple part after INSERT INTO GRAPH or no graph set.'
+                    );
+                }
+
+            /**
+             * Save parts for DELETE DATA {}
+             */
+            } elseif ('deleteData' === $subType) {
+                preg_match('/DELETE\s+DATA\s*\{(.*)\}/si', $query, $matches);
+
+                if (false === isset($matches[1])) {
+                    throw new \Exception('No triple part after DELETE DATA found.');
+                }
+
+            /**
+             * Save parts for WITH <> DELETE {} WHERE {}
+             */
+            } elseif ('withDeleteWhere' === $subType) {
+                preg_match('/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/si', $query, $matches);
+
+                if (false === isset($matches[1])) {
+                    throw new \Exception(
+                        'No valid WITH <> DELETE {...} WHERE { ...} query given.'
+                    );
+                }
+
+            /**
+             * Save parts for WITH <> DELETE {} INSERT {} WHERE {}
+             */
+            } elseif ('withDeleteWhere' === $subType) {
+                preg_match(
+                    '/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*INSERT\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/si',
+                    $query,
+                    $matches
+                );
+
+                if (false === isset($matches[1])) {
+                    throw new \Exception(
+                        'No valid WITH <> DELETE {...} INSERT { ... } WHERE { ...} query given.'
+                    );
+                }
+            }
+
+        } else {
+            throw new \Exception('Given query is not suitable for UpdateQuery: ' . $query);
+        }
+    }
+
+    /**
      *
      * @param string $query
      * @return array
@@ -254,83 +343,6 @@ class UpdateQueryImpl extends AbstractQuery
         $this->unsetEmptyValues($this->queryParts);
 
         return $this->queryParts;
-    }
-
-    /**
-     * Init the query instance with a given SPARQL query string.
-     *
-     * @param string $query Query to use for initialization.
-     */
-    public function init($query)
-    {
-        $this->query = $query;
-        $subType = $this->getSubType();
-
-        if (null !== $subType) {
-            /**
-             * Save parts for INSERT DATA
-             */
-            if ('insertData' === $subType) {
-                preg_match('/INSERT\s+DATA\s+\{(.*)\}/si', $query, $matches);
-
-                if (false === isset($matches[1])) {
-                    throw new \Exception('No triple part after INSERT DATA found.');
-                }
-
-            /**
-             * Save parts for INSERT INTO GRAPH <> {} or INSERT INTO <> {}
-             */
-            } elseif ('insertInto' === $subType) {
-                preg_match('/INSERT\s+INTO\s+[GRAPH]{0,}\s*\<(.*)\>\s*\{(.*)\}/si', $query, $matches);
-
-                if (false === isset($matches[1]) || false === isset($matches[2])) {
-                    throw new \Exception(
-                        'There is either no triple part after INSERT INTO GRAPH or no graph set.'
-                    );
-                }
-
-            /**
-             * Save parts for DELETE DATA {}
-             */
-            } elseif ('deleteData' === $subType) {
-                preg_match('/DELETE\s+DATA\s*\{(.*)\}/si', $query, $matches);
-
-                if (false === isset($matches[1])) {
-                    throw new \Exception('No triple part after DELETE DATA found.');
-                }
-
-            /**
-             * Save parts for WITH <> DELETE {} WHERE {}
-             */
-            } elseif ('withDeleteWhere' === $subType) {
-                preg_match('/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/si', $query, $matches);
-
-                if (false === isset($matches[1])) {
-                    throw new \Exception(
-                        'No valid WITH <> DELETE {...} WHERE { ...} query given.'
-                    );
-                }
-
-            /**
-             * Save parts for WITH <> DELETE {} INSERT {} WHERE {}
-             */
-            } elseif ('withDeleteWhere' === $subType) {
-                preg_match(
-                    '/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*INSERT\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/si',
-                    $query,
-                    $matches
-                );
-
-                if (false === isset($matches[1])) {
-                    throw new \Exception(
-                        'No valid WITH <> DELETE {...} INSERT { ... } WHERE { ...} query given.'
-                    );
-                }
-            }
-
-        } else {
-            throw new \Exception('Given query is not suitable for UpdateQuery: ' . $query);
-        }
     }
 
     /**

@@ -153,16 +153,6 @@ class GraphQueryImpl extends AbstractQuery
     }
 
     /**
-     * Init the query instance with a given SPARQL query string.
-     *
-     * @param string $query Query to use for initialization.
-     */
-    public function init($query)
-    {
-        $this->query = $query;
-    }
-
-    /**
      * Represents it an Ask Query?
      *
      * @return boolean False

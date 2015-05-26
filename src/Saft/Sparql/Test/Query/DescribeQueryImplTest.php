@@ -114,7 +114,7 @@ class DescribeQueryImplTest extends TestCase
 
     public function testGetQueryPartsEverything()
     {
-        $this->fixture->init(
+        $this->fixture = new DescribeQueryImpl(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             DESCRIBE ?s
             FROM <http://foo/bar/>
@@ -170,29 +170,6 @@ class DescribeQueryImplTest extends TestCase
             $queryParts['triple_pattern']
         );
         $this->assertEquals(array('s', 'p', 'o'), $queryParts['variables']);
-    }
-
-    /**
-     * Tests init
-     */
-
-    public function testInit()
-    {
-        $this->fixture = new DescribeQueryImpl();
-        $this->fixture->init(
-            'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-            DESCRIBE ?x
-            FROM <http://foobar/>
-            WHERE { ?x foaf:name "Alice" }'
-        );
-
-        $this->assertEquals(
-            'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-            DESCRIBE ?x
-            FROM <http://foobar/>
-            WHERE { ?x foaf:name "Alice" }',
-            $this->fixture->getQuery()
-        );
     }
 
     /**

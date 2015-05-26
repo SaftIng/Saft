@@ -77,7 +77,7 @@ class GraphQueryImplTest extends TestCase
 
     public function testGetQueryParts()
     {
-        $this->fixture->init('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
+        $this->fixture = new GraphQueryImpl('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
 
         $queryParts = $this->fixture->getQueryParts();
 
@@ -121,18 +121,6 @@ class GraphQueryImplTest extends TestCase
     public function testDetermineSubTypeUnknownType()
     {
         $this->assertNull($this->fixture->determineSubType('unknown type'));
-    }
-
-    /**
-     * Tests init
-     */
-
-    public function testInit()
-    {
-        $this->fixture = new GraphQueryImpl();
-        $this->fixture->init('CREATE GRAPH <'. $this->testGraph->getUri() .'>');
-
-        $this->assertEquals('CREATE GRAPH <'. $this->testGraph->getUri() .'>', $this->fixture->getQuery());
     }
 
     /**

@@ -10,6 +10,26 @@ use Saft\Sparql\Query\AbstractQuery;
 class DescribeQueryImpl extends AbstractQuery
 {
     /**
+     * Constructor.
+     *
+     * @param string optional $query SPARQL query string to initialize this instance.
+     */
+    public function __construct($query = '')
+    {
+        parent::__construct($query);
+
+        if (null !== $this->query) {
+            /*
+             * Set where part
+             */
+            $result = preg_match('/\{(.*)\}/s', $query, $match);
+            if (false !== $result && true === isset($match[1])) {
+                $this->queryParts['where'] = trim($match[1]);
+            }
+        }
+    }
+
+    /**
      * Return parts of the query on which this instance based on.
      *
      * @return array $queryParts Query parts; parts which have no elements will be unset.
@@ -59,25 +79,6 @@ class DescribeQueryImpl extends AbstractQuery
 
         } else {
             return null;
-        }
-    }
-
-    /**
-     * Init the query instance with a given SPARQL query string.
-     *
-     * @param  string     $query Query to use for initialization.
-     * @throws \Exception        If no where part found in query.
-     */
-    public function init($query)
-    {
-        $this->query = $query;
-
-        /**
-         * Set where part
-         */
-        $result = preg_match('/\{(.*)\}/s', $query, $match);
-        if (false !== $result && true === isset($match[1])) {
-            $this->queryParts['where'] = trim($match[1]);
         }
     }
 
