@@ -67,7 +67,7 @@ class Parser implements ParserInterface
     public function parseStreamToIterator($inputStream, $baseUri = null, $serialization = null)
     {
         $rdfUri = librdf_new_uri($this->world, $baseUri);
-        
+
         if (false === $rdfUri) {
             throw new Exception('Failed to create librdf_uri from: '. $baseUri);
         }
