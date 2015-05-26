@@ -22,20 +22,7 @@ class VirtuosoTest extends StoreAbstractTest
     {
         parent::setUp();
 
-        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
-
-        // set path to test dir
-        $saftRootDir = dirname(__FILE__) . '/../../../../../';
-        $configFilepath = $saftRootDir . 'test-config.yml';
-
-        // check for config file
-        if (false === file_exists($configFilepath)) {
-            throw new \Exception('test-config.yml missing');
-        }
-
-        // parse YAML file
-        $yaml = new Parser();
-        $this->config = $yaml->parse(file_get_contents($configFilepath));
+        $this->loadTestConfiguration();
 
         if (true === isset($this->config['virtuosoConfig'])) {
             $this->fixture = new Virtuoso(
