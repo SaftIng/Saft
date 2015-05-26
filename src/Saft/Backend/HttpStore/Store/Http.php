@@ -7,6 +7,7 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
+use Saft\Rdf\StatementIteratorFactory;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
@@ -55,6 +56,11 @@ class Http extends AbstractSparqlStore
     private $statementFactory;
 
     /**
+     * @var StatementIteratorFactory
+     */
+    private $statementIteratorFactory;
+
+    /**
      * Constructor.
      *
      * @param array $adapterOptions Array containing database credentials
@@ -64,6 +70,7 @@ class Http extends AbstractSparqlStore
         StatementFactory $statementFactory,
         QueryFactory $queryFactory,
         ResultFactory $resultFactory,
+        StatementIteratorFactory $statementIteratorFactory,
         array $adapterOptions
     ) {
         $this->adapterOptions = $adapterOptions;
@@ -77,8 +84,15 @@ class Http extends AbstractSparqlStore
         $this->statementFactory = $statementFactory;
         $this->queryFactory = $queryFactory;
         $this->resultFactory = $resultFactory;
+        $this->statementIteratorFactory = $statementIteratorFactory;
 
-        parent::__construct($nodeFactory, $statementFactory, $queryFactory, $resultFactory);
+        parent::__construct(
+            $nodeFactory,
+            $statementFactory,
+            $queryFactory,
+            $resultFactory,
+            $statementIteratorFactory
+        );
     }
 
     /**

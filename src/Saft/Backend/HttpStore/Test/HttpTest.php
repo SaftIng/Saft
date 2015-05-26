@@ -5,6 +5,7 @@ namespace Saft\Backend\HttpStore\Test;
 use Saft\Backend\HttpStore\Store\Http;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementFactoryImpl;
+use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Store\Result\ResultFactoryImpl;
 use Saft\Store\Test\StoreAbstractTest;
@@ -23,6 +24,7 @@ class HttpTest extends StoreAbstractTest
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
                 new ResultFactoryImpl(),
+                new StatementIteratorFactoryImpl(),
                 $this->config['httpConfig']
             );
         } elseif (true === isset($this->config['configuration']['standardStore'])
@@ -32,6 +34,7 @@ class HttpTest extends StoreAbstractTest
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
                 new ResultFactoryImpl(),
+                new StatementIteratorFactoryImpl(),
                 $this->config['configuration']['standardStore']
             );
         } else {
@@ -56,6 +59,7 @@ class HttpTest extends StoreAbstractTest
             new StatementFactoryImpl(),
             new QueryFactoryImpl(),
             new ResultFactoryImpl(),
+            new StatementIteratorFactoryImpl(),
             $config
         );
     }

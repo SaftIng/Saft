@@ -9,6 +9,7 @@ use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementFactoryImpl;
+use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Store\Result\ResultFactoryImpl;
@@ -27,6 +28,7 @@ class ARC2Test extends StoreAbstractTest
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
                 new ResultFactoryImpl(),
+                new StatementIteratorFactoryImpl(),
                 $this->config['arc2Config']
             );
         } elseif (true === isset($this->config['configuration']['standardStore'])) {
@@ -35,6 +37,7 @@ class ARC2Test extends StoreAbstractTest
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
                 new ResultFactoryImpl(),
+                new StatementIteratorFactoryImpl(),
                 $this->config['configuration']['standardStore']
             );
         } else {

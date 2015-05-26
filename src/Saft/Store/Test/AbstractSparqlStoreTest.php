@@ -10,6 +10,7 @@ use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
+use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Store\Result\EmptyResult;
 use Saft\Store\Result\ResultFactoryImpl;
@@ -28,7 +29,8 @@ class AbstractSparqlStoreTest extends TestCase
                 new NodeFactoryImpl(),
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
-                new ResultFactoryImpl()
+                new ResultFactoryImpl(),
+                new StatementIteratorFactoryImpl()
             )
         );
     }

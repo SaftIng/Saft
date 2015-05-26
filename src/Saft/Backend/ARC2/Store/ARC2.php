@@ -2,13 +2,13 @@
 
 namespace Saft\Backend\ARC2\Store;
 
-use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
+use Saft\Rdf\StatementIteratorFactory;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
 use Saft\Store\AbstractSparqlStore;
@@ -43,6 +43,11 @@ class ARC2 extends AbstractSparqlStore
     private $statementFactory = null;
 
     /**
+     * @var StatementIteratorFactory
+     */
+    private $statementIteratorFactory = null;
+
+    /**
      * @var ARC2_Store
      */
     protected $store;
@@ -57,6 +62,7 @@ class ARC2 extends AbstractSparqlStore
         StatementFactory $statementFactory,
         QueryFactory $queryFactory,
         ResultFactory $resultFactory,
+        StatementIteratorFactory $statementIteratorFactory,
         array $configuration
     ) {
         $this->configuration = $configuration;
@@ -73,8 +79,15 @@ class ARC2 extends AbstractSparqlStore
         $this->statementFactory = $statementFactory;
         $this->queryFactory = $queryFactory;
         $this->resultFactory = $resultFactory;
+        $this->statementIteratorFactory = $statementIteratorFactory;
 
-        parent::__construct($nodeFactory, $statementFactory, $queryFactory, $resultFactory);
+        parent::__construct(
+            $nodeFactory,
+            $statementFactory,
+            $queryFactory,
+            $resultFactory,
+            $statementIteratorFactory
+        );
     }
 
     /**
@@ -135,15 +148,17 @@ class ARC2 extends AbstractSparqlStore
             // after batch is full, execute collected statements all at once
             if (0 === $counter % $batchSize) {
                 /**
-                 * $batchStatements is an array with graphUri('s) as key(s) and ArrayStatementIteratorImpl
-                 * instances as value. Each entry is related to a certain graph and contains a bunch of
-                 * statement instances.
+                 * $batchStatements is an array with graphUri('s) as key(s) and iterator instances as value
+                 * Each entry is related to a certain graph and contains a bunch of statement instances.
                  */
                 foreach ($batchStatements as $graphUriToUse => $statementBatch) {
                     $this->query(
                         'INSERT INTO <'. $graphUriToUse .'> {'.
-                        $this->sparqlFormat(new ArrayStatementIteratorImpl($statementBatch)) .
-                        '}',
+                        $this->sparqlFormat(
+                            $this->statementIteratorFactory->createArrayStatementIterator(
+                                $statementBatch
+                            )
+                        ) .'}',
                         $options
                     );
                 }
@@ -224,7 +239,9 @@ class ARC2 extends AbstractSparqlStore
             $statement->getObject()
         );
 
-        $statementIterator = new ArrayStatementIteratorImpl(array($tripleStatement));
+        $statementIterator = $this->statementIteratorFactory->createArrayStatementIterator(
+            array($tripleStatement)
+        );
 
         $triple = $this->sparqlFormat($statementIterator);
         $query = 'DELETE FROM <'. $graph->getUri() .'> {'. $triple .'} WHERE {'. $triple .'}';

@@ -2,11 +2,11 @@
 
 namespace Saft\Store;
 
-use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
+use Saft\Rdf\StatementIteratorFactory;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\Query;
 use Saft\Sparql\Query\QueryFactory;
@@ -32,14 +32,27 @@ abstract class AbstractTriplePatternStore implements Store
      */
     private $statementFactory;
 
+    /**
+     * @var StatementIteratorFactory
+     */
+    private $statementIteratorFactory;
+
+    /**
+     * @param NodeFactory              $nodeFactory
+     * @param StatementFactory         $statementFactory
+     * @param QueryFactory             $queryFactory
+     * @param statementIteratorFactory $statementIteratorFactory
+     */
     public function __construct(
         NodeFactory $nodeFactory,
         StatementFactory $statementFactory,
-        QueryFactory $queryFactory
+        QueryFactory $queryFactory,
+        StatementIteratorFactory $statementIteratorFactory
     ) {
         $this->nodeFactory = $nodeFactory;
         $this->queryFactory = $queryFactory;
         $this->statementFactory = $statementFactory;
+        $this->statementIteratorFactory = $statementIteratorFactory;
     }
 
     /**
@@ -217,7 +230,7 @@ abstract class AbstractTriplePatternStore implements Store
             throw new \Exception('Query contains neither quads nor triples.');
         }
 
-        return new ArrayStatementIteratorImpl($statementArray);
+        return $this->statementIteratorFactory->createArrayStatementIterator($statementArray);
     }
 
     protected function createNodeByValueAndType($value, $type)

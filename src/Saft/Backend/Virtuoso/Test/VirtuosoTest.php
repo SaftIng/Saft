@@ -10,6 +10,7 @@ use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
+use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Store\Result\ResultFactoryImpl;
 use Saft\Store\Test\StoreAbstractTest;
@@ -42,6 +43,7 @@ class VirtuosoTest extends StoreAbstractTest
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
                 new ResultFactoryImpl(),
+                new StatementIteratorFactoryImpl(),
                 $this->config['virtuosoConfig']
             );
         } elseif (true === isset($this->config['configuration']['standardStore'])
@@ -51,6 +53,7 @@ class VirtuosoTest extends StoreAbstractTest
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
                 new ResultFactoryImpl(),
+                new StatementIteratorFactoryImpl(),
                 $this->config['configuration']['standardStore']
             );
         } else {

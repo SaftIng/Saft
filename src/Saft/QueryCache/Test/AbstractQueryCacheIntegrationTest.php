@@ -9,6 +9,7 @@ use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
+use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Store\Test\BasicTriplePatternStore;
@@ -58,7 +59,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
@@ -255,7 +257,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
@@ -286,7 +289,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
@@ -314,7 +318,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
 
         $this->fixture->setChainSuccessor($successor);
@@ -335,7 +340,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
@@ -427,7 +433,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
@@ -536,7 +543,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
@@ -558,7 +566,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
@@ -840,7 +849,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
@@ -889,7 +899,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
@@ -954,7 +965,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
@@ -1010,7 +1022,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
@@ -1060,7 +1073,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
@@ -1089,7 +1103,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
@@ -1111,7 +1126,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
@@ -1144,7 +1160,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
@@ -1162,7 +1179,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $successor = new BasicTriplePatternStore(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl()
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 

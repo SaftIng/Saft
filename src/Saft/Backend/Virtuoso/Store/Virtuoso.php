@@ -10,6 +10,7 @@ use Saft\Rdf\NodeUtils;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
+use Saft\Rdf\StatementIteratorFactory;
 use Saft\Rdf\Triple;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
@@ -57,6 +58,11 @@ class Virtuoso extends AbstractSparqlStore
     private $statementFactory = null;
 
     /**
+     * @var StatementIteratorFactory
+     */
+    private $statementIteratorFactory = null;
+
+    /**
      * Constructor.
      *
      * @param  array $configuration Array containing database credentials
@@ -67,6 +73,7 @@ class Virtuoso extends AbstractSparqlStore
         StatementFactory $statementFactory,
         QueryFactory $queryFactory,
         ResultFactory $resultFactory,
+        StatementIteratorFactory $statementIteratorFactory,
         array $configuration
     ) {
         $this->checkRequirements();
@@ -80,8 +87,16 @@ class Virtuoso extends AbstractSparqlStore
         $this->statementFactory = $statementFactory;
         $this->queryFactory = $queryFactory;
         $this->resultFactory = $resultFactory;
+        $this->resultFactory = $resultFactory;
+        $this->statementIteratorFactory = $statementIteratorFactory;
 
-        parent::__construct($nodeFactory, $statementFactory, $queryFactory, $resultFactory);
+        parent::__construct(
+            $nodeFactory,
+            $statementFactory,
+            $queryFactory,
+            $resultFactory,
+            $statementIteratorFactory
+        );
     }
 
     /**

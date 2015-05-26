@@ -3,11 +3,11 @@
 namespace Saft\QueryCache;
 
 use Saft\Cache\CacheFactory;
-use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
+use Saft\Rdf\StatementIteratorFactory;
 use Saft\Store\ChainableStore;
 use Saft\Store\Store;
 use Saft\Sparql\Query\AbstractQuery;
@@ -68,6 +68,11 @@ class QueryCache implements Store, ChainableStore
     protected $separator;
 
     /**
+     * @var StatementIteratorFactory
+     */
+    private $statementIteratorFactory;
+
+    /**
      * @var Store
      */
     protected $successor;
@@ -75,16 +80,21 @@ class QueryCache implements Store, ChainableStore
     /**
      * Constructor
      *
-     * @param NodeFactory $nodeFactory
-     * @param StatementFactory $statementFactory
-     * @param QueryFactory $queryFactory
-     * @param array $config Configuration array.
+     * @param CacheFactory             $cacheFactory
+     * @param QueryFactory             $queryFactory
+     * @param StatementIteratorFactory $statementIteratorFactory
+     * @param array                    $config Configuration array.
      */
-    public function __construct(CacheFactory $cacheFactory, QueryFactory $queryFactory, array $config)
-    {
+    public function __construct(
+        CacheFactory $cacheFactory,
+        QueryFactory $queryFactory,
+        StatementIteratorFactory $statementIteratorFactory,
+        array $config
+    ) {
         if (isset($config['cacheConfig']) && is_array($config['cacheConfig'])) {
             $this->cacheFactory = $cacheFactory;
             $this->queryFactory = $queryFactory;
+            $this->statementIteratorFactory = $statementIteratorFactory;
 
             $this->cache = $cacheFactory->createCache($config['cacheConfig']);
 
@@ -329,7 +339,10 @@ class QueryCache implements Store, ChainableStore
 
         // if successor is set, ask it first before run the command yourself.
         if ($this->successor instanceof Store) {
-            $this->invalidateByTriplePattern(new ArrayStatementIteratorImpl(array($statement)), $graphUri);
+            $this->invalidateByTriplePattern(
+                $this->statementIteratorFactory->createArrayStatementIterator(array($statement)),
+                $graphUri
+            );
 
             return $this->successor->deleteMatchingStatements($statement, $graph, $options);
 
