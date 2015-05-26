@@ -31,15 +31,7 @@ class ARC2Test extends StoreAbstractTest
                 new StatementIteratorFactoryImpl(),
                 $this->config['arc2Config']
             );
-        } elseif (true === isset($this->config['configuration']['standardStore'])) {
-            $this->fixture = new ARC2(
-                new NodeFactoryImpl(),
-                new StatementFactoryImpl(),
-                new QueryFactoryImpl(),
-                new ResultFactoryImpl(),
-                new StatementIteratorFactoryImpl(),
-                $this->config['configuration']['standardStore']
-            );
+
         } else {
             $this->markTestSkipped('Array arc2Config is not set in the config.yml.');
         }

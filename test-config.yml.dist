@@ -39,15 +39,3 @@ memcachedCacheConfig: &memcachedCacheConfig
     class: "Saft\\Backend\\MemcacheD\\Cache\\MemcacheD"
     host: "127.0.0.1"
     port: "11211"
-
-# Test configuration
-configuration:
-    # Default cache
-    # If a TestCase has to decide which cache backend to use, it uses this.
-    standardCache:
-        <<: *fileCacheConfig
-
-    # Default store
-    # If a TestCase has to decide which store implementation to use, it uses this.
-    standardStore:
-        <<: *virtuosoConfig

@@ -27,16 +27,7 @@ class HttpTest extends StoreAbstractTest
                 new StatementIteratorFactoryImpl(),
                 $this->config['httpConfig']
             );
-        } elseif (true === isset($this->config['configuration']['standardStore'])
-            && 'http' === $this->config['configuration']['standardStore']['type']) {
-            $this->fixture = new Http(
-                new NodeFactoryImpl(),
-                new StatementFactoryImpl(),
-                new QueryFactoryImpl(),
-                new ResultFactoryImpl(),
-                new StatementIteratorFactoryImpl(),
-                $this->config['configuration']['standardStore']
-            );
+
         } else {
             $this->markTestSkipped('Array httpConfig is not set in the config.yml.');
         }
