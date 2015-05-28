@@ -588,12 +588,14 @@ abstract class StoreAbstractTest extends TestCase
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new NamedNodeImpl('http://o/')
+                new NamedNodeImpl('http://o/'),
+                $this->testGraph
             ),
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
-                new LiteralImpl('test literal')
+                new LiteralImpl('test literal'),
+                $this->testGraph
             )
         ));
 
@@ -611,6 +613,74 @@ abstract class StoreAbstractTest extends TestCase
             new ArrayStatementIteratorImpl(array()),
             $this->fixture->getMatchingStatements($statement, $this->testGraph)
         );
+    }
+
+    public function testGetMatchingStatementsCheckGraph()
+    {
+        // 2 triples
+        $statements = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
+            ),
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
+            ),
+        ));
+
+        // add triples
+        $this->fixture->addStatements($statements, $this->testGraph);
+
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new AnyPatternImpl(),
+            $this->testGraph
+        );
+
+        $iterator = $this->fixture->getMatchingStatements($statement);
+
+        foreach ($iterator as $statement) {
+            // this check is to avoid fatal error in test suite, because graph is null
+            $this->assertTrue(null !== $statement->getGraph());
+
+            $this->assertEquals($statement->getGraph()->getUri(), $this->testGraph->getUri());
+        }
+    }
+
+    public function testGetMatchingStatementsCheckForEmptyGraph()
+    {
+        // 2 triples
+        $statements = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
+            ),
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
+            ),
+        ));
+
+        // add triples
+        $this->fixture->addStatements($statements, $this->testGraph);
+
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new AnyPatternImpl()
+        );
+
+        $iterator = $this->fixture->getMatchingStatements($statement);
+
+        foreach ($iterator as $statement) {
+            $this->assertNull($statement->getGraph());
+        }
     }
 
     /**

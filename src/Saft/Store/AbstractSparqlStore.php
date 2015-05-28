@@ -319,7 +319,8 @@ abstract class AbstractSparqlStore implements Store
             $entries[] = $this->statementFactory->createStatement(
                 $statementList[0],
                 $statementList[1],
-                $statementList[2]
+                $statementList[2],
+                $graph
             );
         }
 
