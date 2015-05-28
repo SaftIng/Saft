@@ -179,7 +179,9 @@ class Virtuoso extends AbstractSparqlStore
      */
     public function getTripleCount(Node $graph)
     {
-        $result = $this->query('SELECT (COUNT(*) AS ?count) FROM <' . $graph->getUri() . '> WHERE {?s ?p ?o.}');
+        $result = $this->query(
+            'SELECT (COUNT(*) AS ?count) FROM <' . $graph->getUri() . '> WHERE {?s ?p ?o.}'
+        );
         $result = $result->getResultObject();
 
         return $result[0]['count']->getValue();
@@ -421,7 +423,10 @@ class Virtuoso extends AbstractSparqlStore
     {
         try {
             // execute query
-            $query = $this->connection->prepare($queryString, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
+            $query = $this->connection->prepare(
+                $queryString,
+                array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY)
+            );
             $query->execute();
             return $query;
         } catch (\PDOException $e) {

@@ -173,7 +173,9 @@ class Http extends AbstractSparqlStore
      */
     public function getTripleCount(Node $graph)
     {
-        $result = $this->query('SELECT (COUNT(*) AS ?count) FROM <' . $graph->getUri() . '> WHERE {?s ?p ?o.}');
+        $result = $this->query(
+            'SELECT (COUNT(*) AS ?count) FROM <' . $graph->getUri() . '> WHERE {?s ?p ?o.}'
+        );
         $result = $result->getResultObject();
 
         return $result[0]['count']->getValue();

@@ -326,7 +326,10 @@ class ARC2 extends AbstractSparqlStore
      */
     protected function getRowCount($tableName)
     {
-        $result = $this->store->queryDB('SELECT COUNT(*) as count FROM '. $tableName, $this->store->getDBCon());
+        $result = $this->store->queryDB(
+            'SELECT COUNT(*) as count FROM '. $tableName,
+            $this->store->getDBCon()
+        );
         $row = $result->fetch_assoc();
         return $row['count'];
     }
