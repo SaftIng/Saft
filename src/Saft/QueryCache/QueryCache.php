@@ -340,7 +340,7 @@ class QueryCache implements Store, ChainableStore
         // if successor is set, ask it first before run the command yourself.
         if ($this->successor instanceof Store) {
             $this->invalidateByTriplePattern(
-                $this->statementIteratorFactory->createArrayStatementIterator(array($statement)),
+                $this->statementIteratorFactory->createIteratorFromArray(array($statement)),
                 $graphUri
             );
 

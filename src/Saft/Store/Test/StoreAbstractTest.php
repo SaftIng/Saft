@@ -6,6 +6,7 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
+use Saft\Rdf\StatementIterator;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Sparql\SparqlUtils;
 use Saft\Store\Result\EmptyResult;
@@ -555,6 +556,22 @@ abstract class StoreAbstractTest extends TestCase
     /*
      * Tests getMatchingStatements
      */
+
+    public function testGetMatchingStatementsReturnType()
+    {
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new AnyPatternImpl()
+        );
+
+        $iterator = $this->fixture->getMatchingStatements($statement);
+
+        $this->assertTrue(
+            $iterator instanceof StatementIterator,
+            "Get Matching Statements has to return a StatementIterator"
+        );
+    }
 
     public function testGetMatchingStatements()
     {

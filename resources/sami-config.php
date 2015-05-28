@@ -3,11 +3,11 @@
 use Sami\Sami;
 use Symfony\Component\Finder\Finder;
 
-$root = realpath(__DIR__);
+$root = realpath(__DIR__) . DIRECTORY_SEPARATOR . '..';
 $iterator = Finder::create()
     ->files()
     ->name('*.php')
-    ->in($root . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'src')
+    ->in($root . DIRECTORY_SEPARATOR .'src')
 ;
 
 return new Sami($iterator, array(

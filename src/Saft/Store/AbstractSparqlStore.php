@@ -128,7 +128,7 @@ abstract class AbstractSparqlStore implements Store
                 foreach ($batchStatements as $graphUriToUse => $batch) {
                     foreach ($batch as $batchEntries) {
                         $content = $this->sparqlFormat(
-                            $this->statementIteratorFactory->createArrayStatementIterator(
+                            $this->statementIteratorFactory->createIteratorFromArray(
                                 array($batchEntries)
                             ),
                             $graph
@@ -187,7 +187,7 @@ abstract class AbstractSparqlStore implements Store
             throw new \Exception('Graph was not given, neither as parameter nor in statement.');
         }
 
-        $statementIterator = $this->statementIteratorFactory->createArrayStatementIterator(
+        $statementIterator = $this->statementIteratorFactory->createIteratorFromArray(
             array($statement)
         );
 
@@ -325,7 +325,7 @@ abstract class AbstractSparqlStore implements Store
         }
 
         // return a StatementIterator which contains the matching statements
-        return $this->statementIteratorFactory->createArrayStatementIterator($entries);
+        return $this->statementIteratorFactory->createIteratorFromArray($entries);
     }
 
     /**
@@ -351,7 +351,7 @@ abstract class AbstractSparqlStore implements Store
             $graph = $statement->getGraph();
         }
 
-        $statementIterator = $this->statementIteratorFactory->createArrayStatementIterator(
+        $statementIterator = $this->statementIteratorFactory->createIteratorFromArray(
             array($statement)
         );
 
