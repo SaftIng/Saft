@@ -77,13 +77,15 @@ class AbstractSparqlStoreTest extends TestCase
         $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
         $this->mock->addStatements($this->getFilledTestArrayStatementIterator());
 
-        //test to add not concrete Statement
+        // test to add not concrete Statement
         $subject1 = new AnyPatternImpl();
         $predicate1 = new NamedNodeImpl('http://saft/test/p1');
         $object1 = new NamedNodeImpl('http://saft/test/o1');
         $graph1 = new NamedNodeImpl('http://saft/test/g1');
-        $triple1 = new StatementImpl($subject1, $predicate1, $object1, $graph1);
-        $statements = new ArrayStatementIteratorImpl(array($triple1));
+
+        $statements = new ArrayStatementIteratorImpl(array(
+            new StatementImpl($subject1, $predicate1, $object1, $graph1)
+        ));
 
         $this->setExpectedException('\Exception');
         $this->mock->addStatements($statements);

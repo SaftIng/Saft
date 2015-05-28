@@ -100,12 +100,11 @@ abstract class AbstractSparqlStore implements Store
             // given $graph forces usage of it and not the graph from the statement instance
             if (null !== $graph) {
                 $graphUriToUse = $graph->getUri();
-                // reuse $graph instance later on.
+                $statement->setGraph($graph);
 
-            // use graphUri from statement
+            // use graph from statement
             } elseif (null !== $statement->getGraph()) {
-                $graph = $statement->getGraph();
-                $graphUriToUse = $graph->getUri();
+                $graphUriToUse = $statement->getGraph()->getUri();
 
             // no graph instance was found
             } else {
@@ -130,8 +129,7 @@ abstract class AbstractSparqlStore implements Store
 
                      foreach ($batch as $batchEntries) {
                          $content .= $this->sparqlFormat(
-                             $this->statementIteratorFactory->createIteratorFromArray(array($batchEntries)),
-                             $graph
+                             $this->statementIteratorFactory->createIteratorFromArray(array($batchEntries))
                          ) .' ';
                      }
 
@@ -147,18 +145,18 @@ abstract class AbstractSparqlStore implements Store
         }
 
         // handle remaining statements of the batch (that happens if the batch size was not reached (again))
+        $content = '';
+
         foreach ($batchStatements as $graphUriToUse => $batch) {
-            $content = '';
 
             foreach ($batch as $batchEntries) {
                 $content .= $this->sparqlFormat(
-                    $this->statementIteratorFactory->createIteratorFromArray(array($batchEntries)),
-                    $graph
+                    $this->statementIteratorFactory->createIteratorFromArray(array($batchEntries))
                 ) .' ';
             }
-
-            $this->query('INSERT DATA {'. $content .'}', $options);
         }
+
+        $this->query('INSERT DATA {'. $content .'}', $options);
     }
 
     /**
