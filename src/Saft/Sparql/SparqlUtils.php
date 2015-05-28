@@ -12,12 +12,12 @@ class SparqlUtils
     /**
      * Returns the Statement-Data in sparql-Format.
      *
-     * @param StatementIterator $statements   List of statements to format as SPARQL string.
-     * @param string            $graphUri     Use if each statement is a triple and to use another graph as
-     *                                        the default.
+     * @param  StatementIterator|array $statements List of statements to format as SPARQL string.
+     * @param  Node                    $graph      Use if each statement is a triple and to use another
+     *                                             graph as the default.
      * @return string, part of query
      */
-    public static function statementIteratorToSparqlFormat(StatementIterator $statements, Node $graph = null)
+    public static function statementIteratorToSparqlFormat($statements, Node $graph = null)
     {
         $query = '';
         foreach ($statements as $statement) {
