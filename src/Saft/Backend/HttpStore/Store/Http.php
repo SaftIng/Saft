@@ -168,7 +168,8 @@ class Http extends AbstractSparqlStore
      */
     public function isGraphAvailable(Node $graph)
     {
-        return true === in_array($graph->getUri(), $this->getAvailableGraphs());
+        $graphs = $this->getAvailableGraphs();
+        return isset($graphs[$graph->getUri()]);
     }
 
     /**
