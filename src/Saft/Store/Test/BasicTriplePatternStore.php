@@ -17,13 +17,34 @@ use Saft\Store\Store;
 class BasicTriplePatternStore extends AbstractTriplePatternStore
 {
     /**
+     * Contains all Statement instances which were added via addStatements. Its structure is:
+     *
+     * array (
+     *      'http://graph' => array(
+     *          'statementHash' => new StatementImpl(...),
+     *      )
+     * )
+     *
+     * @var array
+     */
+    protected $statements = array();
+
+    /**
      * Has no function and returns an empty array.
      *
      * @return array Empty array
      */
     public function getAvailableGraphs()
     {
-        return array();
+        $graphs = array();
+
+        foreach (array_keys($this->statements) as $graphUri) {
+            if ('defaultGraph' == $graphUri) {
+                $graphs[$graphUri] = $this->nodeFactory->createNamedNode($graphUri);
+            }
+        }
+
+        return $graphs;
     }
 
     /**
@@ -37,53 +58,103 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
     }
 
     /**
-     * Adds multiple Statements to (default-) graph.
+     * Adds multiple Statements to (default-) graph. It holds added statements as long as this instance exists.
      *
-     * @param  StatementIterator|array $statements    StatementList instance must contain Statement instances
-     *                                                which are 'concret-' and not 'pattern'-statements.
-     * @param  Node                    $graph         optional Overrides target graph. If set, all statements will
-     *                                                be add to that graph, if available.
-     * @param  array                   $options       optional It contains key-value pairs and should provide additional
-     *                                                introductions for the store and/or its adapter(s).
+     * @param  StatementIterator|array $statements             StatementList instance must contain Statement
+     *                                                         instances which are 'concret-' and not
+     *                                                         'pattern'-statements.
+     * @param  Node                    $graph         optional Overrides target graph. If set, all statements
+     *                                                         will be add to that graph, if available.
+     * @param  array                   $options       optional It contains key-value pairs and should provide
+     *                                                         additional introductions for the store and/or
+     *                                                         its adapter(s).
      */
     public function addStatements($statements, Node $graph = null, array $options = array())
     {
+        foreach ($statements as $statement) {
+            if (null !== $graph) {
+                $graphUri = $graph->getUri();
+
+            // no graph given, use graph information from $statement
+            } elseif (null === $graph && $statement->getGraph()) {
+                $graphUri = $statement->getGraph();
+
+            // no graph information given, use default graph
+            } elseif (null === $graph && null === $statement->getGraph()) {
+                $graphUri = 'defaultGraph';
+            }
+
+            // use hash to differenciate between statements (no doublings allowed)
+            $statementHash = hash('sha256', json_encode($statement));
+
+            // add it
+            $this->statements[$graphUri][$statementHash] = $statement;
+        }
     }
 
     /**
      * Removes all statements from a (default-) graph which match with given statement.
      *
-     * @param  Statement $Statement It can be either a concrete or pattern-statement.
-     * @param  Node $graph optional Overrides target graph. If set, all statements will be delete in
-     *                                       that graph.
-     * @param  array $options optional It contains key-value pairs and should provide additional
+     * @param  Statement $statement          It can be either a concrete or pattern-statement.
+     * @param  Node      $graph     optional Overrides target graph. If set, all statements will be
+     *                                       delete in that graph.
+     * @param  array     $options   optional It contains key-value pairs and should provide additional
      *                                       introductions for the store and/or its adapter(s).
-     * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
-     *                 will be thrown.
      */
     public function deleteMatchingStatements(
         Statement $statement,
         Node $graph = null,
         array $options = array()
     ) {
+        if (null !== $graph) {
+            $graphUri = $graph->getUri();
+
+        // no graph given, use graph information from $statement
+        } elseif (null === $graph && $statement->getGraph()) {
+            $graphUri = $statement->getGraph()->getUri();
+
+        // no graph information given, use default graph
+        } elseif (null === $graph && null === $statement->getGraph()) {
+            $graphUri = 'defaultGraph';
+        }
+
+        // use hash to differenciate between statements (no doublings allowed)
+        $statementHash = hash('sha256', json_encode($statement));
+
+        // delete it
+        unset($this->statements[$graphUri][$statementHash]);
     }
 
     /**
-     * It gets all statements of a given graph which match the following conditions:
-     * - statement's subject is either equal to the subject of the same statement of the graph or it is null.
-     * - statement's predicate is either equal to the predicate of the same statement of the graph or it is null.
-     * - statement's object is either equal to the object of a statement of the graph or it is null.
+     * It basically returns all stored statements.
      *
-     * @param  Statement $Statement It can be either a concrete or pattern-statement.
-     * @param  Node $graph optional Overrides target graph. If set, you will get all
-     *                                       matching statements of that graph.
-     * @param  array $options optional It contains key-value pairs and should provide additional
-     *                                       introductions for the store and/or its adapter(s).
-     * @return StatementIterator It contains Statement instances  of all matching statements of the given graph.
+     * @param  Statement         $Statement          It can be either a concrete or pattern-statement.
+     * @param  Node              $graph     optional Overrides target graph. If set, you will get all
+     *                                               matching statements of that graph.
+     * @param  array             $options   optional It contains key-value pairs and should provide additional
+     *                                               introductions for the store and/or its adapter(s).
+     * @return StatementIterator It contains Statement instances  of all matching statements of the given
+     *                           graph.
      */
     public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
-        return new ArrayStatementIteratorImpl(array());
+        if (null !== $graph) {
+            $graphUri = $graph->getUri();
+
+        // no graph given, use graph information from $statement
+        } elseif (null === $graph && $statement->getGraph()) {
+            $graphUri = $statement->getGraph();
+
+        // no graph information given, use default graph
+        } elseif (null === $graph && null === $statement->getGraph()) {
+            $graphUri = 'defaultGraph';
+        }
+
+        if (false == isset($this->statements[$graphUri])) {
+            $this->statements[$graphUri] = array();
+        }
+
+        return new ArrayStatementIteratorImpl($this->statements[$graphUri]);
     }
 
     /**
@@ -97,7 +168,23 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
      */
     public function hasMatchingStatement(Statement $statement, Node $graph = null, array $options = array())
     {
-        return true;
+        if (null !== $graph) {
+            $graphUri = $graph->getUri();
+
+        // no graph given, use graph information from $statement
+        } elseif (null === $graph && $statement->getGraph()) {
+            $graphUri = $statement->getGraph();
+
+        // no graph information given, use default graph
+        } elseif (null === $graph && null === $statement->getGraph()) {
+            $graphUri = 'defaultGraph';
+        }
+
+        // use hash to differenciate between statements (no doublings allowed)
+        $statementHash = hash('sha256', json_encode($statement));
+
+        // check it
+        return isset($this->statements[$graphUri][$statementHash]);
     }
 
     /**
@@ -112,7 +199,6 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
      */
     public function createGraph(NamedNode $graph, array $options = array())
     {
-        // TODO: Implement createGraph() method.
     }
 
     /**
@@ -126,6 +212,5 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
      */
     public function dropGraph(NamedNode $graph, array $options = array())
     {
-        // TODO: Implement dropGraph() method.
     }
 }

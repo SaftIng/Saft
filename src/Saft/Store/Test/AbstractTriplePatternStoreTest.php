@@ -98,7 +98,8 @@ class AbstractTriplePatternStoreTest extends TestCase
         $this->assertNull($this->fixture->query($query));
 
         $resultStatements = $this->fixture->getMatchingStatements($statement);
-        $this->assertEquals($resultStatements->next(), $statement);
+
+        $this->assertEquals($statement, $resultStatements->current());
         $this->assertEmpty($resultStatements->next());
     }
 
@@ -125,7 +126,7 @@ class AbstractTriplePatternStoreTest extends TestCase
     public function testDeleteMultipleStatementsQuadRecognition()
     {
         $quad = $this->getTestQuad();
-        $graphPattern = SparqlUtils::statementsToSparqlFormat([$quad]);
+        $graphPattern = SparqlUtils::statementsToSparqlFormat(array($quad));
         $query = 'DELETE DATA { ' . $graphPattern . '}';
 
         $this->assertNull($this->fixture->query($query));
@@ -166,7 +167,10 @@ class AbstractTriplePatternStoreTest extends TestCase
     public function testHasMatchingStatementTripleRecognition()
     {
         $triple = $this->getTestTriple();
-        $query = 'ASK { '. SparqlUtils::statementsToSparqlFormat([$triple]) .'}';
+
+        $this->fixture->addStatements(array($triple), $this->testGraph);
+
+        $query = 'ASK { '. SparqlUtils::statementsToSparqlFormat(array($triple), $this->testGraph) .'}';
 
         $this->assertTrue($this->fixture->query($query));
     }

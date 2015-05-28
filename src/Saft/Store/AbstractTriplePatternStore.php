@@ -203,7 +203,7 @@ abstract class AbstractTriplePatternStore implements Store
                 $o = $this->createNodeByValueAndType($pattern['o'], $pattern['o_type']);
                 $g = null;
 
-                $statementsArray[] = $this->statementFactory->createStatement($s, $p, $o, $g);
+                $statementArray[] = $this->statementFactory->createStatement($s, $p, $o, $g);
             }
 
         // if only quads, but not triples
@@ -218,7 +218,7 @@ abstract class AbstractTriplePatternStore implements Store
                 $o = $this->createNodeByValueAndType($pattern['o'], $pattern['o_type']);
                 $g = $this->createNodeByValueAndType($pattern['g'], $pattern['g_type']);
 
-                $statementsArray[] = $this->statementFactory->createStatement($s, $p, $o, $g);
+                $statementArray[] = $this->statementFactory->createStatement($s, $p, $o, $g);
             }
 
         // found quads and triples

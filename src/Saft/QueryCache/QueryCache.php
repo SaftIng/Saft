@@ -708,13 +708,14 @@ class QueryCache implements Store, ChainableStore
     /**
      * Invalidate all query cache entries which belong to Statement Iterator entries.
      *
-     * @param  StatementIterator $statements          Statement iterator containing statements to be created.
-     *                                                They will be invalidated first.
-     * @param  string            $graphUri   optional URI of the graph which is related to the statements. If
-     *                                                null, the graph of the statement will be used.
+     * @param  StatementIterator|array $statements          Statement iterator containing statements
+     *                                                      to be created. They will be invalidated first.
+     * @param  string                  $graphUri   optional URI of the graph which is related to the
+     *                                                      statements. If null, the graph of the
+     *                                                      statement will be used.
      * @throws \Exception If no graph URI for a certain statement is available.
      */
-    public function invalidateByTriplePattern(StatementIterator $statements, $graphUri = null)
+    public function invalidateByTriplePattern($statements, $graphUri = null)
     {
         // log it
         $this->addToLog(array(

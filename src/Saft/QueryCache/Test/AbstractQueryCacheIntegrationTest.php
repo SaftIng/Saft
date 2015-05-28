@@ -1114,6 +1114,9 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
             new NamedNodeImpl('http://p'),
             new LiteralImpl('foo')
         );
+
+        $this->fixture->addStatements(array($statement), $this->testGraph);
+
         $options = array(1);
 
         // assumption is that all given parameter will be returned
@@ -1137,6 +1140,9 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
             new NamedNodeImpl('http://p'),
             new NamedNodeImpl('http://o')
         );
+
+        $this->fixture->addStatements(array($statement), $this->testGraph);
+
         $options = array(1);
 
         // assumption is that all given parameter will be returned
@@ -1167,9 +1173,13 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         // test data
         $statement = new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl());
+
+        $this->fixture->addStatements(array($statement), $this->testGraph);
+
         $options = array(1);
 
-        // assumption is that all given parameter will be returned
+        // assumption is that the mock just returns the previously added $statement, even if
+        // it only contains non-concrete nodes.
         $this->assertTrue($this->fixture->hasMatchingStatement($statement, $this->testGraph, $options));
     }
 
@@ -1186,6 +1196,9 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         // test data
         $statement = new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl());
+
+        $this->fixture->addStatements(array($statement), $this->testGraph);
+
         $options = array(1);
 
         // assumption is that all given parameter will be returned
