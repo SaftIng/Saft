@@ -11,7 +11,7 @@ class StatementIteratorFactoryImpl implements StatementIteratorFactory
      *                                       which implements \Iterator interface.
      * @return StatementIterator
      */
-    public function createArrayStatementIterator($statements)
+    public function createArrayStatementIterator(array $statements)
     {
         if (is_array($statements)) {
             return new ArrayStatementIteratorImpl($statements);

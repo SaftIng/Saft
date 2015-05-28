@@ -98,8 +98,7 @@ interface Store
      * to only returned available graphs in the current context. But that depends on the implementation
      * and can differ.
      *
-     * @return array Simple array of key-value-pairs, which consists of graph URIs as key and NamedNode
-     *               instance as value.
+     * @return array Array with the graph URI as key and a NamedNode as value for each graph.
      */
     public function getAvailableGraphs();
 

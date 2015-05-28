@@ -32,7 +32,7 @@ class Parser implements ParserInterface
 
         $format = 'turtle';
 
-        $this->world = librdf_new_world();
+        $this->world = librdf_php_get_world();
         $this->parser = librdf_new_parser($this->world, $format, null, null);
 
         if (false === $this->parser) {

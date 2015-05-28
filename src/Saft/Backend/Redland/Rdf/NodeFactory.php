@@ -31,7 +31,7 @@ class NodeFactory implements SaftNodeFactory
 
         $datatypeUri = null;
 
-        $world = librdf_new_world();
+        $world = librdf_php_get_world();
 
         if ($datatype !== null) {
             if (!$datatype instanceof Node) {
@@ -78,7 +78,7 @@ class NodeFactory implements SaftNodeFactory
         }
 
         // TODO catch invalid URIs
-        $world = librdf_new_world();
+        $world = librdf_php_get_world();
         $uri = librdf_new_uri($world, $uri);
         $redlandNode = librdf_new_node_from_uri($world, $uri);
 
