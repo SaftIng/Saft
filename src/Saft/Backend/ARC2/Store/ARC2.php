@@ -162,7 +162,7 @@ class ARC2 extends AbstractSparqlStore
                     $this->query(
                         'INSERT INTO <'. $graphUriToUse .'> {'.
                         $this->sparqlFormat(
-                            $this->statementIteratorFactory->createArrayStatementIterator(
+                            $this->statementIteratorFactory->createIteratorFromArray(
                                 $statementBatch
                             )
                         ) .'}',
@@ -250,7 +250,7 @@ class ARC2 extends AbstractSparqlStore
             $statement->getObject()
         );
 
-        $statementIterator = $this->statementIteratorFactory->createArrayStatementIterator(
+        $statementIterator = $this->statementIteratorFactory->createIteratorFromArray(
             array($tripleStatement)
         );
 

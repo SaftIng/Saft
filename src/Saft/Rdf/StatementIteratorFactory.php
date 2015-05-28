@@ -13,5 +13,5 @@ interface StatementIteratorFactory
      *
      * TODO should become createStatementIteratorFromArray
      */
-    public function createArrayStatementIterator(array $statements);
+    public function createIteratorFromArray(array $statements);
 }

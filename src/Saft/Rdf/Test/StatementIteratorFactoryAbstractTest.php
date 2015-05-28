@@ -13,21 +13,21 @@ abstract class StatementIteratorFactoryAbstractTest extends TestCase
     abstract public function newInstance();
 
     /*
-     * Tests createArrayStatementIterator
+     * Tests createIteratorFromArray
      */
 
-    public function testCreateArrayStatementIteratorArrayGiven()
+    public function testCreateIteratorFromArrayArrayGiven()
     {
         $this->fixture = $this->newInstance();
         $parameter = array();
 
         $this->assertClassOfInstanceImplements(
-            $this->fixture->createArrayStatementIterator($parameter),
+            $this->fixture->createIteratorFromArray($parameter),
             'Saft\Rdf\StatementIterator'
         );
     }
 
-    public function testCreateArrayStatementIteratorIteratorGiven()
+    public function testCreateIteratorFromArrayIteratorGiven()
     {
         $this->fixture = $this->newInstance();
         $parameter = new \ArrayIterator(array());
@@ -36,16 +36,16 @@ abstract class StatementIteratorFactoryAbstractTest extends TestCase
         $implements = class_implements();
 
         $this->assertClassOfInstanceImplements(
-            $this->fixture->createArrayStatementIterator($parameter),
+            $this->fixture->createIteratorFromArray($parameter),
             'Saft\Rdf\StatementIterator'
         );
     }
 
-    public function testCreateArrayStatementIteratorInvalidParameterGiven()
+    public function testCreateIteratorFromArrayInvalidParameterGiven()
     {
         $this->setExpectedException('\Exception');
 
         $parameter = array('invalid parameter');
-        $this->newInstance()->createArrayStatementIterator($parameter);
+        $this->newInstance()->createIteratorFromArray($parameter);
     }
 }
