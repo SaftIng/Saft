@@ -134,28 +134,6 @@ class Http extends AbstractSparqlStore
     }
 
     /**
-     * Returns a list of all available graph URIs of the store. It can also respect access control,
-     * to only returned available graphs in the current context. But that depends on the implementation
-     * and can differ.
-     *
-     * @return array Simple array of key-value-pairs, which consists of graph URIs as key and NamedNode
-     *               instance as value.
-     */
-    public function getAvailableGraphs()
-    {
-        $result = $this->query('SELECT DISTINCT ?g WHERE { GRAPH ?g {?s ?p ?o.} }');
-
-        $graphs = array();
-
-        // $entry is of type NamedNode
-        foreach ($result as $entry) {
-            $graphs[$entry['g']->getUri()] = $this->nodeFactory->createNamedNode($entry['g']->getUri());
-        }
-
-        return $graphs;
-    }
-
-    /**
      * @return array Empty
      * TODO implement getStoreDescription
      */
