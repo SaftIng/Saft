@@ -80,13 +80,18 @@ abstract class AbstractTriplePatternStore implements Store
 
                 // if it goes into the loop, there is more than one triple pattern in the DELETE query,
                 // which is not allowed.
-                foreach ($statements as $value) {
-                    throw new \Exception(
-                        'DELETE query can not contain more than one triple pattern: '. $query
-                    );
+                $i = 0;
+                foreach ($statements as $statement) {
+                    if (1 <= $i++) {
+                        throw new \Exception(
+                            'DELETE query can not contain more than one triple pattern: '. $query
+                        );
+                    }
+
+                    // if only one Statement is in the list, no exception will be thrown and in
+                    // $statement is that Statement later on and can be used.
                 }
 
-                $statement = $this->getStatement($queryObject);
                 return $this->deleteMatchingStatements($statement);
 
             // INSERT DATA or INSERT INTO query
