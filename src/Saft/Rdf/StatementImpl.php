@@ -35,10 +35,13 @@ class StatementImpl extends AbstractStatement
      */
     public function __construct(Node $subject, Node $predicate, Node $object, Node $graph = null)
     {
-        $this->subject = $subject;
-        $this->predicate = $predicate;
-        $this->object = $object;
-        $this->graph = $graph;
+        $this->setSubject($subject);
+        $this->setPredicate($predicate);
+        $this->setObject($object);
+
+        if (null !== $graph) {
+            $this->setGraph($graph);
+        }
     }
 
     /**
@@ -87,5 +90,37 @@ class StatementImpl extends AbstractStatement
     public function isTriple()
     {
         return null === $this->graph;
+    }
+
+    /**
+     * @param NamedNode|Variable $graph
+     */
+    public function setGraph(Node $graph)
+    {
+        $this->graph = $graph;
+    }
+
+    /**
+     * @param Node $object
+     */
+    public function setObject(Node $object)
+    {
+        $this->object = $object;
+    }
+
+    /**
+     * @param NamedNode|Variable $predicate
+     */
+    public function setPredicate(Node $predicate)
+    {
+        $this->predicate = $predicate;
+    }
+
+    /**
+     * @param BlankNode|NamedNode $subject
+     */
+    public function setSubject(Node $subject)
+    {
+        $this->subject = $subject;
     }
 }
