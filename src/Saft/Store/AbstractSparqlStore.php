@@ -227,7 +227,8 @@ abstract class AbstractSparqlStore implements Store
         $graphs = array();
 
         foreach ($result as $entry) {
-            $graphs[$entry['g']->getUri()] = $entry['g'];
+            $graphNode = $entry['g'];
+            $graphs[$graphNode->getUri()] = $graphNode;
         }
 
         return $graphs;

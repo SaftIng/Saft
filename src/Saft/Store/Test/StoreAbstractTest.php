@@ -548,8 +548,8 @@ abstract class StoreAbstractTest extends TestCase
         $graphUri = $this->testGraph->getUri();
 
         // check, that our test graph is part of the array
-        $this->assertTrue(isset($availableGraphs[$graphUri]));
-        $this->assertTrue($this->testGraph->equals($availableGraphs[$graphUri]));
+        $this->assertTrue(isset($availableGraphs[$graphUri]), "The test graph is not available");
+        $this->assertTrue($this->testGraph->equals($availableGraphs[$graphUri]), "The test graph object is not valid");
     }
 
     /*
