@@ -57,6 +57,21 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * It checks of the given instance implements a certain class or interface.
+     *
+     * @param object $instance         Instance to check.
+     * @param string $classOrInterface Name of the class or interface to check if it is implemented
+     *                                 by $instance.
+     */
+    public function assertClassOfInstanceImplements($instance, $classOrInterface)
+    {
+        $this->assertTrue(is_object($instance), '$instance is not an object.');
+
+        $implements = class_implements($instance);
+        $this->assertTrue(isset($implements[$classOrInterface]));
+    }
+
+    /**
      * This assertion consumes the StatementIterator and counts its entries until it is empty. It automatically
      * calls assertTrue and -False on $statementIterator->valid() from time to time.
      *

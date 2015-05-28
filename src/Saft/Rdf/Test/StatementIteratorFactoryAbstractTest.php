@@ -21,10 +21,10 @@ abstract class StatementIteratorFactoryAbstractTest extends TestCase
         $this->fixture = $this->newInstance();
         $parameter = array();
 
-        // get a list of all interfaces that instance implements
-        $implements = class_implements($this->fixture->createArrayStatementIterator($parameter));
-
-        $this->assertTrue(isset($implements['Saft\Rdf\StatementIterator']));
+        $this->assertClassOfInstanceImplements(
+            $this->fixture->createArrayStatementIterator($parameter),
+            'Saft\Rdf\StatementIterator'
+        );
     }
 
     public function testCreateArrayStatementIteratorIteratorGiven()
@@ -33,9 +33,12 @@ abstract class StatementIteratorFactoryAbstractTest extends TestCase
         $parameter = new \ArrayIterator(array());
 
         // get a list of all interfaces that instance implements
-        $implements = class_implements($this->fixture->createArrayStatementIterator($parameter));
+        $implements = class_implements();
 
-        $this->assertTrue(isset($implements['Saft\Rdf\StatementIterator']));
+        $this->assertClassOfInstanceImplements(
+            $this->fixture->createArrayStatementIterator($parameter),
+            'Saft\Rdf\StatementIterator'
+        );
     }
 
     public function testCreateArrayStatementIteratorInvalidParameterGiven()
