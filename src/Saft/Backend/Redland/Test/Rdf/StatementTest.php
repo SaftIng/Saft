@@ -36,7 +36,7 @@ class StatementTest extends \Saft\Rdf\Test\StatementAbstractTest
 
     public function newInstance($subject, $predicate, $object, $graph = null)
     {
-        $world = librdf_new_world();
+        $world = librdf_php_get_world();
 
         $factory = new NodeFactory();
         try {
