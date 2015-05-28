@@ -227,7 +227,8 @@ abstract class AbstractSparqlStore implements Store
         $graphs = array();
 
         foreach ($result as $entry) {
-            $graphs[$entry['g']->getUri()] = $entry['g'];
+            $graphNode = $entry['g'];
+            $graphs[$graphNode->getUri()] = $graphNode;
         }
 
         return $graphs;
@@ -322,7 +323,7 @@ abstract class AbstractSparqlStore implements Store
             );
         }
 
-        // returns an iterator containing received statements
+        // return a StatementIterator which contains the matching statements
         return $this->statementIteratorFactory->createArrayStatementIterator($entries);
     }
 
