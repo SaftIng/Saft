@@ -45,7 +45,7 @@ abstract class StatementIteratorFactoryAbstractTest extends TestCase
     {
         $this->setExpectedException('\Exception');
 
-        $parameter = 'invalid parameter';
+        $parameter = array('invalid parameter');
         $this->newInstance()->createArrayStatementIterator($parameter);
     }
 }
