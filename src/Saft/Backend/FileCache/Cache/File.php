@@ -32,13 +32,13 @@ class File implements Cache
     {
         // if cachePath key is not set, save reference to systems temp directory
         if (false === isset($config['cachePath'])) {
-            $this->cachePath = sys_get_temp_dir() . '/saft/';
+            $this->cachePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'saft' . DIRECTORY_SEPARATOR;
         } else {
             $this->cachePath = $config['cachePath'];
 
-            // check that there is a / at the end
-            if ('/' !== substr($this->cachePath, strlen($this->cachePath)-1, 1)) {
-                $this->cachePath .= '/';
+            // check that there is the direcory separator at the end
+            if (DIRECTORY_SEPARATOR !== substr($this->cachePath, strlen($this->cachePath)-1, 1)) {
+                $this->cachePath .= DIRECTORY_SEPARATOR;
             }
         }
 
