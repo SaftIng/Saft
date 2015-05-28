@@ -10,6 +10,8 @@ interface StatementIteratorFactory
      * @param  array|\Iterator   $statements List of statements, represented by an array or instance
      *                                       which implements \Iterator interface.
      * @return StatementIterator
+     *
+     * TODO should become createStatementIteratorFromArray
      */
-    public function createArrayStatementIterator($statements);
+    public function createArrayStatementIterator(array $statements);
 }
