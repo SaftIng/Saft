@@ -5,6 +5,7 @@ SAMI = ./vendor/bin/sami.php
 XSLTPROC = xsltproc
 
 PHPCS-RULES = resources/codesniffer-ruleset.xml
+SAMI-CONFIG = resources/sami-config.php
 
 default:
 	@echo ""
@@ -30,7 +31,7 @@ codebeautifier:
 	$(PHPCBF) --standard=$(PHPCS-RULES) --extensions=php -p src/*
 
 apidoc:
-	$(SAMI) update -n -v --force sami-config.php
+	$(SAMI) update -n -v --force $(SAMI-CONFIG)
 
 clean:
 	rm -r ./gen ./tmp

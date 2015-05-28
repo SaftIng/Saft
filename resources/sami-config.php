@@ -7,12 +7,12 @@ $root = realpath(__DIR__);
 $iterator = Finder::create()
     ->files()
     ->name('*.php')
-    ->in($root.'/src')
+    ->in($root.'/../src')
 ;
 
 return new Sami($iterator, array(
     'title'               => 'Saft API Documentation',
-    'theme'               => 'enhanced',
+    'theme'               => 'default',
     'build_dir'           => "$root/gen/apidoc",
     'cache_dir'           => "$root/tmp/samicache",
     'include_parent_data' => true,
