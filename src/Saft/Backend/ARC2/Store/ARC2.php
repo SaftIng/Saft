@@ -294,7 +294,7 @@ class ARC2 extends AbstractSparqlStore
      * @return array Simple array of key-value-pairs, which consists of graph URIs as key and NamedNode
      *               instance as value.
      */
-    public function getAvailableGraphs()
+    public function getGraphs()
     {
         $g2t = $this->configuration['table-prefix'] . '_g2t';
         $id2val = $this->configuration['table-prefix'] . '_id2val';

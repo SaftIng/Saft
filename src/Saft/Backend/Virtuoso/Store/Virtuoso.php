@@ -150,7 +150,7 @@ class Virtuoso extends AbstractSparqlStore
      * @return array Simple array of key-value-pairs, which consists of graph URIs as key and NamedNode
      *               instance as value.
      */
-    public function getAvailableGraphs()
+    public function getGraphs()
     {
         $query = $this->sqlQuery(
             'SELECT ID_TO_IRI(REC_GRAPH_IID) AS graph FROM DB.DBA.RDF_EXPLICITLY_CREATED_GRAPH'
@@ -195,7 +195,7 @@ class Virtuoso extends AbstractSparqlStore
      */
     public function isGraphAvailable(Node $graph)
     {
-        $graphs = $this->getAvailableGraphs();
+        $graphs = $this->getGraphs();
 
         return isset($graphs[$graph->getUri()]);
     }

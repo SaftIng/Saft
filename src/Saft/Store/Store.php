@@ -100,7 +100,7 @@ interface Store
      *
      * @return array Array with the graph URI as key and a NamedNode as value for each graph.
      */
-    public function getAvailableGraphs();
+    public function getGraphs();
 
     /**
      * Create a new graph with the URI given as Node. If the underlying store implementation doesn't

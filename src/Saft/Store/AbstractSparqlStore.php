@@ -235,7 +235,7 @@ abstract class AbstractSparqlStore implements Store
      * @return array Simple array of key-value-pairs, which consists of graph URIs as key and NamedNode
      *               instance as value.
      */
-    public function getAvailableGraphs()
+    public function getGraphs()
     {
         $result = $this->query('SELECT DISTINCT ?g WHERE { GRAPH ?g {?s ?p ?o.} }');
 

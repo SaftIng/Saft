@@ -280,36 +280,6 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     }
 
     /**
-     * Tests getAvailableGraphs
-     */
-
-    public function testGetAvailableGraphs()
-    {
-        // set basic store as successor
-        $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(),
-            new StatementFactoryImpl(),
-            new QueryFactoryImpl(),
-            new StatementIteratorFactoryImpl()
-        );
-        $this->fixture->setChainSuccessor($successor);
-
-        // assumption is that all given parameter will be returned
-        $this->assertEquals(
-            array(),
-            $this->fixture->getAvailableGraphs()
-        );
-    }
-
-    // try to call function method without a successor set leads to an exception
-    public function testGetAvailableGraphsNoSuccessor()
-    {
-        $this->setExpectedException('\Exception');
-
-        $this->fixture->getAvailableGraphs();
-    }
-
-    /**
      * Tests get- and setChainSuccessor
      */
 
@@ -326,6 +296,37 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
         $this->assertEquals($successor, $this->fixture->getChainSuccessor());
     }
+
+    /**
+     * Tests getGraphs
+     */
+
+    public function testGetGraphs()
+    {
+        // set basic store as successor
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
+        );
+        $this->fixture->setChainSuccessor($successor);
+
+        // assumption is that all given parameter will be returned
+        $this->assertEquals(
+            array(),
+            $this->fixture->getGraphs()
+        );
+    }
+
+    // try to call function method without a successor set leads to an exception
+    public function testGetGraphsNoSuccessor()
+    {
+        $this->setExpectedException('\Exception');
+
+        $this->fixture->getGraphs();
+    }
+
 
     /**
      * Tests getLog

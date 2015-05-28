@@ -34,7 +34,7 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
      *
      * @return array Empty array
      */
-    public function getAvailableGraphs()
+    public function getGraphs()
     {
         $graphs = array();
 

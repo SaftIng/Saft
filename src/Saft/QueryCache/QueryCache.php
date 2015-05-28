@@ -358,14 +358,14 @@ class QueryCache implements Store, ChainableStore
      * @return array      Array which contains graph URI's as values and keys.
      * @throws \Exception If no successor is set but this function was called.
      */
-    public function getAvailableGraphs()
+    public function getGraphs()
     {
         // log it
-        $this->addToLog(array('method' => 'getAvailableGraphs'));
+        $this->addToLog(array('method' => 'getGraphs'));
 
         // if successor is set, ask it first before run the command yourself.
         if ($this->successor instanceof Store) {
-            return $this->successor->getAvailableGraphs();
+            return $this->successor->getGraphs();
 
         // dont run command by myself
         } else {

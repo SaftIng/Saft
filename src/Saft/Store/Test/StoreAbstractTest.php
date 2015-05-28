@@ -536,15 +536,15 @@ abstract class StoreAbstractTest extends TestCase
     }
 
     /**
-     * test for method getAvailableGraphs
+     * test for method getGraphs
      */
 
-    public function testGetAvailableGraphs()
+    public function testGetGraphs()
     {
         $this->fixture->createGraph($this->testGraph);
 
         // FYI: $availableGraphs is an array containing graph URI strings as key and a respective NamedNode as value.
-        $availableGraphs = $this->fixture->getAvailableGraphs();
+        $availableGraphs = $this->fixture->getGraphs();
 
         $graphUri = $this->testGraph->getUri();
 
