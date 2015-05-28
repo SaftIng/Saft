@@ -86,7 +86,7 @@ abstract class AbstractSparqlStore implements Store
         /**
          * Create batches out of given statements to improve statement throughput.
          */
-        $counter = 0;
+        $counter = 1;
         $batchSize = 100;
         $batchStatements = array();
 
@@ -125,22 +125,39 @@ abstract class AbstractSparqlStore implements Store
                  * $batchStatements is an array with graphUri('s) as key(s) and iterator instances as value.
                  * Each entry is related to a certain graph and contains a bunch of statement instances.
                  */
-                foreach ($batchStatements as $graphUriToUse => $batch) {
-                    foreach ($batch as $batchEntries) {
-                        $content = $this->sparqlFormat(
-                            $this->statementIteratorFactory->createIteratorFromArray(
-                                array($batchEntries)
-                            ),
-                            $graph
-                        );
+                 foreach ($batchStatements as $graphUriToUse => $batch) {
+                     $content = '';
 
-                        $this->query('INSERT DATA {'. $content .'}', $options);
-                    }
-                }
+                     foreach ($batch as $batchEntries) {
+                         $content .= $this->sparqlFormat(
+                             $this->statementIteratorFactory->createIteratorFromArray(array($batchEntries)),
+                             $graph
+                         ) .' ';
+                     }
+
+                     $this->query('INSERT DATA {'. $content .'}', $options);
+                 }
 
                 // re-init variables
                 $batchStatements = array();
+
+            } else {
+                ++$counter;
             }
+        }
+
+        // handle remaining statements of the batch (that happens if the batch size was not reached (again))
+        foreach ($batchStatements as $graphUriToUse => $batch) {
+            $content = '';
+
+            foreach ($batch as $batchEntries) {
+                $content .= $this->sparqlFormat(
+                    $this->statementIteratorFactory->createIteratorFromArray(array($batchEntries)),
+                    $graph
+                ) .' ';
+            }
+
+            $this->query('INSERT DATA {'. $content .'}', $options);
         }
     }
 
