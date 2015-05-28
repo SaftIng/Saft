@@ -90,10 +90,10 @@ interface Store
     public function getStoreDescription();
 
     /**
-     * Returns a list of all available graph URIs of the store.
+     * Returns a list of all graphs currently available in the store.
      * It can also respect access control, to only returned available graphs in the current context.
      *
-     * @return array Simple array of graph URIs.
+     * @return array Array with the graph URI as key and a NamedNode as value for each graph.
      */
     public function getAvailableGraphs();
 
