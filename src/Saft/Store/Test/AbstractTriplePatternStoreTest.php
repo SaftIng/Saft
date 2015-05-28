@@ -95,7 +95,7 @@ class AbstractTriplePatternStoreTest extends TestCase
             }
         }';
 
-        $this->assertTrue($this->fixture->query($query));
+        $this->assertNull($this->fixture->query($query));
 
         $resultStatements = $this->fixture->getMatchingStatements($statement);
         $this->assertEquals($resultStatements->next(), $statement);

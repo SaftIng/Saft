@@ -582,9 +582,9 @@ abstract class StoreAbstractTest extends TestCase
         );
 
         /**
-         * Build SetResult instance to check against
+         * Build StatementIterator instance to check against
          */
-        $statementResultToCheckAgainst = new StatementSetResultImpl(array(
+        $instanceToCheckAgainst = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
                 new NamedNodeImpl('http://p/'),
@@ -596,10 +596,9 @@ abstract class StoreAbstractTest extends TestCase
                 new LiteralImpl('test literal')
             )
         ));
-        $statementResultToCheckAgainst->setVariables(array('s', 'p', 'o'));
 
         $this->assertEquals(
-            $statementResultToCheckAgainst,
+            $instanceToCheckAgainst,
             $this->fixture->getMatchingStatements($statement, $this->testGraph)
         );
     }
@@ -608,11 +607,8 @@ abstract class StoreAbstractTest extends TestCase
     {
         $statement = new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl());
 
-        $statementResult = new StatementSetResultImpl(array());
-        $statementResult->setVariables(array('s', 'p', 'o'));
-
         $this->assertEquals(
-            $statementResult,
+            new ArrayStatementIteratorImpl(array()),
             $this->fixture->getMatchingStatements($statement, $this->testGraph)
         );
     }

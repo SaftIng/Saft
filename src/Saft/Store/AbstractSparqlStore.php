@@ -322,10 +322,8 @@ abstract class AbstractSparqlStore implements Store
             );
         }
 
-        // return a StatementResult which contains the fresh created Statement instances-
-        $statementResult = $this->resultFactory->createStatementResult($entries);
-        $statementResult->setVariables($result->getVariables());
-        return $statementResult;
+        // returns an iterator containing received statements
+        return $this->statementIteratorFactory->createArrayStatementIterator($entries);
     }
 
     /**

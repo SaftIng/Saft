@@ -149,7 +149,7 @@ class Http extends AbstractSparqlStore
 
         // $entry is of type NamedNode
         foreach ($result as $entry) {
-            $graphs[$entry['g']->getUri()] = $entry['g']->getUri();
+            $graphs[$entry['g']->getUri()] = $this->nodeFactory->createNamedNode($entry['g']->getUri());
         }
 
         return $graphs;
