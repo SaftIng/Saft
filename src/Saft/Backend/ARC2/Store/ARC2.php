@@ -55,7 +55,12 @@ class ARC2 extends AbstractSparqlStore
     /**
      * Constructor.
      *
-     * @param  array $configuration Array containing database credentials
+     * @param NodeFactory              $nodeFactory
+     * @param StatementFactory         $statementFactory
+     * @param QueryFactory             $queryFactory
+     * @param ResultFactory            $resultFactory
+     * @param StatementIteratorFactory $statementIteratorFactory
+     * @param array                    $configuration Array containing database credentials
      */
     public function __construct(
         NodeFactory $nodeFactory,
@@ -95,12 +100,14 @@ class ARC2 extends AbstractSparqlStore
      * supports SPARQL+ and not SPARQL Update 1.1, which means an INSERT INTO query has to look like:
      * INSERT INTO <http://graph/> { triple ... }.
      *
-     * @param  StatementIterator|array $statements  StatementList instance must contain Statement instances
-     *                                              which are 'concret-' and not 'pattern'-statements.
-     * @param  Node                    $graph       optional Overrides target graph. If set, all statements will
-     *                                              be add to that graph, if available.
-     * @param  array                   $options     optional It contains key-value pairs and should provide additional
-     *                                              introductions for the store and/or its adapter(s).
+     * @param  StatementIterator|array $statements       StatementList instance must contain Statement
+     *                                                   instances which are 'concret-' and not
+     *                                                   'pattern'-statements.
+     * @param  Node                    $graph   optional Overrides target graph. If set, all statements
+     *                                                   will be add to that graph, if it is available.
+     * @param  array                   $options optional Key-value pairs which provide additional
+     *                                                   introductions for the store and/or its
+     *                                                   adapter(s).
      */
     public function addStatements($statements, Node $graph = null, array $options = array())
     {
@@ -170,13 +177,14 @@ class ARC2 extends AbstractSparqlStore
     }
 
     /**
-     * Create a new graph with the URI given as Node. If the underlying store implementation doesn't support empty
-     * graphs this method will have no effect.
+     * Create a new graph with the URI given as Node. If the underlying store implementation doesn't
+     * support empty graphs this method will have no effect.
      *
-     * @param  NamedNode $graph            Instance of NamedNode containing the URI of the graph to create.
-     * @param  array     $options optional It contains key-value pairs and should provide additional introductions
-     *                                     for the store and/or its adapter(s).
+     * @param  NamedNode  $graph            Instance of NamedNode containing the URI of the graph to create.
+     * @param  array      $options optional It contains key-value pairs and should provide additional
+     *                                      introductions for the store and/or its adapter(s).
      * @throws \Exception If given $graph is not a NamedNode.
+     * @throws \Exception If the given graph could not be created.
      */
     public function createGraph(NamedNode $graph, array $options = array())
     {
@@ -213,13 +221,16 @@ class ARC2 extends AbstractSparqlStore
      * Removes all statements from a (default-) graph which match with given statement.
      *
      * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  Node      $graph     optional Overrides target graph. If set, all statements will be delete in
-     *                                       that graph.
-     * @param  array     $options   optional It contains key-value pairs and should provide additional
-     *                                       introductions for the store and/or its adapter(s).
+     * @param  Node      $graph     optional Overrides target graph. If set, all statements will
+     *                                       be delete in that graph.
+     * @param  array     $options   optional Key-value pairs which provide additional introductions
+     *                                       for the store and/or its adapter(s).
      */
-    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
-    {
+    public function deleteMatchingStatements(
+        Statement $statement,
+        Node $graph = null,
+        array $options = array()
+    ) {
         // given $graph forces usage of it and not the graph from the statement instance
         if (null !== $graph) {
             // use given $graph
@@ -252,10 +263,11 @@ class ARC2 extends AbstractSparqlStore
     /**
      * Removes the given graph from the store.
      *
-     * @param  NamedNode $graph            Instance of NamedNode containing the URI of the graph to drop.
-     * @param  array     $options optional It contains key-value pairs and should provide additional introductions
-     *                                     for the store and/or its adapter(s).
+     * @param  NamedNode  $graph            Instance of NamedNode containing the URI of the graph to drop.
+     * @param  array      $options optional It contains key-value pairs and should provide additional
+     *                                      introductions for the store and/or its adapter(s).
      * @throws \Exception If given $graph is not a NamedNode.
+     * @throws \Exception If the given graph could not be droped
      */
     public function dropGraph(NamedNode $graph, array $options = array())
     {
@@ -275,9 +287,12 @@ class ARC2 extends AbstractSparqlStore
     }
 
     /**
-     * Returns array with graphUri's which are available.
+     * Returns a list of all available graph URIs of the store. It can also respect access control,
+     * to only returned available graphs in the current context. But that depends on the implementation
+     * and can differ.
      *
-     * @return array Array which contains graph URI's as values and keys.
+     * @return array Simple array of key-value-pairs, which consists of graph URIs as key and NamedNode
+     *               instance as value.
      */
     public function getAvailableGraphs()
     {
@@ -305,6 +320,9 @@ class ARC2 extends AbstractSparqlStore
 
     /**
      * Helper function to get the number of rows in a table.
+     *
+     * @param  string $tableName
+     * @return int Number of rows in the target table.
      */
     protected function getRowCount($tableName)
     {
@@ -349,11 +367,10 @@ class ARC2 extends AbstractSparqlStore
     /**
      * This method sends a SPARQL query to the store.
      *
-     * @param  string $query            The SPARQL query to send to the store.
-     * @param  array  $options optional It contains key-value pairs and should provide additional introductions
-     *                                  for the store and/or its adapter(s).
-     * @return Result Returns result of the query. Depending on the query type, it returns either an instance
-     *                of EmptyResult, SetResult, StatementResult or ValueResult.
+     * @param  string     $query            The SPARQL query to send to the store.
+     * @param  array      $options optional It contains key-value pairs and should provide additional
+     *                                      introductions for the store and/or its adapter(s).
+     * @return Result     Returns result of the query. Its type depends on the type of the query.
      * @throws \Exception If query is no string.
      * @throws \Exception If query is malformed.
      * @todo handle multiple graphs in FROM clause

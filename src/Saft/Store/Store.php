@@ -12,50 +12,54 @@ use Saft\Sparql\Result\Result;
 
 /**
  * Declaration of methods that any Store implementation must have, whether its for a Triple- or Quad store.
- *
- * TODO specify how to init instance (using constructor or init-function?)
  */
 interface Store
 {
     /**
      * Adds multiple Statements to (default-) graph.
      *
-     * @param  StatementIterator|array $statements StatementList instance must contain Statement instances
-     *                                             which are 'concret-' and not 'pattern'-statements.
-     * @param  Node                    $graph      optional Overrides target graph. If set, all statements will
-     *                                             be add to that graph, if available.
-     * @param  array                   $options    optional It contains key-value pairs and should provide additional
-     *                                             introductions for the store and/or its adapter(s).
-     * @return boolean Returns true, if function performed without errors. In case an error occur, an exception
-     *                 will be thrown.
+     * @param  StatementIterator|array $statements       StatementList instance must contain Statement
+     *                                                   instances which are 'concret-' and not
+     *                                                   'pattern'-statements.
+     * @param  Node                    $graph   optional Overrides target graph. If set, all statements
+     *                                                   will be add to that graph, if it is available.
+     * @param  array                   $options optional Key-value pairs which provide additional
+     *                                                   introductions for the store and/or its
+     *                                                   adapter(s).
      */
     public function addStatements($statements, Node $graph = null, array $options = array());
 
     /**
      * Removes all statements from a (default-) graph which match with given statement.
      *
-     * @param  Statement $Statement          It can be either a concrete or pattern-statement.
-     * @param  Node      $graph     optional Overrides target graph. If set, all statements will be delete in
-     *                                       that graph.
-     * @param  array     $options   optional It contains key-value pairs and should provide additional
-     *                                       introductions for the store and/or its adapter(s).
-     * @return boolean Returns true, if function performed without errors. In case
-     *                 an error occur, an exception will be thrown.
+     * @param  Statement $statement          It can be either a concrete or pattern-statement.
+     * @param  Node      $graph     optional Overrides target graph. If set, all statements will
+     *                                       be delete in that graph.
+     * @param  array     $options   optional Key-value pairs which provide additional introductions
+     *                                       for the store and/or its adapter(s).
      */
-    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array());
+    public function deleteMatchingStatements(
+        Statement $statement,
+        Node $graph = null,
+        array $options = array()
+    );
 
     /**
      * It gets all statements of a given graph which match the following conditions:
-     * - statement's subject is either equal to the subject of the same statement of the graph or it is null.
-     * - statement's predicate is either equal to the predicate of the same statement of the graph or it is null.
+     * - statement's subject is either equal to the subject of the same statement of the graph or
+     *   it is null.
+     * - statement's predicate is either equal to the predicate of the same statement of the graph or
+     *   it is null.
      * - statement's object is either equal to the object of a statement of the graph or it is null.
      *
-     * @param  Statement $Statement          It can be either a concrete or pattern-statement.
-     * @param  Node      $graph     optional Overrides target graph. If set, you will get all
-     *                                       matching statements of that graph.
-     * @param  array     $options   optional It contains key-value pairs and should provide additional
-     *                                       introductions for the store and/or its adapter(s).
-     * @return StatementIterator It contains Statement instances  of all matching statements of the given graph.
+     * @param  Statement         $Statement          It can be either a concrete or pattern-statement.
+     * @param  Node              $graph     optional Overrides target graph. If set, you will get all
+     *                                               matching statements of that graph.
+     * @param  array             $options   optional It contains key-value pairs and should provide
+     *                                               additional introductions for the store and/or its
+     *                                               adapter(s).
+     * @return StatementIterator It contains Statement instances  of all matching statements of the
+     *                           given graph.
      */
     public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = array());
 
@@ -74,10 +78,10 @@ interface Store
     /**
      * This method sends a SPARQL query to the store.
      *
-     * @param  string $query            The SPARQL query to send to the store.
-     * @param  array  $options optional It contains key-value pairs and should provide additional
-     *                                  introductions for the store and/or its adapter(s).
-     * @return Result Returns result of the query. Its type depends on the type of the query.
+     * @param  string     $query            The SPARQL query to send to the store.
+     * @param  array      $options optional It contains key-value pairs and should provide additional
+     *                                      introductions for the store and/or its adapter(s).
+     * @return Result     Returns result of the query. Its type depends on the type of the query.
      * @throws \Exception If query is no string, is malformed or an execution error occured.
      */
     public function query($query, array $options = array());
@@ -90,20 +94,22 @@ interface Store
     public function getStoreDescription();
 
     /**
-     * Returns a list of all available graph URIs of the store.
-     * It can also respect access control, to only returned available graphs in the current context.
+     * Returns a list of all available graph URIs of the store. It can also respect access control,
+     * to only returned available graphs in the current context. But that depends on the implementation
+     * and can differ.
      *
-     * @return array Simple array of graph URIs.
+     * @return array Simple array of key-value-pairs, which consists of graph URIs as key and NamedNode
+     *               instance as value.
      */
     public function getAvailableGraphs();
 
     /**
-     * Create a new graph with the URI given as Node. If the underlying store implementation doesn't support empty
-     * graphs this method will have no effect.
+     * Create a new graph with the URI given as Node. If the underlying store implementation doesn't
+     * support empty graphs this method will have no effect.
      *
-     * @param  NamedNode $graph            Instance of NamedNode containing the URI of the graph to create.
-     * @param  array     $options optional It contains key-value pairs and should provide additional introductions
-     *                                     for the store and/or its adapter(s).
+     * @param  NamedNode  $graph            Instance of NamedNode containing the URI of the graph to create.
+     * @param  array      $options optional It contains key-value pairs and should provide additional
+     *                                      introductions for the store and/or its adapter(s).
      * @throws \Exception If given $graph is not a NamedNode.
      * @throws \Exception If the given graph could not be created.
      */
@@ -112,9 +118,9 @@ interface Store
     /**
      * Removes the given graph from the store.
      *
-     * @param  NamedNode $graph            Instance of NamedNode containing the URI of the graph to drop.
-     * @param  array     $options optional It contains key-value pairs and should provide additional introductions
-     *                                     for the store and/or its adapter(s).
+     * @param  NamedNode  $graph            Instance of NamedNode containing the URI of the graph to drop.
+     * @param  array      $options optional It contains key-value pairs and should provide additional
+     *                                      introductions for the store and/or its adapter(s).
      * @throws \Exception If given $graph is not a NamedNode.
      * @throws \Exception If the given graph could not be droped
      */

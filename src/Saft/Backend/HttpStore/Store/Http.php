@@ -63,7 +63,13 @@ class Http extends AbstractSparqlStore
     /**
      * Constructor.
      *
-     * @param array $adapterOptions Array containing database credentials
+     * @param NodeFactory              $nodeFactory
+     * @param StatementFactory         $statementFactory
+     * @param QueryFactory             $queryFactory
+     * @param ResultFactory            $resultFactory
+     * @param StatementIteratorFactory $statementIteratorFactory
+     * @param array                    $adapterOptions           Array containing database credentials
+     * @throws \Exception              If HTTP store requires the PHP ODBC extension to be loaded.
      */
     public function __construct(
         NodeFactory $nodeFactory,
@@ -128,9 +134,12 @@ class Http extends AbstractSparqlStore
     }
 
     /**
-     * Returns array with graphUri's which are available.
+     * Returns a list of all available graph URIs of the store. It can also respect access control,
+     * to only returned available graphs in the current context. But that depends on the implementation
+     * and can differ.
      *
-     * @return array Array which contains graph URI's as values and keys.
+     * @return array Simple array of key-value-pairs, which consists of graph URIs as key and NamedNode
+     *               instance as value.
      */
     public function getAvailableGraphs()
     {
@@ -217,11 +226,10 @@ class Http extends AbstractSparqlStore
     /**
      * This method sends a SPARQL query to the store.
      *
-     * @param  string $query            The SPARQL query to send to the store.
-     * @param  array  $options optional It contains key-value pairs and should provide additional
-     *                                  introductions for the store and/or its adapter(s).
-     * @return Result Returns result of the query. Depending on the query type, it returns either an instance
-     *                of EmptyResult, SetResult, StatementResult or ValueResult.
+     * @param  string     $query            The SPARQL query to send to the store.
+     * @param  array      $options optional It contains key-value pairs and should provide additional
+     *                                      introductions for the store and/or its adapter(s).
+     * @return Result     Returns result of the query. Its type depends on the type of the query.
      * @throws \Exception     If query is no string.
      * @throws \Exception     If query is malformed.
      * @throws StoreException If server returned an error.

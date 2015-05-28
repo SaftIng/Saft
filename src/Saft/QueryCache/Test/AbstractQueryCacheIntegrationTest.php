@@ -69,7 +69,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
 
         // assumption is that all given parameter will be returned
-        $this->assertTrue($this->fixture->addStatements($statementIterator, $this->testGraph, array(1)));
+        $this->assertNull($this->fixture->addStatements($statementIterator, $this->testGraph, array(1)));
     }
 
     // try to call function method without a successor set leads to an exception
@@ -266,7 +266,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $statement = new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl());
 
         // assumption is that all given parameter will be returned
-        $this->assertTrue($this->fixture->deleteMatchingStatements($statement, $this->testGraph, array(1)));
+        $this->assertNull($this->fixture->deleteMatchingStatements($statement, $this->testGraph, array(1)));
     }
 
     // try to call function method without a successor set leads to an exception

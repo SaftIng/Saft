@@ -10,6 +10,8 @@ interface ChainableStore
      * function gets called.
      * E.g. you chain a query cache and a virtuoso instance. In this example all queries will be handled by
      * the query cache first, but if no cache entry was found, the virtuoso instance gets called.
+     *
+     * @param Store $successor An instance of a class which implements Store interface.
      */
     public function setChainSuccessor(Store $successor);
 }

@@ -56,12 +56,13 @@ abstract class AbstractTriplePatternStore implements Store
     }
 
     /**
-     * Execute a given query on the store.
+     * This method sends a SPARQL query to the store.
      *
-     * @param  string     $query            SPARQL query string.
-     * @param  string     $options optional Further configuration options.
-     * @throws \Exception If unsupported query was given or if WITH-DELETE-WHERE and WITH-DELETE-INSERT-WHERE query was
-     *                    given.
+     * @param  string     $query            The SPARQL query to send to the store.
+     * @param  array      $options optional It contains key-value pairs and should provide additional
+     *                                      introductions for the store and/or its adapter(s).
+     * @return Result     Returns result of the query. Its type depends on the type of the query.
+     * @throws \Exception If query is no string, is malformed or an execution error occured.
      */
     public function query($query, array $options = array())
     {
@@ -233,6 +234,14 @@ abstract class AbstractTriplePatternStore implements Store
         return $this->statementIteratorFactory->createArrayStatementIterator($statementArray);
     }
 
+    /**
+     * Creates an instance of Node by given $value and $type.
+     *
+     * @param  mixed  $value
+     * @param  string $type
+     * @return Node   Instance of Node interface.
+     * @throws \Exception
+     */
     protected function createNodeByValueAndType($value, $type)
     {
         /**
