@@ -143,7 +143,7 @@ class AbstractSparqlStoreTest extends TestCase
 
     public function testDeleteMatchingStatements()
     {
-        $query = 'DELETE DATA { Graph <http://saft/test/g1> ';
+        $query = 'DELETE WHERE { Graph <http://saft/test/g1> ';
         $query.= '{<http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.} }';
 
         $this->mock->method('query')->with(new EqualsSparqlConstraint($query));
