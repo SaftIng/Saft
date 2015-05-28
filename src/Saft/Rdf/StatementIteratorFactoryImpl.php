@@ -13,15 +13,6 @@ class StatementIteratorFactoryImpl implements StatementIteratorFactory
      */
     public function createIteratorFromArray(array $statements)
     {
-        if (is_array($statements)) {
-            return new ArrayStatementIteratorImpl($statements);
-
-        } elseif ($statements instanceof \Iterator) {
-            $arrayIterator = new \ArrayIterator($statements);
-            return new ArrayStatementIteratorImpl($arrayIterator->getArrayCopy());
-
-        } else {
-            throw new \Exception('Parameter $statements is neither an array nor instace of \Iterator.');
-        }
+        return new ArrayStatementIteratorImpl($statements);
     }
 }
