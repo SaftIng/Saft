@@ -40,7 +40,19 @@ class LiteralImpl extends AbstractLiteral
             throw new \Exception('Literal value can\'t be null. Please use AnyPattern if you need a variable.');
         }
 
-        $this->value = (string)$value;
+        /*
+         * Prevent PHP from its type casting. We cast
+         * - true to 'true'
+         * - false to 'false'
+         * - the rest to string, for instance 1 to '1', 0.1 to '0.1', ...
+         */
+        if (true === $value) {
+            $this->value = 'true';
+        } elseif (false === $value) {
+            $this->value = 'false';
+        } else {
+            $this->value = (string)$value;
+        }
 
         if ($lang !== null) {
             $this->lang = (string)$lang;
