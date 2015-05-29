@@ -4,6 +4,12 @@ namespace Saft\Rdf;
 
 class NodeFactoryImpl implements NodeFactory
 {
+    const NAMED_NODE_REGEX = '/^<([^<>]+)>$/';
+    const BLANK_NODE_REGEX = '/^_:(.+)$/';
+    const LITERAL_DATATYPE_REGEX = '/^"(.+)"\^\^<([^<>]+)>$/';
+    const LITERAL_LANG_REGEX = '/^"(.+)"@([\w\-]+)$/';
+    const LITERAL_REGEX = '/^"(.*)"$/';
+
     /**
      * @param string $value
      * @param Node|string $datatype (optional)
@@ -34,5 +40,20 @@ class NodeFactoryImpl implements NodeFactory
     public function createAnyPattern()
     {
         return new AnyPatternImpl();
+    }
+
+    public function createNodeFromNQuads($string)
+    {
+        if (preg_match(self::NAMED_NODE_REGEX, $string, $matches)) {
+            return $this->createNamedNode($matches[1]);
+        } elseif (preg_match(self::BLANK_NODE_REGEX, $string, $matches)) {
+            return $this->createBlankNode($matches[1]);
+        } elseif (preg_match(self::LITERAL_DATATYPE_REGEX, $string, $matches)) {
+            return $this->createLiteral($matches[1], $matches[2]);
+        } elseif (preg_match(self::LITERAL_LANG_REGEX, $string, $matches)) {
+            return $this->createLiteral($matches[1], null, $matches[2]);
+        } elseif (preg_match(self::LITERAL_REGEX, $string, $matches)) {
+            return $this->createLiteral($matches[1]);
+        }
     }
 }

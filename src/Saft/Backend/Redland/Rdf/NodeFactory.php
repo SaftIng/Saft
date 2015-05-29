@@ -3,9 +3,9 @@
 namespace Saft\Backend\Redland\Rdf;
 
 use \Saft\Rdf\Node;
-use \Saft\Rdf\NodeFactory as SaftNodeFactory;
+use \Saft\Rdf\NodeFactoryImpl as SaftNodeFactoryImpl;
 
-class NodeFactory implements SaftNodeFactory
+class NodeFactory extends SaftNodeFactoryImpl
 {
     /**
      * @var string
@@ -87,16 +87,6 @@ class NodeFactory implements SaftNodeFactory
         }
 
         return new NamedNode($redlandNode);
-    }
-
-    public function createBlankNode($blankId)
-    {
-
-    }
-
-    public function createAnyPattern()
-    {
-
     }
 
     public function createRedlandNodeFromNode(Node $node)

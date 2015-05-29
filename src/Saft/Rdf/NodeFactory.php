@@ -11,4 +11,6 @@ interface NodeFactory
     public function createBlankNode($blankId);
 
     public function createAnyPattern();
+
+    public function createNodeFromNQuads($string);
 }
