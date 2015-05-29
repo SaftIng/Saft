@@ -124,17 +124,17 @@ abstract class AbstractSparqlStore implements Store
                  * $batchStatements is an array with graphUri('s) as key(s) and iterator instances as value.
                  * Each entry is related to a certain graph and contains a bunch of statement instances.
                  */
-                 foreach ($batchStatements as $graphUriToUse => $batch) {
-                     $content = '';
+                foreach ($batchStatements as $graphUriToUse => $batch) {
+                    $content = '';
 
-                     foreach ($batch as $batchEntries) {
-                         $content .= $this->sparqlFormat(
-                             $this->statementIteratorFactory->createIteratorFromArray(array($batchEntries))
-                         ) .' ';
-                     }
+                    foreach ($batch as $batchEntries) {
+                        $content .= $this->sparqlFormat(
+                            $this->statementIteratorFactory->createIteratorFromArray(array($batchEntries))
+                        ) .' ';
+                    }
 
-                     $this->query('INSERT DATA {'. $content .'}', $options);
-                 }
+                    $this->query('INSERT DATA {'. $content .'}', $options);
+                }
 
                 // re-init variables
                 $batchStatements = array();
@@ -148,7 +148,6 @@ abstract class AbstractSparqlStore implements Store
         $content = '';
 
         foreach ($batchStatements as $graphUriToUse => $batch) {
-
             foreach ($batch as $batchEntries) {
                 $content .= $this->sparqlFormat(
                     $this->statementIteratorFactory->createIteratorFromArray(array($batchEntries))
