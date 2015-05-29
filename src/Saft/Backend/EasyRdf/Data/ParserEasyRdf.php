@@ -88,7 +88,7 @@ class ParserEasyRdf implements Parser
 
         // if format is still null, throw exception, because we dont know what format the given stream is
         if (null === $serialization) {
-            throw new Exception('Either given $serialization is unknown or i could not guess format.');
+            throw new \Exception('Either given $serialization is unknown or the parser could not guess the format.');
         }
 
         $graph->parse($inputString, $serialization->getName());
