@@ -2,8 +2,8 @@
 
 namespace Saft\Backend\EasyRdf\Data;
 
-use EasyRdf_Format;
-use EasyRdf_Graph;
+use EasyRdf\Format;
+use EasyRdf\Graph;
 use Saft\Data\Serializer;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NodeFactory;
@@ -51,7 +51,7 @@ class SerializerEasyRdf implements Serializer
             $format = 'ntriples';
         }
 
-        $graph = new EasyRdf_Graph();
+        $graph = new Graph();
 
         // go through all statements
         foreach ($statements as $statement) {
@@ -106,6 +106,6 @@ class SerializerEasyRdf implements Serializer
      */
     public function getSupportedSerializations()
     {
-        return array_keys(\EasyRdf_Format::getFormats());
+        return array_keys(Format::getFormats());
     }
 }

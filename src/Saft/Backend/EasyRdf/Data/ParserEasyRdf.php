@@ -2,8 +2,8 @@
 
 namespace Saft\Backend\EasyRdf\Data;
 
-use EasyRdf_Format;
-use EasyRdf_Graph;
+use EasyRdf\Format;
+use EasyRdf\Graph;
 use Saft\Data\Parser;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NodeFactory;
@@ -54,7 +54,7 @@ class ParserEasyRdf implements Parser
      */
     public function getSupportedSerializations()
     {
-        return array_keys(\EasyRdf_Format::getFormats());
+        return array_keys(Format::getFormats());
     }
 
     /**
@@ -76,14 +76,14 @@ class ParserEasyRdf implements Parser
      */
     public function parseStringToIterator($inputString, $baseUri = null, $serialization = null)
     {
-        $graph = new EasyRdf_Graph();
+        $graph = new Graph();
 
         // let EasyRdf guess the format
         if ($serialization === null) {
-            $serialization = EasyRdf_Format::guessFormat($inputString);
+            $serialization = Format::guessFormat($inputString);
 
         } else {
-            $serialization = EasyRdf_Format::getFormat($serialization);
+            $serialization = Format::getFormat($serialization);
         }
 
         // if format is still null, throw exception, because we dont know what format the given stream is
@@ -117,7 +117,7 @@ class ParserEasyRdf implements Parser
      */
     public function parseStreamToIterator($inputStream, $baseUri = null, $serialization = null)
     {
-        $graph = new EasyRdf_Graph();
+        $graph = new Graph();
 
         // let EasyRdf guess the format
         if ($serialization === null) {
@@ -125,10 +125,10 @@ class ParserEasyRdf implements Parser
             if (false === strpos($inputStream, '://')) {
                 $inputStream = 'file://'. $inputStream;
             }
-            $serialization = EasyRdf_Format::guessFormat(file_get_contents($inputStream));
+            $serialization = Format::guessFormat(file_get_contents($inputStream));
 
         } else {
-            $serialization = EasyRdf_Format::getFormat($serialization);
+            $serialization = Format::getFormat($serialization);
         }
 
         // if format is still null, throw exception, because we dont know what format the given stream is

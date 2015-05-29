@@ -40,7 +40,7 @@
     },
     "require": {
         "php": ">=5.3.3",
-        "easyrdf/easyrdf": "*",
+        "easyrdf/easyrdf": "dev-master",
         "fzaninotto/Streamer": "*",
         "semsol/arc2": "dev-master",
         "php-curl-class/php-curl-class": "*",
