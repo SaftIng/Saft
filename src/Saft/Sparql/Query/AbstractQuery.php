@@ -483,7 +483,11 @@ abstract class AbstractQuery implements Query
                 // and extract S, P and O.
                 $triplePattern = $this->extractTriplePattern($matches[2][$key]);
 
-                // TODO Handle case that more than one triple pattern or no one was found
+                // TODO Handle case that more than one triple pattern was found
+
+                if (0 == count($triplePattern)) {
+                    throw new \Exception('Quad related part of the query is invalid: '. $matches[2][$key]);
+                }
 
                 $quad = $triplePattern[0];
                 $quad['g'] = $graph;
@@ -738,6 +742,12 @@ abstract class AbstractQuery implements Query
                         if (false !== strpos($adaptedQuery, 'with')
                             && false !== strpos($adaptedQuery, 'delete')
                             && false !== strpos($adaptedQuery, 'where')) {
+                            return 'updateQuery';
+
+                        // check if query is of type: WITH <http:// ... > DELETE { ... }
+                        // TODO make it more precise
+                        } elseif (false !== strpos($adaptedQuery, 'with')
+                            && false !== strpos($adaptedQuery, 'delete')) {
                             return 'updateQuery';
                         }
                 }

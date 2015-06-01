@@ -183,6 +183,12 @@ class UpdateQueryImpl extends AbstractQuery
                     && false !== strpos($adaptedQuery, 'delete')
                     && false !== strpos($adaptedQuery, 'where')) {
                     return 'withDeleteWhere';
+
+                // check if query is of type: WITH <http:// ... > DELETE { ... }
+                // TODO make it more precise
+                } elseif (false !== strpos($adaptedQuery, 'with')
+                    && false !== strpos($adaptedQuery, 'delete')) {
+                    return 'withDelete';
                 }
         }
 
