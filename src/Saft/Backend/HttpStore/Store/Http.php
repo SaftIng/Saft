@@ -155,6 +155,84 @@ class Http extends AbstractSparqlStore
     }
 
     /**
+     * Checks, what rights the current user has to query and update graphs and triples. Be aware, that method
+     * could polute your store by creating test graphs.
+     *
+     * @return array An array with key value pairs. Keys are graphUpdate, tripleQuerying and tripleUpdate.
+     *               The values are boolean values, which depend on the according right if they are true or
+     *               false.
+     * @todo Implement a safer way to check, if the current user can create and drop a graph
+     * @todo Implement a safer way to check, if the current user can create a triple inside a graph
+     *       Problem here is to get a graph, in which you have write access.
+     */
+    public function getRights()
+    {
+        $rights = array(
+            'graphUpdate' => false,
+            'tripleQuerying' => false,
+            'tripleUpdate' => false
+        );
+
+        // generate a unique graph URI which we will use later on for our tests.
+        $graph = 'http://saft/'. hash('sha1', rand(0, time()) . microtime(true)) .'/';
+
+        /*
+         * check if we can create and drop graphs
+         */
+        try {
+            $this->query('CREATE GRAPH <'. $graph .'>');
+            $this->query('DROP GRAPH <'. $graph .'>');
+            $rights['graphUpdate'] = true;
+        } catch (\Exception $e) {
+            // ignore exception here and assume we could not create or drop the graph.
+        }
+
+        /*
+         * check if we can query triples
+         */
+        try {
+            $this->query('SELECT ?g { GRAPH ?g {?s ?p ?o} } LIMIT 1');
+            $rights['tripleQuerying'] = true;
+        } catch (\Exception $e) {
+            // ignore exception here and assume we could not query anything.
+        }
+
+        /*
+         * check if we can create and update queries.
+         */
+        try {
+            if ($rights['graphUpdate']) {
+                // create graph
+                $this->query('CREATE GRAPH <'. $graph .'>');
+
+                // create a simple triple
+                $this->query('INSERT DATA { GRAPH <'. $graph .'> { <'. $graph .'1> <'. $graph .'2> "42" } }');
+
+                // remove all triples
+                $this->query('WITH <'. $graph .'> DELETE { ?s ?p ?o }');
+
+                // drop graph
+                $this->query('DROP GRAPH <'. $graph .'>');
+
+                $rights['tripleUpdate'] = true;
+            }
+        } catch (\Exception $e) {
+            // ignore exception here and assume we could not update a triple.
+            echo $e->getMessage() ."
+
+            ";
+
+            // whatever happens, try to remove the fresh graph.
+            try {
+                $this->query('DROP GRAPH <'. $graph .'>');
+            } catch (\Exception $e) {
+            }
+        }
+
+        return $rights;
+    }
+
+    /**
      * @return array Empty
      * TODO implement getStoreDescription
      */
@@ -332,6 +410,7 @@ class Http extends AbstractSparqlStore
          */
         } else {
             $result = $this->client->sendSparqlUpdateQuery($query);
+            $decodedResult = json_decode($result, true);
 
             if ('askQuery' === AbstractQuery::getQueryType($query)) {
                 $askResult = json_decode($result, true);
@@ -341,11 +420,16 @@ class Http extends AbstractSparqlStore
 
                 // assumption here is, if a string was returned, something went wrong.
                 } elseif (0 < strlen($result)) {
-                    throw new StoreException($result);
+                    throw new \Exception($result);
 
                 } else {
                     $return = $this->resultFactory->createEmptyResult();
                 }
+
+            // usually a SPARQL result does not return a string. if it does anyway, assume there is an error.
+            } elseif (null === $decodedResult && 0 < strlen($result)) {
+                throw new \Exception($result);
+
             } else {
                 $return = $this->resultFactory->createEmptyResult();
             }

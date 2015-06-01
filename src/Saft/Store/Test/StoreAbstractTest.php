@@ -29,18 +29,6 @@ abstract class StoreAbstractTest extends TestCase
         }
     }
 
-    /**
-     *
-     */
-    public function tearDown()
-    {
-        if (null !== $this->fixture) {
-            $this->fixture->dropGraph($this->testGraph);
-        }
-
-        parent::tearDown();
-    }
-
     protected function getTestQuad()
     {
         $subject1 = new NamedNodeImpl('http://saft/testquad/s1');
@@ -85,6 +73,9 @@ abstract class StoreAbstractTest extends TestCase
 
     public function testAddStatements()
     {
+        // clear test graph
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
+
         $anyStatement = new StatementImpl(
             new AnyPatternImpl(),
             new AnyPatternImpl(),
@@ -156,6 +147,9 @@ abstract class StoreAbstractTest extends TestCase
 
     public function testAddStatementsWithArray()
     {
+        // clear test graph
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
+
         $anyStatement = new StatementImpl(
             new AnyPatternImpl(),
             new AnyPatternImpl(),
@@ -191,6 +185,9 @@ abstract class StoreAbstractTest extends TestCase
 
     public function testAddStatementsInvalidStatements()
     {
+        // clear test graph
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
+
         // build statement iterator containing one statement which consists only of variables.
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl())
@@ -624,6 +621,9 @@ abstract class StoreAbstractTest extends TestCase
 
     public function testGetMatchingStatementsEmptyGraph()
     {
+        // clear test graph
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph .'>');
+
         $statement = new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl());
 
         $this->assertEquals(
@@ -881,6 +881,9 @@ abstract class StoreAbstractTest extends TestCase
 
     public function testQueryEmptyResult()
     {
+        // clear test graph
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph .'>');
+
         $setResult = new SetResultImpl(new \ArrayIterator());
         $setResult->setVariables(array('s', 'p', 'o'));
 
