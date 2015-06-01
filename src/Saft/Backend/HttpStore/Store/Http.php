@@ -128,7 +128,7 @@ class Http extends AbstractSparqlStore
     /**
      * Closes a current connection.
      */
-    public function closeConnection()
+    protected function closeConnection()
     {
         $this->client->getClient()->close();
     }
@@ -176,7 +176,7 @@ class Http extends AbstractSparqlStore
      *
      * @return Client Setup HTTP client.
      */
-    public function openConnection()
+    protected function openConnection()
     {
         $this->client = new Client();
 

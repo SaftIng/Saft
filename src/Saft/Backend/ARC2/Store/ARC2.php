@@ -346,7 +346,7 @@ class ARC2 extends AbstractSparqlStore
     /**
      * Creates and sets up an instance of ARC2_Store.
      */
-    public function openConnection()
+    protected function openConnection()
     {
         // set standard values
         $this->configuration = array_merge(array(
