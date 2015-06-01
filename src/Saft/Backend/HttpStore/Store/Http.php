@@ -24,11 +24,11 @@ use Saft\Store\Result\ResultFactory;
 class Http extends AbstractSparqlStore
 {
     /**
-     * Adapter option array
+     * Adapter options
      *
      * @var array
      */
-    protected $adapterOptions = null;
+    protected $configuration = null;
 
     /**
      * @var Client
@@ -68,7 +68,7 @@ class Http extends AbstractSparqlStore
      * @param QueryFactory             $queryFactory
      * @param ResultFactory            $resultFactory
      * @param StatementIteratorFactory $statementIteratorFactory
-     * @param array                    $adapterOptions           Array containing database credentials
+     * @param array                    $configuration            Array containing database credentials
      * @throws \Exception              If HTTP store requires the PHP ODBC extension to be loaded.
      */
     public function __construct(
@@ -77,13 +77,13 @@ class Http extends AbstractSparqlStore
         QueryFactory $queryFactory,
         ResultFactory $resultFactory,
         StatementIteratorFactory $statementIteratorFactory,
-        array $adapterOptions
+        array $configuration
     ) {
-        $this->adapterOptions = $adapterOptions;
+        $this->configuration = $configuration;
 
         $this->checkRequirements();
 
-        // Open connection
+        // Open connection and, if possible, authenticate on server
         $this->openConnection();
 
         $this->nodeFactory = $nodeFactory;
@@ -107,6 +107,27 @@ class Http extends AbstractSparqlStore
     public function __destruct()
     {
         $this->closeConnection();
+    }
+
+    /**
+     * Using digest authentication to authenticate user on the server.
+     *
+     * @param  string $authUrl  URL to authenticate.
+     * @param  string $username Username to access.
+     * @param  string $password Password to access.
+     * @throws \Exception If response
+     */
+    protected function authenticateOnServer($authUrl, $username, $password)
+    {
+        $this->client->setUrl($authUrl);
+        $this->client->sendDigestAuthentication($username, $password);
+
+        $curlInfo = curl_getinfo($this->client->getClient()->curl);
+
+        // If status code is not 200, something went wrong
+        if (200 !== $curlInfo['http_code']) {
+            throw new \Exception('Response with Status Code [' . $curlInfo['http_code'] . '].', 500);
+        }
     }
 
     /**
@@ -180,27 +201,28 @@ class Http extends AbstractSparqlStore
     {
         $this->client = new Client();
 
-        $adapterOptions = array_merge(array(
+        $configuration = array_merge(array(
             'authUrl' => '',
             'password' => '',
             'queryUrl' => '',
             'username' => ''
-        ), $this->adapterOptions);
+        ), $this->configuration);
 
-        $this->client->setUrl($adapterOptions['authUrl']);
-        $this->client->sendDigestAuthentication($adapterOptions['username'], $adapterOptions['password']);
-
-        $curlInfo = curl_getinfo($this->client->getClient()->curl);
-
-        // If status code is 200, means everything is OK
-        if (200 === $curlInfo['http_code']) {
-            $this->client->setUrl($adapterOptions['queryUrl']);
-            return $this->client;
-
-        // validate HTTP status code (user/password credential issues)
-        } else {
-            throw new \Exception('Response with Status Code [' . $curlInfo['http_code'] . '].', 500);
+        // authenticate only if an authUrl was given.
+        if (NodeUtils::simpleCheckURI($configuration['authUrl'])) {
+            $this->authenticateOnServer(
+                $configuration['authUrl'],
+                $configuration['username'],
+                $configuration['password']
+            );
         }
+
+        // check query URL
+        if (false === NodeUtils::simpleCheckUri($configuration['queryUrl'])) {
+            throw new \Exception('Parameter queryUrl is not an URI or empty: '. $configuration['queryUrl']);
+        }
+
+        $this->client->setUrl($configuration['queryUrl']);
     }
 
     /**
