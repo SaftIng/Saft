@@ -145,11 +145,10 @@ class Http extends AbstractSparqlStore
     /**
      * Counts the number of triples in a graph.
      *
-     * @param  Node $graph URI of the graph you wanna count triples
-     * @return integer Number of found triples
-     * @throw  \Exception If parameter $graphUri is not valid or empty.
+     * @param  NamedNode $graph NamedNode instance of the graph you wanna count triples.
+     * @return integer   Number of found triples
      */
-    public function getTripleCount(Node $graph)
+    public function getTripleCount(NamedNode $graph)
     {
         $result = $this->query(
             'SELECT (COUNT(*) AS ?count) FROM <' . $graph->getUri() . '> WHERE {?s ?p ?o.}'
