@@ -25,11 +25,6 @@ use Symfony\Component\Yaml\Parser;
 abstract class AbstractQueryCacheIntegrationTest extends TestCase
 {
     /**
-     * @var string
-     */
-    protected $className = '';
-
-    /**
      * @var QueryFactory
      */
     protected $queryFactory;

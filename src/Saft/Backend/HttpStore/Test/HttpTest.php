@@ -31,8 +31,6 @@ class HttpTest extends StoreAbstractTest
         } else {
             $this->markTestSkipped('Array httpConfig is not set in the config.yml.');
         }
-
-        $this->className = 'HttpIntegrationTest';
     }
 
     /**
