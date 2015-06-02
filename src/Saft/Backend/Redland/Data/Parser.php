@@ -2,8 +2,8 @@
 
 namespace Saft\Backend\Redland\Data;
 
-use \Saft\Data\Parser as ParserInterface;
-use \Saft\Backend\Redland\Rdf\StatementIterator;
+use Saft\Data\Parser as ParserInterface;
+use Saft\Backend\Redland\Rdf\StatementIterator;
 
 class Parser implements ParserInterface
 {

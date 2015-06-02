@@ -2,8 +2,8 @@
 
 namespace Saft\Backend\Redland\Rdf;
 
-use \Saft\Rdf\Node;
-use \Saft\Rdf\AbstractStatement;
+use Saft\Rdf\AbstractStatement;
+use Saft\Rdf\Node;
 
 class Statement extends AbstractStatement
 {

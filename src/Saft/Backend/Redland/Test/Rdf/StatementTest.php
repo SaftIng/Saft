@@ -2,12 +2,12 @@
 
 namespace Saft\Backend\Redland\Tests\Rdf;
 
-use \Saft\Rdf\AnyPatternImpl;
-use \Saft\Backend\Redland\Rdf\BlankNode;
-use \Saft\Backend\Redland\Rdf\Literal;
-use \Saft\Backend\Redland\Rdf\NamedNode;
-use \Saft\Backend\Redland\Rdf\NodeFactory;
-use \Saft\Backend\Redland\Rdf\Statement;
+use Saft\Rdf\AnyPatternImpl;
+use Saft\Backend\Redland\Rdf\BlankNode;
+use Saft\Backend\Redland\Rdf\Literal;
+use Saft\Backend\Redland\Rdf\NamedNode;
+use Saft\Backend\Redland\Rdf\NodeFactory;
+use Saft\Backend\Redland\Rdf\Statement;
 
 class StatementTest extends \Saft\Rdf\Test\StatementAbstractTest
 {

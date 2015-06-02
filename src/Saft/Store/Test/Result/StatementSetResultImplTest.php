@@ -2,8 +2,8 @@
 
 namespace Saft\Store\Test\Result;
 
-use Saft\Rdf\StatementImpl;
 use Saft\Rdf\AnyPatternImpl;
+use Saft\Rdf\StatementImpl;
 use Saft\Store\Result\StatementSetResultImpl;
 use Saft\Test\TestCase;
 

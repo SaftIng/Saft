@@ -2,7 +2,7 @@
 
 namespace Saft\Backend\Redland\Rdf;
 
-use \Saft\Rdf\AbstractNamedNode;
+use Saft\Rdf\AbstractNamedNode;
 
 class NamedNode extends AbstractNamedNode
 {

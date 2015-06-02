@@ -2,8 +2,8 @@
 
 namespace Saft\Rdf\Test;
 
-use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\AnyPatterImpl;
+use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Test\TestCase;

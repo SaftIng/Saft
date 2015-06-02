@@ -2,7 +2,7 @@
 
 namespace Saft\Backend\Redland\Rdf;
 
-use \Saft\Rdf\AbstractBlankNode;
+use Saft\Rdf\AbstractBlankNode;
 
 class BlankNode extends AbstractBlankNode
 {

@@ -2,7 +2,7 @@
 
 namespace Saft\Backend\Redland\Rdf;
 
-use \Saft\Rdf\AbstractLiteral;
+use Saft\Rdf\AbstractLiteral;
 
 class Literal extends AbstractLiteral
 {

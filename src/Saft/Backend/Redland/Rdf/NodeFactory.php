@@ -2,8 +2,8 @@
 
 namespace Saft\Backend\Redland\Rdf;
 
-use \Saft\Rdf\Node;
-use \Saft\Rdf\NodeFactoryImpl as SaftNodeFactoryImpl;
+use Saft\Rdf\Node;
+use Saft\Rdf\NodeFactoryImpl as SaftNodeFactoryImpl;
 
 class NodeFactory extends SaftNodeFactoryImpl
 {

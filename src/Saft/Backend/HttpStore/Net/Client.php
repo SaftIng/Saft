@@ -2,6 +2,8 @@
 
 namespace Saft\Backend\HttpStore\Net;
 
+use Curl\Curl;
+
 class Client
 {
     /**
@@ -19,7 +21,7 @@ class Client
      */
     public function __construct()
     {
-        $this->client = new \Curl\Curl();
+        $this->client = new Curl();
     }
 
     /**

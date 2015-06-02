@@ -2,17 +2,17 @@
 
 namespace Saft\Store\Test;
 
+use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
-use Saft\Rdf\AnyPatternImpl;
 use Saft\Sparql\SparqlUtils;
 use Saft\Store\Result\EmptyResult;
 use Saft\Store\Result\EmptyResultImpl;
-use Saft\Store\Result\StatementSetResultImpl;
 use Saft\Store\Result\SetResultImpl;
+use Saft\Store\Result\StatementSetResultImpl;
 use Saft\Store\Result\ValueResultImpl;
 use Saft\Test\TestCase;
 use Symfony\Component\Yaml\Parser;

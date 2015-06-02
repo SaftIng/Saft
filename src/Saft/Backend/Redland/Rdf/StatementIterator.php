@@ -2,7 +2,7 @@
 
 namespace Saft\Backend\Redland\Rdf;
 
-use \Saft\Rdf\StatementIterator as SaftStatementIterator;
+use Saft\Rdf\StatementIterator as SaftStatementIterator;
 
 class StatementIterator implements SaftStatementIterator
 {

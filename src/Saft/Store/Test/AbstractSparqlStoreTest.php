@@ -2,14 +2,14 @@
 
 namespace Saft\Store\Test;
 
+use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\Statement;
-use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
+use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Store\Result\EmptyResult;

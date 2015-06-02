@@ -2,7 +2,7 @@
 
 namespace Saft\Rdf\Test;
 
-use \Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\ArrayStatementIteratorImpl;
 
 class ArrayStatementIteratorImplTest extends StatementIteratorAbstractTest
 {

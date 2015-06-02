@@ -2,10 +2,10 @@
 
 namespace Saft\Rdf\Test;
 
-use Saft\Rdf\StatementImpl;
 use Saft\Rdf\AnyPatternImpl;
-use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\LiteralImpl;
+use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\StatementImpl;
 use Saft\Test\TestCase;
 
 abstract class StatementAbstractTest extends TestCase
