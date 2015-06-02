@@ -31,27 +31,6 @@ abstract class LiteralAbstractTest extends TestCase
      */
     abstract public function getNodeFactory();
 
-    public function testValueIsString()
-    {
-        $fixture = $this->newInstance(1);
-        $this->assertTrue(is_string($fixture->getValue()));
-
-        $fixture = $this->newInstance(1.1245);
-        $this->assertTrue(is_string($fixture->getValue()));
-
-        $fixture = $this->newInstance("1");
-        $this->assertTrue(is_string($fixture->getValue()));
-
-        $fixture = $this->newInstance("1.1245");
-        $this->assertTrue(is_string($fixture->getValue()));
-
-        $fixture = $this->newInstance("true");
-        $this->assertTrue(is_string($fixture->getValue()));
-
-        $fixture = $this->newInstance(true);
-        $this->assertTrue(is_string($fixture->getValue()));
-    }
-
     public function testDatatypeIsNamedNode()
     {
         $xsdBoolean = $this->getNodeFactory()->createNamedNode('http://www.w3.org/2001/XMLSchema#boolean');
@@ -85,6 +64,10 @@ abstract class LiteralAbstractTest extends TestCase
         $this->assertTrue($fixtureG->getDatatype()->isNamed());
     }
 
+    /*
+     * Tests equality of instances.
+     */
+
     /**
      * Tests term equality of two Literal instances:
      *
@@ -113,28 +96,11 @@ abstract class LiteralAbstractTest extends TestCase
         $this->assertFalse($fixtureE->equals($fixtureF));
     }
 
-    /**
-     * These assertions are specific to the PHP implementation and not necessarily implied by the RDF 1.1 standard.
+    /*
+     * Tests for getDatatype
      */
-    public function testImplementationSpecificEquality()
-    {
-        $xsdBoolean = $this->getNodeFactory()->createNamedNode('http://www.w3.org/2001/XMLSchema#boolean');
-
-        $fixtureA = $this->newInstance(true);
-        $fixtureB = $this->newInstance(true, $xsdBoolean);
-        $fixtureC = $this->newInstance("true", $xsdBoolean);
-
-        $this->assertFalse($fixtureA->equals($fixtureB));
-        $this->assertTrue($fixtureB->equals($fixtureC));
-
-        $fixtureD = $this->newInstance(1);
-        $fixtureE = $this->newInstance(1.0);
-
-        $this->assertTrue($fixtureD->equals($fixtureE));
-    }
 
     /**
-     * Tests getDatatype
      * @depends testDatatypeIsNamedNode
      */
     public function testGetDatatypeBoolean()
@@ -158,7 +124,6 @@ abstract class LiteralAbstractTest extends TestCase
     }
 
     /**
-     *
      * @depends testDatatypeIsNamedNode
      */
     public function testGetDatatypeInteger()
@@ -221,6 +186,32 @@ abstract class LiteralAbstractTest extends TestCase
         $this->assertEquals($rdfLangString->getUri(), $fixtureC->getDatatype()->getUri());
     }
 
+    /*
+     * These assertions are specific to the PHP implementation and not necessarily implied by the
+     * RDF 1.1 standard.
+     */
+
+    public function testImplementationSpecificEquality()
+    {
+        $xsdBoolean = $this->getNodeFactory()->createNamedNode('http://www.w3.org/2001/XMLSchema#boolean');
+
+        $fixtureA = $this->newInstance(true);
+        $fixtureB = $this->newInstance(true, $xsdBoolean);
+        $fixtureC = $this->newInstance("true", $xsdBoolean);
+
+        $this->assertFalse($fixtureA->equals($fixtureB));
+        $this->assertTrue($fixtureB->equals($fixtureC));
+
+        $fixtureD = $this->newInstance(1);
+        $fixtureE = $this->newInstance(1.0);
+
+        $this->assertTrue($fixtureD->equals($fixtureE));
+    }
+
+    /*
+     * Tests for initialization
+     */
+
     /**
      * @depends testDatatypeIsNamedNode
      */
@@ -251,8 +242,16 @@ abstract class LiteralAbstractTest extends TestCase
         $this->newInstance("foo", "http://www.w3.org/2001/XMLSchema#string");
     }
 
-    /**
-     * Tests isBlank
+    // instanciation with null shouldn't be possible
+    public function testInitializationUsingNull()
+    {
+        $this->setExpectedException('\Exception');
+
+        $this->newInstance(null);
+    }
+
+    /*
+     * Tests for isBlank
      */
     public function testIsBlank()
     {
@@ -260,56 +259,93 @@ abstract class LiteralAbstractTest extends TestCase
         $this->assertFalse($fixture->isBlank());
     }
 
-    /**
-     * Tests isConcrete
+    /*
+     * Tests for isConcrete
      */
+
     public function testIsConcrete()
     {
         $fixture = $this->newInstance('hallo', null, 'de');
         $this->assertTrue($fixture->isConcrete());
     }
 
-    /**
-     * Tests isLiteral
+    /*
+     * Tests for isLiteral
      */
+
     public function testIsLiteral()
     {
         $fixture = $this->newInstance('hallo', null, 'de');
         $this->assertTrue($fixture->isLiteral());
     }
 
-    /**
-     * Tests isNamed
+    /*
+     * Tests for isNamed
      */
+
     public function testIsNamed()
     {
         $fixture = $this->newInstance('hallo', null, 'de');
         $this->assertFalse($fixture->isNamed());
     }
 
-    /**
-     * Tests isVariable
+    /*
+     * Tests for isVariable
      */
+
     public function testIsVariable()
     {
         $fixture = $this->newInstance('hallo');
         $this->assertFalse($fixture->isVariable());
     }
 
-
-    /**
-     * instanciation with null shouldn't be possible
+    /*
+     * Tests for matches
      */
-    public function testInstanciationNull()
-    {
-        $this->setExpectedException('\Exception');
 
-        $this->newInstance(null);
+    public function testMatches()
+    {
+        $xsdInteger = $this->getNodeFactory()->createNamedNode('http://www.w3.org/2001/XMLSchema#integer');
+        $fixtureA = $this->newInstance(true);
+        $fixtureB = $this->newInstance(true);
+
+        $this->assertTrue($fixtureA->matches($fixtureB));
+
+        $fixtureE = $this->newInstance(1);
+        $fixtureF = $this->newInstance(1, $xsdInteger);
+
+        $this->assertFalse($fixtureE->matches($fixtureF));
     }
 
-    /**
-     * Tests toNT
+    /*
+     * Tests for value is string
      */
+
+    public function testValueIsString()
+    {
+        $fixture = $this->newInstance(1);
+        $this->assertTrue(is_string($fixture->getValue()));
+
+        $fixture = $this->newInstance(1.1245);
+        $this->assertTrue(is_string($fixture->getValue()));
+
+        $fixture = $this->newInstance("1");
+        $this->assertTrue(is_string($fixture->getValue()));
+
+        $fixture = $this->newInstance("1.1245");
+        $this->assertTrue(is_string($fixture->getValue()));
+
+        $fixture = $this->newInstance("true");
+        $this->assertTrue(is_string($fixture->getValue()));
+
+        $fixture = $this->newInstance(true);
+        $this->assertTrue(is_string($fixture->getValue()));
+    }
+
+    /*
+     * Tests for toNTQuads
+     */
+
     public function testToNTLangAndValueSet()
     {
         $fixture = $this->newInstance('foo', null, 'en');
@@ -350,19 +386,9 @@ abstract class LiteralAbstractTest extends TestCase
         );
     }
 
-    public function testMatches()
-    {
-        $xsdInteger = $this->getNodeFactory()->createNamedNode('http://www.w3.org/2001/XMLSchema#integer');
-        $fixtureA = $this->newInstance(true);
-        $fixtureB = $this->newInstance(true);
-
-        $this->assertTrue($fixtureA->matches($fixtureB));
-
-        $fixtureE = $this->newInstance(1);
-        $fixtureF = $this->newInstance(1, $xsdInteger);
-
-        $this->assertFalse($fixtureE->matches($fixtureF));
-    }
+    /*
+     * Tests for toString
+     */
 
     public function testToString()
     {
