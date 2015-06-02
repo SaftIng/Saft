@@ -29,10 +29,10 @@ abstract class NamedNodeAbstractTest extends TestCase
         $this->assertFalse($fixtureA->equals($fixtureC));
     }
 
-
-    /**
-     * Tests instanciation
+    /*
+     * Tests instantiation
      */
+
     public function testInstanciationInvalidUri()
     {
         $this->setExpectedException('\Exception');
@@ -40,11 +40,9 @@ abstract class NamedNodeAbstractTest extends TestCase
         $this->newInstance('foo');
     }
 
-    /**
-     * instanciation with null shouldn't be possible
-     */
     public function testInstanciationNull()
     {
+        // instanciation with null shouldn't be possible and has to lead to an exception
         $this->setExpectedException('\Exception');
 
         $this->newInstance(null);
@@ -56,45 +54,50 @@ abstract class NamedNodeAbstractTest extends TestCase
         $this->assertEquals('http://saft/test', $fixture->getUri());
     }
 
-    /**
-     * Tests isBlank
+    /*
+     * Tests for isBlank
      */
+
     public function testIsBlank()
     {
         $fixture = $this->newInstance('http://saft/test');
         $this->assertFalse($fixture->isBlank());
     }
 
-    /**
-     * Tests isConcrete
+    /*
+     * Tests for isConcrete
      */
+
     public function testIsConcrete()
     {
         $fixture = $this->newInstance('http://saft/test');
         $this->assertTrue($fixture->isConcrete());
     }
 
-    /**
-     * Tests isLiteral
+    /*
+     * Tests for isLiteral
      */
+
     public function testIsLiteral()
     {
         $fixture = $this->newInstance('http://saft/test');
         $this->assertFalse($fixture->isLiteral());
     }
 
-    /**
-     * Tests isNamed
+    /*
+     * Tests for isNamed
      */
+
     public function testIsNamed()
     {
         $fixture = $this->newInstance('http://saft/test');
         $this->assertTrue($fixture->isNamed());
     }
 
-    /**
-     * Tests isVariable
+    /*
+     * Tests for isVariable
      */
+
     public function testIsVariable()
     {
         $fixture = $this->newInstance('http://saft/test');

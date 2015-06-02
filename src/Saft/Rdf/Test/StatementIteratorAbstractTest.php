@@ -18,46 +18,7 @@ abstract class StatementIteratorAbstractTest extends TestCase
     abstract public function createInstanceWithArray(array $statements);
 
     /*
-     * Tests iteration
-     */
-
-    public function testIterationForeach()
-    {
-        $nodeFactory = new NodeFactoryImpl();
-        $rdfLangString = $nodeFactory->createNamedNode(
-            'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'
-        );
-        $statements = [
-        new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new NamedNodeImpl('http://o/')
-        ),
-        new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new LiteralImpl('foobar', $rdfLangString, 'en')
-        ),
-        new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new LiteralImpl(42)
-        )];
-
-        $iterator = $this->createInstanceWithArray($statements);
-
-        $this->assertTrue($iterator->valid());
-
-        $actual = array();
-        foreach ($iterator as $key => $value) {
-            $actual[] = $value;
-        }
-
-        $this->assertEqualsArrays($statements, $actual);
-    }
-
-    /*
-     * Tests constructor
+     * Tests for constructor
      */
 
     public function testConstructorValidList()
@@ -80,7 +41,7 @@ abstract class StatementIteratorAbstractTest extends TestCase
     }
 
     /*
-     * Tests count
+     * Tests for count
      */
 
     public function testCountAssertionSome()
@@ -118,5 +79,44 @@ abstract class StatementIteratorAbstractTest extends TestCase
         $iterator = $this->createInstanceWithArray($statements);
 
         $this->assertCountStatementIterator(0, $iterator);
+    }
+
+    /*
+     * Tests iteration
+     */
+
+    public function testIterationWithForeachLoop()
+    {
+        $nodeFactory = new NodeFactoryImpl();
+        $rdfLangString = $nodeFactory->createNamedNode(
+            'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'
+        );
+        $statements = [
+        new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new NamedNodeImpl('http://o/')
+        ),
+        new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new LiteralImpl('foobar', $rdfLangString, 'en')
+        ),
+        new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new LiteralImpl(42)
+        )];
+
+        $iterator = $this->createInstanceWithArray($statements);
+
+        $this->assertTrue($iterator->valid());
+
+        $actual = array();
+        foreach ($iterator as $key => $value) {
+            $actual[] = $value;
+        }
+
+        $this->assertEqualsArrays($statements, $actual);
     }
 }

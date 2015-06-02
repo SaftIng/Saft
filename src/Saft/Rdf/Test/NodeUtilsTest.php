@@ -7,9 +7,10 @@ use Saft\Test\TestCase;
 
 class NodeUtilsTest extends TestCase
 {
-    /**
-     * Tests simpleCheckURI
+    /*
+     * Tests for simpleCheckURI
      */
+
     public function testSimpleCheckURI()
     {
         $this->assertFalse(NodeUtils::simpleCheckURI(''));

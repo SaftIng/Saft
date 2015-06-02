@@ -10,17 +10,6 @@ use Saft\Rdf\StatementImpl;
 
 class StatementImplTest extends StatementAbstractTest
 {
-
-    public function newLiteralInstance($value, $lang = null, $datatype = null)
-    {
-        return new LiteralImpl($value, $lang, $datatype);
-    }
-
-    public function newNamedNodeInstance($uri)
-    {
-        return new NamedNodeImpl($uri);
-    }
-
     public function newAnyPatternInstance($value)
     {
         return new AnyPatternImpl($value);
@@ -34,5 +23,15 @@ class StatementImplTest extends StatementAbstractTest
     public function newInstance($subject, $predicate, $object, $graph = null)
     {
         return new StatementImpl($subject, $predicate, $object, $graph);
+    }
+
+    public function newLiteralInstance($value, $lang = null, $datatype = null)
+    {
+        return new LiteralImpl($value, $lang, $datatype);
+    }
+
+    public function newNamedNodeInstance($uri)
+    {
+        return new NamedNodeImpl($uri);
     }
 }
