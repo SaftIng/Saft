@@ -47,4 +47,38 @@ class VirtuosoTest extends StoreAbstractTest
 
         parent::tearDown();
     }
+
+    /*
+     * Tests for isGraphAvailable
+     */
+
+    public function testIsGraphAvailable()
+    {
+        $this->fixture->dropGraph($this->testGraph);
+
+        $this->assertFalse($this->fixture->isGraphAvailable($this->testGraph));
+
+        $this->fixture->createGraph($this->testGraph);
+
+        $this->assertTrue($this->fixture->isGraphAvailable($this->testGraph));
+    }
+
+    /*
+     * Tests for sqlQuery
+     */
+
+    public function testSqlQuery()
+    {
+        $re = $this->fixture->sqlQuery('SELECT * FROM DB.INFORMATION_SCHEMA.TABLES');
+
+        $this->assertTrue(is_array($re->fetchAll(\PDO::FETCH_ASSOC)));
+    }
+
+    public function testSqlQueryInvalidQuery()
+    {
+        $this->setExpectedException('\Exception');
+
+        $this->fixture->sqlQuery('invalid query');
+    }
+
 }
