@@ -12,7 +12,17 @@ class CacheFileIntegrationTest extends AbstractCacheTest
         parent::setUp();
 
         $cacheFactory = new CacheFactoryImpl();
-        $this->fixture = $cacheFactory->createCache($this->config['fileCacheConfig']);
+
+        if (true === isset($this->config['fileCacheConfig'])) {
+            try {
+                $this->fixture = $cacheFactory->createCache($this->config['fileCacheConfig']);
+            } catch (\Exception $e) {
+                $this->markTestSkipped($e->getMessage());
+            }
+
+        } else {
+            $this->markTestSkipped('Array fileCacheConfig is not set in the test-config.yml.');
+        }
     }
 
     /*

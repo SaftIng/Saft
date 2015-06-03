@@ -36,7 +36,7 @@ class HttpTest extends StoreAbstractTest
             $rights = $this->fixture->getRights();
 
         } else {
-            $this->markTestSkipped('Array httpConfig is not set in the config.yml.');
+            $this->markTestSkipped('Array httpConfig is not set in the test-config.yml.');
         }
 
         /*

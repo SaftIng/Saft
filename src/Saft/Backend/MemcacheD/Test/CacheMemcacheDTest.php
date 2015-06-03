@@ -13,10 +13,15 @@ class CacheMemcacheDTest extends AbstractCacheTest
 
         $cacheFactory = new CacheFactoryImpl();
 
-        try {
-            $this->fixture = $cacheFactory->createCache($this->config['memcachedCacheConfig']);
-        } catch (\Exception $e) {
-            $this->markTestSkipped($e->getMessage());
+        if (true === isset($this->config['memcachedCacheConfig'])) {
+            try {
+                $this->fixture = $cacheFactory->createCache($this->config['memcachedCacheConfig']);
+            } catch (\Exception $e) {
+                $this->markTestSkipped($e->getMessage());
+            }
+
+        } else {
+            $this->markTestSkipped('Array memcachedCacheConfig is not set in the test-config.yml.');
         }
     }
 }

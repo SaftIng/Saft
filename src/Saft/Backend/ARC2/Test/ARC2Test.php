@@ -33,7 +33,7 @@ class ARC2Test extends StoreAbstractTest
             );
 
         } else {
-            $this->markTestSkipped('Array arc2Config is not set in the config.yml.');
+            $this->markTestSkipped('Array arc2Config is not set in the test-config.yml.');
         }
     }
 

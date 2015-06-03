@@ -35,7 +35,7 @@ class VirtuosoTest extends StoreAbstractTest
             );
 
         } else {
-            $this->markTestSkipped('Array virtuosoConfig is not set in the config.yml.');
+            $this->markTestSkipped('Array virtuosoConfig is not set in the test-config.yml.');
         }
     }
 
