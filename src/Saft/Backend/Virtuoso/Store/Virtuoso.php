@@ -172,22 +172,6 @@ class Virtuoso extends AbstractSparqlStore
     }
 
     /**
-     * Counts the number of triples in a graph.
-     *
-     * @param  Node  $graph URI of the graph you wanna count triples
-     * @return integer Number of found triples
-     */
-    public function getTripleCount(Node $graph)
-    {
-        $result = $this->query(
-            'SELECT (COUNT(*) AS ?count) FROM <' . $graph->getUri() . '> WHERE {?s ?p ?o.}'
-        );
-        $result = $result->getResultObject();
-
-        return $result[0]['count']->getValue();
-    }
-
-    /**
      * Checks if a certain graph is available in the store.
      *
      * @param  Node $graph URI of the graph to check if it is available.
