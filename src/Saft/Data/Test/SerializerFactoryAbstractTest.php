@@ -20,7 +20,7 @@ abstract class SerializerFactoryAbstractTest extends TestCase
     abstract protected function newInstance();
 
     /*
-     * Tests createSerializerFor
+     * Tests for createSerializerFor
      */
 
     // simple test to go through all availableSerializations and check for each that an object

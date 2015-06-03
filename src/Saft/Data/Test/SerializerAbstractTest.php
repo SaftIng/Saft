@@ -16,7 +16,7 @@ abstract class SerializerAbstractTest extends TestCase
     abstract protected function newInstance();
 
     /*
-     * Tests serializeIteratorToStream
+     * Tests for serializeIteratorToStream
      */
 
     public function testSerializeIteratorToStreamAsNQuads()

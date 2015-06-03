@@ -17,7 +17,7 @@ abstract class ParserAbstractTest extends TestCase
     abstract protected function newInstance();
 
     /*
-     * Tests getSupportedSerializations
+     * Tests for getSupportedSerializations
      */
 
     // TODO what else can we test here?
@@ -27,7 +27,7 @@ abstract class ParserAbstractTest extends TestCase
     }
 
     /*
-     * Tests parseStreamToIterator
+     * Tests for parseStreamToIterator
      */
 
     // we load here the content of a turtle file and transform it into an StatementIterator instance.
@@ -94,7 +94,7 @@ abstract class ParserAbstractTest extends TestCase
     }
 
     /*
-     * Tests parseStringToIterator
+     * Tests for parseStringToIterator
      */
 
     public function testParseStringToIteratorTurtleString()

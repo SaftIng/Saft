@@ -55,7 +55,7 @@ class HttpTest extends StoreAbstractTest
         }
     }
 
-    /**
+    /*
      * Tests for openConnection
      */
 
@@ -91,8 +91,8 @@ class HttpTest extends StoreAbstractTest
         );
     }
 
-    /**
-     * Tests getRights
+    /*
+     * Tests for getRights
      */
 
     // this test depends on that dbpedia DOES NOT give you SPARQL UPDATE rights to create/drop graphs or triples.

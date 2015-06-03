@@ -21,7 +21,7 @@ abstract class ParserFactoryAbstractTest extends TestCase
     abstract protected function newInstance();
 
     /*
-     * Tests createParserFor
+     * Tests for createParserFor
      */
 
     // simple test to go through all availableSerializations and check for each that an object

@@ -44,8 +44,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->queryFactory = new QueryFactoryImpl();
     }
 
-    /**
-     * Tests addStatements
+    /*
+     * Tests for addStatements
      */
 
     public function testAddStatements()
@@ -78,8 +78,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->fixture->addStatements($statementIterator);
     }
 
-    /**
-     * Tests buildPatternListBySPO
+    /*
+     * Tests for buildPatternListBySPO
      */
 
     public function testBuildPatternListBySPO3Placeholders()
@@ -115,8 +115,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         );
     }
 
-    /**
-     * Tests buildPatternListByStatement
+    /*
+     * Tests for buildPatternListByStatement
      */
 
     public function testBuildPatternListByStatement()
@@ -175,8 +175,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         );
     }
 
-    /**
-     * Tests buildPatternListByTriplePattern
+    /*
+     * Tests for buildPatternListByTriplePattern
      */
 
     public function testBuildPatternListByTriplePattern()
@@ -242,8 +242,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         );
     }
 
-    /**
-     * Tests deleteMatchingStatements
+    /*
+     * Tests for deleteMatchingStatements
      */
 
     public function testDeleteMatchingStatements()
@@ -274,8 +274,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->fixture->deleteMatchingStatements($statement);
     }
 
-    /**
-     * Tests get- and setChainSuccessor
+    /*
+     * Tests for get- and setChainSuccessor
      */
 
     public function testGetAndSetChainSuccessor()
@@ -292,7 +292,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->assertEquals($successor, $this->fixture->getChainSuccessor());
     }
 
-    /**
+    /*
      * Tests getGraphs
      */
 
@@ -323,8 +323,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     }
 
 
-    /**
-     * Tests getLog
+    /*
+     * Tests for getLog
      *
      * The following functions tests the log result for certain function calls
      */
@@ -835,8 +835,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         );
     }
 
-    /**
-     * Tests getMatchingStatement
+    /*
+     * Tests for getMatchingStatement
      */
 
     public function testGetMatchingStatementsNamedNodes()
@@ -1034,8 +1034,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         );
     }
 
-    /**
-     * Tests getResult
+    /*
+     * Tests for getResult
      */
 
     public function testGetResultQueryObject()
@@ -1059,8 +1059,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->fixture->getResult(032);
     }
 
-    /**
-     * Tests getStoreDescription
+    /*
+     * Tests for getStoreDescription
      */
 
     public function testGetStoreDescription()
@@ -1089,8 +1089,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->fixture->getStoreDescription();
     }
 
-    /**
-     * Tests hasMatchingStatement
+    /*
+     * Tests for hasMatchingStatement
      */
 
     public function testHasMatchingStatementNamedNodesLiteral()
@@ -1222,8 +1222,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         );
     }
 
-    /**
-     * Tests invalidateByGraphUri
+    /*
+     * Tests for invalidateByGraphUri
      */
     public function testInvalidateByGraphUri()
     {
@@ -1264,8 +1264,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->assertNull($this->fixture->getCache()->get($queryObject->getQuery()));
     }
 
-    /**
-     * Tests invalidateByQuery
+    /*
+     * Tests for invalidateByQuery
      */
     public function testInvalidateByQuery()
     {
@@ -1306,8 +1306,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->assertNull($this->fixture->getCache()->get($queryObject->getQuery()));
     }
 
-    /**
-     * Tests invalidateByTriplePattern
+    /*
+     * Tests for invalidateByTriplePattern
      */
 
     public function testInvalidateByTriplePatternGraph3VariablesAndUriGiven()
@@ -1353,8 +1353,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->assertNull($this->fixture->getCache()->get($queryObject->getQuery()));
     }
 
-    /**
-     * Tests query
+    /*
+     * Tests for query
      */
 
     public function testQuery()
@@ -1385,8 +1385,8 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $this->fixture->query('SELECT * FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}', array());
     }
 
-    /**
-     * Tests saveResult
+    /*
+     * Tests for saveResult
      */
     public function testSaveResultCacheEntries()
     {

@@ -7,9 +7,6 @@ use Saft\Cache\Test\AbstractCacheTest;
 
 class CacheMemcacheDTest extends AbstractCacheTest
 {
-    /**
-     *
-     */
     public function setUp()
     {
         parent::setUp();

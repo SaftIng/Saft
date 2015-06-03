@@ -7,9 +7,6 @@ use Saft\Cache\Test\AbstractCacheTest;
 
 class CacheFileIntegrationTest extends AbstractCacheTest
 {
-    /**
-     *
-     */
     public function setUp()
     {
         parent::setUp();
@@ -18,7 +15,7 @@ class CacheFileIntegrationTest extends AbstractCacheTest
         $this->fixture = $cacheFactory->createCache($this->config['fileCacheConfig']);
     }
 
-    /**
+    /*
      * Tests checkRequirements
      */
 

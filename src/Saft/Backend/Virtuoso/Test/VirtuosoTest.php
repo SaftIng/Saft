@@ -39,9 +39,6 @@ class VirtuosoTest extends StoreAbstractTest
         }
     }
 
-    /**
-     *
-     */
     public function tearDown()
     {
         if (null !== $this->fixture) {

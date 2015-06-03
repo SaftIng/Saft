@@ -9,9 +9,6 @@ use Symfony\Component\Yaml\Parser;
 
 abstract class AbstractCacheTest extends TestCase
 {
-    /**
-     *
-     */
     public function tearDown()
     {
         if (null !== $this->fixture) {
@@ -21,8 +18,8 @@ abstract class AbstractCacheTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * function checkRequirements
+    /*
+     * Tests for checkRequirements
      */
 
     public function testCheckRequirements()
@@ -30,8 +27,8 @@ abstract class AbstractCacheTest extends TestCase
         $this->assertTrue($this->fixture->checkRequirements());
     }
 
-    /**
-     * function clean
+    /*
+     * Tests for clean
      */
 
     public function testClean()
@@ -45,8 +42,8 @@ abstract class AbstractCacheTest extends TestCase
         $this->assertNull($this->fixture->get('foo'));
     }
 
-    /**
-     * function delete
+    /*
+     * Tests for delete
      */
 
     public function testDelete()
@@ -62,8 +59,8 @@ abstract class AbstractCacheTest extends TestCase
         $this->assertNull($this->fixture->get('foo'));
     }
 
-    /**
-     * function get
+    /*
+     * Tests for get
      */
 
     public function testGet()
@@ -75,8 +72,8 @@ abstract class AbstractCacheTest extends TestCase
         $this->assertEquals('bar', $this->fixture->get('foo'));
     }
 
-    /**
-     * Tests getCacheObject
+    /*
+     * Tests for getCacheObject
      */
 
     public function testGetCacheObject()
@@ -84,8 +81,8 @@ abstract class AbstractCacheTest extends TestCase
         $this->assertTrue($this->fixture instanceof Cache);
     }
 
-    /**
-     * tests getCompleteEntry
+    /*
+     * Tests for getCompleteEntry
      */
 
     public function testGetCompleteEntry()
@@ -153,8 +150,8 @@ abstract class AbstractCacheTest extends TestCase
         $this->assertNull($this->fixture->get(time().'invalid key'));
     }
 
-    /**
-     * function constructor
+    /*
+     * Tests for constructor
      */
 
     public function testInitInvalidClass()
@@ -175,8 +172,8 @@ abstract class AbstractCacheTest extends TestCase
         $this->fixture = $cacheFactory->createCache(array());
     }
 
-    /**
-     * function set
+    /*
+     * Tests for set
      */
 
     public function testSetDifferentKeyTypes()
