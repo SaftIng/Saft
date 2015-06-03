@@ -211,4 +211,71 @@ abstract class StatementAbstractTest extends TestCase
         $this->setExpectedException('\Exception');
         $fixture->toNQuads();
     }
+
+    /*
+     * Tests for toNTriples
+     */
+
+    public function testToNTriplesNotConcreteStatement()
+    {
+        $fixture = $this->newInstance(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl());
+
+        // Expect exception because a Statement has to be concrete in N-Triples.
+        $this->setExpectedException('\Exception');
+        $fixture->toNTriples();
+    }
+
+    // test for the same result if you use a quad instead of triple
+    public function testToNTriplesWithGraph()
+    {
+        $fixture = $this->newInstance($this->testGraph, $this->testGraph, $this->testGraph, $this->testGraph);
+
+        $this->assertEquals(
+            '<'. $this->testGraph->getUri() .'> '.
+            '<'. $this->testGraph->getUri() .'> '.
+            '<'. $this->testGraph->getUri() .'> .',
+            $fixture->toNTriples()
+        );
+    }
+
+    public function testToNTriplesWithTriple()
+    {
+        $fixture = $this->newInstance($this->testGraph, $this->testGraph, $this->testGraph);
+
+        $this->assertEquals(
+            '<'. $this->testGraph->getUri() .'> '.
+            '<'. $this->testGraph->getUri() .'> '.
+            '<'. $this->testGraph->getUri() .'> .',
+            $fixture->toNTriples()
+        );
+    }
+
+    /*
+     * Tests for __toString
+     */
+
+    public function testToStringQuad()
+    {
+        $fixture = $this->newInstance($this->testGraph, $this->testGraph, $this->testGraph, $this->testGraph);
+
+        $this->assertEquals(
+            's: '. $this->testGraph->getUri() .
+            ', p: '. $this->testGraph->getUri() .
+            ', o: '. $this->testGraph->getUri() .
+            ', g: '. $this->testGraph->getUri(),
+            $fixture->__toString()
+        );
+    }
+
+    public function testToStringTriple()
+    {
+        $fixture = $this->newInstance($this->testGraph, $this->testGraph, $this->testGraph);
+
+        $this->assertEquals(
+            's: '. $this->testGraph->getUri() .
+            ', p: '. $this->testGraph->getUri() .
+            ', o: '. $this->testGraph->getUri(),
+            $fixture->__toString()
+        );
+    }
 }
