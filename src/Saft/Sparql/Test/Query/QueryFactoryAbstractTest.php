@@ -26,8 +26,8 @@ abstract class QueryFactoryAbstractTest extends TestCase
         $this->fixture = $this->newInstance();
     }
 
-    /**
-     * Tests createInstanceByQueryString
+    /*
+     * Tests for createInstanceByQueryString
      */
 
     public function testCreateInstanceByQueryStringAskQuery()

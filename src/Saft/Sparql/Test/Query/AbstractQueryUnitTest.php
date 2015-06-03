@@ -28,8 +28,8 @@ class AbstractQueryUnitTest extends TestCase
         $this->fixture = $this->getMockForAbstractClass('\Saft\Sparql\Query\AbstractQuery');
     }
 
-    /**
-     * Tests determineObjectDatatype
+    /*
+     * Tests for determineObjectDatatype
      */
 
     public function testDetermineObjectDatatype()
@@ -55,8 +55,8 @@ class AbstractQueryUnitTest extends TestCase
         $this->assertNull($this->fixture->determineObjectDatatype('Foo'));
     }
 
-    /**
-     * Tests determineEntityType
+    /*
+     * Tests for determineEntityType
      */
 
     public function testDetermineEntityTypeLiteral()
@@ -72,8 +72,8 @@ class AbstractQueryUnitTest extends TestCase
         $this->assertNull($this->fixture->determineEntityType(time()));
     }
 
-    /**
-     * Tests determineObjectLanguage
+    /*
+     * Tests for determineObjectLanguage
      */
 
     public function testDetermineObjectLanguage()
@@ -91,8 +91,8 @@ class AbstractQueryUnitTest extends TestCase
         $this->assertNull($this->fixture->determineObjectLanguage('"Foo@"'));
     }
 
-    /**
-     * Tests determineObjectValue
+    /*
+     * Tests for determineObjectValue
      */
 
     public function testDetermineObjectValue()
@@ -123,7 +123,7 @@ class AbstractQueryUnitTest extends TestCase
         $this->assertNull($this->fixture->determineObjectValue('Foo@"^^<'));
     }
 
-    /**
+    /*
      * Tests extractFilterPattern
      */
 
@@ -202,7 +202,7 @@ class AbstractQueryUnitTest extends TestCase
         );
     }
 
-    /**
+    /*
      * Tests extractNamespacesFromQuery
      */
 
@@ -239,7 +239,7 @@ class AbstractQueryUnitTest extends TestCase
         $this->assertFalse(isset($queryParts['namespaces']));
     }
 
-    /**
+    /*
      * Tests extractProloguePrefixesFromQuery
      */
 
@@ -267,7 +267,7 @@ class AbstractQueryUnitTest extends TestCase
         $this->assertEquals(array('foo' => 'http://bar.de'), $queryParts['prefixes']);
     }
 
-    /**
+    /*
      * Tests extractQuads
      */
 
@@ -330,7 +330,7 @@ class AbstractQueryUnitTest extends TestCase
         );
     }
 
-    /**
+    /*
      * Tests extractTriplePattern
      */
 
@@ -483,7 +483,6 @@ class AbstractQueryUnitTest extends TestCase
     /**
      * Tests that all common namespaces are available
      */
-
     public function testGetCommmonNamespaces()
     {
         $this->assertEquals(
@@ -536,8 +535,8 @@ class AbstractQueryUnitTest extends TestCase
         );
     }
 
-    /**
-     * Tests getQueryType
+    /*
+     * Tests for getQueryType
      */
 
     public function testGetQueryTypeAsk()
@@ -649,9 +648,10 @@ class AbstractQueryUnitTest extends TestCase
         $this->assertEquals('updateQuery', AbstractQuery::getQueryType($query));
     }
 
-    /**
-     * Tests setQuery
+    /*
+     * Tests for setQuery
      */
+
     public function testSetQuery()
     {
         $this->fixture->setQuery('foo');

@@ -26,6 +26,10 @@ class AbstractTriplePatternStoreTest extends TestCase
         );
     }
 
+    /*
+     * Helper functions
+     */
+
     protected function getTestQuad()
     {
         $subject1 = new NamedNodeImpl('http://saft/testquad/s1');
@@ -65,7 +69,7 @@ class AbstractTriplePatternStoreTest extends TestCase
     }
 
     /*
-     * Tests addStatements
+     * Tests for addStatements
      */
 
     public function testAddStatementsNoTriplesAndQuads()
@@ -104,7 +108,7 @@ class AbstractTriplePatternStoreTest extends TestCase
     }
 
     /*
-     * Tests deleteMultipleStatements
+     * Tests for deleteMultipleStatements
      */
 
     public function testDeleteMultipleStatementsExceptionCauseOfMultipleStatements()
@@ -160,7 +164,7 @@ class AbstractTriplePatternStoreTest extends TestCase
     }
 
     /*
-     * Tests hasMatchingStatement
+     * Tests for hasMatchingStatement
      */
 
     // triple recognition

@@ -22,7 +22,7 @@ abstract class ValueResultAbstractTest extends TestCase
     }
 
     /**
-     * Tests __construct
+     * Tests for __construct
      */
 
     public function testConstructor()
@@ -38,7 +38,7 @@ abstract class ValueResultAbstractTest extends TestCase
     }
 
     /**
-     * Tests isSetResult
+     * Tests for isSetResult
      */
 
     public function testIsSetResult()
@@ -47,7 +47,7 @@ abstract class ValueResultAbstractTest extends TestCase
     }
 
     /**
-     * Tests isStatementSetResult
+     * Tests for isStatementSetResult
      */
 
     public function testisStatementSetResult()
@@ -56,7 +56,7 @@ abstract class ValueResultAbstractTest extends TestCase
     }
 
     /**
-     * Tests isValueResult
+     * Tests for isValueResult
      */
 
     public function testIsValueResult()

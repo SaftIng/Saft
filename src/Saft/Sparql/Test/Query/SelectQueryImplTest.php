@@ -15,8 +15,8 @@ class SelectQueryImplTest extends TestCase
         $this->fixture = new SelectQueryImpl();
     }
 
-    /**
-     * Tests constructor
+    /*
+     * Tests for constructor
      */
 
     public function testConstructor()
@@ -97,8 +97,8 @@ class SelectQueryImplTest extends TestCase
         $this->assertEquals('5', $queryParts['offset']);
     }
 
-    /**
-     * Tests getQueryParts
+    /*
+     * Tests for getQueryParts
      */
 
     public function testGetQueryParts()
@@ -296,8 +296,8 @@ class SelectQueryImplTest extends TestCase
         $this->assertEquals(array('s', 'p', 'o', 'foo', 'g'), $queryParts['variables']);
     }
 
-    /**
-     * Tests isAskQuery
+    /*
+     * Tests for isAskQuery
      */
 
     public function testIsAskQuery()
@@ -305,8 +305,8 @@ class SelectQueryImplTest extends TestCase
         $this->assertFalse($this->fixture->isAskQuery());
     }
 
-    /**
-     * Tests isDescribeQuery
+    /*
+     * Tests for isDescribeQuery
      */
 
     public function testIsDescribeQuery()
@@ -314,8 +314,8 @@ class SelectQueryImplTest extends TestCase
         $this->assertFalse($this->fixture->isDescribeQuery());
     }
 
-    /**
-     * Tests isGraphQuery
+    /*
+     * Tests for isGraphQuery
      */
 
     public function testIsGraphQuery()
@@ -323,8 +323,8 @@ class SelectQueryImplTest extends TestCase
         $this->assertFalse($this->fixture->isGraphQuery());
     }
 
-    /**
-     * Tests isSelectQuery
+    /*
+     * Tests for isSelectQuery
      */
 
     public function testIsSelectQuery()
@@ -332,8 +332,8 @@ class SelectQueryImplTest extends TestCase
         $this->assertTrue($this->fixture->isSelectQuery());
     }
 
-    /**
-     * Tests isUpdateQuery
+    /*
+     * Tests for isUpdateQuery
      */
 
     public function testIsUpdateQuery()

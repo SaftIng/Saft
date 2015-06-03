@@ -14,8 +14,8 @@ class DescribeQueryImplTest extends TestCase
         $this->fixture = new DescribeQueryImpl();
     }
 
-    /**
-     * Tests constructor
+    /*
+     * Tests for constructor
      */
 
     public function testConstructor()
@@ -37,8 +37,8 @@ class DescribeQueryImplTest extends TestCase
     }
 
 
-    /**
-     * Tests extractNamespacesFromQuery
+    /*
+     * Tests for extractNamespacesFromQuery
      */
 
     public function testExtractNamespacesFromQuery()
@@ -72,8 +72,8 @@ class DescribeQueryImplTest extends TestCase
         $this->assertFalse(isset($queryParts['namespaces']));
     }
 
-    /**
-     * Tests extractPrefixesFromQuery
+    /*
+     * Tests for extractPrefixesFromQuery
      */
 
     public function testExtractPrefixesFromQuery()
@@ -108,8 +108,8 @@ class DescribeQueryImplTest extends TestCase
         $this->assertFalse(isset($queryParts['prefixes']));
     }
 
-    /**
-     * Tests getQueryParts
+    /*
+     * Tests for getQueryParts
      */
 
     public function testGetQueryPartsEverything()
@@ -172,8 +172,8 @@ class DescribeQueryImplTest extends TestCase
         $this->assertEquals(array('s', 'p', 'o'), $queryParts['variables']);
     }
 
-    /**
-     * Tests isAskQuery
+    /*
+     * Tests for isAskQuery
      */
 
     public function testIsAskQuery()
@@ -181,8 +181,8 @@ class DescribeQueryImplTest extends TestCase
         $this->assertFalse($this->fixture->isAskQuery());
     }
 
-    /**
-     * Tests isDescribeQuery
+    /*
+     * Tests for isDescribeQuery
      */
 
     public function testIsDescribeQuery()
@@ -190,8 +190,8 @@ class DescribeQueryImplTest extends TestCase
         $this->assertTrue($this->fixture->isDescribeQuery());
     }
 
-    /**
-     * Tests isGraphQuery
+    /*
+     * Tests for isGraphQuery
      */
 
     public function testIsGraphQuery()
@@ -199,8 +199,8 @@ class DescribeQueryImplTest extends TestCase
         $this->assertFalse($this->fixture->isGraphQuery());
     }
 
-    /**
-     * Tests isSelectQuery
+    /*
+     * Tests for isSelectQuery
      */
 
     public function testIsSelectQuery()
@@ -208,8 +208,8 @@ class DescribeQueryImplTest extends TestCase
         $this->assertFalse($this->fixture->isSelectQuery());
     }
 
-    /**
-     * Tests isUpdateQuery
+    /*
+     * Tests for isUpdateQuery
      */
 
     public function testIsUpdateQuery()

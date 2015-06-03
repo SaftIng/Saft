@@ -15,8 +15,8 @@ class GraphQueryImplTest extends TestCase
         $this->fixture = new GraphQueryImpl();
     }
 
-    /**
-     * Tests constructor
+    /*
+     * Tests for constructor
      */
 
     public function testConstructor()
@@ -26,8 +26,8 @@ class GraphQueryImplTest extends TestCase
         $this->assertEquals('CREATE GRAPH <'. $this->testGraph->getUri() .'>', $this->fixture->getQuery());
     }
 
-    /**
-     * Tests extractFilterPattern
+    /*
+     * Tests for extractFilterPattern
      */
 
     public function testExtractFilterPattern()
@@ -35,8 +35,8 @@ class GraphQueryImplTest extends TestCase
         $this->assertEquals(array(), $this->fixture->extractFilterPattern(''));
     }
 
-    /**
-     * Tests extractNamespacesFromQuery
+    /*
+     * Tests for extractNamespacesFromQuery
      */
 
     public function testExtractNamespacesFromQuery()
@@ -44,8 +44,8 @@ class GraphQueryImplTest extends TestCase
         $this->assertEquals(array(), $this->fixture->extractNamespacesFromQuery(''));
     }
 
-    /**
-     * Tests extractPrefixesFromQuery
+    /*
+     * Tests for extractPrefixesFromQuery
      */
 
     public function testExtractPrefixesFromQuery()
@@ -53,8 +53,8 @@ class GraphQueryImplTest extends TestCase
         $this->assertEquals(array(), $this->fixture->extractPrefixesFromQuery(''));
     }
 
-    /**
-     * Tests extractTriplePattern
+    /*
+     * Tests for extractTriplePattern
      */
 
     public function testExtractTriplePattern()
@@ -62,8 +62,8 @@ class GraphQueryImplTest extends TestCase
         $this->assertEquals(array(), $this->fixture->extractTriplePattern(''));
     }
 
-    /**
-     * Tests extractVariablesFromQuery
+    /*
+     * Tests for extractVariablesFromQuery
      */
 
     public function testExtractVariablesFromQuery()
@@ -71,8 +71,8 @@ class GraphQueryImplTest extends TestCase
         $this->assertEquals(array(), $this->fixture->extractVariablesFromQuery(''));
     }
 
-    /**
-     * Tests getQueryParts
+    /*
+     * Tests for getQueryParts
      */
 
     public function testGetQueryParts()
@@ -86,8 +86,8 @@ class GraphQueryImplTest extends TestCase
         $this->assertEquals('clearGraph', $queryParts['sub_type']);
     }
 
-    /**
-     * Tests determineSubType
+    /*
+     * Tests for determineSubType
      */
 
     public function testDetermineSubType()
@@ -123,8 +123,8 @@ class GraphQueryImplTest extends TestCase
         $this->assertNull($this->fixture->determineSubType('unknown type'));
     }
 
-    /**
-     * Tests isAskQuery
+    /*
+     * Tests for isAskQuery
      */
 
     public function testIsAskQuery()
@@ -132,8 +132,8 @@ class GraphQueryImplTest extends TestCase
         $this->assertFalse($this->fixture->isAskQuery());
     }
 
-    /**
-     * Tests isDescribeQuery
+    /*
+     * Tests for isDescribeQuery
      */
 
     public function testIsDescribeQuery()
@@ -141,8 +141,8 @@ class GraphQueryImplTest extends TestCase
         $this->assertFalse($this->fixture->isDescribeQuery());
     }
 
-    /**
-     * Tests isGraphQuery
+    /*
+     * Tests for isGraphQuery
      */
 
     public function testIsGraphQuery()
@@ -150,8 +150,8 @@ class GraphQueryImplTest extends TestCase
         $this->assertTrue($this->fixture->isGraphQuery());
     }
 
-    /**
-     * Tests isSelectQuery
+    /*
+     * Tests for isSelectQuery
      */
 
     public function testIsSelectQuery()
@@ -159,8 +159,8 @@ class GraphQueryImplTest extends TestCase
         $this->assertFalse($this->fixture->isSelectQuery());
     }
 
-    /**
-     * Tests isUpdateQuery
+    /*
+     * Tests for isUpdateQuery
      */
 
     public function testIsUpdateQuery()

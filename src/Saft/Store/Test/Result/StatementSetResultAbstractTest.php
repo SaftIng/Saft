@@ -14,8 +14,8 @@ abstract class StatementSetResultAbstractTest extends TestCase
      */
     abstract public function newInstance($list);
 
-    /**
-     * Tests isSetResult
+    /*
+     * Tests for isSetResult
      */
 
     public function testIsSetResult()
@@ -26,8 +26,8 @@ abstract class StatementSetResultAbstractTest extends TestCase
         $this->assertFalse($this->fixture->isSetResult());
     }
 
-    /**
-     * Tests isStatementSetResult
+    /*
+     * Tests for isStatementSetResult
      */
 
     public function testIsStatementSetResult()
@@ -38,8 +38,8 @@ abstract class StatementSetResultAbstractTest extends TestCase
         $this->assertTrue($this->fixture->isStatementSetResult());
     }
 
-    /**
-     * Tests isValueResult
+    /*
+     * Tests for isValueResult
      */
 
     public function testIsValueResult()

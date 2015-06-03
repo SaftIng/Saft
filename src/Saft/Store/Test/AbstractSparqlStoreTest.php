@@ -36,7 +36,7 @@ class AbstractSparqlStoreTest extends TestCase
     }
 
     /*
-     * Test provisioning method
+     * Helper methods
      */
 
     protected function getTestStatement()
@@ -64,7 +64,7 @@ class AbstractSparqlStoreTest extends TestCase
     }
 
     /*
-     * Tests addStatements
+     * Tests for addStatements
      */
 
     public function testAddStatements()
@@ -93,7 +93,7 @@ class AbstractSparqlStoreTest extends TestCase
 
     public function testAddStatementsMultipleVariatonOfObjects()
     {
-        /**
+        /*
          * object is a number
          */
         $subject1 = new NamedNodeImpl('http://saft/test/s1');
@@ -101,7 +101,7 @@ class AbstractSparqlStoreTest extends TestCase
         $object1 = new LiteralImpl(42); // will be handled as string, because no datatype given.
         $triple1 = new StatementImpl($subject1, $predicate1, $object1);
 
-        /**
+        /*
          * object is a literal
          */
         $object2 = new LiteralImpl('John'); // will be handled as string, because no datatype given.
@@ -140,7 +140,7 @@ class AbstractSparqlStoreTest extends TestCase
     }
 
     /*
-     * Tests deleteMatchingStatements
+     * Tests for deleteMatchingStatements
      */
 
     public function testDeleteMatchingStatements()
@@ -154,7 +154,7 @@ class AbstractSparqlStoreTest extends TestCase
     }
 
     /*
-     * Tests getMatchingStatements
+     * Tests for getMatchingStatements
      */
 
     public function testGetMatchingStatements()
@@ -174,7 +174,7 @@ class AbstractSparqlStoreTest extends TestCase
     }
 
     /*
-     * Tests hasMatchingStatement
+     * Tests for hasMatchingStatement
      */
 
     public function testHasMatchingStatement()
@@ -188,14 +188,13 @@ class AbstractSparqlStoreTest extends TestCase
         $this->assertNull($result);
     }
 
-
     /**
      * test if pattern-variable is recognized properly.
      */
     public function testPatternStatement()
     {
         $this->markTestSkipped("Variable have to be introduced");
-        /**
+        /*
          * subject is a pattern variable
          */
         $subject = new AnyPatternImpl('?s1');
@@ -211,7 +210,7 @@ class AbstractSparqlStoreTest extends TestCase
 
         $this->assertTrue(is_bool($result));
 
-        /**
+        /*
          * graph is a pattern variable
          */
         $graph1 = new AnyPatternImpl('?g1');

@@ -29,6 +29,10 @@ abstract class StoreAbstractTest extends TestCase
         }
     }
 
+    /*
+     * Helper functions
+     */
+
     protected function getTestQuad()
     {
         $subject1 = new NamedNodeImpl('http://saft/testquad/s1');
@@ -67,8 +71,46 @@ abstract class StoreAbstractTest extends TestCase
         return new StatementImpl($subject2, $predicate2, $object2, $this->testGraph);
     }
 
+    /**
+     * Tests add and delete statements on default graph
+     */
+    public function testAddAndDeleteStatementsOnDefaultGraph()
+    {
+        $stmtOne = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new NamedNodeImpl('http://o/')
+        );
+        $stmtTwo = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new LiteralImpl('test literal')
+        );
+
+        if ($this->fixture->hasMatchingStatement($stmtOne) || $this->fixture->hasMatchingStatement($stmtTwo)) {
+            $this->markTestSkipped("Skip this test, because one of our test triples already exists");
+        }
+
+        // 2 triples
+        $statements = new ArrayStatementIteratorImpl([$stmtOne, $stmtTwo]);
+
+        // add triples
+        $this->fixture->addStatements($statements);
+
+        // graph has the two entries
+        $this->assertTrue($this->fixture->hasMatchingStatement($stmtOne));
+        $this->assertTrue($this->fixture->hasMatchingStatement($stmtTwo));
+
+        $this->fixture->deleteMatchingStatements($stmtOne);
+        $this->fixture->deleteMatchingStatements($stmtTwo);
+
+        // graph has the two entries
+        $this->assertFalse($this->fixture->hasMatchingStatement($stmtOne));
+        $this->assertFalse($this->fixture->hasMatchingStatement($stmtTwo));
+    }
+
     /*
-     * Actual test methods
+     * Tests for addStatements
      */
 
     public function testAddStatements()
@@ -107,42 +149,6 @@ abstract class StoreAbstractTest extends TestCase
         // graph has two entries
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
         $this->assertCountStatementIterator(2, $statements);
-    }
-
-
-    public function testAddAndDeleteStatementsOnDefaultGraph()
-    {
-        $stmtOne = new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new NamedNodeImpl('http://o/')
-        );
-        $stmtTwo = new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new LiteralImpl('test literal')
-        );
-
-        if ($this->fixture->hasMatchingStatement($stmtOne) || $this->fixture->hasMatchingStatement($stmtTwo)) {
-            $this->markTestSkipped("Skip this test, because one of our test triples already exists");
-        }
-
-        // 2 triples
-        $statements = new ArrayStatementIteratorImpl([$stmtOne, $stmtTwo]);
-
-        // add triples
-        $this->fixture->addStatements($statements);
-
-        // graph has the two entries
-        $this->assertTrue($this->fixture->hasMatchingStatement($stmtOne));
-        $this->assertTrue($this->fixture->hasMatchingStatement($stmtTwo));
-
-        $this->fixture->deleteMatchingStatements($stmtOne);
-        $this->fixture->deleteMatchingStatements($stmtTwo);
-
-        // graph has the two entries
-        $this->assertFalse($this->fixture->hasMatchingStatement($stmtOne));
-        $this->assertFalse($this->fixture->hasMatchingStatement($stmtTwo));
     }
 
     public function testAddStatementsWithArray()
@@ -297,7 +303,7 @@ abstract class StoreAbstractTest extends TestCase
     }
 
     /*
-     * Tests createGraph
+     * Tests for createGraph
      */
 
     public function testCreateGraph()
@@ -308,12 +314,11 @@ abstract class StoreAbstractTest extends TestCase
     }
 
     /*
-     * function dropGraph
-     *
-     * We can drop the graph and create a graph, but we can't asume any action since a store might
-     * not support empty graphs.
+     * Tests for dropGraph
      */
 
+    // We can drop the graph and create a graph, but we can't asume any action since a store might
+    // not support empty graphs.
     public function testDropGraph()
     {
         $this->fixture->dropGraph($this->testGraph);
@@ -326,12 +331,12 @@ abstract class StoreAbstractTest extends TestCase
     }
 
     /*
-     * Tests deleteMatchingStatements
+     * Tests for deleteMatchingStatements
      */
 
     public function testDeleteMatchingStatements2()
     {
-        /**
+        /*
          * Create some test data
          */
         $anyStatement = new StatementImpl(
@@ -428,7 +433,7 @@ abstract class StoreAbstractTest extends TestCase
         $statements = $this->fixture->getMatchingStatements($anyStatement);
         $this->assertCountStatementIterator(2, $statements);
 
-        /**
+        /*
          * drop all triples
          */
         $this->fixture->deleteMatchingStatements(
@@ -480,7 +485,7 @@ abstract class StoreAbstractTest extends TestCase
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
         $this->assertCountStatementIterator(2, $statements);
 
-        /**
+        /*
          * drop all triples
          */
         $this->fixture->deleteMatchingStatements(
@@ -494,7 +499,7 @@ abstract class StoreAbstractTest extends TestCase
     }
 
     /*
-     * Tests deleteMultipleStatements
+     * Tests for deleteMultipleStatements
      */
 
     public function testDeleteMultipleStatementsQuadRecognition()
@@ -532,8 +537,8 @@ abstract class StoreAbstractTest extends TestCase
         );
     }
 
-    /**
-     * test for method getGraphs
+    /*
+     * Tests for getGraphs
      */
 
     public function testGetGraphs()
@@ -551,7 +556,7 @@ abstract class StoreAbstractTest extends TestCase
     }
 
     /*
-     * Tests getMatchingStatements
+     * Tests for getMatchingStatements
      */
 
     public function testGetMatchingStatementsReturnType()
@@ -595,7 +600,7 @@ abstract class StoreAbstractTest extends TestCase
             new AnyPatternImpl()
         );
 
-        /**
+        /*
          * Build StatementIterator instance to check against
          */
         $instanceToCheckAgainst = new ArrayStatementIteratorImpl(array(
@@ -700,8 +705,8 @@ abstract class StoreAbstractTest extends TestCase
         }
     }
 
-    /**
-     * Tests getStoreDescription
+    /*
+     * Tests for getStoreDescription
      */
 
     // Test if an array for the store description is returned
@@ -711,7 +716,7 @@ abstract class StoreAbstractTest extends TestCase
     }
 
     /*
-     * Tests hasMatchingStatements
+     * Tests for hasMatchingStatements
      */
 
     public function testHasMatchingStatement()
@@ -774,7 +779,7 @@ abstract class StoreAbstractTest extends TestCase
     }
 
     /*
-     * Tests query
+     * Tests for query
      */
 
     public function testQuery()
@@ -807,7 +812,7 @@ abstract class StoreAbstractTest extends TestCase
         // add triples
         $this->fixture->addStatements($statements, $this->testGraph);
 
-        /**
+        /*
          * Build SetResult instance to check against
          */
         $setResultToCheckAgainst = new SetResultImpl(
