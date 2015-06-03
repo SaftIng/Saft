@@ -38,4 +38,12 @@ abstract class ParserFactoryAbstractTest extends TestCase
             $this->assertTrue(is_object($this->fixture->createParserFor($serialization)));
         }
     }
+
+    public function testCreateParserForRequestInvalidSerialization()
+    {
+        // expected exception because invalid serialization was given
+        $this->setExpectedException('\Exception');
+
+        $this->newInstance()->createParserFor('invalid serialization');
+    }
 }

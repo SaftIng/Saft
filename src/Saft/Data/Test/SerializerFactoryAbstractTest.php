@@ -37,4 +37,12 @@ abstract class SerializerFactoryAbstractTest extends TestCase
             $this->assertTrue(is_object($this->fixture->createSerializerFor($serialization)));
         }
     }
+
+    public function testCreateSerializerForRequestInvalidSerialization()
+    {
+        // expected exception because invalid serialization was given
+        $this->setExpectedException('\Exception');
+
+        $this->newInstance()->createSerializerFor('invalid serialization');
+    }
 }
