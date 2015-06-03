@@ -5,7 +5,6 @@
 
 # SparqlStore and TriplePatternStore related configurations
 httpConfig: &httpConfig
-    class: "Saft\\Backend\\HttpStore\\Store\\Http"
     authUrl: "http://localhost:8890/sparql-auth"
     queryUrl: "http://localhost:8890/sparql"
     username: "dba"
@@ -19,23 +18,19 @@ arc2Config: &arc2Config
     table-prefix: "saft"
 
 queryCacheConfig: &queryCacheConfig
-    class: "Saft\\QueryCache\\QueryCache"
     cacheConfig:
         class: "Saft\\Backend\\FileCache\\Cache\\File"
         cachePath: "/tmp/saft/"
 
 virtuosoConfig: &virtuosoConfig
-    class: "Saft\\Backend\\Virtuoso\\Store\\Virtuoso"
     dsn: "VOS"
     username: "dba"
     password: "dba"
 
 # Cache related configurations.
 fileCacheConfig: &fileCacheConfig
-    class: "Saft\\Backend\\FileCache\\Cache\\File"
     cachePath: "/tmp/saft/"
 
 memcachedCacheConfig: &memcachedCacheConfig
-    class: "Saft\\Backend\\MemcacheD\\Cache\\MemcacheD"
     host: "127.0.0.1"
     port: "11211"
