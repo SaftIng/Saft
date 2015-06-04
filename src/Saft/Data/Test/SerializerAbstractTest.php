@@ -21,6 +21,14 @@ abstract class SerializerAbstractTest extends TestCase
 
     public function testSerializeIteratorToStreamAsNQuads()
     {
+        // serialize $iterator to turtle
+        $this->fixture = $this->newInstance();
+
+        if (false === in_array('n-quads', $this->fixture->getSupportedSerializations())) {
+            // Fixture does not support n-quads serialization.
+            return;
+        }
+
         $iterator = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
                 new NamedNodeImpl('http://saft/example/'),
@@ -36,9 +44,7 @@ abstract class SerializerAbstractTest extends TestCase
 
         $testFile = sys_get_temp_dir() .'/saft/serialize.ttl';
 
-        // serialize $iterator to turtle
-        $this->fixture = $this->newInstance();
-        $this->fixture->serializeIteratorToStream($iterator, $testFile, 'nquads');
+        $this->fixture->serializeIteratorToStream($iterator, $testFile, 'n-quads');
 
         // read written data to check them
         $stream = new Stream(fopen($testFile, 'r'));
@@ -61,6 +67,13 @@ abstract class SerializerAbstractTest extends TestCase
 
     public function testSerializeIteratorToStreamAsNTriples()
     {
+        // serialize $iterator to turtle
+        $this->fixture = $this->newInstance();
+
+        if (false === in_array('n-triples', $this->fixture->getSupportedSerializations())) {
+            $this->markTestSkipped('Fixture does not support n-triples serialization.');
+        }
+
         $iterator = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
                 new NamedNodeImpl('http://saft/example/'),
@@ -76,9 +89,7 @@ abstract class SerializerAbstractTest extends TestCase
 
         $testFile = sys_get_temp_dir() .'/saft/serialize.ttl';
 
-        // serialize $iterator to turtle
-        $this->fixture = $this->newInstance();
-        $this->fixture->serializeIteratorToStream($iterator, $testFile, 'ntriples');
+        $this->fixture->serializeIteratorToStream($iterator, $testFile, 'n-triples');
 
         // read written data to check them
         $stream = new Stream(fopen($testFile, 'r'));

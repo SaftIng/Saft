@@ -14,7 +14,7 @@ class SerializerFactoryImpl implements SerializerFactory
      */
     public function createSerializerFor($serialization)
     {
-        if ('nquads' == $serialization || 'ntriples' == $serialization) {
+        if ('n-quads' == $serialization || 'n-triples' == $serialization) {
             return new NQuadsSerializerImpl();
 
         } else {
@@ -22,5 +22,15 @@ class SerializerFactoryImpl implements SerializerFactory
                 'No serializer for requested serialization available: '. $serialization
             );
         }
+    }
+
+    /**
+     * Returns a list of all supported serialization types.
+     *
+     * @return array Array of supported serialization types which can be used by this serializer.
+     */
+    public function getSupportedSerializations()
+    {
+        return array('n-triples', 'n-quads');
     }
 }

@@ -19,6 +19,11 @@ class ParserEasyRdf implements Parser
     private $nodeFactory;
 
     /**
+     * @var array
+     */
+    protected $serializationMap;
+
+    /**
      * @var StatementFactory
      */
     private $statementFactory;
@@ -33,6 +38,17 @@ class ParserEasyRdf implements Parser
     {
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
+
+        /**
+         * Map of serializations. It maps the Saft term on according the EasyRdf format.
+         */
+        $this->serializationMap = array(
+            'n-triples' => 'ntriples',
+            'rdf-json' => 'json',
+            'rdf-xml' => 'rdfxml',
+            'rdfa' => 'rdfa',
+            'turtle' => 'turtle',
+        );
     }
 
     /**
@@ -54,7 +70,7 @@ class ParserEasyRdf implements Parser
      */
     public function getSupportedSerializations()
     {
-        return array_keys(Format::getFormats());
+        return array_keys($this->serializationMap);
     }
 
     /**
@@ -68,8 +84,8 @@ class ParserEasyRdf implements Parser
      *                                          parser will either apply some standard serialization, or the
      *                                          only one it is supporting, or will try to guess the correct
      *                                          serialization, or will throw an Exception.
-     *                                          Supported formats are a subset of the following:
-     *                                          json, rdfxml, sparql-xml, rdfa, turtle, ntriples, n3
+     *                                          For more information have a look here:
+     *                                          http://safting.github.io/doc/phpframework/data/
      * @return StatementIterator StatementIterator instaince containing all the Statements parsed by the
      *                           parser to far
      * @throws \Exception        If the base URI $baseUri is no valid URI.

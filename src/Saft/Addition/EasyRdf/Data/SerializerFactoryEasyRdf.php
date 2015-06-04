@@ -27,4 +27,14 @@ class SerializerFactoryEasyRdf implements SerializerFactory
             );
         }
     }
+
+    /**
+     * Returns a list of all supported serialization types.
+     *
+     * @return array Array of supported serialization types which can be used by this serializer.
+     */
+    public function getSupportedSerializations()
+    {
+        return array('n-triples', 'rdf-json', 'rdf-xml', 'rdfa', 'turtle');
+    }
 }

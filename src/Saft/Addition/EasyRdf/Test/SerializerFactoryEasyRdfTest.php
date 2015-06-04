@@ -14,11 +14,10 @@ class SerializerFactoryEasyRdfTest extends SerializerFactoryAbstractTest
      * @var array
      */
     protected $availableSerializations = array(
-        'json',
-        'ntriples',
+        'n-triples',
+        'rdf-json',
+        'rdf-xml',
         'rdfa',
-        'rdfxml',
-        'sparql-xml',
         'turtle'
     );
 

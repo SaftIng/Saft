@@ -29,7 +29,7 @@ class NQuadsSerializerImpl implements Serializer
      * @param  string            $serialization The serialization which should be used. If null is given
      *                                          the serializer will either apply some default serialization,
      *                                          or the only one it is supporting, or will throw an Exception.
-     * @throws \Exception If unknown format was given.
+     * @throws \Exception If unknown serialization was given.
      */
     public function serializeIteratorToStream(
         StatementIterator $statements,
@@ -41,9 +41,9 @@ class NQuadsSerializerImpl implements Serializer
         /*
          * Handle format
          */
-        if ('nquads' == $serialization) {
+        if ('n-quads' == $serialization) {
             $function = 'toNQuads';
-        } elseif ('ntriples' == $serialization) {
+        } elseif ('n-triples' == $serialization) {
             $function = 'toNTriples';
         } else {
             throw new \Exception('Unknown format given: '. $serialization);
@@ -63,6 +63,6 @@ class NQuadsSerializerImpl implements Serializer
      */
     public function getSupportedSerializations()
     {
-        return array('ntriples', 'nquads');
+        return array('n-triples', 'n-quads');
     }
 }

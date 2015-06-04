@@ -15,6 +15,28 @@ use Streamer\Stream;
 class SerializerEasyRdf implements Serializer
 {
     /**
+     * @var array
+     */
+    protected $serializationMap;
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        /**
+         * Map of serializations. It maps the Saft term on according the EasyRdf format.
+         */
+        $this->serializationMap = array(
+            'n-triples' => 'ntriples',
+            'rdf-json' => 'json',
+            'rdf-xml' => 'rdfxml',
+            'rdfa' => 'rdfa',
+            'turtle' => 'turtle',
+        );
+    }
+
+    /**
      * Set the prefixes which the serializer can/should use when generating the serialization.
      * Prefixes are ignored here.
      *
@@ -28,27 +50,26 @@ class SerializerEasyRdf implements Serializer
     /**
      * Transforms the statements of a StatementIterator instance into a stream, a file for instance.
      *
-     * @param  StatementIterator $statements   The StatementIterator containing all the Statements which
-     *                                         should be serialized by the serializer.
-     * @param  string            $outputStream filename of the stream to where the serialization should be
-     *                                         written.
-     * @param  string            $format       The serialization which should be used. If null is given the
-     *                                         serializer will either apply some default serialization, or
-     *                                         the only one it is supporting, or will throw an Exception.
-     * @throws \Exception If unknown format was given.
+     * @param  StatementIterator $statements    The StatementIterator containing all the Statements which
+     *                                          should be serialized by the serializer.
+     * @param  string            $outputStream  filename of the stream to where the serialization should be
+     *                                          written.
+     * @param  string            $serialization The serialization which should be used. If null is given the
+     *                                          serializer will either apply some default serialization, or
+     *                                          the only one it is supporting, or will throw an Exception.
+     * @throws \Exception If unknown serilaization was given.
      */
-    public function serializeIteratorToStream(StatementIterator $statements, $outputStream, $format = null)
+    public function serializeIteratorToStream(StatementIterator $statements, $outputStream, $serialization = null)
     {
         $stream = new Stream(fopen($outputStream, 'w'));
 
         // if no format was given, serialize to turtle.
-        if (null == $format) {
+        if (null == $serialization) {
             $format = 'turtle';
         }
 
-        // TODO check what nquads is in EasyRdf
-        if ('nquads' == $format) {
-            $format = 'ntriples';
+        if (false === isset($this->serializationMap[$serialization])) {
+            throw new \Exception ('Unknown serialization given: '. $serialization);
         }
 
         $graph = new Graph();
@@ -94,7 +115,7 @@ class SerializerEasyRdf implements Serializer
             $graph->add($s, $p, $o);
         }
 
-        $stream->write($graph->serialise($format) . PHP_EOL);
+        $stream->write($graph->serialise($this->serializationMap[$serialization]) . PHP_EOL);
 
         $stream->close();
     }
@@ -106,6 +127,6 @@ class SerializerEasyRdf implements Serializer
      */
     public function getSupportedSerializations()
     {
-        return array_keys(Format::getFormats());
+        return array_keys($this->serializationMap);
     }
 }
