@@ -21,7 +21,7 @@ abstract class AbstractLiteral implements Literal
     {
         // Only compare, if given instance is a literal
         if ($toCompare->isLiteral() && $this->getDatatype()->equals($toCompare->getDatatype())) {
-            return $this->getValue() == $toCompare->getValue();
+            return $this->getValue() === $toCompare->getValue() && $this->getLanguage() == $toCompare->getLanguage();
         }
         return false;
     }
