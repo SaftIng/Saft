@@ -19,7 +19,7 @@ arc2Config: &arc2Config
 
 queryCacheConfig: &queryCacheConfig
     cacheConfig:
-        class: "Saft\\Backend\\FileCache\\Cache\\File"
+        class: "Saft\\Addition\\FileCache\\Cache\\File"
         cachePath: "/tmp/saft/"
 
 virtuosoConfig: &virtuosoConfig

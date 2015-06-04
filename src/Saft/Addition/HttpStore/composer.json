@@ -1,0 +1,38 @@
+{
+    "name": "saft/saft-store-http",
+    "type": "library",
+    "description": "HTTP/REST store implementation.",
+    "keywords": ["Saft", "REST", "HTTP", "Store", "RDF", "Triple Store"],
+    "homepage": "https://safting.github.io/",
+    "license": "GPL2",
+    "authors": [
+        {
+            "name": "Natanael Arndt",
+            "homepage": "http://aksw.org/NatanaelArndt",
+            "email": "arndtn@gmail.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Konrad Abicht",
+            "homepage": "http://www.inspirito.de",
+            "email": "hi@inspirito.de",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "ext-curl": "*",
+        "php-curl-class/php-curl-class": "*",
+
+        "saft/saft-store": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.5.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Saft\\Addition\\HttpStore\\": "."
+        }
+    },
+    "minimum-stability": "dev"
+}

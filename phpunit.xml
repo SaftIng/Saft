@@ -17,7 +17,7 @@
     <testsuites>
         <testsuite name="Saft">
             <directory suffix="Test.php">./src/Saft/*/Test</directory>
-            <directory suffix="Test.php">./src/Saft/Backend/*/Test</directory>
+            <directory suffix="Test.php">./src/Saft/Addition/*/Test</directory>
         </testsuite>
     </testsuites>
     <!-- Enable Code Coverage report -->
