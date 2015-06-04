@@ -1,6 +1,6 @@
 <?php
 
-namespace Saft\QueryCache;
+namespace Saft\Addition\QueryCache;
 
 use Saft\Cache\CacheFactory;
 use Saft\Rdf\NamedNode;

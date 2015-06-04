@@ -1,10 +1,10 @@
 <?php
 
-namespace Saft\QueryCache\Test;
+namespace Saft\Addition\QueryCache\Test;
 
+use Saft\Addition\QueryCache\QueryCache;
+use Saft\Addition\QueryCache\Test\AbstractQueryCacheIntegrationTest;
 use Saft\Cache\CacheFactoryImpl;
-use Saft\QueryCache\QueryCache;
-use Saft\QueryCache\Test\AbstractQueryCacheIntegrationTest;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
 

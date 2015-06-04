@@ -1,6 +1,6 @@
 <?php
 
-namespace Saft\QueryCache\Test;
+namespace Saft\Addition\QueryCache\Test;
 
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
