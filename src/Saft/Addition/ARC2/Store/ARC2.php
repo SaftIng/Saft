@@ -12,7 +12,6 @@ use Saft\Rdf\StatementIteratorFactory;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
 use Saft\Store\AbstractSparqlStore;
-use Saft\Store\Exception\StoreException;
 use Saft\Store\Result\EmptyResult;
 use Saft\Store\Result\ResultFactory;
 use Saft\Store\Result\SetResult;
@@ -388,7 +387,7 @@ class ARC2 extends AbstractSparqlStore
         if (false === $queryObject->isGraphQuery()
             && false === isset($queryParts['triple_pattern'])
             && false === isset($queryParts['quad_pattern'])) {
-            throw new StoreException('Non-graph queries must have triples or quads.');
+            throw new \Exception('Non-graph queries must have triples or quads.');
         }
 
         // execute query on the store

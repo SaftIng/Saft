@@ -16,7 +16,6 @@ use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Store;
-use Saft\Store\Exception\StoreException;
 use Saft\Store\Result\EmptyResult;
 use Saft\Store\Result\ResultFactory;
 use Saft\Store\Result\SetResult;
@@ -280,7 +279,7 @@ class Virtuoso extends AbstractSparqlStore
                 $pdoQuery->execute();
 
             } catch (\PDOException $e) {
-                throw new StoreException($e->getMessage());
+                throw new \Exception($e->getMessage());
             }
 
             $entries = array();

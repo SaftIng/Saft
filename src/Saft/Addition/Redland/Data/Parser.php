@@ -27,7 +27,7 @@ class Parser implements ParserInterface
     public function __construct()
     {
         if (false === extension_loaded('redland')) {
-            throw new Exception('Redland php5-librdf is required for this parser');
+            throw new \Exception('Redland php5-librdf is required for this parser');
         }
 
         $format = 'turtle';
@@ -36,7 +36,7 @@ class Parser implements ParserInterface
         $this->parser = librdf_new_parser($this->world, $format, null, null);
 
         if (false === $this->parser) {
-            throw new Exception('Failed to create librdf_parser of type: '. $format);
+            throw new \Exception('Failed to create librdf_parser of type: '. $format);
         }
     }
 
@@ -51,7 +51,7 @@ class Parser implements ParserInterface
     {
         $redlandStream = librdf_parser_parse_string_as_stream($this->parser, $data, $rdfUri);
         if (false === $redlandStream) {
-            throw new Exception('Failed to parse RDF stream');
+            throw new \Exception('Failed to parse RDF stream');
         }
 
         return new StatementIterator($redlandStream);
@@ -69,7 +69,7 @@ class Parser implements ParserInterface
         $rdfUri = librdf_new_uri($this->world, $baseUri);
 
         if (false === $rdfUri) {
-            throw new Exception('Failed to create librdf_uri from: '. $baseUri);
+            throw new \Exception('Failed to create librdf_uri from: '. $baseUri);
         }
 
         $data = file_get_contents($inputStream);
