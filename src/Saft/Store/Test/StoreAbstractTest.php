@@ -104,7 +104,7 @@ abstract class StoreAbstractTest extends TestCase
         $this->fixture->deleteMatchingStatements($stmtOne);
         $this->fixture->deleteMatchingStatements($stmtTwo);
 
-        // graph has the two entries
+        // graph does not have the two entries anymore
         $this->assertFalse($this->fixture->hasMatchingStatement($stmtOne));
         $this->assertFalse($this->fixture->hasMatchingStatement($stmtTwo));
     }

@@ -47,6 +47,57 @@ class VirtuosoTest extends StoreAbstractTest
     }
 
     /*
+     * Tests to check add and delete statements on default graph.
+     */
+
+    // override test from parent class because Virtuoso does not support what we want to test.
+    public function testAddAndDeleteStatementsOnDefaultGraph()
+    {
+        // See: https://github.com/openlink/virtuoso-opensource/issues/417
+        $this->markTestSkipped('Virtuoso does not grant write access to the default graph.');
+    }
+
+    /*
+     * Tests for addStatements
+     */
+
+    /**
+     * Tests add statements on default graph. It is expected that an exception will is thrown, because
+     * no graph information were given.
+     */
+    public function testAddStatementsOnDefaultGraphWithException()
+    {
+        $stmtOne = new StatementImpl(
+            new NamedNodeImpl('http://add/delete/defaultgraph/s/'),
+            new NamedNodeImpl('http://add/delete/defaultgraph/p/'),
+            new NamedNodeImpl('http://add/delete/defaultgraph/o/')
+        );
+
+        $this->setExpectedException('\Exception');
+        $this->fixture->addStatements(array($stmtOne));
+    }
+
+    /*
+     * Tests for deleteMatchingStatements
+     */
+
+    /**
+     * Tests delete matching statements on default graph. It is expected that an exception will is thrown,
+     * because no graph information were given.
+     */
+    public function testDeleteMatchingStatementsOnDefaultGraphWithException()
+    {
+        $stmtOne = new StatementImpl(
+            new NamedNodeImpl('http://add/delete/defaultgraph/s/'),
+            new NamedNodeImpl('http://add/delete/defaultgraph/p/'),
+            new NamedNodeImpl('http://add/delete/defaultgraph/o/')
+        );
+
+        $this->setExpectedException('\Exception');
+        $this->fixture->deleteMatchingStatements($stmtOne);
+    }
+
+    /*
      * Tests for isGraphAvailable
      */
 

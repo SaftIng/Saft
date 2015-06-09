@@ -113,6 +113,36 @@ class Virtuoso extends AbstractSparqlStore
     }
 
     /**
+     * Adds multiple Statements to (default-) graph.
+     *
+     * @param  StatementIterator|array $statements StatementList instance must contain Statement instances
+     *                                             which are 'concret-' and not 'pattern'-statements.
+     * @param  Node                    $graph      Overrides target graph. If set, all statements
+     *                                             will be add to that graph, if it is available. (optional)
+     * @param  array                   $options    Key-value pairs which provide additional introductions
+     *                                             for the store and/or its adapter(s). (optional)
+     * @todo change that check-loop and make it possible to lazy-load statements from the iterator
+     */
+    public function addStatements($statements, Node $graph = null, array $options = array())
+    {
+        // check if there are triples in $statements and no graph given (and no option set)
+        if (null === $graph) {
+            foreach ($statements as $statement) {
+                // if no graph information were given and a statement has to be added, we
+                // must stop it, because Virtuoso does not support it
+                // https://github.com/SaftIng/Saft/issues/36
+                if ($statement->isTriple()) {
+                    throw new \Exception(
+                        'Virtuoso is a quad store and therefore needs to know the graph to add statements.'
+                    );
+                }
+            }
+        }
+
+        parent::addStatements($statements, $graph, $options);
+    }
+
+    /**
      * Checks that all requirements for queries via HTTP are fullfilled.
      *
      * @return boolean True, if all requirements are fullfilled.
@@ -139,6 +169,27 @@ class Virtuoso extends AbstractSparqlStore
     protected function closeConnection()
     {
         $this->connection = null;
+    }
+
+    /**
+     * Removes all statements from a (default-) graph which match with given statement.
+     *
+     * @param  Statement $statement          It can be either a concrete or pattern-statement.
+     * @param  Node      $graph     optional Overrides target graph. If set, all statements will
+     *                                       be delete in that graph.
+     * @param  array     $options   optional Key-value pairs which provide additional introductions
+     *                                       for the store and/or its adapter(s).
+     */
+    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
+    {
+        // given $graph forces usage of it and not the graph from the statement instance
+        if (null == $graph && null == $statement->getGraph()) {
+            throw new \Exception(
+                'Virtuoso is a quad store and therefore needs to know the graph to delete statements.'
+            );
+        }
+
+        parent::deleteMatchingStatements($statement, $graph, $options);
     }
 
     /**

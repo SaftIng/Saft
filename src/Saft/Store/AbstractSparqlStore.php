@@ -197,8 +197,6 @@ abstract class AbstractSparqlStore implements Store
             $graph = $statement->getGraph();
             $graphUriToUse = $graph->getUri();
 
-        } else {
-            throw new \Exception('Graph was not given, neither as parameter nor in statement.');
         }
 
         $statementIterator = $this->statementIteratorFactory->createIteratorFromArray(
