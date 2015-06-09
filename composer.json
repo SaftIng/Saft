@@ -31,7 +31,6 @@
         "saft/saft-sparql": "self.version",
         "saft/saft-cache": "self.version",
         "saft/saft-cache-file": "self.version",
-        "saft/saft-cache-phparray": "self.version",
         "saft/saft-cache-memcached": "self.version",
         "saft/saft-querycache": "self.version",
         "saft/saft-store-http": "self.version",
