@@ -144,28 +144,29 @@ class UpdateQueryImpl extends AbstractQuery
         // only lower chars
         $adaptedQuery = strtolower($adaptedQuery);
 
-        $firstPart = substr($adaptedQuery, 0, 8);
+        // only first part and without whitespaces
+        $firstPart = str_replace(' ', '', substr($adaptedQuery, 0, 8));
 
         // TODO make check more precise, because its possible that are more than one whitespace between keywords.
         switch($firstPart) {
             // DELETE DATA
-            case 'delete d':
+            case 'deleted':
                 return 'deleteData';
 
             // DELETE FROM <> { } WHERE { } (SPARQL+ from ARC2)
-            case 'delete f':
+            case 'deletef':
                 return 'deleteFromWhere';
 
             // DELETE WHERE
-            case 'delete w':
+            case 'deletew':
                 return 'deleteWhere';
 
             // INSERT DATA
-            case 'insert d':
+            case 'insertd':
                 return 'insertData';
 
             // INSERT INTO
-            case 'insert i':
+            case 'inserti':
                 return 'insertInto';
 
             default:
@@ -189,6 +190,12 @@ class UpdateQueryImpl extends AbstractQuery
                 } elseif (false !== strpos($adaptedQuery, 'with')
                     && false !== strpos($adaptedQuery, 'delete')) {
                     return 'withDelete';
+
+                // check if query is of type: DELETE { ... } WHERE { ... }
+                // TODO make it more precise
+                } elseif (false !== strpos($adaptedQuery, 'delete')
+                    && false !== strpos($adaptedQuery, 'where')) {
+                    return 'deletePrologWhere';
                 }
         }
 
@@ -295,6 +302,20 @@ class UpdateQueryImpl extends AbstractQuery
                 /**
                  * TODO extract graphs
                  */
+            } else {
+                throw new \Exception('Where part after DELETE WHERE is empty.');
+            }
+
+        /*
+         * Save parts for DELETE {} WHERE {}
+         */
+        } elseif ('deletePrologWhere' === $this->queryParts['sub_type']) {
+            // TODO extract graphs
+            preg_match('/DELETE\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/im', $this->getQuery(), $matches);
+
+            if (true === isset($matches[1]) && true === isset($matches[2])) {
+                $this->queryParts['deleteProlog'] = trim($matches[1]);
+                $this->queryParts['deleteWhere'] = trim($matches[2]);
             } else {
                 throw new \Exception('Where part after DELETE WHERE is empty.');
             }
