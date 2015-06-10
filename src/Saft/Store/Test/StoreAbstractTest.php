@@ -19,16 +19,6 @@ use Symfony\Component\Yaml\Parser;
 
 abstract class StoreAbstractTest extends TestCase
 {
-    public function setUp()
-    {
-        parent::setUp();
-
-        if (null !== $this->fixture) {
-            $this->fixture->dropGraph($this->testGraph);
-            $this->fixture->createGraph($this->testGraph);
-        }
-    }
-
     /*
      * Helper functions
      */
@@ -380,20 +370,6 @@ abstract class StoreAbstractTest extends TestCase
         // count no triples
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
         $this->assertCountStatementIterator(0, $statements);
-    }
-
-    public function testDeleteMatchingStatementsNoGraphGiven()
-    {
-        // expect exception thrown, because no graph was given, neither set in Statement nor given extra
-        $this->setExpectedException('\Exception');
-
-        $this->fixture->deleteMatchingStatements(
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/'),
-                new AnyPatternImpl()
-            )
-        );
     }
 
     public function testDeleteMatchingStatementsUseStatementGraph()

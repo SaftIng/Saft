@@ -51,6 +51,9 @@ class HttpTest extends StoreAbstractTest
         if (false === $rights['tripleUpdate']) {
             $this->markTestSkipped('Test skipped, because the adapter can not update triples.');
         }
+
+        $this->fixture->dropGraph($this->testGraph);
+        $this->fixture->createGraph($this->testGraph);
     }
 
     /*

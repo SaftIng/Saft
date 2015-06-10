@@ -32,6 +32,9 @@ class ARC2Test extends StoreAbstractTest
                 $this->config['arc2Config']
             );
 
+            $this->fixture->dropGraph($this->testGraph);
+            $this->fixture->createGraph($this->testGraph);
+
         } else {
             $this->markTestSkipped('Array arc2Config is not set in the test-config.yml.');
         }
