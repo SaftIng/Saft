@@ -136,8 +136,6 @@ class ARC2 extends AbstractSparqlStore
                 $graphUriToUse = $graph->getUri();
 
             // no graph instance was found
-            } else {
-                throw new \Exception('Graph was not given, neither as parameter nor in statement.');
             }
 
             // init batch entry for the current graph URI, if not set yet.
@@ -237,9 +235,6 @@ class ARC2 extends AbstractSparqlStore
         // use graphUri from statement
         } elseif (null === $graph && null !== $statement->getGraph()) {
             $graph = $statement->getGraph();
-
-        } else {
-            throw new \Exception('Graph was not given, neither as parameter nor in statement.');
         }
 
         // create triple statement, because we have to handle the graph extra
@@ -254,7 +249,11 @@ class ARC2 extends AbstractSparqlStore
         );
 
         $triple = $this->sparqlFormat($statementIterator);
-        $query = 'DELETE FROM <'. $graph->getUri() .'> {'. $triple .'} WHERE {'. $triple .'}';
+        $query = 'DELETE ';
+        if (null !== $graph) {
+            $query .= 'FROM <'. $graph->getUri() .'> ';
+        }
+        $query .= '{'. $triple .'} WHERE {'. $triple .'}';
 
         $this->query($query);
     }
