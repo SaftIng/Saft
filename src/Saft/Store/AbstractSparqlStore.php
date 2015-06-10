@@ -106,9 +106,8 @@ abstract class AbstractSparqlStore implements Store
             } elseif (null !== $statement->getGraph()) {
                 $graphUriToUse = $statement->getGraph()->getUri();
 
-            // no graph instance was found
             } else {
-                throw new \Exception('Graph was not given, neither as parameter nor in statement.');
+                $graphUriToUse = null;
             }
 
             // init batch entry for the current graph URI, if not set yet.

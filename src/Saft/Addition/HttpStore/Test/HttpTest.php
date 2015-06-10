@@ -57,6 +57,22 @@ class HttpTest extends StoreAbstractTest
     }
 
     /*
+     * Tests to check add and delete statements on default graph.
+     */
+
+    // override test from parent class because we dont know if the target server supports
+    // write access to default graph and it may throw an exception, if not. because of that
+    // we just dont test it to avoid confusion.
+    public function testAddAndDeleteStatementsOnDefaultGraph()
+    {
+        $this->markTestSkipped(
+            'Skip test from parent class because we dont know if the target server supports '.
+            'write access to default graph and it may throw an exception, if not. because of that '.
+            'we just dont test it to avoid confusion.'
+        );
+    }
+
+    /*
      * Tests for openConnection
      */
 
