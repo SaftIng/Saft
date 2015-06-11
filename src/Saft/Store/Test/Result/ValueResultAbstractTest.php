@@ -28,6 +28,7 @@ abstract class ValueResultAbstractTest extends TestCase
     public function testConstructor()
     {
         $this->fixture = new ValueResultImpl(0);
+        $this->assertEquals(0, $this->fixture->getValue());
     }
 
     public function testConstructorNonScalarParameter()
