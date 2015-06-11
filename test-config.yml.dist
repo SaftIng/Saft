@@ -29,8 +29,10 @@ virtuosoConfig: &virtuosoConfig
 
 # Cache related configurations.
 fileCacheConfig: &fileCacheConfig
+    class: "Saft\\Addition\\FileCache\\Cache\\File"
     cachePath: "/tmp/saft/"
 
 memcachedCacheConfig: &memcachedCacheConfig
+    class: "Saft\\Addition\\MemcacheD\\Cache\\MemcacheD"
     host: "127.0.0.1"
     port: "11211"
