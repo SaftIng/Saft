@@ -315,7 +315,9 @@ class ARC2 extends AbstractSparqlStore
 
         // collect graph URI's
         while ($row = $result->fetch_assoc()) {
-            $graphs[$row['graphUri']] = $this->nodeFactory->createNamedNode($row['graphUri']);
+            if (NodeUtils::simpleCheckURI($row['graphUri'])) {
+                $graphs[$row['graphUri']] = $this->nodeFactory->createNamedNode($row['graphUri']);
+            }
         }
 
         return $graphs;
