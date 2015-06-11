@@ -12,6 +12,7 @@ use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Store\Result\ResultFactoryImpl;
 use Saft\Store\Test\BasicTriplePatternStore;
 use Saft\Test\TestCase;
 use Symfony\Component\Yaml\Parser;
@@ -483,13 +484,21 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     // TODO implement this test using @depends
     public function testGetLogGetMatchingStatements()
     {
-        $this->markTestSkipped("We need variables for this");
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // build testdata
-        $statement = new StatementImpl(new VariableImpl('?s'), new VariableImpl('?p'), new VariableImpl('?o'));
+        $statement = new StatementImpl(
+            new AnyPatternImpl('?s'),
+            new AnyPatternImpl('?p'),
+            new AnyPatternImpl('?o')
+        );
         $statementIterator = new ArrayStatementIteratorImpl(array($statement));
         $options = array(1);
 
@@ -514,11 +523,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                     'method' => 'saveResult',
                     'parameter' => array(
                         'queryObject' => $queryObject,
-                        'result' => array(
-                            $statement,
-                            $this->testGraph->getUri(),
-                            array(1)
-                        )
+                        'result' => new ArrayStatementIteratorImpl(array())
                     )
                 ),
                 array(
@@ -782,9 +787,13 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
     // TODO implement this test using @depends
     public function testGetLogQuery()
     {
-        $this->markTestSkipped("We need variables for this");
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // build testdata
@@ -812,15 +821,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                     'method' => 'saveResult',
                     'parameter' => array(
                         'queryObject' => $queryObject,
-                        'result' => array(
-                            new StatementImpl(
-                                new AnyPatternImpl('?s'),
-                                new AnyPatternImpl('?p'),
-                                new AnyPatternImpl('?o')
-                            ),
-                            null,
-                            array()
-                        )
+                        'result' => new ArrayStatementIteratorImpl(array())
                     )
                 ),
                 // invalidate previous saved result, if available
@@ -1359,9 +1360,13 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
 
     public function testQuery()
     {
-        $this->markTestSkipped("We need variables for this");
         // set basic store as successor
-        $successor = new BasicTriplePatternStore(new NodeFactoryImpl());
+        $successor = new BasicTriplePatternStore(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
+        );
         $this->fixture->setChainSuccessor($successor);
 
         // test data
@@ -1369,11 +1374,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         $options = array();
 
         $this->assertEquals(
-            array(
-                new StatementImpl(new AnyPatternImpl('?s'), new AnyPatternImpl('?p'), new AnyPatternImpl('?o')),
-                null,
-                $options
-            ),
+            new ArrayStatementIteratorImpl(array()),
             $this->fixture->query($query, $options)
         );
     }
