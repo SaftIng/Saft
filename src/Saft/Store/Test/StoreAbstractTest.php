@@ -298,9 +298,19 @@ abstract class StoreAbstractTest extends TestCase
 
     public function testCreateGraph()
     {
+        // no matter what, remove test graph
+        $this->fixture->dropGraph($this->testGraph);
+
+        // check that there is no test graph
+        $graphs = $this->fixture->getGraphs();
+        $this->assertFalse(isset($graphs[$this->testGraph->getUri()]));
+
+        // create test graph
         $this->fixture->createGraph($this->testGraph);
 
-        // TODO try to add Triples
+        // check that there is a test graph
+        $graphs = $this->fixture->getGraphs();
+        $this->assertTrue(isset($graphs[$this->testGraph->getUri()]));
     }
 
     /*
@@ -311,13 +321,19 @@ abstract class StoreAbstractTest extends TestCase
     // not support empty graphs.
     public function testDropGraph()
     {
-        $this->fixture->dropGraph($this->testGraph);
-
+        // create test graph (even if it already exists)
         $this->fixture->createGraph($this->testGraph);
 
-        // TODO add Triples to the graph but expect Exception
+        // check that the graph exists
+        $graphs = $this->fixture->getGraphs();
+        $this->assertTrue(isset($graphs[$this->testGraph->getUri()]));
 
+        // drop graph
         $this->fixture->dropGraph($this->testGraph);
+
+        // check that the graph was dropped
+        $graphs = $this->fixture->getGraphs();
+        $this->assertFalse(isset($graphs[$this->testGraph->getUri()]));
     }
 
     /*
