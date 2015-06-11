@@ -5,6 +5,7 @@ namespace Saft\Addition\ARC2\Store;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
@@ -174,44 +175,33 @@ class ARC2 extends AbstractSparqlStore
     }
 
     /**
-     * Create a new graph with the URI given as Node. If the underlying store implementation doesn't
-     * support empty graphs this method will have no effect.
+     * Create a new graph with the URI given as NamedNode.
      *
      * @param  NamedNode  $graph            Instance of NamedNode containing the URI of the graph to create.
      * @param  array      $options optional It contains key-value pairs and should provide additional
      *                                      introductions for the store and/or its adapter(s).
-     * @throws \Exception If given $graph is not a NamedNode.
      * @throws \Exception If the given graph could not be created.
      */
     public function createGraph(NamedNode $graph, array $options = array())
     {
-        if ($graph->isNamed()) {
-            // table names
-            $g2t = $this->configuration['table-prefix'] . '_g2t';
-            $id2val = $this->configuration['table-prefix'] . '_id2val';
+        // table names
+        $g2t = $this->configuration['table-prefix'] . '_g2t';
+        $id2val = $this->configuration['table-prefix'] . '_id2val';
 
-            /*
-             * for id2val table
-             */
-            // generate new id based on the number of existing rows + 1
-            // TODO change that to be more save: create pull request to ARC2 with:
-            // - either add primary key auto increment
-            // - or change table type to innodb to have lock-on-write
-            $newIdid2val = 1 + $this->getRowCount($id2val);
+        /*
+         * for id2val table
+         */
+        $query = 'INSERT INTO '. $id2val .' (val) VALUES("'. $graph->getUri() .'")';
+        $this->store->queryDB($query, $this->store->getDBCon());
+        $usedId = $this->store->getDBCon()->insert_id;
 
-            $query = 'INSERT INTO '. $id2val .' (id, val) VALUES('. $newIdid2val .', "'. $graph->getUri() .'")';
-            $this->store->queryDB($query, $this->store->getDBCon());
-
-            /*
-             * for id2val table
-             */
-            $newIdg2t = 1 + $this->getRowCount($g2t);
-            $query = 'INSERT INTO '. $g2t .' (g, t) VALUES('. $newIdg2t .', "'. $newIdid2val .'")';
-            $this->store->queryDB($query, $this->store->getDBCon());
-
-        } else {
-            throw new \Exception('Given $graph is not a NamedNode.');
-        }
+        /*
+         * for g2t table
+         */
+        $newIdg2t = 1 + $this->getRowCount($g2t);
+        $query = 'INSERT INTO '. $g2t .' (t, g) VALUES('. $newIdg2t .', '. $usedId .')';
+        $this->store->queryDB($query, $this->store->getDBCon());
+        $usedId = $this->store->getDBCon()->insert_id;
     }
 
     /**
@@ -264,16 +254,31 @@ class ARC2 extends AbstractSparqlStore
      * @param  NamedNode  $graph            Instance of NamedNode containing the URI of the graph to drop.
      * @param  array      $options optional It contains key-value pairs and should provide additional
      *                                      introductions for the store and/or its adapter(s).
-     * @throws \Exception If given $graph is not a NamedNode.
      * @throws \Exception If the given graph could not be droped
      */
     public function dropGraph(NamedNode $graph, array $options = array())
     {
-        if ($graph->isNamed()) {
-            $this->store->queryDB('DELETE FROM <'. $graph->getUri() .'>', $this->store->getDBCon());
-        } else {
-            throw new \Exception('Given $graph is not a NamedNode.');
+        // table names
+        $g2t = $this->configuration['table-prefix'] . '_g2t';
+        $id2val = $this->configuration['table-prefix'] . '_id2val';
+
+        /*
+         * ask for all entries with the given graph URI
+         */
+        $query = 'SELECT id FROM '. $id2val .' WHERE val = "'. $graph->getUri() .'"';
+        $result = $this->store->queryDB($query, $this->store->getDBCon());
+
+        /*
+         * go through all given entries and remove all according entries in the g2t table
+         */
+        while ($row = $result->fetch_assoc()) {
+            $query = 'DELETE FROM '. $g2t .' WHERE t="'. $row['id'] .'"';
+            $this->store->queryDB($query, $this->store->getDBCon());
         }
+
+        // remove entry/entries in the id2val table too
+        $query = 'DELETE FROM '. $id2val .' WHERE val = "'. $graph->getUri() .'"';
+        $this->store->queryDB($query, $this->store->getDBCon());
     }
 
     /**
