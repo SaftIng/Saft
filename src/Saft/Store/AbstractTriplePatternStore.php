@@ -41,7 +41,7 @@ abstract class AbstractTriplePatternStore implements Store
      * @param NodeFactory              $nodeFactory
      * @param StatementFactory         $statementFactory
      * @param QueryFactory             $queryFactory
-     * @param statementIteratorFactory $statementIteratorFactory
+     * @param StatementIteratorFactory $statementIteratorFactory
      */
     public function __construct(
         NodeFactory $nodeFactory,
