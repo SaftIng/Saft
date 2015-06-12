@@ -27,13 +27,9 @@ abstract class SerializerFactoryAbstractTest extends TestCase
     // is returned by the SerializerFactory instance.
     public function testCreateSerializerFor()
     {
-        if (0 == count($this->availableSerializations) || empty($this->availableSerializations)) {
-            $this->markTestSkipped('Array $availableSerializations contains no entries.');
-        }
-
         $this->fixture = $this->newInstance();
 
-        foreach ($this->availableSerializations as $serialization) {
+        foreach ($this->fixture->getSupportedSerializations() as $serialization) {
             $this->assertTrue(is_object($this->fixture->createSerializerFor($serialization)));
         }
     }

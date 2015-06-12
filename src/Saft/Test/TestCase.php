@@ -164,13 +164,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      * marked as skipped with a short notification about that the file is missing.
      *
      * The content of the YAML-file will be transformed into an array and stored in $config property.
+     *
+     * @param string $configFilePath Path to the config file.
      */
-    protected function loadTestConfiguration()
+    protected function loadTestConfiguration($configFilepath)
     {
-        // set path to test dir
-        $saftRootDir = dirname(__FILE__) . '/../../../';
-        $configFilepath = $saftRootDir . 'test-config.yml';
-
         // check that the config file exists
         if (false === file_exists($configFilepath)) {
             $this->markTestSkipped('File test-config.yml is missing.');
@@ -190,6 +188,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
         $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
 
-        $this->loadTestConfiguration();
+        // set path to test file
+        $saftRootDir = dirname(__FILE__) . '/../../../';
+        $configFilepath = $saftRootDir . 'test-config.yml';
+
+        $this->loadTestConfiguration($configFilepath);
     }
 }

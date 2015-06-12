@@ -188,16 +188,14 @@ class AbstractSparqlStoreTest extends TestCase
         $this->assertNull($result);
     }
 
-    /**
-     * test if pattern-variable is recognized properly.
+    /*
+     * Tests for that the pattern-variable is recognized properly.
      */
-    public function testPatternStatement()
+
+    // subject is a pattern variable
+    public function testPatternStatementSubjectIsPattern()
     {
-        $this->markTestSkipped("Variable have to be introduced");
-        /*
-         * subject is a pattern variable
-         */
-        $subject = new AnyPatternImpl('?s1');
+        $subject = new AnyPatternImpl();
         $predicate = new NamedNodeImpl('http://saft/test/p1');
         $object = new NamedNodeImpl('http://saft/test/o1');
         $triple = new StatementImpl($subject, $predicate, $object);
@@ -209,10 +207,14 @@ class AbstractSparqlStoreTest extends TestCase
         $result = $this->mock->hasMatchingStatement($triple);
 
         $this->assertTrue(is_bool($result));
+    }
 
-        /*
-         * graph is a pattern variable
-         */
+    // graph is a pattern variable
+    public function testPatternStatementGraphIsPattern()
+    {
+        $subject = new AnyPatternImpl();
+        $predicate = new NamedNodeImpl('http://saft/test/p1');
+        $object = new NamedNodeImpl('http://saft/test/o1');
         $graph1 = new AnyPatternImpl('?g1');
         $statement = new StatementImpl($subject, $predicate, $object, $graph1);
 

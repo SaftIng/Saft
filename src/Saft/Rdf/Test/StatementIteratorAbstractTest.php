@@ -25,11 +25,14 @@ abstract class StatementIteratorAbstractTest extends TestCase
     {
         // empty array must be fine
         $this->fixture = $this->createInstanceWithArray(array());
+        $this->assertClassOfInstanceImplements($this->fixture, 'Saft\Rdf\StatementIterator');
+        $this->assertCountStatementIterator(0, $this->fixture);
 
         // array with Statement instance must be fine
         $this->fixture = $this->createInstanceWithArray(
             array(new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl()))
         );
+        $this->assertCountStatementIterator(1, $this->fixture);
     }
 
     public function testConstructorInvalidList()

@@ -1,0 +1,38 @@
+{
+    "name": "saft/saft-store-virtuoso",
+    "type": "library",
+    "description": "Virtuoso store implementation.",
+    "keywords": ["Saft", "Triple Store", "Virtuoso", "RDF"],
+    "homepage": "https://safting.github.io/",
+    "license": "GPL2",
+    "authors": [
+        {
+            "name": "Natanael Arndt",
+            "homepage": "http://aksw.org/NatanaelArndt",
+            "email": "arndtn@gmail.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Konrad Abicht",
+            "homepage": "http://www.inspirito.de",
+            "email": "hi@inspirito.de",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "ext-odbc": "*",
+        "ext-pdo_odbc": "*",
+
+        "saft/saft-store": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.5.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Saft\\Addition\\Virtuoso\\": "."
+        }
+    },
+    "minimum-stability":"dev"
+}

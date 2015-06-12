@@ -13,4 +13,11 @@ interface SerializerFactory
      * @throws \Exception If serializer for requested serialization is not available.
      */
     public function createSerializerFor($serialization);
+
+    /**
+     * Returns a list of all supported serialization types.
+     *
+     * @return array Array of supported serialization types.
+     */
+    public function getSupportedSerializations();
 }
