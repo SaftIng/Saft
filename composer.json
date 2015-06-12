@@ -39,6 +39,7 @@
         "fzaninotto/Streamer": "*",
         "semsol/arc2": "dev-master",
         "php-curl-class/php-curl-class": "*",
+        "zendframework/zend-diactoros": "*",
         "ext-memcached": "*",
         "ext-odbc": "*",
         "ext-pdo_odbc": "*",
