@@ -2,6 +2,7 @@
 
 namespace Saft\Rest;
 
+use Saft\Rdf\NodeUtils;
 use Saft\Store\Store;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -46,20 +47,23 @@ class Hub
          */
         $serverParams = $request->getServerParams();
 
-        // subject must be * or an URI
-        if (false == isset($serverParams['s'])) {
-            return array(
-                'message' => 'Bad Request: Parameter s not set.',
-                'code' => 400
-            );
-        }
+        foreach (array('s', 'p', 'o') as $param) {
+            // check if s or p or o is set
+            if (false == isset($serverParams[$param])) {
+                return array(
+                    'message' => 'Bad Request: Parameter '. $param .' not set.',
+                    'code' => 400
+                );
+            }
 
-        if (isset($serverParams['s'])
-            && ('*' != $serverParams['s'] && false == NodeUtils::simpleCheckURI($serverParams['s']))) {
-            return array(
-                'message' => 'Bad Request: Parameter s is invalid. Must be * or an URI.',
-                'code' => 400
-            );
+            // s or p or o must be * or an URI
+            if (isset($serverParams[$param])
+                && ('*' != $serverParams[$param] && false == NodeUtils::simpleCheckURI($serverParams[$param]))) {
+                return array(
+                    'message' => 'Bad Request: Parameter '. $param .' is invalid. Must be * or an URI.',
+                    'code' => 400
+                );
+            }
         }
 
         return true;

@@ -30,6 +30,96 @@ class HubTest extends TestCase
      * Tests for handleRequest
      */
 
+    // check for parameter o (invalid)
+    public function testHandleRequestParameterOInvalid()
+    {
+        // s and p must be set, otherwise we would get an error concerning missing s or p
+        $request = new ServerRequest(
+            array('s' => '*', 'p' => '*', 'o' => 'invalid')
+        );
+
+        $fixture = new Hub($this->getMockStore());
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Parameter o is invalid. Must be * or an URI.',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
+    // check for parameter o (missing)
+    public function testHandleRequestParameterOMissing()
+    {
+        // s and p must be set, otherwise we would get an error concerning missing s or p
+        $request = new ServerRequest(
+            array('s' => '*', 'p' => '*')
+        );
+
+        $fixture = new Hub($this->getMockStore());
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Parameter o not set.',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
+    // check for parameter p (invalid)
+    public function testHandleRequestParameterPInvalid()
+    {
+        // s must be set, otherwise we would get an error concerning missing s
+        $request = new ServerRequest(
+            array('s' => '*', 'p' => 'invalid')
+        );
+
+        $fixture = new Hub($this->getMockStore());
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Parameter p is invalid. Must be * or an URI.',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
+    // check for parameter p (missing)
+    public function testHandleRequestParameterPMissing()
+    {
+        // s must be set, otherwise we would get an error concerning missing s
+        $request = new ServerRequest(
+            array('s' => '*')
+        );
+
+        $fixture = new Hub($this->getMockStore());
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Parameter p not set.',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
+    // check for parameter s (invalid)
+    public function testHandleRequestParameterSInvalid()
+    {
+        $request = new ServerRequest(
+            array('s' => 'invalid')
+        );
+
+        $fixture = new Hub($this->getMockStore());
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Parameter s is invalid. Must be * or an URI.',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
+    // check for parameter s (missing)
     public function testHandleRequestParameterSMissing()
     {
         $request = new ServerRequest();
