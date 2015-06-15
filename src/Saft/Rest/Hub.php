@@ -27,7 +27,8 @@ class Hub
     }
 
     /**
-     * Validate given request.
+     * Validate given request. Specification is located under:
+     * http://safting.github.io/doc/restinterface/triplestore
      *
      * @param RequestInterface $request
      * @return array|true Returns true, if request is valid, otherwise an array with keys 'message' and 'key' set.
@@ -66,6 +67,27 @@ class Hub
             }
         }
 
+        /*
+         * if o is set and not *, ot is mandatory (must be set to uri or literal)
+         */
+        // check that ot is set
+        if (true == NodeUtils::simpleCheckURI($serverParams['o'])
+            && false === isset($serverParams['ot'])) {
+            return array(
+                'message' => 'Bad Request: Parameter o is an URI, so ot must be set.',
+                'code' => 400
+            );
+        }
+
+        // check that ot is either uri or literal
+        if (true == NodeUtils::simpleCheckURI($serverParams['o'])
+            && false == in_array($serverParams['ot'], array('literal', 'uri'))) {
+            return array(
+                'message' => 'Bad Request: Parameter ot is neither uri nor literal.',
+                'code' => 400
+            );
+        }
+
         return true;
     }
 
@@ -86,6 +108,7 @@ class Hub
             // if we reach that point, the given $request was considered valid.
 
             return new Response(' ', 200);
+
         /*
          * invalid request given.
          */

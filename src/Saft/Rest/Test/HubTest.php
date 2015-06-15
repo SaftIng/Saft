@@ -66,6 +66,44 @@ class HubTest extends TestCase
         $this->assertEquals(400, $response->getStatusCode());
     }
 
+    // check for parameter ot (invalid)
+    public function testHandleRequestParameterOTInvalid()
+    {
+        // s, p and o are set. o is an URI, so ot must be set and literal or uri
+        // we check if ot is literal or uri
+        $request = new ServerRequest(
+            array('s' => '*', 'p' => '*', 'o' => 'http://foo', 'ot' => 'neither uri nor literal')
+        );
+
+        $fixture = new Hub($this->getMockStore());
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Parameter ot is neither uri nor literal.',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
+    // check for parameter ot (missing)
+    public function testHandleRequestParameterOTMissing()
+    {
+        // s, p and o are set. o is an URI, so ot must be set and literal or uri
+        // we only check the case that ot is not set
+        $request = new ServerRequest(
+            array('s' => '*', 'p' => '*', 'o' => 'http://foo')
+        );
+
+        $fixture = new Hub($this->getMockStore());
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Parameter o is an URI, so ot must be set.',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
     // check for parameter p (invalid)
     public function testHandleRequestParameterPInvalid()
     {
