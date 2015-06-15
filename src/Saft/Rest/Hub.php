@@ -48,6 +48,9 @@ class Hub
          */
         $serverParams = $request->getServerParams();
 
+        /*
+         * check s, p and o
+         */
         foreach (array('s', 'p', 'o') as $param) {
             // check if s or p or o is set
             if (false == isset($serverParams[$param])) {
@@ -86,6 +89,66 @@ class Hub
                 'message' => 'Bad Request: Parameter ot is neither uri nor literal.',
                 'code' => 400
             );
+        }
+
+        /*
+         * check optional parameters
+         */
+
+        /*
+         * action - possible verbs: add, ask, count, delete, get
+         */
+        if (isset($serverParams['action'])) {
+            // check for possible verbs
+            if (false == in_array($serverParams['action'], array('add', 'ask', 'count', 'delete', 'get'))) {
+                return array(
+                    'message' =>
+                       'Bad Request: Parameter action must be one of these verbs: add, ask, count, delete, get',
+                    'code' => 400
+                );
+            }
+        }
+
+        /*
+         * limit - optional, must be an integer equal or higher than 0
+         */
+        if (isset($serverParams['limit'])) {
+            // limit must be an integer
+            if (false == ctype_digit(ltrim((string)$serverParams['limit'], '-'))) {
+                return array(
+                    'message' => 'Bad Request: Parameter limit is not an integer.',
+                    'code' => 400
+                );
+            }
+
+            // limit must be equal or higher than 0
+            if (0 > (int)$serverParams['limit']) {
+                return array(
+                    'message' => 'Bad Request: Parameter limit is not equal or higher than 0.',
+                    'code' => 400
+                );
+            }
+        }
+
+        /*
+         * offset - optional, must be an integer equal or higher than 0
+         */
+        if (isset($serverParams['offset'])) {
+            // offset must be an integer
+            if (false == ctype_digit(ltrim((string)$serverParams['offset'], '-'))) {
+                return array(
+                    'message' => 'Bad Request: Parameter offset is not an integer.',
+                    'code' => 400
+                );
+            }
+
+            // offset must be equal or higher than 0
+            if (1 > (int)$serverParams['offset']) {
+                return array(
+                    'message' => 'Bad Request: Parameter offset is not equal or higher than 1.',
+                    'code' => 400
+                );
+            }
         }
 
         return true;

@@ -30,6 +30,87 @@ class HubTest extends TestCase
      * Tests for handleRequest
      */
 
+    // check for parameter action
+    public function testHandleRequestParameterActionValid()
+    {
+        $fixture = new Hub($this->getMockStore());
+
+        // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
+
+        // check add
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'action' => 'add'));
+        $this->assertEquals(200, $fixture->computeRequest($request)->getStatusCode());
+
+        // check ask
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'action' => 'ask'));
+        $this->assertEquals(200, $fixture->computeRequest($request)->getStatusCode());
+
+        // check count
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'action' => 'count'));
+        $this->assertEquals(200, $fixture->computeRequest($request)->getStatusCode());
+
+        // check delete
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'action' => 'delete'));
+        $this->assertEquals(200, $fixture->computeRequest($request)->getStatusCode());
+
+        // check get
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'action' => 'get'));
+        $this->assertEquals(200, $fixture->computeRequest($request)->getStatusCode());
+    }
+
+    // check for parameter action (invalid)
+    public function testHandleRequestParameterActionInvalid()
+    {
+        $fixture = new Hub($this->getMockStore());
+
+        // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
+
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'action' => 'something'));
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Parameter action must be one of these verbs: add, ask, count, delete, get',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
+    // check for parameter limit (lower 0)
+    public function testHandleRequestParameterLimitLower0()
+    {
+        // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
+        $request = new ServerRequest(
+            array('s' => '*', 'p' => '*', 'o' => '*', 'limit' => -1)
+        );
+
+        $fixture = new Hub($this->getMockStore());
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Parameter limit is not equal or higher than 0.',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
+    // check for parameter limit (if not integer)
+    public function testHandleRequestParameterLimitNotInteger()
+    {
+        // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
+        $request = new ServerRequest(
+            array('s' => '*', 'p' => '*', 'o' => '*', 'limit' => 'foo')
+        );
+
+        $fixture = new Hub($this->getMockStore());
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Parameter limit is not an integer.',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
     // check for parameter o (invalid)
     public function testHandleRequestParameterOInvalid()
     {
@@ -61,6 +142,42 @@ class HubTest extends TestCase
 
         $this->assertEquals(
             'Bad Request: Parameter o not set.',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
+    // check for parameter offset (not integer)
+    public function testHandleRequestParameterOffsetNotInteger()
+    {
+        // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
+        $request = new ServerRequest(
+            array('s' => '*', 'p' => '*', 'o' => '*', 'offset' => 'not integer')
+        );
+
+        $fixture = new Hub($this->getMockStore());
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Parameter offset is not an integer.',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
+    // check for parameter offset (lower 1)
+    public function testHandleRequestParameterOffsetLower1()
+    {
+        // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
+        $request = new ServerRequest(
+            array('s' => '*', 'p' => '*', 'o' => '*', 'offset' => 0)
+        );
+
+        $fixture = new Hub($this->getMockStore());
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Parameter offset is not equal or higher than 1.',
             $response->getBody()->__toString()
         );
         $this->assertEquals(400, $response->getStatusCode());
