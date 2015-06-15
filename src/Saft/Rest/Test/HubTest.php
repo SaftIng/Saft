@@ -75,6 +75,47 @@ class HubTest extends TestCase
         $this->assertEquals(400, $response->getStatusCode());
     }
 
+    // check for parameter case_insensitive (invalid)
+    public function testHandleRequestParameterCaseInsensitiveInvalid()
+    {
+        $fixture = new Hub($this->getMockStore());
+
+        // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
+
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'case_insensitive' => array()));
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Parameter case_insensitive must be one of these verbs: true, false',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
+    // check for parameter case_insensitive (valid)
+    public function testHandleRequestParameterCaseInsensitiveValid()
+    {
+        $fixture = new Hub($this->getMockStore());
+
+        // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
+
+        // check 'true'
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'case_insensitive' => 'true'));
+        $this->assertEquals(200, $fixture->computeRequest($request)->getStatusCode());
+
+        // check 'false'
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'case_insensitive' => 'false'));
+        $this->assertEquals(200, $fixture->computeRequest($request)->getStatusCode());
+
+        // check true
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'case_insensitive' => true));
+        $this->assertEquals(200, $fixture->computeRequest($request)->getStatusCode());
+
+        // check false
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'case_insensitive' => true));
+        $this->assertEquals(200, $fixture->computeRequest($request)->getStatusCode());
+    }
+
     // check for parameter limit (lower 0)
     public function testHandleRequestParameterLimitLower0()
     {
@@ -287,6 +328,47 @@ class HubTest extends TestCase
             $response->getBody()->__toString()
         );
         $this->assertEquals(400, $response->getStatusCode());
+    }
+
+    // check for parameter reasoning_on (invalid)
+    public function testHandleRequestParameterReasoningOnInvalid()
+    {
+        $fixture = new Hub($this->getMockStore());
+
+        // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
+
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'reasoning_on' => array()));
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Parameter reasoning_on must be one of these verbs: true, false',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
+    // check for parameter reasoning_on (valid)
+    public function testHandleRequestParameterReasoningOnValid()
+    {
+        $fixture = new Hub($this->getMockStore());
+
+        // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
+
+        // check 'true'
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'reasoning_on' => 'true'));
+        $this->assertEquals(200, $fixture->computeRequest($request)->getStatusCode());
+
+        // check 'false'
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'reasoning_on' => 'false'));
+        $this->assertEquals(200, $fixture->computeRequest($request)->getStatusCode());
+
+        // check true
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'reasoning_on' => true));
+        $this->assertEquals(200, $fixture->computeRequest($request)->getStatusCode());
+
+        // check false
+        $request = new ServerRequest(array('s' => '*', 'p' => '*', 'o' => '*', 'reasoning_on' => true));
+        $this->assertEquals(200, $fixture->computeRequest($request)->getStatusCode());
     }
 
     // check that returned response object implement ResponseInterface

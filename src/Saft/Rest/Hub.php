@@ -100,17 +100,31 @@ class Hub
          */
         if (isset($serverParams['action'])) {
             // check for possible verbs
-            if (false == in_array($serverParams['action'], array('add', 'ask', 'count', 'delete', 'get'))) {
+            if (false == in_array($serverParams['action'], array('add', 'ask', 'count', 'delete', 'get'), true)) {
                 return array(
                     'message' =>
-                       'Bad Request: Parameter action must be one of these verbs: add, ask, count, delete, get',
+                        'Bad Request: Parameter action must be one of these verbs: add, ask, count, delete, get',
                     'code' => 400
                 );
             }
         }
 
         /*
-         * limit - optional, must be an integer equal or higher than 0
+         * case_insensitive - possible values are true or false
+         */
+        if (isset($serverParams['case_insensitive'])) {
+            // check for possible verbs
+            if (false == in_array($serverParams['case_insensitive'], array('true', 'false', true, false), true)) {
+                return array(
+                    'message' =>
+                        'Bad Request: Parameter case_insensitive must be one of these verbs: true, false',
+                    'code' => 400
+                );
+            }
+        }
+
+        /*
+         * limit - must be an integer equal or higher than 0
          */
         if (isset($serverParams['limit'])) {
             // limit must be an integer
@@ -131,7 +145,7 @@ class Hub
         }
 
         /*
-         * offset - optional, must be an integer equal or higher than 0
+         * offset - must be an integer equal or higher than 0
          */
         if (isset($serverParams['offset'])) {
             // offset must be an integer
@@ -146,6 +160,20 @@ class Hub
             if (1 > (int)$serverParams['offset']) {
                 return array(
                     'message' => 'Bad Request: Parameter offset is not equal or higher than 1.',
+                    'code' => 400
+                );
+            }
+        }
+
+        /*
+         * reasoning_on - possible values are true or false (as string or boolean)
+         */
+        if (isset($serverParams['reasoning_on'])) {
+            // check for possible verbs
+            if (false == in_array($serverParams['reasoning_on'], array('true', 'false', true, false), true)) {
+                return array(
+                    'message' =>
+                        'Bad Request: Parameter reasoning_on must be one of these verbs: true, false',
                     'code' => 400
                 );
             }
