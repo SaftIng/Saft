@@ -21,8 +21,8 @@ interface Serializer
      *
      * @param  StatementIterator $statements   The StatementIterator containing all the Statements which
      *                                         should be serialized by the serializer.
-     * @param  string            $outputStream filename of the stream to where the serialization should be
-     *                                         written.
+     * @param  string|resource   $outputStream filename or file pointer to the stream to where the serialization
+     *                                         should be written.
      * @param  string            $format       The serialization which should be used. If null is given the
      *                                         serializer will either apply some default serialization, or
      *                                         the only one it is supporting, or will throw an Exception.
