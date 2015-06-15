@@ -8,11 +8,11 @@ use Saft\Rdf\Node;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
-use Saft\Store\ChainableStore;
-use Saft\Store\Store;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\Query;
 use Saft\Sparql\Query\QueryFactory;
+use Saft\Store\ChainableStore;
+use Saft\Store\Store;
 
 /**
  * This class implements a SPARQL query cache, which was described in the following paper:
@@ -30,7 +30,7 @@ use Saft\Sparql\Query\QueryFactory;
  * The implementation here uses a key-value-pair based cache mechanism. The original approach was using a
  * relation database to store and manage query cache related entities.
  */
-class QueryCache implements Store, ChainableStore
+class QueryCache implements ChainableStore
 {
     /**
      * @var Cache

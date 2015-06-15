@@ -2,7 +2,7 @@
 
 namespace Saft\Store;
 
-interface ChainableStore
+interface ChainableStore extends Store
 {
     /**
      * Set successor instance. This method is useful, if you wanna build chain of instances which implement
