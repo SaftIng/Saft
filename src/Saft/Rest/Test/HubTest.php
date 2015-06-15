@@ -30,6 +30,65 @@ class HubTest extends TestCase
      * Tests for handleRequest
      */
 
+    // check for HTTP header Accept (invalid)
+    public function testHandleRequestHeaderAcceptInvalid()
+    {
+        $fixture = new Hub($this->getMockStore());
+
+        // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
+
+        $request = new ServerRequest(
+            // server params
+            array('s' => '*', 'p' => '*', 'o' => '*'),
+            // uploaded files
+            array(),
+            // uri
+            null,
+            // method
+            null,
+            // body
+            'php://input',
+            // headers
+            array(
+                'Accept' => array()
+            )
+        );
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Accept headers can not be empty.',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
+    // check for HTTP header Accept (valid)
+    public function testHandleRequestHeaderAcceptValid()
+    {
+        $fixture = new Hub($this->getMockStore());
+
+        // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
+
+        $request = new ServerRequest(
+            // server params
+            array('s' => '*', 'p' => '*', 'o' => '*'),
+            // uploaded files
+            array(),
+            // uri
+            null,
+            // method
+            null,
+            // body
+            'php://input',
+            // headers
+            array(
+                'Accept' => 'application/json,application/n-triples'
+            )
+        );
+
+        $this->assertEquals(200, $fixture->computeRequest($request)->getStatusCode());
+    }
+
     // check for parameter action
     public function testHandleRequestParameterActionValid()
     {

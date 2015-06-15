@@ -44,6 +44,32 @@ class Hub
         }
 
         /*
+         * Check HTTP headers
+         */
+        $headers = $request->getHeaders();
+
+        /*
+         * check Accept
+         */
+        if (isset($headers['Accept']) && is_array($headers['Accept'])) {
+            // no elements means error
+            if (0 == count($headers['Accept'])) {
+                return array(
+                    'message' => 'Bad Request: Accept headers can not be empty.',
+                    'code' => 400
+                );
+            }
+
+            // first entry must be a string
+            if (isset($headers['Accept'][0]) && false == is_string($headers['Accept'][0])) {
+                return array(
+                    'message' => 'Bad Request: Accept headers must be a string.',
+                    'code' => 400
+                );
+            }
+        }
+
+        /*
          * Check parameter
          */
         $serverParams = $request->getServerParams();
