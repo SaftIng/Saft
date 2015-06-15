@@ -198,13 +198,13 @@ class Hub
         if (true === ($result = $this->checkRequest($request))) {
             // if we reach that point, the given $request was considered valid.
 
-            return new Response(' ', 200);
+            return new Response('php://memory', 200);
 
         /*
          * invalid request given.
          */
         } else {
-            $response = new Response('php://temp', $result['code']);
+            $response = new Response('php://memory', $result['code']);
             $response->getBody()->write($result['message']);
 
             return $response;
