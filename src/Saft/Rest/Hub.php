@@ -150,6 +150,19 @@ class Hub
         }
 
         /*
+         * graphUri - URI of the graph to execute the query on
+         */
+        if (isset($serverParams['graphUri'])) {
+            // check for possible verbs
+            if (false == NodeUtils::simpleCheckURI($serverParams['graphUri'])) {
+                return array(
+                    'message' => 'Bad Request: Parameter graphUri must be an URI.',
+                    'code' => 400
+                );
+            }
+        }
+
+        /*
          * limit - must be an integer equal or higher than 0
          */
         if (isset($serverParams['limit'])) {

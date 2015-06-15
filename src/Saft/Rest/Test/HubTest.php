@@ -175,6 +175,38 @@ class HubTest extends TestCase
         $this->assertEquals(200, $fixture->computeRequest($request)->getStatusCode());
     }
 
+    // check for parameter graphUri (invalid)
+    public function testHandleRequestParameterGraphUriInvalid()
+    {
+        // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
+        $request = new ServerRequest(
+            array('s' => '*', 'p' => '*', 'o' => '*', 'graphUri' => 'invalid')
+        );
+
+        $fixture = new Hub($this->getMockStore());
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(
+            'Bad Request: Parameter graphUri must be an URI.',
+            $response->getBody()->__toString()
+        );
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
+    // check for parameter graphUri (valid)
+    public function testHandleRequestParameterGraphUriValid()
+    {
+        // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
+        $request = new ServerRequest(
+            array('s' => '*', 'p' => '*', 'o' => '*', 'graphUri' => $this->testGraph->getUri())
+        );
+
+        $fixture = new Hub($this->getMockStore());
+        $response = $fixture->computeRequest($request);
+
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
     // check for parameter limit (lower 0)
     public function testHandleRequestParameterLimitLower0()
     {
