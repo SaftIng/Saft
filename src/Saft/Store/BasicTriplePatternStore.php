@@ -1,6 +1,6 @@
 <?php
 
-namespace Saft\Store\Test;
+namespace Saft\Store;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNode;

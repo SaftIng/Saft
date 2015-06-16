@@ -12,6 +12,7 @@ use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Store\BasicTriplePatternStore;
 use Saft\Test\TestCase;
 
 class AbstractTriplePatternStoreTest extends TestCase
