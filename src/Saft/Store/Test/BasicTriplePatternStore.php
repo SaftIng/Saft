@@ -141,12 +141,16 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
         if (null !== $graph) {
             $graphUri = $graph->getUri();
 
-        // no graph given, use graph information from $statement
-        } elseif (null === $graph && $statement->getGraph()) {
-            $graphUri = $statement->getGraph();
-
         // no graph information given, use default graph
         } elseif (null === $graph && null === $statement->getGraph()) {
+            $graphUri = 'defaultGraph';
+
+        // no graph given, use graph information from $statement
+        } elseif (null === $graph && $statement->getGraph()->isNamed()) {
+            $graphUri = $statement->getGraph()->getUri();
+
+        // no graph given, use graph information from $statement
+        } elseif (null === $graph && false == $statement->getGraph()->isNamed()) {
             $graphUri = 'defaultGraph';
         }
 
