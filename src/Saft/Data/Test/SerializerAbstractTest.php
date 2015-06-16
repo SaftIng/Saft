@@ -6,7 +6,6 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Test\TestCase;
-use Streamer\Stream;
 
 abstract class SerializerAbstractTest extends TestCase
 {
@@ -42,18 +41,10 @@ abstract class SerializerAbstractTest extends TestCase
             ),
         ));
 
-        $testFile = sys_get_temp_dir() .'/saft/serialize.ttl';
+        $filepath = tempnam(sys_get_temp_dir(), 'saft_');
+        $testFile = fopen('file://' . $filepath, 'w+');
 
         $this->fixture->serializeIteratorToStream($iterator, $testFile, 'n-quads');
-
-        // read written data to check them
-        $stream = new Stream(fopen($testFile, 'r'));
-        $string = '';
-        while (!$stream->isEOF()) {
-            $string .= $stream->read();
-        }
-
-        unlink($testFile);
 
         // check
         $this->assertEquals(
@@ -61,7 +52,7 @@ abstract class SerializerAbstractTest extends TestCase
             '<http://saft/example/Foo> .'. PHP_EOL .
             '<http://saft/example/2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> '.
             '<http://saft/example/Foo> .',
-            trim($string)
+            trim(file_get_contents($filepath))
         );
     }
 
@@ -87,18 +78,10 @@ abstract class SerializerAbstractTest extends TestCase
             ),
         ));
 
-        $testFile = sys_get_temp_dir() .'/saft/serialize.ttl';
+        $filepath = tempnam(sys_get_temp_dir(), 'saft_');
+        $testFile = fopen('file://' . $filepath, 'w+');
 
         $this->fixture->serializeIteratorToStream($iterator, $testFile, 'n-triples');
-
-        // read written data to check them
-        $stream = new Stream(fopen($testFile, 'r'));
-        $string = '';
-        while (!$stream->isEOF()) {
-            $string .= $stream->read();
-        }
-
-        unlink($testFile);
 
         // check
         $this->assertEquals(
@@ -106,7 +89,7 @@ abstract class SerializerAbstractTest extends TestCase
             '<http://saft/example/Foo> .'. PHP_EOL .
             '<http://saft/example/2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> '.
             '<http://saft/example/Foo> .',
-            trim($string)
+            trim(file_get_contents($filepath))
         );
     }
 }

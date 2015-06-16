@@ -3,7 +3,6 @@
 namespace Saft\Data;
 
 use Saft\Rdf\StatementIterator;
-use Streamer\Stream;
 
 class NQuadsSerializerImpl implements Serializer
 {
@@ -36,11 +35,15 @@ class NQuadsSerializerImpl implements Serializer
         $outputStream,
         $serialization = null
     ) {
-        // check parameter $outputStream
+        /*
+         * check parameter $outputStream
+         */
         if (is_resource($outputStream)) {
-            $stream = new Stream($outputStream);
+            // use it as it is
+
         } elseif (is_string($outputStream)) {
-            $stream = new Stream(fopen($outputStream, 'w'));
+            $outputStream = fopen($outputStream, 'w');
+
         } else {
             throw new \Exception('Parameter $outputStream is neither a string nor resource.');
         }
@@ -57,10 +60,11 @@ class NQuadsSerializerImpl implements Serializer
         }
 
         foreach ($statements as $statement) {
-            $stream->write($statement->$function() . PHP_EOL);
+            fwrite($outputStream, $statement->$function() . PHP_EOL);
         }
 
-        $stream->close();
+        // Do not close the stream, because ... it is a stream and not a file! Well, maybe the user uses a
+        // file, but its handler will be closed by PHP automatically at the end anyway.
     }
 
     /**

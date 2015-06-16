@@ -9,7 +9,6 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactory;
-use Streamer\Stream;
 
 class ParserEasyRdf implements Parser
 {
