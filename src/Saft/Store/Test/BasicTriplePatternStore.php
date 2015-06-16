@@ -5,8 +5,12 @@ namespace Saft\Store\Test;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
+use Saft\Rdf\NodeFactory;
 use Saft\Rdf\Statement;
+use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
+use Saft\Rdf\StatementIteratorFactory;
+use Saft\Sparql\Query\QueryFactory;
 use Saft\Store\AbstractTriplePatternStore;
 use Saft\Store\Store;
 
@@ -16,6 +20,26 @@ use Saft\Store\Store;
  */
 class BasicTriplePatternStore extends AbstractTriplePatternStore
 {
+    /**
+     * @var NodeFactory
+     */
+    private $nodeFactory;
+
+    /**
+     * @var QueryFactory
+     */
+    private $queryFactory;
+
+    /**
+     * @var StatementFactory
+     */
+    private $statementFactory;
+
+    /**
+     * @var StatementIteratorFactory
+     */
+    private $statementIteratorFactory;
+
     /**
      * Contains all Statement instances which were added via addStatements. Its structure is:
      *
@@ -30,6 +54,31 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
     protected $statements = array();
 
     /**
+     * @param NodeFactory              $nodeFactory
+     * @param StatementFactory         $statementFactory
+     * @param QueryFactory             $queryFactory
+     * @param statementIteratorFactory $statementIteratorFactory
+     */
+    public function __construct(
+        NodeFactory $nodeFactory,
+        StatementFactory $statementFactory,
+        QueryFactory $queryFactory,
+        StatementIteratorFactory $statementIteratorFactory
+    ) {
+        $this->nodeFactory = $nodeFactory;
+        $this->queryFactory = $queryFactory;
+        $this->statementFactory = $statementFactory;
+        $this->statementIteratorFactory = $statementIteratorFactory;
+
+        parent::__construct(
+            $nodeFactory,
+            $statementFactory,
+            $queryFactory,
+            $statementIteratorFactory
+        );
+    }
+
+    /**
      * Has no function and returns an empty array.
      *
      * @return array Empty array
@@ -39,7 +88,7 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
         $graphs = array();
 
         foreach (array_keys($this->statements) as $graphUri) {
-            if ('defaultGraph' == $graphUri) {
+            if ('http://saft/defaultGraph/' == $graphUri) {
                 $graphs[$graphUri] = $this->nodeFactory->createNamedNode($graphUri);
             }
         }
@@ -60,14 +109,13 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
     /**
      * Adds multiple Statements to (default-) graph. It holds added statements as long as this instance exists.
      *
-     * @param  StatementIterator|array $statements             StatementList instance must contain Statement
-     *                                                         instances which are 'concret-' and not
-     *                                                         'pattern'-statements.
-     * @param  Node                    $graph         optional Overrides target graph. If set, all statements
-     *                                                         will be add to that graph, if available.
-     * @param  array                   $options       optional It contains key-value pairs and should provide
-     *                                                         additional introductions for the store and/or
-     *                                                         its adapter(s).
+     * @param  StatementIterator|array $statements          StatementList instance must contain Statement
+     *                                                      instances which are 'concret-' and not 'pattern'-statements.
+     * @param  Node                    $graph      optional Overrides target graph. If set, all statements
+     *                                                      will be add to that graph, if available.
+     * @param  array                   $options    optional It contains key-value pairs and should provide
+     *                                                      additional introductions for the store and/or
+     *                                                      its adapter(s).
      */
     public function addStatements($statements, Node $graph = null, array $options = array())
     {
@@ -75,13 +123,17 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
             if (null !== $graph) {
                 $graphUri = $graph->getUri();
 
-            // no graph given, use graph information from $statement
-            } elseif (null === $graph && $statement->getGraph()) {
-                $graphUri = $statement->getGraph();
-
             // no graph information given, use default graph
             } elseif (null === $graph && null === $statement->getGraph()) {
-                $graphUri = 'defaultGraph';
+                $graphUri = 'http://saft/defaultGraph/';
+
+            // no graph given, use graph information from $statement
+            } elseif (null === $graph && $statement->getGraph()->isNamed()) {
+                $graphUri = $statement->getGraph()->getUri();
+
+            // no graph given, use graph information from $statement
+            } elseif (null === $graph && false == $statement->getGraph()->isNamed()) {
+                $graphUri = 'http://saft/defaultGraph/';
             }
 
             // use hash to differenciate between statements (no doublings allowed)
@@ -109,13 +161,17 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
         if (null !== $graph) {
             $graphUri = $graph->getUri();
 
-        // no graph given, use graph information from $statement
-        } elseif (null === $graph && $statement->getGraph()) {
-            $graphUri = $statement->getGraph()->getUri();
-
         // no graph information given, use default graph
         } elseif (null === $graph && null === $statement->getGraph()) {
-            $graphUri = 'defaultGraph';
+            $graphUri = 'http://saft/defaultGraph/';
+
+        // no graph given, use graph information from $statement
+        } elseif (null === $graph && $statement->getGraph()->isNamed()) {
+            $graphUri = $statement->getGraph()->getUri();
+
+        // no graph given, use graph information from $statement
+        } elseif (null === $graph && false == $statement->getGraph()->isNamed()) {
+            $graphUri = 'http://saft/defaultGraph/';
         }
 
         // use hash to differenciate between statements (no doublings allowed)
@@ -143,7 +199,7 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
 
         // no graph information given, use default graph
         } elseif (null === $graph && null === $statement->getGraph()) {
-            $graphUri = 'defaultGraph';
+            $graphUri = 'http://saft/defaultGraph/';
 
         // no graph given, use graph information from $statement
         } elseif (null === $graph && $statement->getGraph()->isNamed()) {
@@ -151,14 +207,41 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
 
         // no graph given, use graph information from $statement
         } elseif (null === $graph && false == $statement->getGraph()->isNamed()) {
-            $graphUri = 'defaultGraph';
+            $graphUri = 'http://saft/defaultGraph/';
         }
 
         if (false == isset($this->statements[$graphUri])) {
             $this->statements[$graphUri] = array();
         }
 
-        return new ArrayStatementIteratorImpl($this->statements[$graphUri]);
+        // if not default graph was requested
+        if ('http://saft/defaultGraph/' != $graphUri) {
+            return new ArrayStatementIteratorImpl($this->statements[$graphUri]);
+
+        // if default graph was requested, return matching statements from all graphs
+        } else {
+            $_statements = array();
+
+            foreach ($this->statements as $graphUri => $statements) {
+                foreach ($statements as $statement) {
+
+                    if ('http://saft/defaultGraph/' == $graphUri) {
+                        $graph = null;
+                    } else {
+                        $graph = $this->nodeFactory->createNamedNode($graphUri);
+                    }
+
+                    $_statements[] = $this->statementFactory->createStatement(
+                        $statement->getSubject(),
+                        $statement->getPredicate(),
+                        $statement->getObject(),
+                        $graph
+                    );
+                }
+            }
+
+            return new ArrayStatementIteratorImpl($_statements);
+        }
     }
 
     /**
@@ -175,13 +258,17 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
         if (null !== $graph) {
             $graphUri = $graph->getUri();
 
-        // no graph given, use graph information from $statement
-        } elseif (null === $graph && $statement->getGraph()) {
-            $graphUri = $statement->getGraph();
-
         // no graph information given, use default graph
         } elseif (null === $graph && null === $statement->getGraph()) {
-            $graphUri = 'defaultGraph';
+            $graphUri = 'http://saft/defaultGraph/';
+
+        // no graph given, use graph information from $statement
+        } elseif (null === $graph && $statement->getGraph()->isNamed()) {
+            $graphUri = $statement->getGraph()->getUri();
+
+        // no graph given, use graph information from $statement
+        } elseif (null === $graph && false == $statement->getGraph()->isNamed()) {
+            $graphUri = 'http://saft/defaultGraph/';
         }
 
         // use hash to differenciate between statements (no doublings allowed)
