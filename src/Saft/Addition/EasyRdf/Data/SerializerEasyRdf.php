@@ -79,7 +79,7 @@ class SerializerEasyRdf implements Serializer
         }
 
         if (false === isset($this->serializationMap[$serialization])) {
-            throw new \Exception ('Unknown serialization given: '. $serialization);
+            throw new \Exception('Unknown serialization given: '. $serialization);
         }
 
         $graph = new Graph();

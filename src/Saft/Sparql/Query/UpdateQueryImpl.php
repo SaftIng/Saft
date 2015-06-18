@@ -148,7 +148,7 @@ class UpdateQueryImpl extends AbstractQuery
         $firstPart = str_replace(' ', '', substr($adaptedQuery, 0, 8));
 
         // TODO make check more precise, because its possible that are more than one whitespace between keywords.
-        switch($firstPart) {
+        switch ($firstPart) {
             // DELETE DATA
             case 'deleted':
                 return 'deleteData';

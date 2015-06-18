@@ -12,7 +12,7 @@ class QueryFactoryImpl implements QueryFactory
      */
     public function createInstanceByQueryString($query)
     {
-        switch(AbstractQuery::getQueryType($query)) {
+        switch (AbstractQuery::getQueryType($query)) {
             case 'askQuery':
                 return new AskQueryImpl($query);
 

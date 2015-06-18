@@ -689,7 +689,7 @@ abstract class AbstractQuery implements Query
          */
         $firstPart = substr($adaptedQuery, 0, 3);
 
-        switch($firstPart) {
+        switch ($firstPart) {
             // ASK
             case 'ask':
                 return 'askQuery';
@@ -704,7 +704,7 @@ abstract class AbstractQuery implements Query
             default:
                 $firstPart = substr($adaptedQuery, 0, 6);
 
-                switch($firstPart) {
+                switch ($firstPart) {
                     // CLEAR GRAPH
                     case 'clear ':
                         return 'graphQuery';
@@ -736,7 +736,6 @@ abstract class AbstractQuery implements Query
                         return 'selectQuery';
 
                     default:
-
                         // check if query is of type: WITH <http:// ... > DELETE { ... } WHERE { ... }
                         // TODO make it more precise
                         if (false !== strpos($adaptedQuery, 'with')

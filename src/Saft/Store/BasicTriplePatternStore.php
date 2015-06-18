@@ -224,7 +224,6 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
 
             foreach ($this->statements as $graphUri => $statements) {
                 foreach ($statements as $statement) {
-
                     if ('http://saft/defaultGraph/' == $graphUri) {
                         $graph = null;
                     } else {

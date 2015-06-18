@@ -129,5 +129,4 @@ class VirtuosoTest extends StoreAbstractTest
 
         $this->fixture->sqlQuery('invalid query');
     }
-
 }

@@ -426,7 +426,7 @@ class ARC2 extends AbstractSparqlStore
                 foreach ($result['result']['variables'] as $variable) {
                     // checks for variable type
                     // example: $row['s type']
-                    switch($row[$variable .' type']) {
+                    switch ($row[$variable .' type']) {
                         // ARC2 does not differenciate between typed literal and literal, like Virtuoso does
                         // for instance. You have to check for lang and datatype key by yourself.
                         case 'literal':
