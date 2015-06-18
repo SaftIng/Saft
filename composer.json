@@ -25,9 +25,6 @@
         "saft/saft-store": "self.version",
         "saft/saft-data": "self.version",
         "saft/saft-sparql": "self.version",
-        "saft/saft-cache": "self.version",
-        "saft/saft-cache-file": "self.version",
-        "saft/saft-cache-memcached": "self.version",
         "saft/saft-querycache": "self.version",
         "saft/saft-store-http": "self.version",
         "saft/saft-store-virtuoso": "self.version",
@@ -36,6 +33,7 @@
     "require": {
         "php": ">=5.3.3",
         "easyrdf/easyrdf": "dev-master",
+        "nette/caching": "*",
         "semsol/arc2": "dev-master",
         "php-curl-class/php-curl-class": "*",
         "ext-memcached": "*",

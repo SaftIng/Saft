@@ -1,5 +1,5 @@
 #
-# This file contains a list with different configurations for test cases which rely on store and cache.
+# This file contains a list with different configurations for test cases which rely on store.
 #
 # Feel free to copy it to test-config.yml and adapt. You can reuse existing configurations or you can use your own.
 
@@ -17,22 +17,7 @@ arc2Config: &arc2Config
     database: "saft"
     table-prefix: "saft"
 
-queryCacheConfig: &queryCacheConfig
-    cacheConfig:
-        class: "Saft\\Addition\\FileCache\\Cache\\File"
-        cachePath: "/tmp/saft/"
-
 virtuosoConfig: &virtuosoConfig
     dsn: "VOS"
     username: "dba"
     password: "dba"
-
-# Cache related configurations.
-fileCacheConfig: &fileCacheConfig
-    class: "Saft\\Addition\\FileCache\\Cache\\File"
-    cachePath: "/tmp/saft/"
-
-memcachedCacheConfig: &memcachedCacheConfig
-    class: "Saft\\Addition\\MemcacheD\\Cache\\MemcacheD"
-    host: "127.0.0.1"
-    port: "11211"

@@ -2,6 +2,9 @@
 
 namespace Saft\Addition\QueryCache\Test;
 
+use Nette\Caching\Cache;
+use Nette\Caching\Storages\MemoryStorage;
+use Saft\Addition\QueryCache\QueryCache;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
@@ -15,7 +18,6 @@ use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Store\BasicTriplePatternStore;
 use Saft\Store\Result\ResultFactoryImpl;
 use Saft\Test\TestCase;
-use Symfony\Component\Yaml\Parser;
 
 /**
  * That abstract class provides tests for the QueryCache component. But it will not be executed directly but
@@ -23,7 +25,7 @@ use Symfony\Component\Yaml\Parser;
  *
  * This way we can run all the tests for different configuration with minimum overhead.
  */
-abstract class AbstractQueryCacheIntegrationTest extends TestCase
+class QueryCacheTest extends TestCase
 {
     /**
      * @var QueryFactory
@@ -43,6 +45,14 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
         parent::setUp();
 
         $this->queryFactory = new QueryFactoryImpl();
+
+        $this->fixture = new QueryCache(
+            new MemoryStorage($path),
+            new QueryFactoryImpl(),
+            new StatementIteratorFactoryImpl()
+        );
+
+        $this->fixture->getCache()->clean();
     }
 
     /*
@@ -1252,17 +1262,17 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          */
 
         // graph URI entry
-        $this->assertNull($this->fixture->getCache()->get($this->testGraph->getUri()));
+        $this->assertNull($this->fixture->getCache()->load($this->testGraph->getUri()));
 
         // pattern key entry
         $this->assertNull(
-            $this->fixture->getCache()->get(
+            $this->fixture->getCache()->load(
                 $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
             )
         );
 
         // query cache container
-        $this->assertNull($this->fixture->getCache()->get($queryObject->getQuery()));
+        $this->assertNull($this->fixture->getCache()->load($queryObject->getQuery()));
     }
 
     /*
@@ -1294,17 +1304,17 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          */
 
         // graph URI entry
-        $this->assertNull($this->fixture->getCache()->get($this->testGraph->getUri()));
+        $this->assertNull($this->fixture->getCache()->load($this->testGraph->getUri()));
 
         // pattern key entry
         $this->assertNull(
-            $this->fixture->getCache()->get(
+            $this->fixture->getCache()->load(
                 $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
             )
         );
 
         // query cache container
-        $this->assertNull($this->fixture->getCache()->get($queryObject->getQuery()));
+        $this->assertNull($this->fixture->getCache()->load($queryObject->getQuery()));
     }
 
     /*
@@ -1341,17 +1351,17 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          */
 
         // graph URI entry
-        $this->assertNull($this->fixture->getCache()->get($this->testGraph->getUri()));
+        $this->assertNull($this->fixture->getCache()->load($this->testGraph->getUri()));
 
         // pattern key entry
         $this->assertNull(
-            $this->fixture->getCache()->get(
+            $this->fixture->getCache()->load(
                 $this->testGraph->getUri() . '*'. $this->separator .'*'. $this->separator .'*'
             )
         );
 
         // query cache container
-        $this->assertNull($this->fixture->getCache()->get($queryObject->getQuery()));
+        $this->assertNull($this->fixture->getCache()->load($queryObject->getQuery()));
     }
 
     /*
@@ -1404,7 +1414,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          */
         $this->assertEquals(
             array($queryObject->getQuery() => $queryObject->getQuery()),
-            $this->fixture->getCache()->get($this->testGraph->getUri())
+            $this->fixture->getCache()->load($this->testGraph->getUri())
         );
 
         /**
@@ -1412,7 +1422,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
          */
         $this->assertEquals(
             array($queryObject->getQuery() => $queryObject->getQuery()),
-            $this->fixture->getCache()->get(
+            $this->fixture->getCache()->load(
                 $this->testGraph->getUri() . $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
             )
         );
@@ -1433,7 +1443,7 @@ abstract class AbstractQueryCacheIntegrationTest extends TestCase
                 'result' => $result,
                 'query' => $queryObject->getQuery(),
             ),
-            $this->fixture->getCache()->get($queryObject->getQuery())
+            $this->fixture->getCache()->load($queryObject->getQuery())
         );
 
         /**
