@@ -1,8 +1,8 @@
 <?php
 
-namespace Saft\Store\Test\Result;
+namespace Saft\Sparql\Test\Result;
 
-use Saft\Store\Result\ValueResultImpl;
+use Saft\Sparql\Result\ValueResultImpl;
 
 class ValueResultImplTest extends ValueResultAbstractTest
 {

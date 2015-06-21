@@ -14,13 +14,13 @@ use Saft\Rdf\StatementIteratorFactory;
 use Saft\Rdf\Triple;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
+use Saft\Sparql\Result\EmptyResult;
+use Saft\Sparql\Result\ResultFactory;
+use Saft\Sparql\Result\SetResult;
+use Saft\Sparql\Result\StatementResult;
+use Saft\Sparql\Result\ValueResult;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Store;
-use Saft\Store\Result\EmptyResult;
-use Saft\Store\Result\ResultFactory;
-use Saft\Store\Result\SetResult;
-use Saft\Store\Result\StatementResult;
-use Saft\Store\Result\ValueResult;
 
 /**
  * SparqlStore implementation of OpenLink Virtuoso. It supports version 6.1.8+

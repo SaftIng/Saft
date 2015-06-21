@@ -11,9 +11,9 @@ use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
 use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\QueryFactory;
-use Saft\Store\Result\Result;
-use Saft\Store\Result\EmptyResult;
-use Saft\Store\Result\ResultFactory;
+use Saft\Sparql\Result\Result;
+use Saft\Sparql\Result\EmptyResult;
+use Saft\Sparql\Result\ResultFactory;
 
 /**
  * Predefined sparql Store. All Triple methods reroute to the query-method. In the specific sparql-Store those

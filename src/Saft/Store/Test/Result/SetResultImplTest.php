@@ -1,8 +1,8 @@
 <?php
 
-namespace Saft\Store\Test\Result;
+namespace Saft\Sparql\Test\Result;
 
-use Saft\Store\Result\SetResultImpl;
+use Saft\Sparql\Result\SetResultImpl;
 
 class SetResultImplTest extends SetResultAbstractTest
 {

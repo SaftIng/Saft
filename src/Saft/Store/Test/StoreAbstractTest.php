@@ -9,11 +9,11 @@ use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\SparqlUtils;
-use Saft\Store\Result\EmptyResult;
-use Saft\Store\Result\EmptyResultImpl;
-use Saft\Store\Result\SetResultImpl;
-use Saft\Store\Result\StatementSetResultImpl;
-use Saft\Store\Result\ValueResultImpl;
+use Saft\Sparql\Result\EmptyResult;
+use Saft\Sparql\Result\EmptyResultImpl;
+use Saft\Sparql\Result\SetResultImpl;
+use Saft\Sparql\Result\StatementSetResultImpl;
+use Saft\Sparql\Result\ValueResultImpl;
 use Saft\Test\TestCase;
 use Symfony\Component\Yaml\Parser;
 
@@ -501,7 +501,7 @@ abstract class StoreAbstractTest extends TestCase
         $query = 'DELETE DATA { ' . $graphPattern . '}';
         $queryResult = $this->fixture->query($query);
 
-        $this->assertClassOfInstanceImplements($queryResult, 'Saft\Store\Result\Result');
+        $this->assertClassOfInstanceImplements($queryResult, 'Saft\Sparql\Result\Result');
         $this->assertTrue($queryResult->isEmptyResult());
     }
 

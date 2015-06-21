@@ -13,9 +13,9 @@ use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
+use Saft\Sparql\Result\ResultFactory;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Store;
-use Saft\Store\Result\ResultFactory;
 
 /**
  * SparqlStore implementation of a client which handles store operations via HTTP. It is able to determine some

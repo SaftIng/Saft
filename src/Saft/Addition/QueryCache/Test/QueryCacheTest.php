@@ -15,8 +15,8 @@ use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Sparql\Result\ResultFactoryImpl;
 use Saft\Store\BasicTriplePatternStore;
-use Saft\Store\Result\ResultFactoryImpl;
 use Saft\Test\TestCase;
 
 /**

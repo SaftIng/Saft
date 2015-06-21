@@ -13,10 +13,10 @@ use Saft\Rdf\StatementIteratorFactory;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
 use Saft\Store\AbstractSparqlStore;
-use Saft\Store\Result\EmptyResult;
-use Saft\Store\Result\ResultFactory;
-use Saft\Store\Result\SetResult;
-use Saft\Store\Result\ValueResult;
+use Saft\Sparql\Result\EmptyResult;
+use Saft\Sparql\Result\ResultFactory;
+use Saft\Sparql\Result\SetResult;
+use Saft\Sparql\Result\ValueResult;
 
 class ARC2 extends AbstractSparqlStore
 {

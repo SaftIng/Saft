@@ -1,6 +1,6 @@
 <?php
 
-namespace Saft\Store\Result;
+namespace Saft\Sparql\Result;
 
 /**
  * Represents an empty result, usually after an INSERT or UPDATE SPARQL query.

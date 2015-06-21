@@ -1,10 +1,10 @@
 <?php
 
-namespace Saft\Store\Test\Result;
+namespace Saft\Sparql\Test\Result;
 
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\StatementImpl;
-use Saft\Store\Result\StatementResult;
+use Saft\Sparql\Result\StatementResult;
 use Saft\Test\TestCase;
 
 abstract class StatementSetResultAbstractTest extends TestCase

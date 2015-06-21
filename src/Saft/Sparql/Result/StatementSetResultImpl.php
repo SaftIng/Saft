@@ -1,6 +1,6 @@
 <?php
 
-namespace Saft\Store\Result;
+namespace Saft\Sparql\Result;
 
 use Saft\Rdf\Statement;
 

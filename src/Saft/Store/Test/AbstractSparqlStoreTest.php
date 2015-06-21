@@ -12,8 +12,8 @@ use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
-use Saft\Store\Result\EmptyResult;
-use Saft\Store\Result\ResultFactoryImpl;
+use Saft\Sparql\Result\EmptyResult;
+use Saft\Sparql\Result\ResultFactoryImpl;
 use Saft\Test\EqualsSparqlConstraint;
 use Saft\Test\TestCase;
 

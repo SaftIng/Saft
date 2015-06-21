@@ -1,9 +1,9 @@
 <?php
 
-namespace Saft\Store\Test\Result;
+namespace Saft\Sparql\Test\Result;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Store\Result\SetResult;
+use Saft\Sparql\Result\SetResult;
 use Saft\Test\TestCase;
 
 abstract class SetResultAbstractTest extends TestCase
