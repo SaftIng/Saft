@@ -78,24 +78,4 @@ interface Statement
      * @param Statement $toCompare the statement to compare with
      */
     public function equals(Statement $toCompare);
-
-    /**
-     * @param NamedNode $graph
-     */
-    public function setGraph(Node $graph);
-
-    /**
-     * @param Node $object
-     */
-    public function setObject(Node $object);
-
-    /**
-     * @param NamedNode $predicate
-     */
-    public function setPredicate(Node $predicate);
-
-    /**
-     * @param BlankNode|NamedNode $subject
-     */
-    public function setSubject(Node $subject);
 }

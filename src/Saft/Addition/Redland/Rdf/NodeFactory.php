@@ -4,6 +4,7 @@ namespace Saft\Addition\Redland\Rdf;
 
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactoryImpl as SaftNodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
 
 class NodeFactory extends SaftNodeFactoryImpl
 {
@@ -75,6 +76,10 @@ class NodeFactory extends SaftNodeFactoryImpl
     {
         if ($uri === null) {
             throw new \Exception('Can\'t initialize node with null.');
+        }
+
+        if (!NodeUtils::simpleCheckURI($uri)) {
+            throw new \Exception('Invalid URI was given for RDF NamedNode creation.');
         }
 
         // TODO catch invalid URIs
