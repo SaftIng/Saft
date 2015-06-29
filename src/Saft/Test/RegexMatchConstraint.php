@@ -2,6 +2,10 @@
 
 namespace Saft\Test;
 
+/**
+ * That constraint tries to match a given regex on a given string. If the regex matches, the constraint is true,
+ * false otherwise.
+ */
 class RegexMatchConstraint extends \PHPUnit_Framework_Constraint
 {
     protected $regex;
