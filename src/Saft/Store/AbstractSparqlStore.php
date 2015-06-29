@@ -100,7 +100,6 @@ abstract class AbstractSparqlStore implements Store
             // given $graph forces usage of it and not the graph from the statement instance
             if (null !== $graph) {
                 $graphUriToUse = $graph->getUri();
-                $statement->setGraph($graph);
 
             // use graph from statement
             } elseif (null !== $statement->getGraph()) {
@@ -128,7 +127,8 @@ abstract class AbstractSparqlStore implements Store
 
                     foreach ($batch as $batchEntries) {
                         $content .= $this->sparqlFormat(
-                            $this->statementIteratorFactory->createIteratorFromArray(array($batchEntries))
+                            $this->statementIteratorFactory->createIteratorFromArray(array($batchEntries)),
+                            $graph
                         ) .' ';
                     }
 
@@ -144,12 +144,14 @@ abstract class AbstractSparqlStore implements Store
         }
 
         // handle remaining statements of the batch (that happens if the batch size was not reached (again))
+        // TODO remove this code duplication. Maybe move the repeeted code to a new method
         $content = '';
 
         foreach ($batchStatements as $graphUriToUse => $batch) {
             foreach ($batch as $batchEntries) {
                 $content .= $this->sparqlFormat(
-                    $this->statementIteratorFactory->createIteratorFromArray(array($batchEntries))
+                    $this->statementIteratorFactory->createIteratorFromArray(array($batchEntries)),
+                    $graph
                 ) .' ';
             }
         }
