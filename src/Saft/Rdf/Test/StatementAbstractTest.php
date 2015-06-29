@@ -112,9 +112,6 @@ abstract class StatementAbstractTest extends TestCase
         $this->assertTrue($patternC->matches($fixtureB));
         $this->assertFalse($patternC->matches($fixtureC));
 
-        // This assumes, that the default graph is not the union of all named graphs
-        $this->assertFalse($patternA->matches($fixtureB));
-
         $subject = new NamedNodeImpl('http://foo.net');
         $predicate = new NamedNodeImpl('http://bar.net');
         $object = new LiteralImpl('baz');
