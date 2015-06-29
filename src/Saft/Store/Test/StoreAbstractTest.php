@@ -229,6 +229,39 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertCountStatementIterator(2, $statements);
     }
 
+    public function testQueryAddAndQueryStatementsDefaultGraph()
+    {
+        $this->markTestSkipped(
+            "We can not assume any behavior in this case so far because different implementations are treating default"
+            . "graphs differently. See also http://www.w3.org/TR/2013/REC-sparql11-update-20130321/#graphStore"
+        );
+        $insertQuery = 'INSERT DATA {
+            <http://example.org/a> <http://example.org/b> <http://example.org/c>
+        }';
+
+        $selectQuery = 'SELECT * {
+            <http://example.org/a> ?p ?o
+        }';
+
+        $this->fixture->query($insertQuery);
+        $result = $this->fixture->query($selectQuery);
+
+        $match = false;
+        foreach ($result as $row) {
+            if (
+                $row['p']->isNamedNode() &&
+                $row['p']->getUri() == "http://example.org/b" &&
+                $row['o']->isNamedNode() &&
+                $row['o']->getUri() == "http://example.org/c"
+            ) {
+                $match = true;
+            }
+            var_dump($row);
+        }
+
+        $this->assertTrue($match);
+    }
+
     public function testAddStatementsUseStatementGraph()
     {
         // remove all triples from the test graph
@@ -610,7 +643,7 @@ abstract class StoreAbstractTest extends TestCase
             )
         ));
 
-        $this->assertEquals(
+        $this->assertIteratorContent(
             $instanceToCheckAgainst,
             $this->fixture->getMatchingStatements($statement, $this->testGraph)
         );
@@ -665,7 +698,7 @@ abstract class StoreAbstractTest extends TestCase
         }
     }
 
-    public function testGetMatchingStatementsCheckForEmptyGraph()
+    public function testGetMatchingStatementsCheckForTriples()
     {
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
@@ -693,8 +726,53 @@ abstract class StoreAbstractTest extends TestCase
         $iterator = $this->fixture->getMatchingStatements($statement);
 
         foreach ($iterator as $statement) {
-            $this->assertNull($statement->getGraph());
+            $this->assertTrue($statement->isTriple());
         }
+    }
+
+    public function testGetMatchingStatementsFromAnyGraph()
+    {
+        // 2 triples
+        $statements = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o1/'),
+                new NamedNodeImpl('http://graph/a')
+            ),
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o2/'),
+                new NamedNodeImpl('http://graph/b')
+            ),
+        ));
+
+        // add triples
+        $this->fixture->addStatements($statements);
+
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new AnyPatternImpl(),
+            new AnyPatternImpl()
+        );
+
+        $iterator = $this->fixture->getMatchingStatements($statement);
+
+        $statementCount = 0;
+        foreach ($iterator as $statement) {
+            if ($statement->getObject()->getUri() == 'http://o1/') {
+                ++$statementCount;
+                $this->assertTrue($statement->isQuad());
+                $this->assertEquals('http://graph/a', $statement->getGraph()->getUri());
+            } elseif ($statement->getObject()->getUri() == 'http://o2/') {
+                ++$statementCount;
+                $this->assertTrue($statement->isQuad());
+                $this->assertEquals('http://graph/b', $statement->getGraph()->getUri());
+            }
+        }
+        $this->assertEquals(2, $statementCount);
     }
 
     /*

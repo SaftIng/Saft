@@ -10,6 +10,7 @@ use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
+use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
 use Saft\Store\AbstractSparqlStore;
@@ -113,64 +114,32 @@ class ARC2 extends AbstractSparqlStore
     {
         $graphUriToUse = null;
 
-        /**
-         * Create batches out of given statements to improve statement throughput.
-         */
-        $counter = 0;
-        $batchSize = 100;
-        $batchStatements = array();
-
         foreach ($statements as $statement) {
-            // non-concrete Statement instances not allowed
-            if (false === $statement->isConcrete()) {
+            if (!$statement->isConcrete()) {
+                // non-concrete Statement instances not allowed
+                // we have to undo the transaction somehow
                 throw new \Exception('At least one Statement is not concrete');
             }
 
-            // given $graph forces usage of it and not the graph from the statement instance
             if (null !== $graph) {
+                // given $graph forces usage of it and not the graph from the statement instance
                 $graphUriToUse = $graph->getUri();
                 // reuse $graph instance later on.
-
-            // use graphUri from statement
             } elseif (null !== $statement->getGraph()) {
+                // use graphUri from statement
                 $graph = $statement->getGraph();
                 $graphUriToUse = $graph->getUri();
-
-            // no graph instance was found
             }
+            // else: non-concrete Statement instances not allowed
 
-            // init batch entry for the current graph URI, if not set yet.
-            if (false === isset($batchStatements[$graphUriToUse])) {
-                $batchStatements[$graphUriToUse] = array();
-            }
-
-            $batchStatements[$graphUriToUse][] = $this->statementFactory->createStatement(
-                $statement->getSubject(),
-                $statement->getPredicate(),
-                $statement->getObject()
+            $this->query(
+                'INSERT INTO <'. $graphUriToUse .'> {'
+                . SparqlUtils::getNodeInSparqlFormat($statement->getSubject()) . ' '
+                . SparqlUtils::getNodeInSparqlFormat($statement->getPredicate()) . ' '
+                . SparqlUtils::getNodeInSparqlFormat($statement->getObject()) . ' . '
+                . '}',
+                $options
             );
-
-            // after batch is full, execute collected statements all at once
-            if (0 === $counter % $batchSize) {
-                /**
-                 * $batchStatements is an array with graphUri('s) as key(s) and iterator instances as value
-                 * Each entry is related to a certain graph and contains a bunch of statement instances.
-                 */
-                foreach ($batchStatements as $graphUriToUse => $statementBatch) {
-                    $this->query(
-                        'INSERT INTO <'. $graphUriToUse .'> {'.
-                        $this->sparqlFormat(
-                            $this->statementIteratorFactory->createIteratorFromArray(
-                                $statementBatch
-                            )
-                        ) .'}',
-                        $options
-                    );
-                }
-
-                // re-init variables
-                $batchStatements = array();
-            }
         }
     }
 

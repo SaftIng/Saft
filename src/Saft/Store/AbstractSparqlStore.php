@@ -268,25 +268,18 @@ abstract class AbstractSparqlStore implements Store
      */
     public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
-        // if $graph was given, but its not a named node, set it to null.
-        if (null !== $graph && false === $graph->isNamed()) {
-            $graph = null;
-        }
         // otherwise check, if graph was set in the statement and it is a named node and use it, if so.
-        if (null === $graph
-            && null !== $statement->getGraph()
-            && true === $statement->getGraph()->isNamed()) {
+        if (null === $graph && $statement->isQuad()) {
             $graph = $statement->getGraph();
         }
 
         /*
          * Build query
          */
-        $query = 'SELECT ?s ?p ?o ';
-        if (null !== $graph) {
-            $query .= 'FROM <'. $graph->getUri() .'> ';
+        $query = 'SELECT ?s ?p ?o { ?s ?p ?o ';
+        if ($graph !== null) {
+            $query = 'SELECT ?s ?p ?o ?g { graph ?g { ?s ?p ?o } ';
         }
-        $query .= 'WHERE { ?s ?p ?o ';
 
         // create shortcuts for S, P and O
         $subject = $statement->getSubject();
@@ -294,51 +287,58 @@ abstract class AbstractSparqlStore implements Store
         $object = $statement->getObject();
 
         // add filter, if subject is a named node or literal
-        if ($subject->isNamed()) {
-            $query .= 'FILTER (str(?s) = "'. $subject->getUri() .'") ';
+        if (!$subject->isVariable()) {
+            $query .= 'FILTER (?s = '. $subject->toNQuads() .') ';
         }
 
         // add filter, if predicate is a named node or literal
-        if ($predicate->isNamed()) {
-            $query .= 'FILTER (str(?p) = "'. $predicate->getUri() .'") ';
+        if (!$predicate->isVariable()) {
+            $query .= 'FILTER (?p = '. $predicate->toNQuads() .') ';
         }
 
         // add filter, if object is a named node or literal
-        if ($object->isNamed()) {
-            $query .= 'FILTER (str(?o) = "'. $object->getUri() .'") ';
-        } elseif ($object->isLiteral()) {
-            $query .= 'FILTER (str(?o) = "'. $object->getValue() .'") ';
+        if (!$object->isVariable()) {
+            $query .= 'FILTER (?o = '. $object->toNQuads() .') ';
         }
+
+        // add filter, if graph is a named node or literal
+        if ($graph !== null && !$graph->isVariable()) {
+            $query .= 'FILTER (?g = '. $graph->toNQuads() .') ';
+        }
+
         $query .= '}';
+
+        //print $query;
 
         // execute query and save result
         // TODO transform getMatchingStatements into lazy loading, so a batch loading is possible
         $result = $this->query($query, $options);
 
-        if (null === $result) {
-            return $this->resultFactory->createEmptyResult();
-        }
-
         /*
          * Transform SetResult entries to Statement instances.
          */
-        $entries = array();
-        foreach ($result as $entry) {
-            $statementList = array();
-            $i = 0;
-            foreach ($result->getVariables() as $variable) {
-                $statementList[$i++] = $entry[$variable];
+        $statementList = array();
+        if ($graph !== null) {
+            foreach ($result as $entry) {
+                $statementList[] = $this->statementFactory->createStatement(
+                    $entry['s'],
+                    $entry['p'],
+                    $entry['o'],
+                    $entry['g']
+                );
             }
-            $entries[] = $this->statementFactory->createStatement(
-                $statementList[0],
-                $statementList[1],
-                $statementList[2],
-                $graph
-            );
+        } else {
+            foreach ($result as $entry) {
+                $statementList[] = $this->statementFactory->createStatement(
+                    $entry['s'],
+                    $entry['p'],
+                    $entry['o']
+                );
+            }
         }
 
         // return a StatementIterator which contains the matching statements
-        return $this->statementIteratorFactory->createIteratorFromArray($entries);
+        return $this->statementIteratorFactory->createIteratorFromArray($statementList);
     }
 
     /**
