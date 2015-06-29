@@ -23,7 +23,7 @@ class AbstractSparqlStoreTest extends TestCase
      * @var string
      */
     protected $regexLiteral = '"[a-z0-9]+"\^\^<[a-z0-9:\/#-\.]+>';
-    
+
     /**
      * @var string
      */
@@ -33,7 +33,7 @@ class AbstractSparqlStoreTest extends TestCase
      * @var string
      */
     protected $regexUri = '[a-z0-9:\/#-\.]+';
-    
+
     public function setUp()
     {
         parent::setUp();
@@ -66,21 +66,21 @@ class AbstractSparqlStoreTest extends TestCase
         } elseif ('uri' == $s) {
             $s = new NamedNodeImpl('http://saft/test/s');
         }
-        
+
         // p
         if ('pattern' == $p) {
             $p = new AnyPatternImpl();
         } elseif ('uri' == $p) {
             $p = new NamedNodeImpl('http://saft/test/p');
         }
-        
+
         // o
         if ('pattern' == $o) {
             $o = new AnyPatternImpl();
         } elseif ('uri' == $o) {
             $o = new NamedNodeImpl('http://saft/test/o');
         }
-        
+
         // g
         if ('pattern' == $g) {
             $g = new AnyPatternImpl();
@@ -91,7 +91,7 @@ class AbstractSparqlStoreTest extends TestCase
         } else { // null == $g
             $stmt = new StatementImpl($s, $p, $o);
         }
-        
+
         return $stmt;
     }
 
@@ -112,9 +112,9 @@ class AbstractSparqlStoreTest extends TestCase
             $this->getTestStatement('uri', 'uri', 'uri', 'uri'),
             $this->getTestStatement('uri', 'uri', 'uri', 'uri')
         ));
-        
+
         /*
-            check that query function gets a query which looks like: 
+            check that query function gets a query which looks like:
             INSERT DATA {
                 Graph <http://saft/test/g1> { <http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>. }
                 Graph <http://saft/test/g2> { <http://saft/test/s2> <http://saft/test/p2> <http://saft/test/o2>. }
@@ -124,10 +124,10 @@ class AbstractSparqlStoreTest extends TestCase
             ->expects($this->once())
             ->method('query')
             ->with(new RegexMatchConstraint(
-                '/INSERTDATA{Graph<'. $this->regexUri .'>{'. 
-                    '<'. $this->regexUri .'><'. $this->regexUri .'><'. $this->regexUri .'>.'.
-                '}Graph<'. $this->regexUri .'>{'. 
-                    '<'. $this->regexUri .'><'. $this->regexUri .'><'. $this->regexUri .'>.'.
+                '/INSERTDATA{Graph<'. $this->regexUri .'>{'.
+                '<'. $this->regexUri .'><'. $this->regexUri .'><'. $this->regexUri .'>.'.
+                '}Graph<'. $this->regexUri .'>{'.
+                '<'. $this->regexUri .'><'. $this->regexUri .'><'. $this->regexUri .'>.'.
                 '}}/si'
             ));
 
@@ -154,16 +154,16 @@ class AbstractSparqlStoreTest extends TestCase
         $triple2 = new StatementImpl($subject1, $predicate1, $object2);
 
         // Setup array statement iterator
-        $statements = new ArrayStatementIteratorImpl(array($triple1, $triple2));        
-        
+        $statements = new ArrayStatementIteratorImpl(array($triple1, $triple2));
+
         /*
-            check that query function gets a query which looks like: 
-            INSERT DATA { 
+            check that query function gets a query which looks like:
+            INSERT DATA {
                 Graph <http://saft/test/> {
-                    <http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#string>. 
+                    <http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#string>.
                 }
                 Graph <http://saft/test/> {
-                    <http://saft/test/s1> <http://saft/test/p1> "John"^^<http://www.w3.org/2001/XMLSchema#string>. 
+                    <http://saft/test/s1> <http://saft/test/p1> "John"^^<http://www.w3.org/2001/XMLSchema#string>.
                 }
             }
          */
@@ -171,13 +171,13 @@ class AbstractSparqlStoreTest extends TestCase
             ->expects($this->once())
             ->method('query')
             ->with(new RegexMatchConstraint(
-                '/INSERTDATA{Graph<'. $this->regexUri .'>{'. 
-                    '<'. $this->regexUri .'><'. $this->regexUri .'>'. $this->regexLiteral .'.'.
-                '}Graph<'. $this->regexUri .'>{'. 
-                    '<'. $this->regexUri .'><'. $this->regexUri .'>'. $this->regexLiteral .'.'.
+                '/INSERTDATA{Graph<'. $this->regexUri .'>{'.
+                '<'. $this->regexUri .'><'. $this->regexUri .'>'. $this->regexLiteral .'.'.
+                '}Graph<'. $this->regexUri .'>{'.
+                '<'. $this->regexUri .'><'. $this->regexUri .'>'. $this->regexLiteral .'.'.
                 '}}/si'
             ));
-        
+
         // add test statements
         $this->mock->addStatements($statements, $this->testGraph);
     }
@@ -186,8 +186,8 @@ class AbstractSparqlStoreTest extends TestCase
     public function testAddStatementsWithGraphUri()
     {
         /*
-            check that query function gets a query which looks like: 
-            INSERT DATA { 
+            check that query function gets a query which looks like:
+            INSERT DATA {
                 Graph <http://saft/test/foograph> {
                     <http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.
             } }
@@ -196,8 +196,8 @@ class AbstractSparqlStoreTest extends TestCase
             ->expects($this->once())
             ->method('query')
             ->with(new RegexMatchConstraint(
-                '/INSERTDATA{Graph<'. $this->regexUri .'>{'. 
-                    '<'. $this->regexUri .'><'. $this->regexUri .'><'. $this->regexUri .'>.'.
+                '/INSERTDATA{Graph<'. $this->regexUri .'>{'.
+                '<'. $this->regexUri .'><'. $this->regexUri .'><'. $this->regexUri .'>.'.
                 '}}/si'
             ));
 
@@ -214,19 +214,19 @@ class AbstractSparqlStoreTest extends TestCase
     public function testDeleteMatchingStatements()
     {
         /*
-            check that query function gets a query which looks like: 
-            DELETE WHERE { 
+            check that query function gets a query which looks like:
+            DELETE WHERE {
                 Graph <http://saft/test/g1> {
                     <http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.
-                } 
+                }
             }
          */
         $this->mock
             ->expects($this->once())
             ->method('query')
             ->with(new RegexMatchConstraint(
-                '/DELETEWHERE{Graph<'. $this->regexUri .'>{'. 
-                    '<'. $this->regexUri .'><'. $this->regexUri .'><'. $this->regexUri .'>.'.
+                '/DELETEWHERE{Graph<'. $this->regexUri .'>{'.
+                '<'. $this->regexUri .'><'. $this->regexUri .'><'. $this->regexUri .'>.'.
                 '}}/si'
             ));
 
@@ -242,11 +242,11 @@ class AbstractSparqlStoreTest extends TestCase
     public function testGetMatchingStatements()
     {
         /*
-           check that query function gets a query which looks like: 
-           SELECT ?s ?p ?o 
-           FROM <http://saft/test/g1> 
-           WHERE { 
-                ?s ?p ?o 
+           check that query function gets a query which looks like:
+           SELECT ?s ?p ?o
+           FROM <http://saft/test/g1>
+           WHERE {
+                ?s ?p ?o
                 FILTER(str(?s)="http://saft/test/s1")
                 FILTER(str(?p)="http://saft/test/p1")
                 FILTER(str(?o)="http://saft/test/o1")
@@ -263,10 +263,10 @@ class AbstractSparqlStoreTest extends TestCase
                 'FROM<'. $this->regexUri .'>'.
                 // where
                 'WHERE{'.
-                    $this->regexPattern . $this->regexPattern . $this->regexPattern .
-                    'FILTER\(str\('. $this->regexPattern .'\)="'. $this->regexUri .'"\)'.
-                    'FILTER\(str\('. $this->regexPattern .'\)="'. $this->regexUri .'"\)'.
-                    'FILTER\(str\('. $this->regexPattern .'\)="'. $this->regexUri .'"\)'.
+                $this->regexPattern . $this->regexPattern . $this->regexPattern .
+                'FILTER\(str\('. $this->regexPattern .'\)="'. $this->regexUri .'"\)'.
+                'FILTER\(str\('. $this->regexPattern .'\)="'. $this->regexUri .'"\)'.
+                'FILTER\(str\('. $this->regexPattern .'\)="'. $this->regexUri .'"\)'.
                 '}'.
                 '/si'
             ));
@@ -284,16 +284,16 @@ class AbstractSparqlStoreTest extends TestCase
 
     public function testHasMatchingStatement()
     {
-        // check that query function gets a query which looks like: 
-        // ASK { Graph <http://saft/test/g1> { 
-        //      <http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1> . 
+        // check that query function gets a query which looks like:
+        // ASK { Graph <http://saft/test/g1> {
+        //      <http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1> .
         // } }
         $this->mock
             ->expects($this->once())
             ->method('query')
             ->with(new RegexMatchConstraint(
-                '/ASK{Graph<'. $this->regexUri .'>{'. 
-                    $this->regexPattern .'<'. $this->regexUri .'><'. $this->regexUri .'>.*'.
+                '/ASK{Graph<'. $this->regexUri .'>{'.
+                $this->regexPattern .'<'. $this->regexUri .'><'. $this->regexUri .'>.*'.
                 '}}/i'
             ));
 
@@ -310,7 +310,7 @@ class AbstractSparqlStoreTest extends TestCase
     // subject is a pattern variable
     public function testPatternStatementSubjectIsPattern()
     {
-        // check that query function gets a query which looks like: 
+        // check that query function gets a query which looks like:
         // ASK { ?s1 <http://saft/test/p1> <http://saft/test/o1> . }
         $this->mock
             ->expects($this->once())
@@ -322,7 +322,7 @@ class AbstractSparqlStoreTest extends TestCase
         $result = $this->mock->hasMatchingStatement(
             $this->getTestStatement('pattern', 'uri', 'uri')
         );
-        
+
         $this->assertNull($result);
     }
 
@@ -335,8 +335,8 @@ class AbstractSparqlStoreTest extends TestCase
             ->expects($this->once())
             ->method('query')
             ->with(new RegexMatchConstraint(
-                '/ASK{Graph'. $this->regexPattern .'{'. 
-                    $this->regexPattern .'<'. $this->regexUri .'><'. $this->regexUri .'>.*'.
+                '/ASK{Graph'. $this->regexPattern .'{'.
+                $this->regexPattern .'<'. $this->regexUri .'><'. $this->regexUri .'>.*'.
                 '}}/i'
             ));
 

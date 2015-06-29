@@ -13,7 +13,7 @@ class RegexMatchConstraint extends \PHPUnit_Framework_Constraint
     public function __construct($regex)
     {
         parent::__construct();
-        
+
         $this->regex = $regex;
     }
 
