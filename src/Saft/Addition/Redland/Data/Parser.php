@@ -49,7 +49,7 @@ class Parser implements ParserInterface
      */
     public function parseStringToIterator($inputString, $baseUri = null, $serialization = null)
     {
-        $redlandStream = librdf_parser_parse_string_as_stream($this->parser, $inputString, $rdfUri);
+        $redlandStream = librdf_parser_parse_string_as_stream($this->parser, $inputString, $baseUri);
         if (false === $redlandStream) {
             throw new \Exception('Failed to parse RDF stream');
         }
