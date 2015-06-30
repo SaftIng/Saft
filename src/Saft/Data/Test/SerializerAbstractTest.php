@@ -24,8 +24,7 @@ abstract class SerializerAbstractTest extends TestCase
         $this->fixture = $this->newInstance();
 
         if (false === in_array('n-quads', $this->fixture->getSupportedSerializations())) {
-            // Fixture does not support n-quads serialization.
-            return;
+            $this->markTestSkipped('Fixture does not support n-quads serialization.');
         }
 
         $iterator = new ArrayStatementIteratorImpl(array(
