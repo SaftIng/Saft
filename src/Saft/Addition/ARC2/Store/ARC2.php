@@ -124,11 +124,10 @@ class ARC2 extends AbstractSparqlStore
             if (null !== $graph) {
                 // given $graph forces usage of it and not the graph from the statement instance
                 $graphUriToUse = $graph->getUri();
-                // reuse $graph instance later on.
+
             } elseif (null !== $statement->getGraph()) {
                 // use graphUri from statement
-                $graph = $statement->getGraph();
-                $graphUriToUse = $graph->getUri();
+                $graphUriToUse = $statement->getGraph()->getUri();
             }
             // else: non-concrete Statement instances not allowed
 
@@ -350,6 +349,8 @@ class ARC2 extends AbstractSparqlStore
      * @return Result     Returns result of the query. Its type depends on the type of the query.
      * @throws \Exception If query is no string.
      * @throws \Exception If query is malformed.
+     * @throws \Exception If query is a DELETE query and contains quads, where the graph of one quad is of type var
+     * @throws \Exception If a non-graph query contains no triples and quads.
      * @todo handle multiple graphs in FROM clause
      */
     public function query($query, array $options = array())
@@ -368,8 +369,104 @@ class ARC2 extends AbstractSparqlStore
         // execute query on the store
         $result = $this->store->query($query);
 
-        if ('selectQuery' === AbstractQuery::getQueryType($query)) {
-            /**
+        /*
+         * special case: if you execute a SELECT COUNT(*) query, ARC2 will return the number of triples
+                       instead of a result set
+         */
+        $countCheck = preg_match(
+            '/selectcount\([a-z*]\)(from|where)/si',
+            preg_replace('/\s+/', '', $query) // remove all whitespaces
+        );
+        if (1 == $countCheck) {
+            $variable = 'callret-0';
+            // build a set result, because the user expects it as result type because a SELECT query
+            // was sent.
+            $setResult = $this->resultFactory->createSetResult(
+                array(
+                    array(
+                        $variable => $this->nodeFactory->createLiteral(
+                            $result,
+                            'http://www.w3.org/2001/XMLSchema#int'
+                        )
+                    )
+                )
+            );
+            $setResult->setVariables(array($variable));
+            return $setResult;
+
+        /*
+         * ARC2 does not support quads, especially not in DELETE queries. The following code construct
+         * tries to close that gap by transforming the query in a one which ARC2 can understand.
+         *
+         * This part transform queries of the kind:
+         *
+         *      DELETE WHERE {
+         *          Graph <http://localhost/Saft/TestGraph/> {
+         *              ?s ?p ?o .
+         *          }
+         *      }
+         *
+         * to SPARQL+ ones:
+         *
+         *      DELETE FROM <http://localhost/Saft/TestGraph/> {
+         *          ?s ?p ?o .
+         *      }
+         *      WHERE {
+         *          ?s ?p ?o .
+         *      }
+         *
+         *
+         * IMPORTANT: Please adapt
+         *            https://github.com/SaftIng/safting.github.io/blob/master/doc/phpframework/addition/ARC2.md
+         *            if you change the support for SPARQL 1.0/1.1 here!
+         */
+        } elseif (
+            $queryObject->isUpdateQuery() &&
+            isset($queryParts['quad_pattern']) &&
+            'deleteWhere' === $queryParts['sub_type']
+        ) {
+            foreach ($queryParts['quad_pattern'] as $quad) {
+                if ('uri' != $quad['g_type']) {
+                    throw new \Exception('The graph of a quad must be an URI here.');
+                }
+
+                // subject
+                $s = NodeUtils::createNodeInstance(
+                    $this->nodeFactory,
+                    $quad['s'],
+                    $quad['s_type']
+                );
+                $s = SparqlUtils::getNodeInSparqlFormat($s);
+
+                // predicate
+                $p = NodeUtils::createNodeInstance(
+                    $this->nodeFactory,
+                    $quad['p'],
+                    $quad['p_type']
+                );
+                $p = SparqlUtils::getNodeInSparqlFormat($p);
+
+                // object
+                $o = NodeUtils::createNodeInstance(
+                    $this->nodeFactory,
+                    $quad['o'],
+                    $quad['o_type'],
+                    $quad['o_datatype'],
+                    $quad['o_lang']
+                );
+                $o = SparqlUtils::getNodeInSparqlFormat($o);
+
+                return $this->query(
+                    'DELETE FROM <'. $quad['g'] .'> {'. $s .' '. $p .' '. $o .' }
+                    WHERE {'. $s .' '. $p .' '. $o .' }'
+                );
+            }
+
+        /*
+         * SELECT query
+         */
+        } elseif ('selectQuery' === AbstractQuery::getQueryType($query)) {
+            /*
              * For a SELECT query the result looks like:
              *
              * array(

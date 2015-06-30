@@ -117,7 +117,7 @@ class HttpTest extends StoreAbstractTest
     {
         $config = array('queryUrl' => 'http://dbpedia.org/sparql');
 
-        $this->fixture = new Http(
+        $fixture = new Http(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
             new QueryFactoryImpl(),
@@ -132,7 +132,22 @@ class HttpTest extends StoreAbstractTest
                 'tripleQuerying' => true,
                 'tripleUpdate' => false,
             ),
-            $this->fixture->getRights()
+            $fixture->getRights()
+        );
+    }
+
+    /*
+     * Tests for query
+     */
+
+    // override test from parent class because Virtuoso does not support what we want to test.
+    public function testQueryAddAndQueryStatementsDefaultGraph()
+    {
+        // See: https://github.com/openlink/virtuoso-opensource/issues/417
+        $this->markTestSkipped(
+            'Skip test from parent class because we dont know if the target server supports '.
+            'write access to default graph and it may throw an exception, if not. because of that '.
+            'we just dont test it to avoid confusion.'
         );
     }
 }

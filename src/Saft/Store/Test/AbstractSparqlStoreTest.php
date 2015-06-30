@@ -12,8 +12,8 @@ use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
-use Saft\Sparql\Result\EmptyResult;
 use Saft\Sparql\Result\ResultFactoryImpl;
+use Saft\Sparql\Result\SetResultImpl;
 use Saft\Test\RegexMatchConstraint;
 use Saft\Test\TestCase;
 
@@ -259,23 +259,25 @@ class AbstractSparqlStoreTest extends TestCase
                 '/'.
                 // select
                 'SELECT'. $this->regexPattern . $this->regexPattern . $this->regexPattern .
-                // from
-                'FROM<'. $this->regexUri .'>'.
-                // where
-                'WHERE{'.
+                $this->regexPattern .'{'.
+                // graph
+                'GRAPH'. $this->regexPattern .'{'.
                 $this->regexPattern . $this->regexPattern . $this->regexPattern .
-                'FILTER\(str\('. $this->regexPattern .'\)="'. $this->regexUri .'"\)'.
-                'FILTER\(str\('. $this->regexPattern .'\)="'. $this->regexUri .'"\)'.
-                'FILTER\(str\('. $this->regexPattern .'\)="'. $this->regexUri .'"\)'.
+                '}'.
+                'FILTER\('. $this->regexPattern .'=<'. $this->regexUri .'>\)'.
+                'FILTER\('. $this->regexPattern .'=<'. $this->regexUri .'>\)'.
+                'FILTER\('. $this->regexPattern .'=<'. $this->regexUri .'>\)'.
+                'FILTER\('. $this->regexPattern .'=<'. $this->regexUri .'>\)'.
                 '}'.
                 '/si'
-            ));
+            ))
+            ->willReturn(new SetResultImpl());
 
         $result = $this->mock->getMatchingStatements(
             $this->getTestStatement('uri', 'uri', 'uri', 'uri')
         );
 
-        $this->assertTrue($result->isEmptyResult());
+        $this->assertClassOfInstanceImplements($result, 'Saft\Rdf\StatementIterator');
     }
 
     /*

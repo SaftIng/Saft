@@ -140,16 +140,16 @@ class AbstractTriplePatternStoreTest extends TestCase
     public function testDeleteMultipleStatementsTripleRecognition()
     {
         $triple = $this->getTestTriple();
-        $graphPattern = SparqlUtils::statementsToSparqlFormat([$triple]);
-        $query = 'DELETE DATA { ' . $graphPattern . '}';
+
+        $query = 'DELETE DATA { ' . SparqlUtils::statementsToSparqlFormat([$triple]) . '}';
 
         $this->assertNull($this->fixture->query($query));
     }
 
     public function testDeleteMultipleStatementsVariablePatterns()
     {
-        $this->markTestSkipped('TODO implement test store which expects certain things on query');
         $statement = $this->getTestPatternStatement();
+
         $query = 'DELETE DATA { '. SparqlUtils::statementsToSparqlFormat([$statement]) .'}';
 
         $this->assertNull($this->fixture->query($query));

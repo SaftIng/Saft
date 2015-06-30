@@ -113,6 +113,17 @@ class VirtuosoTest extends StoreAbstractTest
     }
 
     /*
+     * Tests for query
+     */
+
+    // override test from parent class because Virtuoso does not support what we want to test.
+    public function testQueryAddAndQueryStatementsDefaultGraph()
+    {
+        // See: https://github.com/openlink/virtuoso-opensource/issues/417
+        $this->markTestSkipped('Virtuoso does not grant write access to the default graph.');
+    }
+
+    /*
      * Tests for sqlQuery
      */
 

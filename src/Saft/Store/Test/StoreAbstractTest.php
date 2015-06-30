@@ -5,11 +5,11 @@ namespace Saft\Store\Test;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
+use Saft\Rdf\NamedNode;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\SparqlUtils;
-use Saft\Sparql\Result\EmptyResult;
 use Saft\Sparql\Result\EmptyResultImpl;
 use Saft\Sparql\Result\SetResultImpl;
 use Saft\Sparql\Result\StatementSetResultImpl;
@@ -19,9 +19,34 @@ use Symfony\Component\Yaml\Parser;
 
 abstract class StoreAbstractTest extends TestCase
 {
+    public function tearDown()
+    {
+        $this->fixture->dropGraph($this->testGraph);
+
+        parent::tearDown();
+    }
+
     /*
      * Helper functions
      */
+
+    /**
+     * Counts all triples of a given graph using SELECT COUNT.
+     *
+     * @param NamedNode $graph NamedNode instance which represents the graph to count its triple.
+     * @return int Number of triples in the graph.
+     */
+    protected function countTriples(NamedNode $graph)
+    {
+        $result = $this->fixture->query(
+            'SELECT COUNT(*) FROM <'. $graph->getUri().'> WHERE {?s ?p ?o}'
+        );
+
+        $variables = $result->getVariables();
+        $variable = array_shift($variables);
+        $entry = $result->current();
+        return $entry[$variable]->getValue();
+    }
 
     protected function getTestQuad()
     {
@@ -227,39 +252,6 @@ abstract class StoreAbstractTest extends TestCase
         // graph has now two entries
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
         $this->assertCountStatementIterator(2, $statements);
-    }
-
-    public function testQueryAddAndQueryStatementsDefaultGraph()
-    {
-        $this->markTestSkipped(
-            "We can not assume any behavior in this case so far because different implementations are treating default"
-            . "graphs differently. See also http://www.w3.org/TR/2013/REC-sparql11-update-20130321/#graphStore"
-        );
-        $insertQuery = 'INSERT DATA {
-            <http://example.org/a> <http://example.org/b> <http://example.org/c>
-        }';
-
-        $selectQuery = 'SELECT * {
-            <http://example.org/a> ?p ?o
-        }';
-
-        $this->fixture->query($insertQuery);
-        $result = $this->fixture->query($selectQuery);
-
-        $match = false;
-        foreach ($result as $row) {
-            if (
-                $row['p']->isNamedNode() &&
-                $row['p']->getUri() == "http://example.org/b" &&
-                $row['o']->isNamedNode() &&
-                $row['o']->getUri() == "http://example.org/c"
-            ) {
-                $match = true;
-            }
-            var_dump($row);
-        }
-
-        $this->assertTrue($match);
     }
 
     public function testAddStatementsUseStatementGraph()
@@ -524,42 +516,58 @@ abstract class StoreAbstractTest extends TestCase
     }
 
     /*
-     * Tests for deleteMultipleStatements
+     * Tests for deleteMatchingStatements
      */
 
-    public function testDeleteMultipleStatementsQuadRecognition()
+    public function testDeleteMatchingStatementsQuadRecognition()
     {
-        $quad = $this->getTestQuad();
-        $graphPattern = SparqlUtils::statementsToSparqlFormat([$quad]);
-        $query = 'DELETE DATA { ' . $graphPattern . '}';
-        $queryResult = $this->fixture->query($query);
+        /**
+         * create test data
+         */
+        $this->fixture->createGraph($this->testGraph);
 
-        $this->assertClassOfInstanceImplements($queryResult, 'Saft\Sparql\Result\Result');
-        $this->assertTrue($queryResult->isEmptyResult());
+        $this->assertEquals(0, $this->countTriples($this->testGraph));
+
+        $s = new NamedNodeImpl('http://saft/s');
+        $p = new NamedNodeImpl('http://saft/p');
+        $o = new NamedNodeImpl('http://saft/o');
+        $statement = new StatementImpl($s, $p, $o, $this->testGraph);
+        $this->fixture->addStatements(array($statement));
+
+        // check that test data was created
+        $this->assertEquals(1, $this->countTriples($this->testGraph));
+
+        /*
+         * remove test data via query
+         */
+        $this->fixture->deleteMatchingStatements($statement);
+
+        // check that test data was removed
+        $this->assertEquals(0, $this->countTriples($this->testGraph));
     }
 
-    public function testDeleteMultipleStatementsVariablePatterns()
+    public function testDeleteMatchingStatementsStatementsWithLiteral()
     {
-        $this->markTestSkipped("TODO implement test store which expects certain things on query");
-        $statement = $this->getTestPatternStatement();
-        $query = 'DELETE DATA { '. SparqlUtils::statementsToSparqlFormat([$statement]) .'}';
+        /**
+         * create test data
+         */
+        $this->fixture->createGraph($this->testGraph);
 
-        $this->assertEquals(
-            new EmptyResult(),
-            $this->fixture->query($query)
-        );
-    }
+        $this->assertEquals(0, $this->countTriples($this->testGraph));
 
-    public function testDeleteMultipleStatementsStatementsWithLiteral()
-    {
-        $statement = $this->getTestStatementWithLiteral();
+        $statements = array($this->getTestTriple(), $this->getTestStatementWithLiteral());
+        $this->fixture->addStatements($statements, $this->testGraph);
 
-        $query = 'DELETE DATA { '. SparqlUtils::statementsToSparqlFormat([$statement]) .'}';
+        // check that test data was created
+        $this->assertEquals(2, $this->countTriples($this->testGraph));
 
-        $this->assertEquals(
-            new EmptyResultImpl(),
-            $this->fixture->query($query)
-        );
+        /*
+         * remove test data via query
+         */
+        $this->fixture->deleteMatchingStatements($this->getTestPatternStatement(), $this->testGraph);
+
+        // check that test data was removed
+        $this->assertEquals(0, $this->countTriples($this->testGraph));
     }
 
     /*
@@ -700,30 +708,14 @@ abstract class StoreAbstractTest extends TestCase
 
     public function testGetMatchingStatementsCheckForTriples()
     {
-        // 2 triples
-        $statements = new ArrayStatementIteratorImpl(array(
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/'),
-                new NamedNodeImpl('http://o/')
-            ),
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/'),
-                new LiteralImpl('test literal')
-            ),
-        ));
+        $this->fixture->createGraph($this->testGraph);
 
         // add triples
-        $this->fixture->addStatements($statements, $this->testGraph);
+        $this->fixture->addStatements(array($this->getTestTriple()), $this->testGraph);
 
-        $statement = new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new AnyPatternImpl()
-        );
+        $this->assertEquals(1, $this->countTriples($this->testGraph));
 
-        $iterator = $this->fixture->getMatchingStatements($statement);
+        $iterator = $this->fixture->getMatchingStatements($this->getTestPatternStatement());
 
         foreach ($iterator as $statement) {
             $this->assertTrue($statement->isTriple());
@@ -732,6 +724,8 @@ abstract class StoreAbstractTest extends TestCase
 
     public function testGetMatchingStatementsFromAnyGraph()
     {
+        $this->fixture->dropGraph($this->testGraph);
+
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
@@ -919,6 +913,33 @@ abstract class StoreAbstractTest extends TestCase
         );
     }
 
+    public function testQueryAddAndQueryStatementsDefaultGraph()
+    {
+        // insert test data
+        $this->fixture->query('INSERT DATA {
+            <http://example.org/a> <http://example.org/b> <http://example.org/c>
+        }');
+
+        // select test data
+        $result = $this->fixture->query('SELECT * {
+            <http://example.org/a> ?p ?o
+        }');
+
+        $match = false;
+        foreach ($result as $row) {
+            if (
+                $row['p']->isNamedNode() &&
+                $row['p']->getUri() == "http://example.org/b" &&
+                $row['o']->isNamedNode() &&
+                $row['o']->getUri() == "http://example.org/c"
+            ) {
+                $match = true;
+            }
+        }
+
+        $this->assertTrue($match);
+    }
+
     public function testQueryAsk()
     {
         $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
@@ -959,45 +980,72 @@ abstract class StoreAbstractTest extends TestCase
         // clear test graph
         $this->fixture->query('CLEAR GRAPH <'. $this->testGraph .'>');
 
-        $setResult = new SetResultImpl(new \ArrayIterator());
-        $setResult->setVariables(array('s', 'p', 'o'));
-
-        $this->assertEquals(
-            $setResult,
-            $this->fixture->query('SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}')
+        $result = $this->fixture->query(
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}'
         );
-    }
 
-    public function testQueryDeleteMultipleStatementsQuadRecognition()
-    {
-        $quad = $this->getTestQuad();
-        $graphPattern = SparqlUtils::statementsToSparqlFormat([$quad]);
-        $query = 'DELETE DATA {' . $graphPattern . '}';
-
-        $this->assertEquals(new EmptyResultImpl(), $this->fixture->query($query));
+        // check that variables are set right and there is no content
+        $this->assertEquals(array('s', 'p', 'o'), $result->getVariables());
+        $this->assertCountStatementIterator(0, $result);
     }
 
     public function testQueryDeleteMultipleStatementsVariablePatterns()
     {
-        $this->markTestSkipped("TODO implement test store which expects certain things on query");
-        $statement = $this->getTestPatternStatement();
-        $query = 'DELETE DATA { '. SparqlUtils::statementsToSparqlFormat([$statement]) .'}';
+        /**
+         * create test data
+         */
+        $this->fixture->createGraph($this->testGraph);
 
-        $this->assertEquals(
-            new EmptyResult(),
-            $this->fixture->query($query)
-        );
+        $this->assertEquals(0, $this->countTriples($this->testGraph));
+
+        $statements = array($this->getTestTriple(), $this->getTestQuad());
+        $this->fixture->addStatements($statements, $this->testGraph);
+
+        // check that test data was created
+        $this->assertEquals(2, $this->countTriples($this->testGraph));
+
+        /*
+         * remove test data via query
+         */
+        $triplePart = SparqlUtils::statementsToSparqlFormat(array($this->getTestPatternStatement()));
+        $query = 'DELETE WHERE { Graph <'. $this->testGraph .'> {'. $triplePart .'}}';
+
+        $this->assertTrue($this->fixture->query($query)->isEmptyResult());
+
+        // check that test data was removed
+        $this->assertEquals(0, $this->countTriples($this->testGraph));
     }
 
     public function testQueryDeleteMultipleStatementsStatementsWithLiteral()
     {
-        $statement = $this->getTestStatementWithLiteral();
+        /**
+         * create test data
+         */
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
 
-        $query = 'DELETE DATA { '. SparqlUtils::statementsToSparqlFormat([$statement]) .'}';
+        $this->assertEquals(0, $this->countTriples($this->testGraph));
 
-        $this->assertEquals(
-            new EmptyResultImpl(),
-            $this->fixture->query($query)
-        );
+        $subject2 = new NamedNodeImpl('http://saft/test/s1');
+        $predicate2 = new NamedNodeImpl('http://saft/test/p2');
+        $object2 = new LiteralImpl('Emma');
+        $statement = new StatementImpl($subject2, $predicate2, $object2);
+
+        // add two statements with literal
+        $statements = array($this->getTestStatementWithLiteral(), $statement);
+        $this->fixture->addStatements($statements, $this->testGraph);
+
+        // check that test data was created
+        $this->assertEquals(2, $this->countTriples($this->testGraph));
+
+        /*
+         * remove test data via query
+         */
+        $triplePart = SparqlUtils::statementsToSparqlFormat(array($this->getTestPatternStatement()));
+        $query = 'DELETE WHERE { Graph <'. $this->testGraph .'> {'. $triplePart .'}}';
+
+        $this->assertTrue($this->fixture->query($query)->isEmptyResult());
+
+        // check that test data was removed
+        $this->assertEquals(0, $this->countTriples($this->testGraph));
     }
 }
