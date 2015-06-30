@@ -218,10 +218,6 @@ class Http extends AbstractSparqlStore
             }
         } catch (\Exception $e) {
             // ignore exception here and assume we could not update a triple.
-            echo $e->getMessage() ."
-
-            ";
-
             // whatever happens, try to remove the fresh graph.
             try {
                 $this->query('DROP GRAPH <'. $graph .'>');
