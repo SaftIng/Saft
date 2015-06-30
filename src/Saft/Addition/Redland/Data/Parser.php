@@ -74,7 +74,7 @@ class Parser implements ParserInterface
 
         $data = file_get_contents($inputStream);
 
-        return $this->parseStingToIterator($data, $baseUri, $serialization);
+        return $this->parseStringToIterator($data, $baseUri, $serialization);
     }
 
     public function getCurrentPrefixlist()
