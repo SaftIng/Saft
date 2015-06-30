@@ -31,6 +31,14 @@ class StatementSetResultImpl extends SetResultImpl
                 throw new \Exception('Parameter $array must only contain Statement instances.');
             }
         }
+    }    
+    
+    /**
+     * @return boolean False
+     */
+    public function isEmptyResult()
+    {
+        return false;
     }
 
     /**
@@ -47,5 +55,13 @@ class StatementSetResultImpl extends SetResultImpl
     public function isStatementSetResult()
     {
         return true;
+    }
+
+    /**
+     * @return boolean False
+     */
+    public function isValueResult()
+    {
+        return false;
     }
 }

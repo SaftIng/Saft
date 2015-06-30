@@ -37,6 +37,15 @@ abstract class ValueResultAbstractTest extends TestCase
 
         $this->fixture = new ValueResultImpl(array());
     }
+    
+    /*
+     * Tests for isEmptyResult
+     */
+
+    public function testIsEmptyResult()
+    {
+        $this->assertFalse($this->fixture->isEmptyResult());
+    }
 
     /**
      * Tests for isSetResult

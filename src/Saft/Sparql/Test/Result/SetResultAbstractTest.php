@@ -15,6 +15,18 @@ abstract class SetResultAbstractTest extends TestCase
     abstract public function newInstance($list);
 
     /*
+     * Tests for isEmptyResult
+     */
+
+    public function testIsEmptyResult()
+    {
+        $list = $this->getMockForAbstractClass('\Iterator');
+        $this->fixture = $this->newInstance($list);
+
+        $this->assertFalse($this->fixture->isEmptyResult());
+    }
+    
+    /*
      * Tests for isSetResult
      */
 
