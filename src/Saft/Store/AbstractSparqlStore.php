@@ -308,8 +308,6 @@ abstract class AbstractSparqlStore implements Store
 
         $query .= '}';
 
-        //print $query;
-
         // execute query and save result
         // TODO transform getMatchingStatements into lazy loading, so a batch loading is possible
         $result = $this->query($query, $options);
