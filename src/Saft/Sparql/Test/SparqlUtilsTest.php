@@ -19,13 +19,13 @@ class SparqlUtilsTest extends TestCase
         $triple = new StatementImpl(
             new NamedNodeImpl('http://saft/test/s1'),
             new NamedNodeImpl('http://saft/test/p1'),
-            new LiteralImpl(42)
+            new LiteralImpl("42")
         );
 
         $quad = new StatementImpl(
             new NamedNodeImpl('http://saft/test/s2'),
             new NamedNodeImpl('http://saft/test/p2'),
-            new LiteralImpl(43),
+            new LiteralImpl("43"),
             new NamedNodeImpl('http://some/other/graph/2')
         );
 
@@ -45,13 +45,13 @@ class SparqlUtilsTest extends TestCase
         $triple = new StatementImpl(
             new NamedNodeImpl('http://saft/test/s1'),
             new NamedNodeImpl('http://saft/test/p1'),
-            new LiteralImpl(42)
+            new LiteralImpl("42")
         );
 
         $quad = new StatementImpl(
             new NamedNodeImpl('http://saft/test/s1'),
             new NamedNodeImpl('http://saft/test/p1'),
-            new LiteralImpl(42),
+            new LiteralImpl("42"),
             $this->testGraph
         );
 

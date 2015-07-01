@@ -10,7 +10,7 @@ use Saft\Test\TestCase;
 
 abstract class StatementAbstractTest extends TestCase
 {
-    abstract public function newLiteralInstance($value, $lang = null, $datatype = null);
+    abstract public function newLiteralInstance($value, $datatype = null, $lang = null);
     abstract public function newNamedNodeInstance($uri);
     abstract public function newAnyPatternInstance($value);
     abstract public function newBlankNodeInstance($blankId);

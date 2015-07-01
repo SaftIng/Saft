@@ -28,6 +28,8 @@ class NodeFactory extends SaftNodeFactoryImpl
     {
         if ($value === null) {
             throw new \Exception('Can\'t initialize literal with null as value.');
+        } elseif (!is_string($value)) {
+            throw new \Exception("The literal value has to be of type string");
         }
 
         $datatypeUri = null;

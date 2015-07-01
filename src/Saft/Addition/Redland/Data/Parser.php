@@ -26,7 +26,7 @@ class Parser implements ParserInterface
 
     public function __construct()
     {
-        if (false === extension_loaded('redland')) {
+        if (!extension_loaded('redland')) {
             throw new \Exception('Redland php5-librdf is required for this parser');
         }
 
