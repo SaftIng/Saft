@@ -22,10 +22,10 @@ class NodeUtilsTest extends TestCase
             'bid',
             'bnode'
         );
-        
-        $this->assertEquals(new BlankNodeImpl('bid'), $node);        
+
+        $this->assertEquals(new BlankNodeImpl('bid'), $node);
     }
-    
+
     public function testCreateNodeInstanceLiteral()
     {
         $node = NodeUtils::createNodeInstance(
@@ -34,22 +34,22 @@ class NodeUtilsTest extends TestCase
             'literal',
             'xsd:int'
         );
-        
-        $this->assertEquals(new LiteralImpl('42', new NamedNodeImpl('xsd:int')), $node);        
+
+        $this->assertEquals(new LiteralImpl('42', new NamedNodeImpl('xsd:int')), $node);
     }
-    
+
     public function testCreateNodeInstanceUnknown()
     {
         // expect exception, because given type is unknown
         $this->setExpectedException('\Exception');
-        
+
         $node = NodeUtils::createNodeInstance(
             new NodeFactoryImpl(),
             null,
             'unknown'
         );
     }
-    
+
     public function testCreateNodeInstanceUri()
     {
         $node = NodeUtils::createNodeInstance(
@@ -57,10 +57,10 @@ class NodeUtilsTest extends TestCase
             'http://foo',
             'uri'
         );
-        
+
         $this->assertEquals(new NamedNodeImpl('http://foo'), $node);
     }
-    
+
     /*
      * Tests for simpleCheckURI
      */

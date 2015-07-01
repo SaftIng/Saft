@@ -31,8 +31,8 @@ class StatementSetResultImpl extends SetResultImpl
                 throw new \Exception('Parameter $array must only contain Statement instances.');
             }
         }
-    }    
-    
+    }
+
     /**
      * @return boolean False
      */
