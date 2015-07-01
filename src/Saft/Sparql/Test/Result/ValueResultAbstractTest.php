@@ -37,7 +37,7 @@ abstract class ValueResultAbstractTest extends TestCase
 
         $this->fixture = new ValueResultImpl(array());
     }
-    
+
     /*
      * Tests for isEmptyResult
      */

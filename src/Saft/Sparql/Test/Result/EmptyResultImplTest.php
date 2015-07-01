@@ -22,7 +22,7 @@ class EmptyResultImplTest extends TestCase
     {
         $this->assertTrue($this->fixture->isEmptyResult());
     }
-    
+
     /*
      * Tests for isSetResult
      */
@@ -31,7 +31,7 @@ class EmptyResultImplTest extends TestCase
     {
         $this->assertFalse($this->fixture->isSetResult());
     }
-    
+
     /*
      * Tests for isStatementSetResult
      */
@@ -40,7 +40,7 @@ class EmptyResultImplTest extends TestCase
     {
         $this->assertFalse($this->fixture->isStatementSetResult());
     }
-    
+
     /*
      * Tests for isValueResult
      */

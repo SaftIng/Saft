@@ -25,7 +25,7 @@ abstract class SetResultAbstractTest extends TestCase
 
         $this->assertFalse($this->fixture->isEmptyResult());
     }
-    
+
     /*
      * Tests for isSetResult
      */
