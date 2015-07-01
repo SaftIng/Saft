@@ -82,11 +82,6 @@ abstract class AbstractLiteral implements Literal
     {
         $string = '"' . $this->getValue() . '"';
 
-        // handle boolean values when transformed as n-triples by setting a
-        if (is_bool($this->getValue())) {
-            $string = $this->getValue()?'"true"':'"false"';
-        }
-
         if ($this->getLanguage() !== null) {
             $string .= '@' . $this->getLanguage();
         } elseif ($this->getDatatype() !== null) {

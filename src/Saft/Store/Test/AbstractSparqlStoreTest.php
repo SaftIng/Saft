@@ -144,7 +144,7 @@ class AbstractSparqlStoreTest extends TestCase
          */
         $subject1 = new NamedNodeImpl('http://saft/test/s1');
         $predicate1 = new NamedNodeImpl('http://saft/test/p1');
-        $object1 = new LiteralImpl(42); // will be handled as string, because no datatype given.
+        $object1 = new LiteralImpl("42"); // will be handled as string, because no datatype given.
         $triple1 = new StatementImpl($subject1, $predicate1, $object1);
 
         /*
