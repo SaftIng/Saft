@@ -651,7 +651,7 @@ abstract class StoreAbstractTest extends TestCase
             )
         ));
 
-        $this->assertIteratorContent(
+        $this->assertStatementIteratorEquals(
             $instanceToCheckAgainst,
             $this->fixture->getMatchingStatements($statement, $this->testGraph)
         );
@@ -905,7 +905,7 @@ abstract class StoreAbstractTest extends TestCase
         $setResultToCheckAgainst->setVariables(array('s', 'o'));
 
         // check
-        $this->assertIteratorContent(
+        $this->assertResultEquals(
             $setResultToCheckAgainst,
             $this->fixture->query(
                 'SELECT ?s ?o FROM <' . $this->testGraph->getUri() . '> WHERE {?s ?p ?o.} ORDER BY ?o'
