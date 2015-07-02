@@ -17,4 +17,3 @@ class ParserRedlandTest extends ParserAbstractTest
         return new Parser(new NodeFactoryImpl(), new StatementFactoryImpl());
     }
 }
-?>
