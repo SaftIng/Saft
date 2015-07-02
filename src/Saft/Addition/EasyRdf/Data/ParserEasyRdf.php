@@ -18,11 +18,6 @@ class ParserEasyRdf implements Parser
     private $nodeFactory;
 
     /**
-     * @var array
-     */
-    protected $serializationMap;
-
-    /**
      * @var StatementFactory
      */
     private $statementFactory;
@@ -32,22 +27,13 @@ class ParserEasyRdf implements Parser
      *
      * @param NodeFactory      $nodeFactory
      * @param StatementFactory $statementFactory
+     * @param \EasyRdf\Format  $serialization
      */
-    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory)
+    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory, Format $serialization)
     {
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
-
-        /**
-         * Map of serializations. It maps the Saft term on according the EasyRdf format.
-         */
-        $this->serializationMap = array(
-            'n-triples' => 'ntriples',
-            'rdf-json' => 'json',
-            'rdf-xml' => 'rdfxml',
-            'rdfa' => 'rdfa',
-            'turtle' => 'turtle',
-        );
+        $this->serialization = $serialization;
     }
 
     /**
@@ -60,16 +46,6 @@ class ParserEasyRdf implements Parser
     {
         // TODO implement a way to get a list of all namespaces used in the last parsed datastring/file.
         return array();
-    }
-
-    /**
-     * Returns an array which contains supported serializations.
-     *
-     * @return array Array of supported serializations which are understood by this parser.
-     */
-    public function getSupportedSerializations()
-    {
-        return array_keys($this->serializationMap);
     }
 
     /**
@@ -89,24 +65,11 @@ class ParserEasyRdf implements Parser
      *                           parser to far
      * @throws \Exception        If the base URI $baseUri is no valid URI.
      */
-    public function parseStringToIterator($inputString, $baseUri = null, $serialization = null)
+    public function parseStringToIterator($inputString, $baseUri = null)
     {
         $graph = new Graph();
 
-        // let EasyRdf guess the format
-        if ($serialization === null) {
-            $serialization = Format::guessFormat($inputString);
-
-        } else {
-            $serialization = Format::getFormat($serialization);
-        }
-
-        // if format is still null, throw exception, because we dont know what format the given stream is
-        if (null === $serialization) {
-            throw new \Exception('Either given $serialization is unknown or the parser could not guess the format.');
-        }
-
-        $graph->parse($inputString, $serialization->getName());
+        $graph->parse($inputString, $this->serialization->getName(), $baseUri);
 
         // transform parsed data to PHP array
         return $this->rdfPhpToStatementIterator($graph->toRdfPhp());
@@ -130,28 +93,11 @@ class ParserEasyRdf implements Parser
      *                           far.
      * @throws \Exception        If the base URI $baseUri is no valid URI.
      */
-    public function parseStreamToIterator($inputStream, $baseUri = null, $serialization = null)
+    public function parseStreamToIterator($inputStream, $baseUri = null)
     {
         $graph = new Graph();
 
-        // let EasyRdf guess the format
-        if ($serialization === null) {
-            // use PHP's file:// stream, if its a local file
-            if (false === strpos($inputStream, '://')) {
-                $inputStream = 'file://'. $inputStream;
-            }
-            $serialization = Format::guessFormat(file_get_contents($inputStream));
-
-        } else {
-            $serialization = Format::getFormat($serialization);
-        }
-
-        // if format is still null, throw exception, because we dont know what format the given stream is
-        if (null === $serialization) {
-            throw new \Exception('Either given $format is unknown or i could not guess format.');
-        }
-
-        $graph->parseFile($inputStream, $serialization->getName());
+        $graph->parseFile($inputStream, $this->serialization->getName());
 
         // transform parsed data to PHP array
         return $this->rdfPhpToStatementIterator($graph->toRdfPhp());

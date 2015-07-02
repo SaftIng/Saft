@@ -26,7 +26,7 @@ interface Parser
      *                           parser to far
      * @throws \Exception        If the base URI $baseUri is no valid URI.
      */
-    public function parseStringToIterator($inputString, $baseUri = null, $serialization = null);
+    public function parseStringToIterator($inputString, $baseUri = null);
 
     /**
      * Parses a given stream and returns an iterator containing Statement instances representing the
@@ -46,20 +46,14 @@ interface Parser
      *                           far.
      * @throws \Exception        If the base URI $baseUri is no valid URI.
      */
-    public function parseStreamToIterator($inputStream, $baseUri = null, $serialization = null);
+    public function parseStreamToIterator($inputStream, $baseUri = null);
 
     /**
-     * Returns an array of prefixes which where found during the last parsing.
+     * Returns an array of prefixes which where found during the last parsing. Might also be any other prefix list
+     * depending on the implementation. Might even be empty.
      *
      * @return array An associative array with a prefix mapping of the prefixes parsed so far. The key
      *               will be the prefix, while the values contains the according namespace URI.
      */
     public function getCurrentPrefixList();
-
-    /**
-     * Returns an array which contains supported serializations.
-     *
-     * @return array Array of supported serializations which are understood by this parser.
-     */
-    public function getSupportedSerializations();
 }

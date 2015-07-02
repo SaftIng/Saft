@@ -14,27 +14,16 @@ abstract class ParserAbstractTest extends TestCase
     /**
      * @return Parser
      */
-    abstract protected function newInstance();
+    abstract protected function newInstance($serialization);
 
-    /*
-     * Tests for getSupportedSerializations
-     */
-
-    // TODO what else can we test here?
-    public function testGetSupportedSerializations()
-    {
-        $this->assertTrue(is_array($this->newInstance()->getSupportedSerializations()));
-    }
-
-    /*
+    /**
      * Tests for parseStreamToIterator
+     * we load here the content of a turtle file and transform it into an StatementIterator instance.
+     * afterwards we check if the read data are the same as expected.
      */
-
-    // we load here the content of a turtle file and transform it into an StatementIterator instance.
-    // afterwards we check if the read data are the same as expected.
     public function testParseStreamToIteratorTurtleFile()
     {
-        $this->fixture = $this->newInstance();
+        $this->fixture = $this->newInstance('turtle');
 
         // load iterator for a turtle file
         $inputStream = dirname(__FILE__) .'/../resources/example.ttl';
@@ -93,15 +82,14 @@ abstract class ParserAbstractTest extends TestCase
         $this->assertEquals($statementIteratorToCheckAgainst, $iterator);
     }
 
-    /*
+    /**
      * Tests for parseStringToIterator
      */
-
     public function testParseStringToIteratorTurtleString()
     {
         $xsdString = new NamedNodeImpl('http://www.w3.org/2001/XMLSchema#string');
 
-        $fixture = $this->newInstance();
+        $fixture = $this->newInstance('turtle');
 
         $testString = '@prefix ex: <http://saft/example/> .
             ex:Foo  ex:knows ex:Bar ; ex:name  "Foo"^^<'. $xsdString .'> .

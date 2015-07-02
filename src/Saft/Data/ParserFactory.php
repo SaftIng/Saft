@@ -13,4 +13,11 @@ interface ParserFactory
      * @throws \Exception If parser for requested format is not available.
      */
     public function createParserFor($serialization);
+
+    /**
+     * Returns an array which contains supported serializations.
+     *
+     * @return array Array of supported serializations which are understood by this parser.
+     */
+    public function getSupportedSerializations();
 }
