@@ -14,12 +14,11 @@ class ValueResultImpl implements ValueResult
      */
     public function __construct($value)
     {
-        if (true === is_scalar($value)) {
-            $this->value = $value;
-
-        } else {
-            throw new \Exception('Parameter $value must be a scalar.');
+        if (!is_scalar($value)) {
+            throw new \Exception('The fist argument of the constructor has to be a scalar.');
         }
+
+        $this->value = $value;
     }
 
     /**
