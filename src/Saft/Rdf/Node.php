@@ -15,19 +15,25 @@ interface Node
     public function isNamed();
 
     /**
+     * Checks if this instance is a blank node.
+     *
      * @return boolean
      */
     public function isBlank();
 
     /**
+     * Checks if this instance is concrete, which means it does not contain pattern.
+     *
      * @return boolean
      */
     public function isConcrete();
 
     /**
+     * Checks if this instance is a pattern.
+     *
      * @return boolean
      */
-    public function isVariable();
+    public function isPattern();
 
     /**
      * @return string

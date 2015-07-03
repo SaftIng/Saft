@@ -95,12 +95,12 @@ abstract class NamedNodeAbstractTest extends TestCase
     }
 
     /*
-     * Tests for isVariable
+     * Tests for isPattern
      */
 
-    public function testIsVariable()
+    public function testIsPattern()
     {
         $fixture = $this->newInstance('http://saft/test');
-        $this->assertFalse($fixture->isVariable());
+        $this->assertFalse($fixture->isPattern());
     }
 }

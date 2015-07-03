@@ -63,7 +63,7 @@ class LiteralPatternImpl implements Node
     /**
      * @return boolean
      */
-    public function isVariable()
+    public function isPattern()
     {
         return true;
     }

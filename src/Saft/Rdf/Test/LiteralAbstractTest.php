@@ -257,13 +257,13 @@ abstract class LiteralAbstractTest extends TestCase
     }
 
     /*
-     * Tests for isVariable
+     * Tests for isPattern
      */
 
-    public function testIsVariable()
+    public function testIsPattern()
     {
         $fixture = $this->newInstance('hallo');
-        $this->assertFalse($fixture->isVariable());
+        $this->assertFalse($fixture->isPattern());
     }
 
     /*

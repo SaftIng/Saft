@@ -62,7 +62,7 @@ abstract class AbstractBlankNode implements BlankNode
     /**
      * @return boolean
      */
-    public function isVariable()
+    public function isPattern()
     {
         return false;
     }

@@ -79,13 +79,13 @@ class LiteralPatternImplTest extends TestCase
     }
 
     /*
-     * Tests for isVariable
+     * Tests for isPattern
      */
 
-    public function testIsVariable()
+    public function testIsPattern()
     {
         $fixture = new LiteralPatternImpl('foo', $this->testGraph);
-        $this->assertTrue($fixture->isVariable());
+        $this->assertTrue($fixture->isPattern());
     }
 
     /*

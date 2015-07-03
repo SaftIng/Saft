@@ -68,7 +68,7 @@ abstract class AbstractNamedNode implements NamedNode
     /**
      * @return boolean
      */
-    public function isVariable()
+    public function isPattern()
     {
         return false;
     }

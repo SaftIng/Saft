@@ -287,22 +287,22 @@ abstract class AbstractSparqlStore implements Store
         $object = $statement->getObject();
 
         // add filter, if subject is a named node or literal
-        if (!$subject->isVariable()) {
+        if (!$subject->isPattern()) {
             $query .= 'FILTER (?s = '. $subject->toNQuads() .') ';
         }
 
         // add filter, if predicate is a named node or literal
-        if (!$predicate->isVariable()) {
+        if (!$predicate->isPattern()) {
             $query .= 'FILTER (?p = '. $predicate->toNQuads() .') ';
         }
 
         // add filter, if object is a named node or literal
-        if (!$object->isVariable()) {
+        if (!$object->isPattern()) {
             $query .= 'FILTER (?o = '. $object->toNQuads() .') ';
         }
 
         // add filter, if graph is a named node or literal
-        if ($graph !== null && !$graph->isVariable()) {
+        if ($graph !== null && !$graph->isPattern()) {
             $query .= 'FILTER (?g = '. $graph->toNQuads() .') ';
         }
 

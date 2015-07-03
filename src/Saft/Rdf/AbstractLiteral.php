@@ -70,7 +70,7 @@ abstract class AbstractLiteral implements Literal
     /**
      * @return boolean
      */
-    public function isVariable()
+    public function isPattern()
     {
         return false;
     }
