@@ -21,7 +21,9 @@ abstract class StoreAbstractTest extends TestCase
 {
     public function tearDown()
     {
-        $this->fixture->dropGraph($this->testGraph);
+        if (null !== $this->fixture) {
+            $this->fixture->dropGraph($this->testGraph);
+        }
 
         parent::tearDown();
     }

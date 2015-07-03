@@ -37,15 +37,6 @@ class VirtuosoTest extends StoreAbstractTest
         }
     }
 
-    public function tearDown()
-    {
-        if (null !== $this->fixture) {
-            $this->fixture->dropGraph($this->testGraph);
-        }
-
-        parent::tearDown();
-    }
-
     /*
      * Tests to check add and delete statements on default graph.
      */
