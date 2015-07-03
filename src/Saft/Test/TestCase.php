@@ -10,11 +10,6 @@ use Symfony\Component\Yaml\Parser;
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Saft\Cache
-     */
-    protected $cache;
-
-    /**
      * @var array
      */
     protected $config;
