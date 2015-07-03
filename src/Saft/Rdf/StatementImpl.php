@@ -5,12 +5,12 @@ namespace Saft\Rdf;
 class StatementImpl extends AbstractStatement
 {
     /**
-     * @var NamedNode|BlankNode
+     * @var Node
      */
     protected $subject;
 
     /**
-     * @var NamedNode
+     * @var Node
      */
     protected $predicate;
 
@@ -20,18 +20,17 @@ class StatementImpl extends AbstractStatement
     protected $object;
 
     /**
-     * @var NamedNode
+     * @var Node
      */
     protected $graph;
 
     /**
+     * Constructor
      *
-     * @param NamedNode|BlankNode|Variable $subject
-     * @param NamedNode|Variable           $predicate
-     * @param Node                         $object
-     * @param NodeNode|Variable            $graph
-     * @return
-     * @throw
+     * @param Node $subject
+     * @param Node $predicate
+     * @param Node $object
+     * @param Node $graph
      */
     public function __construct(Node $subject, Node $predicate, Node $object, Node $graph = null)
     {

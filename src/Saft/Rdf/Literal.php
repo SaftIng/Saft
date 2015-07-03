@@ -3,9 +3,10 @@
 namespace Saft\Rdf;
 
 /**
- * This interface is common for Literals according to RDF 1.1
+ * This interface is common for literals according to RDF 1.1
  * {@url http://www.w3.org/TR/rdf11-concepts/#section-Graph-Literal}
  *
+ * @api
  * @package Saft\Rdf
  */
 interface Literal extends Node

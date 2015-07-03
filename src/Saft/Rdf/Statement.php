@@ -2,50 +2,72 @@
 
 namespace Saft\Rdf;
 
+/**
+ * This interface is common for RDF statement. It represents a 3-tuple and 4-tuple. A 3-tuple consists
+ * of subject, predicate and object, whereas a 4-tuple is a 3-tuple but also contains a graph.
+ *
+ * @api
+ * @package Saft\Rdf
+ */
 interface Statement
 {
     /**
-     * Return Statements subject.
-     * @return NamedNode|BlankNode
+     * Returns Statements subject.
+     *
+     * @return Node
      */
     public function getSubject();
 
     /**
-     * Return Statements predicate
-     * @return NamedNode
+     * Returns Statements predicate.
+     *
+     * @return Node
      */
     public function getPredicate();
 
     /**
-     * Return Statements object.
+     * Returns Statements object.
+     *
      * @return Node
      */
     public function getObject();
 
     /**
-     * @return NamedNode|null
+     * Returns Statements graph, if available.
+     *
+     * @return Node|null
      */
     public function getGraph();
 
     /**
-     * @return boolean
+     * If this statement consists of subject, predicate, object and graph, this function returns true,
+     * false otherwise.
+     *
+     * @return boolean True, if this statement consists of subject, predicate, object and graph, false otherwise.
      */
     public function isQuad();
 
     /**
-     * @return boolean
+     * If this statement consists of subject, predicate and object, but no graph, this function returns true,
+     * false otherwise.
+     *
+     * @return boolean True, if this statement consists of subject, predicate and object, but no graph, false otherwise.
      */
     public function isTriple();
 
     /**
-     * Returns true if subject, predicate and object are not variables, i. e.
-     * subject != ? AND predicate != ? AND object != ?.
-     * @return boolean
+     * Returns true if neither subject, predicate, object nor, if available, graph, are patterns.
+     *
+     * @return boolean True, if neither subject, predicate, object nor, if available, graph, are patterns,
+     *                 false otherwise.
      */
     public function isConcrete();
 
     /**
-     * @return boolean
+     * Returns true if at least subject, predicate, object or, if available, graph, are patterns.
+     *
+     * @return boolean True, if at least subject, predicate, object or, if available, graph, are patterns,
+     *                 false otherwise.
      */
     public function isPattern();
 
