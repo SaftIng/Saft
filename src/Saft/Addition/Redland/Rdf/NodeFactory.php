@@ -9,6 +9,11 @@ use Saft\Rdf\NodeUtils;
 class NodeFactory extends SaftNodeFactoryImpl
 {
     /**
+     * @var NodeUtils
+     */
+    protected $nodeUtils;
+
+    /**
      * @var string
      */
     protected static $xsdString = 'http://www.w3.org/2001/XMLSchema#string';
@@ -17,6 +22,11 @@ class NodeFactory extends SaftNodeFactoryImpl
      * @var string
      */
     protected static $rdfLangString = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString';
+
+    public function __construct()
+    {
+        $this->nodeUtils = new NodeUtils();
+    }
 
     /**
      * @param  string $value
@@ -80,7 +90,7 @@ class NodeFactory extends SaftNodeFactoryImpl
             throw new \Exception('Can\'t initialize node with null.');
         }
 
-        if (!NodeUtils::simpleCheckURI($uri)) {
+        if (!$this->nodeUtils->simpleCheckURI($uri)) {
             throw new \Exception('Invalid URI was given for RDF NamedNode creation.');
         }
 

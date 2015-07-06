@@ -11,13 +11,20 @@ use Saft\Test\TestCase;
 
 class NodeUtilsTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->fixture = new NodeUtils();
+    }
+
     /*
      * Tests for createNodeInstance
      */
 
     public function testCreateNodeInstanceBNode()
     {
-        $node = NodeUtils::createNodeInstance(
+        $node = $this->fixture->createNodeInstance(
             new NodeFactoryImpl(),
             'bid',
             'bnode'
@@ -28,7 +35,7 @@ class NodeUtilsTest extends TestCase
 
     public function testCreateNodeInstanceLiteral()
     {
-        $node = NodeUtils::createNodeInstance(
+        $node = $this->fixture->createNodeInstance(
             new NodeFactoryImpl(),
             '42',
             'literal',
@@ -43,7 +50,7 @@ class NodeUtilsTest extends TestCase
         // expect exception, because given type is unknown
         $this->setExpectedException('\Exception');
 
-        $node = NodeUtils::createNodeInstance(
+        $node = $this->fixture->createNodeInstance(
             new NodeFactoryImpl(),
             null,
             'unknown'
@@ -52,7 +59,7 @@ class NodeUtilsTest extends TestCase
 
     public function testCreateNodeInstanceUri()
     {
-        $node = NodeUtils::createNodeInstance(
+        $node = $this->fixture->createNodeInstance(
             new NodeFactoryImpl(),
             'http://foo',
             'uri'
@@ -67,12 +74,12 @@ class NodeUtilsTest extends TestCase
 
     public function testSimpleCheckURI()
     {
-        $this->assertFalse(NodeUtils::simpleCheckURI(''));
-        $this->assertFalse(NodeUtils::simpleCheckURI('http//foobar/'));
+        $this->assertFalse($this->fixture->simpleCheckURI(''));
+        $this->assertFalse($this->fixture->simpleCheckURI('http//foobar/'));
 
-        $this->assertTrue(NodeUtils::simpleCheckURI('http:foobar/'));
-        $this->assertTrue(NodeUtils::simpleCheckURI('http://foobar/'));
-        $this->assertTrue(NodeUtils::simpleCheckURI('http://foobar:42/'));
-        $this->assertTrue(NodeUtils::simpleCheckURI('http://foo:bar@foobar/'));
+        $this->assertTrue($this->fixture->simpleCheckURI('http:foobar/'));
+        $this->assertTrue($this->fixture->simpleCheckURI('http://foobar/'));
+        $this->assertTrue($this->fixture->simpleCheckURI('http://foobar:42/'));
+        $this->assertTrue($this->fixture->simpleCheckURI('http://foo:bar@foobar/'));
     }
 }

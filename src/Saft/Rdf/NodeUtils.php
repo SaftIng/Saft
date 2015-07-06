@@ -23,7 +23,7 @@ class NodeUtils
      * @return Node Node instance, which type is one of: NamedNode, BlankNode, Literal, AnyPattern
      * @throws \Exception if an unknown type was given.
      */
-    public static function createNodeInstance(
+    public function createNodeInstance(
         NodeFactory $nodeFactory,
         $value,
         $type,
@@ -57,7 +57,7 @@ class NodeUtils
      * @param string $string String to check if its a URI or not.
      * @return boolean True if given string is a valid URI, false otherwise.
      */
-    public static function simpleCheckURI($string)
+    public function simpleCheckURI($string)
     {
         $regEx = '/^([a-zA-Z][a-zA-Z0-9+.-]+):([^\x00-\x0f\x20\x7f<>{}|\[\]`"^\\\\])+$/';
         return (1 === preg_match($regEx, (string)$string));

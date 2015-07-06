@@ -94,13 +94,15 @@ abstract class AbstractQuery implements Query
      */
     public function determineEntityType($entity)
     {
+        $nodeUtils = new NodeUtils();
+
         // remove braces at the beginning (only if $entity looks like <http://...>)
         if ('<' == substr($entity, 0, 1)) {
             $entity = str_replace(array('>', '<'), '', $entity);
         }
 
         // checks if $entity is an URL
-        if (true === NodeUtils::simpleCheckURI($entity)) {
+        if (true === $nodeUtils->simpleCheckURI($entity)) {
             return 'uri';
 
         // checks if ^^< is in $entity OR if $entity is surrounded by quotation marks

@@ -81,6 +81,8 @@ class ARC2 extends AbstractSparqlStore
             $this->store->setUp();
         }
 
+        $this->nodeUtils = new NodeUtils();
+
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
         $this->queryFactory = $queryFactory;
@@ -283,7 +285,7 @@ class ARC2 extends AbstractSparqlStore
 
         // collect graph URI's
         while ($row = $result->fetch_assoc()) {
-            if (NodeUtils::simpleCheckURI($row['graphUri'])) {
+            if ($this->nodeUtils->simpleCheckURI($row['graphUri'])) {
                 $graphs[$row['graphUri']] = $this->nodeFactory->createNamedNode($row['graphUri']);
             }
         }
@@ -431,7 +433,7 @@ class ARC2 extends AbstractSparqlStore
                 }
 
                 // subject
-                $s = NodeUtils::createNodeInstance(
+                $s = $this->nodeUtils->createNodeInstance(
                     $this->nodeFactory,
                     $quad['s'],
                     $quad['s_type']
@@ -439,7 +441,7 @@ class ARC2 extends AbstractSparqlStore
                 $s = SparqlUtils::getNodeInSparqlFormat($s);
 
                 // predicate
-                $p = NodeUtils::createNodeInstance(
+                $p = $this->nodeUtils->createNodeInstance(
                     $this->nodeFactory,
                     $quad['p'],
                     $quad['p_type']
@@ -447,7 +449,7 @@ class ARC2 extends AbstractSparqlStore
                 $p = SparqlUtils::getNodeInSparqlFormat($p);
 
                 // object
-                $o = NodeUtils::createNodeInstance(
+                $o = $this->nodeUtils->createNodeInstance(
                     $this->nodeFactory,
                     $quad['o'],
                     $quad['o_type'],

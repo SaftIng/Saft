@@ -18,6 +18,11 @@ class ParserEasyRdf implements Parser
     private $nodeFactory;
 
     /**
+     * @var Format
+     */
+    private $serialization;
+
+    /**
      * @var StatementFactory
      */
     private $statementFactory;
@@ -27,10 +32,12 @@ class ParserEasyRdf implements Parser
      *
      * @param NodeFactory      $nodeFactory
      * @param StatementFactory $statementFactory
-     * @param \EasyRdf\Format  $serialization
+     * @param Format           $serialization
      */
     public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory, Format $serialization)
     {
+        $this->nodeUtils = new NodeUtils();
+
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
         $this->serialization = $serialization;
@@ -122,7 +129,7 @@ class ParserEasyRdf implements Parser
                     /**
                      * Create subject node
                      */
-                    if (true === NodeUtils::simpleCheckURI($subject)) {
+                    if (true === $this->nodeUtils->simpleCheckURI($subject)) {
                         $s = $this->nodeFactory->createNamedNode($subject);
                     } else {
                         $s = $this->nodeFactory->createLiteral($subject);
@@ -131,7 +138,7 @@ class ParserEasyRdf implements Parser
                     /**
                      * Create predicate node
                      */
-                    if (true === NodeUtils::simpleCheckURI($property)) {
+                    if (true === $this->nodeUtils->simpleCheckURI($property)) {
                         $p = $this->nodeFactory->createNamedNode($property);
                     } else {
                         $p = $this->nodeFactory->createLiteral($property);
@@ -141,7 +148,7 @@ class ParserEasyRdf implements Parser
                      * Create object node
                      */
                     // URI
-                    if (NodeUtils::simpleCheckURI($object['value'])) {
+                    if ($this->nodeUtils->simpleCheckURI($object['value'])) {
                         $o = $this->nodeFactory->createNamedNode($object['value']);
 
                     // datatype set

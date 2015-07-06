@@ -41,6 +41,11 @@ class Http extends AbstractSparqlStore
     private $nodeFactory;
 
     /**
+     * @var NodeUtils
+     */
+    protected $nodeUtils;
+
+    /**
      * @var QueryFactory
      */
     private $queryFactory;
@@ -79,6 +84,8 @@ class Http extends AbstractSparqlStore
         StatementIteratorFactory $statementIteratorFactory,
         array $configuration
     ) {
+        $this->nodeUtils = new NodeUtils();
+
         $this->configuration = $configuration;
 
         $this->checkRequirements();
@@ -267,7 +274,7 @@ class Http extends AbstractSparqlStore
         ), $this->configuration);
 
         // authenticate only if an authUrl was given.
-        if (NodeUtils::simpleCheckURI($configuration['authUrl'])) {
+        if ($this->nodeUtils->simpleCheckURI($configuration['authUrl'])) {
             $this->authenticateOnServer(
                 $configuration['authUrl'],
                 $configuration['username'],
@@ -276,7 +283,7 @@ class Http extends AbstractSparqlStore
         }
 
         // check query URL
-        if (false === NodeUtils::simpleCheckUri($configuration['queryUrl'])) {
+        if (false === $this->nodeUtils->simpleCheckUri($configuration['queryUrl'])) {
             throw new \Exception('Parameter queryUrl is not an URI or empty: '. $configuration['queryUrl']);
         }
 
