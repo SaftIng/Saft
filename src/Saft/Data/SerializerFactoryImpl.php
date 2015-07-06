@@ -15,11 +15,12 @@ class SerializerFactoryImpl implements SerializerFactory
     public function createSerializerFor($serialization)
     {
         if ('n-quads' == $serialization || 'n-triples' == $serialization) {
-            return new NQuadsSerializerImpl();
+            return new NQuadsSerializerImpl($serialization);
 
         } else {
             throw new \Exception(
-                'No serializer for requested serialization available: '. $serialization
+                'No serializer for requested serialization available: '. $serialization .'. '.
+                'Possible serializations are: n-triples, n-quads'
             );
         }
     }

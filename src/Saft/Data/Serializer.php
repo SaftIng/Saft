@@ -4,6 +4,14 @@ namespace Saft\Data;
 
 use Saft\Rdf\StatementIterator;
 
+/**
+ * The Serializer interface describes what methods a RDF serializer should provide. An instance of Serialzer must
+ * be initialized with a certain serialization. That means, that you have to create different instances of Serializer
+ * for each serialization you need.
+ *
+ * @api
+ * @package Saft\Data
+ */
 interface Serializer
 {
     /**
@@ -19,16 +27,13 @@ interface Serializer
     /**
      * Transforms the statements of a StatementIterator instance into a stream, a file for instance.
      *
-     * @param  StatementIterator $statements   The StatementIterator containing all the Statements which
-     *                                         should be serialized by the serializer.
-     * @param  string|resource   $outputStream filename or file pointer to the stream to where the serialization
-     *                                         should be written.
-     * @param  string            $format       The serialization which should be used. If null is given the
-     *                                         serializer will either apply some default serialization, or
-     *                                         the only one it is supporting, or will throw an Exception.
-     * @throws \Exception If unknown format was given.
+     * @param StatementIterator $statements   The StatementIterator containing all the Statements which
+     *                                        should be serialized by the serializer.
+     * @param string|resource   $outputStream filename or file pointer to the stream to where the serialization
+     *                                        should be written.
+     * @throws \Exception if unknown format was given.
      */
-    public function serializeIteratorToStream(StatementIterator $statements, $outputStream, $format = null);
+    public function serializeIteratorToStream(StatementIterator $statements, $outputStream);
 
     /**
      * Returns a list of all supported serialization types.

@@ -6,6 +6,16 @@ use Saft\Rdf\StatementIterator;
 
 class NQuadsSerializerImpl implements Serializer
 {
+    public function __construct($serialization)
+    {
+        if ('n-quads' != $serialization && 'n-triples' != $serialization) {
+            throw new \Exception(
+                'Unknown format given: '. $serialization .'. This serializer only supports n-quads and n-triples.'
+            );
+        }
+
+        $this->serialization = $serialization;
+    }
 
     /**
      * Set the prefixes which the serializer can/should use when generating the serialization.
@@ -21,20 +31,14 @@ class NQuadsSerializerImpl implements Serializer
     /**
      * Transforms the statements of a StatementIterator instance into a stream, a file for instance.
      *
-     * @param  StatementIterator $statements    The StatementIterator containing all the Statements which
-     *                                          should be serialized by the serializer.
-     * @param  string|resource   $outputStream  filename or file pointer to the stream to where the serialization
-     *                                          should be written.
-     * @param  string            $serialization The serialization which should be used. If null is given
-     *                                          the serializer will either apply some default serialization,
-     *                                          or the only one it is supporting, or will throw an Exception.
-     * @throws \Exception If unknown serialization was given.
+     * @param StatementIterator $statements   The StatementIterator containing all the Statements which
+     *                                        should be serialized by the serializer.
+     * @param string|resource   $outputStream Filename or file pointer to the stream to where the serialization
+     *                                        should be written.
+     * @throws \Exception if unknown serialization was given.
      */
-    public function serializeIteratorToStream(
-        StatementIterator $statements,
-        $outputStream,
-        $serialization = null
-    ) {
+    public function serializeIteratorToStream(StatementIterator $statements, $outputStream)
+    {
         /*
          * check parameter $outputStream
          */
@@ -51,13 +55,12 @@ class NQuadsSerializerImpl implements Serializer
         /*
          * Handle format
          */
-        if ('n-quads' == $serialization) {
+        if ('n-quads' == $this->serialization) {
             $function = 'toNQuads';
-        } elseif ('n-triples' == $serialization) {
+        } elseif ('n-triples' == $this->serialization) {
             $function = 'toNTriples';
-        } else {
-            throw new \Exception('Unknown format given: '. $serialization);
         }
+        // no else need here, because there is a check in the constructor
 
         foreach ($statements as $statement) {
             fwrite($outputStream, $statement->$function() . PHP_EOL);

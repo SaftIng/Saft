@@ -2,6 +2,12 @@
 
 namespace Saft\Data;
 
+/**
+ * SerializationUtils class provides helper methods, for instance to convert between MIME-type and serialization.
+ *
+ * @api
+ * @package Saft\Data
+ */
 class SerializationUtils
 {
     /**

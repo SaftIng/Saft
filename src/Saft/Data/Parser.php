@@ -3,7 +3,7 @@
 namespace Saft\Data;
 
 /**
- * The Parser interfaces describes what methods a RDF parser should provide. An instance of Parser must be initialized
+ * The Parser interface describes what methods a RDF parser should provide. An instance of Parser must be initialized
  * with a certain serialization the parser is able to parse. That means, that you have to create different instances
  * of Parser for each serialization you need.
  *

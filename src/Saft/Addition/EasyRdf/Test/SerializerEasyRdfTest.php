@@ -8,10 +8,11 @@ use Saft\Data\Test\SerializerAbstractTest;
 class SerializerEasyRdfTest extends SerializerAbstractTest
 {
     /**
+     * @param string $serialization
      * @return Serializer
      */
-    protected function newInstance()
+    protected function newInstance($serialization)
     {
-        return new SerializerEasyRdf();
+        return new SerializerEasyRdf($serialization);
     }
 }

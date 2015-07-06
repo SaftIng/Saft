@@ -20,8 +20,10 @@ class SerializerEasyRdf implements Serializer
 
     /**
      * Constructor.
+     *
+     * @param string $serialization Serialization format, for instance turtle or rdfa.
      */
-    public function __construct()
+    public function __construct($serialization)
     {
         /**
          * Map of serializations. It maps the Saft term on according the EasyRdf format.
@@ -33,6 +35,17 @@ class SerializerEasyRdf implements Serializer
             'rdfa' => 'rdfa',
             'turtle' => 'turtle',
         );
+
+        if (false == isset($this->serializationMap[$serialization])) {
+            throw new \Exception(
+                'Unknown serialization format given: '. $serialization .'. Supported are only '.
+                implode(', ', array_keys($this->serializationMap))
+            );
+        }
+
+        // dont save the given serialization here, but the according one which EasyRdf understands.
+        // there might be some small differences.
+        $this->serialization = $this->serializationMap[$serialization];
     }
 
     /**
@@ -49,16 +62,13 @@ class SerializerEasyRdf implements Serializer
     /**
      * Transforms the statements of a StatementIterator instance into a stream, a file for instance.
      *
-     * @param  StatementIterator $statements    The StatementIterator containing all the Statements which
-     *                                          should be serialized by the serializer.
-     * @param  string|resource   $outputStream  filename or file pointer to the stream to where the serialization
-     *                                          should be written.
-     * @param  string            $serialization The serialization which should be used. If null is given the
-     *                                          serializer will either apply some default serialization, or
-     *                                          the only one it is supporting, or will throw an Exception.
-     * @throws \Exception If unknown serilaization was given.
+     * @param StatementIterator $statements   The StatementIterator containing all the Statements which
+     *                                        should be serialized by the serializer.
+     * @param string|resource   $outputStream Filename or file pointer to the stream to where the serialization
+     *                                        should be written.
+     * @throws \Exception if unknown serilaization was given.
      */
-    public function serializeIteratorToStream(StatementIterator $statements, $outputStream, $serialization = null)
+    public function serializeIteratorToStream(StatementIterator $statements, $outputStream)
     {
         /*
          * check parameter $outputStream
@@ -71,15 +81,6 @@ class SerializerEasyRdf implements Serializer
 
         } else {
             throw new \Exception('Parameter $outputStream is neither a string nor resource.');
-        }
-
-        // if no format was given, serialize to turtle.
-        if (null == $serialization) {
-            $format = 'turtle';
-        }
-
-        if (false === isset($this->serializationMap[$serialization])) {
-            throw new \Exception('Unknown serialization given: '. $serialization);
         }
 
         $graph = new Graph();
@@ -125,7 +126,7 @@ class SerializerEasyRdf implements Serializer
             $graph->add($s, $p, $o);
         }
 
-        fwrite($outputStream, $graph->serialise($this->serializationMap[$serialization]) . PHP_EOL);
+        fwrite($outputStream, $graph->serialise($this->serialization) . PHP_EOL);
     }
 
     /**

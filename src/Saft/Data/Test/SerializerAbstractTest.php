@@ -10,9 +10,10 @@ use Saft\Test\TestCase;
 abstract class SerializerAbstractTest extends TestCase
 {
     /**
+     * @param string $serialization
      * @return Serializer
      */
-    abstract protected function newInstance();
+    abstract protected function newInstance($serialization);
 
     /*
      * Tests for serializeIteratorToStream
@@ -20,11 +21,15 @@ abstract class SerializerAbstractTest extends TestCase
 
     public function testSerializeIteratorToStreamAsNQuads()
     {
-        // serialize $iterator to turtle
-        $this->fixture = $this->newInstance();
+        try {
+            // serialize $iterator to turtle
+            $this->fixture = $this->newInstance('n-quads');
 
-        if (false === in_array('n-quads', $this->fixture->getSupportedSerializations())) {
-            $this->markTestSkipped('Fixture does not support n-quads serialization.');
+            if (false === in_array('n-quads', $this->fixture->getSupportedSerializations())) {
+                $this->markTestSkipped('Fixture does not support n-quads serialization.');
+            }
+        } catch (\Exception $e) {
+            $this->markTestSkipped($e->getMessage());
         }
 
         $iterator = new ArrayStatementIteratorImpl(array(
@@ -57,11 +62,15 @@ abstract class SerializerAbstractTest extends TestCase
 
     public function testSerializeIteratorToStreamAsNTriples()
     {
-        // serialize $iterator to turtle
-        $this->fixture = $this->newInstance();
+        try {
+            // serialize $iterator to turtle
+            $this->fixture = $this->newInstance('n-triples');
 
-        if (false === in_array('n-triples', $this->fixture->getSupportedSerializations())) {
-            $this->markTestSkipped('Fixture does not support n-triples serialization.');
+            if (false === in_array('n-triples', $this->fixture->getSupportedSerializations())) {
+                $this->markTestSkipped('Fixture does not support n-triples serialization.');
+            }
+        } catch (\Exception $e) {
+            $this->markTestSkipped($e->getMessage());
         }
 
         $iterator = new ArrayStatementIteratorImpl(array(

@@ -8,10 +8,11 @@ use Saft\Test\TestCase;
 class NQuadsSerializerImplTest extends SerializerAbstractTest
 {
     /**
+     * @param string $serialization
      * @return Serializer
      */
-    protected function newInstance()
+    protected function newInstance($serialization)
     {
-        return new NQuadsSerializerImpl();
+        return new NQuadsSerializerImpl($serialization);
     }
 }
