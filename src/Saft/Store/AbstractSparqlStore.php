@@ -385,6 +385,7 @@ abstract class AbstractSparqlStore implements Store
      */
     protected function sparqlFormat(StatementIterator $statements, Node $graph = null)
     {
-        return SparqlUtils::statementIteratorToSparqlFormat($statements, $graph);
+        $sparqlUtils = new SparqlUtils();
+        return $sparqlUtils->statementIteratorToSparqlFormat($statements, $graph);
     }
 }

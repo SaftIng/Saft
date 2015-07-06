@@ -39,6 +39,11 @@ class ARC2 extends AbstractSparqlStore
     private $queryFactory = null;
 
     /**
+     * @var SparqlUtils
+     */
+    private $sparqlUtils = null;
+
+    /**
      * @var StatementFactory
      */
     private $statementFactory = null;
@@ -82,6 +87,7 @@ class ARC2 extends AbstractSparqlStore
         }
 
         $this->nodeUtils = new NodeUtils();
+        $this->sparqlUtils = new SparqlUtils();
 
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
@@ -135,9 +141,9 @@ class ARC2 extends AbstractSparqlStore
 
             $this->query(
                 'INSERT INTO <'. $graphUriToUse .'> {'
-                . SparqlUtils::getNodeInSparqlFormat($statement->getSubject()) . ' '
-                . SparqlUtils::getNodeInSparqlFormat($statement->getPredicate()) . ' '
-                . SparqlUtils::getNodeInSparqlFormat($statement->getObject()) . ' . '
+                . $this->sparqlUtils->getNodeInSparqlFormat($statement->getSubject()) . ' '
+                . $this->sparqlUtils->getNodeInSparqlFormat($statement->getPredicate()) . ' '
+                . $this->sparqlUtils->getNodeInSparqlFormat($statement->getObject()) . ' . '
                 . '}',
                 $options
             );
@@ -438,7 +444,7 @@ class ARC2 extends AbstractSparqlStore
                     $quad['s'],
                     $quad['s_type']
                 );
-                $s = SparqlUtils::getNodeInSparqlFormat($s);
+                $s = $this->sparqlUtils->getNodeInSparqlFormat($s);
 
                 // predicate
                 $p = $this->nodeUtils->createNodeInstance(
@@ -446,7 +452,7 @@ class ARC2 extends AbstractSparqlStore
                     $quad['p'],
                     $quad['p_type']
                 );
-                $p = SparqlUtils::getNodeInSparqlFormat($p);
+                $p = $this->sparqlUtils->getNodeInSparqlFormat($p);
 
                 // object
                 $o = $this->nodeUtils->createNodeInstance(
@@ -456,7 +462,7 @@ class ARC2 extends AbstractSparqlStore
                     $quad['o_datatype'],
                     $quad['o_lang']
                 );
-                $o = SparqlUtils::getNodeInSparqlFormat($o);
+                $o = $this->sparqlUtils->getNodeInSparqlFormat($o);
 
                 return $this->query(
                     'DELETE FROM <'. $quad['g'] .'> {'. $s .' '. $p .' '. $o .' }

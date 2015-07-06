@@ -19,6 +19,15 @@ use Symfony\Component\Yaml\Parser;
 
 abstract class StoreAbstractTest extends TestCase
 {
+    protected $sparqlUtils;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->sparqlUtils = new SparqlUtils();
+    }
+
     public function tearDown()
     {
         if (null !== $this->fixture) {
@@ -836,7 +845,7 @@ abstract class StoreAbstractTest extends TestCase
     public function testHasMatchingStatementTripleRecognition()
     {
         $triple = $this->getTestTriple();
-        $query = 'ASK { '. SparqlUtils::statementsToSparqlFormat([$triple]) .'}';
+        $query = 'ASK { '. $this->sparqlUtils->statementsToSparqlFormat([$triple]) .'}';
 
         $this->assertEquals(
             new ValueResultImpl(false),
@@ -1009,7 +1018,7 @@ abstract class StoreAbstractTest extends TestCase
         /*
          * remove test data via query
          */
-        $triplePart = SparqlUtils::statementsToSparqlFormat(array($this->getTestPatternStatement()));
+        $triplePart = $this->sparqlUtils->statementsToSparqlFormat(array($this->getTestPatternStatement()));
         $query = 'DELETE WHERE { Graph <'. $this->testGraph .'> {'. $triplePart .'}}';
 
         $this->assertTrue($this->fixture->query($query)->isEmptyResult());
@@ -1042,7 +1051,7 @@ abstract class StoreAbstractTest extends TestCase
         /*
          * remove test data via query
          */
-        $triplePart = SparqlUtils::statementsToSparqlFormat(array($this->getTestPatternStatement()));
+        $triplePart = $this->sparqlUtils->statementsToSparqlFormat(array($this->getTestPatternStatement()));
         $query = 'DELETE WHERE { Graph <'. $this->testGraph .'> {'. $triplePart .'}}';
 
         $this->assertTrue($this->fixture->query($query)->isEmptyResult());
