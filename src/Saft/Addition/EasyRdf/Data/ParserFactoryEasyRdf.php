@@ -52,11 +52,7 @@ class ParserFactoryEasyRdf implements ParserFactory
             );
         }
 
-        $serialization = Format::getFormat($this->serializationMap[$serialization]);
-
-        $parser = new ParserEasyRdf($this->nodeFactory, $this->statementFactory, $serialization);
-
-        return $parser;
+        return new ParserEasyRdf($this->nodeFactory, $this->statementFactory, $this->serializationMap[$serialization]);
     }
 
     /**
