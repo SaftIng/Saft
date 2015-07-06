@@ -11,7 +11,6 @@ interface StatementIteratorFactory
      *                                       which implements \Iterator interface.
      * @return StatementIterator
      *
-     * TODO should become createStatementIteratorFromArray
      */
-    public function createIteratorFromArray(array $statements);
+    public function createStatementIteratorFromArray(array $statements);
 }

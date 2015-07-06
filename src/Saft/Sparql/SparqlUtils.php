@@ -56,7 +56,7 @@ class SparqlUtils
     {
         // TODO make it more flexible by move $factory to parameter list?
         $factory = new StatementIteratorFactoryImpl();
-        $iterator = $factory->createIteratorFromArray($statements);
+        $iterator = $factory->createStatementIteratorFromArray($statements);
         return self::statementIteratorToSparqlFormat($iterator, $graph);
     }
 

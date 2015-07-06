@@ -246,7 +246,7 @@ abstract class AbstractTriplePatternStore implements Store
             throw new \Exception('Query contains neither quads nor triples.');
         }
 
-        return $this->statementIteratorFactory->createIteratorFromArray($statementArray);
+        return $this->statementIteratorFactory->createStatementIteratorFromArray($statementArray);
     }
 
     /**

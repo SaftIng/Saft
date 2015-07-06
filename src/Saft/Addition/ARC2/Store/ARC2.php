@@ -204,7 +204,7 @@ class ARC2 extends AbstractSparqlStore
             $statement->getObject()
         );
 
-        $statementIterator = $this->statementIteratorFactory->createIteratorFromArray(
+        $statementIterator = $this->statementIteratorFactory->createStatementIteratorFromArray(
             array($tripleStatement)
         );
 

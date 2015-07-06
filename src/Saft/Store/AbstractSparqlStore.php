@@ -127,7 +127,7 @@ abstract class AbstractSparqlStore implements Store
 
                     foreach ($batch as $batchEntries) {
                         $content .= $this->sparqlFormat(
-                            $this->statementIteratorFactory->createIteratorFromArray(array($batchEntries)),
+                            $this->statementIteratorFactory->createStatementIteratorFromArray(array($batchEntries)),
                             $graph
                         ) .' ';
                     }
@@ -150,7 +150,7 @@ abstract class AbstractSparqlStore implements Store
         foreach ($batchStatements as $graphUriToUse => $batch) {
             foreach ($batch as $batchEntries) {
                 $content .= $this->sparqlFormat(
-                    $this->statementIteratorFactory->createIteratorFromArray(array($batchEntries)),
+                    $this->statementIteratorFactory->createStatementIteratorFromArray(array($batchEntries)),
                     $graph
                 ) .' ';
             }
@@ -200,7 +200,7 @@ abstract class AbstractSparqlStore implements Store
 
         }
 
-        $statementIterator = $this->statementIteratorFactory->createIteratorFromArray(
+        $statementIterator = $this->statementIteratorFactory->createStatementIteratorFromArray(
             array($statement)
         );
 
@@ -336,7 +336,7 @@ abstract class AbstractSparqlStore implements Store
         }
 
         // return a StatementIterator which contains the matching statements
-        return $this->statementIteratorFactory->createIteratorFromArray($statementList);
+        return $this->statementIteratorFactory->createStatementIteratorFromArray($statementList);
     }
 
     /**
@@ -362,7 +362,7 @@ abstract class AbstractSparqlStore implements Store
             $graph = $statement->getGraph();
         }
 
-        $statementIterator = $this->statementIteratorFactory->createIteratorFromArray(
+        $statementIterator = $this->statementIteratorFactory->createStatementIteratorFromArray(
             array($statement)
         );
 
