@@ -13,6 +13,7 @@ use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
+use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\ResultFactory;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Store;
@@ -51,6 +52,11 @@ class Http extends AbstractSparqlStore
     private $queryFactory;
 
     /**
+     * @var QueryUtils
+     */
+    protected $queryUtils;
+
+    /**
      * @var ResultFactory
      */
     private $resultFactory;
@@ -85,6 +91,7 @@ class Http extends AbstractSparqlStore
         array $configuration
     ) {
         $this->nodeUtils = new NodeUtils();
+        $this->queryUtils = new QueryUtils();
 
         $this->configuration = $configuration;
 
@@ -310,7 +317,7 @@ class Http extends AbstractSparqlStore
         /**
          * SPARQL query (usually to fetch data)
          */
-        if ('selectQuery' == AbstractQuery::getQueryType($query)) {
+        if ('selectQuery' == $this->queryUtils->getQueryType($query)) {
             $resultArray = json_decode($this->client->sendSparqlSelectQuery($query), true);
             $entries = array();
 
@@ -399,7 +406,7 @@ class Http extends AbstractSparqlStore
             $result = $this->client->sendSparqlUpdateQuery($query);
             $decodedResult = json_decode($result, true);
 
-            if ('askQuery' === AbstractQuery::getQueryType($query)) {
+            if ('askQuery' === $this->queryUtils->getQueryType($query)) {
                 $askResult = json_decode($result, true);
 
                 if (true === isset($askResult['boolean'])) {

@@ -13,11 +13,12 @@ use Saft\Rdf\StatementIteratorFactory;
 use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
-use Saft\Store\AbstractSparqlStore;
+use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\EmptyResult;
 use Saft\Sparql\Result\ResultFactory;
 use Saft\Sparql\Result\SetResult;
 use Saft\Sparql\Result\ValueResult;
+use Saft\Store\AbstractSparqlStore;
 
 class ARC2 extends AbstractSparqlStore
 {
@@ -37,6 +38,11 @@ class ARC2 extends AbstractSparqlStore
      * @var QueryFactory
      */
     private $queryFactory = null;
+
+    /**
+     * @var QueryUtils
+     */
+    protected $queryUtils;
 
     /**
      * @var SparqlUtils
@@ -87,6 +93,7 @@ class ARC2 extends AbstractSparqlStore
         }
 
         $this->nodeUtils = new NodeUtils();
+        $this->queryUtils = new QueryUtils();
         $this->sparqlUtils = new SparqlUtils();
 
         $this->nodeFactory = $nodeFactory;
@@ -473,7 +480,7 @@ class ARC2 extends AbstractSparqlStore
         /*
          * SELECT query
          */
-        } elseif ('selectQuery' === AbstractQuery::getQueryType($query)) {
+        } elseif ('selectQuery' === $this->queryUtils->getQueryType($query)) {
             /*
              * For a SELECT query the result looks like:
              *
@@ -545,7 +552,7 @@ class ARC2 extends AbstractSparqlStore
             return $setResult;
 
         } else {
-            if ('askQuery' === AbstractQuery::getQueryType($query)) {
+            if ('askQuery' === $this->queryUtils->getQueryType($query)) {
                 return $this->resultFactory->createValueResult($result['result']);
 
             } else {

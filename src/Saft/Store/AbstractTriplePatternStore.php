@@ -10,6 +10,7 @@ use Saft\Rdf\StatementIteratorFactory;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\Query;
 use Saft\Sparql\Query\QueryFactory;
+use Saft\Sparql\Query\QueryUtils;
 
 /**
  * Predefined Pattern-statement Store. The Triple-methods need to be implemented in the specific statement-store.
@@ -53,6 +54,8 @@ abstract class AbstractTriplePatternStore implements Store
         $this->queryFactory = $queryFactory;
         $this->statementFactory = $statementFactory;
         $this->statementIteratorFactory = $statementIteratorFactory;
+
+        $this->queryUtils = new QueryUtils();
     }
 
     /**
@@ -68,7 +71,7 @@ abstract class AbstractTriplePatternStore implements Store
     {
         $queryObject = $this->queryFactory->createInstanceByQueryString($query);
 
-        if ('updateQuery' == AbstractQuery::getQueryType($query)) {
+        if ('updateQuery' == $this->queryUtils->getQueryType($query)) {
             /*
              * INSERT or DELETE query
              */
@@ -107,13 +110,13 @@ abstract class AbstractTriplePatternStore implements Store
                     'supported yet.'
                 );
             }
-        } elseif ('askQuery' == AbstractQuery::getQueryType($query)) {
+        } elseif ('askQuery' == $this->queryUtils->getQueryType($query)) {
             /*
              * ASK query
              */
             $statement = $this->getStatement($queryObject);
             return $this->hasMatchingStatement($statement);
-        } elseif ('selectQuery' == AbstractQuery::getQueryType($query)) {
+        } elseif ('selectQuery' == $this->queryUtils->getQueryType($query)) {
             /*
              * SELECT query
              */

@@ -8,6 +8,7 @@ use Saft\Sparql\Query\AskQuery;
 use Saft\Sparql\Query\DescribeQuery;
 use Saft\Sparql\Query\GraphQuery;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Query\SelectQuery;
 use Saft\Sparql\Query\UpdateQuery;
 use Saft\Test\TestCase;
@@ -19,11 +20,17 @@ class AbstractQueryUnitTest extends TestCase
      */
     protected $queryFactory;
 
+    /**
+     * @var QueryUtils
+     */
+    protected $queryUtils;
+
     public function setUp()
     {
         parent::setUp();
 
         $this->queryFactory = new QueryFactoryImpl();
+        $this->queryUtils = new QueryUtils();
 
         $this->fixture = $this->getMockForAbstractClass('\Saft\Sparql\Query\AbstractQuery');
     }
@@ -545,28 +552,28 @@ class AbstractQueryUnitTest extends TestCase
                   ASK  { ?x foaf:name  "Alice" ;
                   foaf:mbox  <mailto:alice@work.example> }';
 
-        $this->assertEquals('askQuery', AbstractQuery::getQueryType($query));
+        $this->assertEquals('askQuery', $this->queryUtils->getQueryType($query));
     }
 
     public function testGetQueryTypeClearGraph()
     {
         $query = 'CLEAR GRAPH <';
 
-        $this->assertEquals('graphQuery', AbstractQuery::getQueryType($query));
+        $this->assertEquals('graphQuery', $this->queryUtils->getQueryType($query));
     }
 
     public function testGetQueryTypeCreateGraph()
     {
         $query = 'CREATE GRAPH <';
 
-        $this->assertEquals('graphQuery', AbstractQuery::getQueryType($query));
+        $this->assertEquals('graphQuery', $this->queryUtils->getQueryType($query));
     }
 
     public function testGetQueryTypeCreateSilentGraph()
     {
         $query = 'CREATE SILENT GRAPH <';
 
-        $this->assertEquals('graphQuery', AbstractQuery::getQueryType($query));
+        $this->assertEquals('graphQuery', $this->queryUtils->getQueryType($query));
     }
 
     public function testGetQueryTypeDescribe()
@@ -575,35 +582,35 @@ class AbstractQueryUnitTest extends TestCase
                   DESCRIBE ?x
                   WHERE { ?x foaf:mbox <mailto:alice@org> }';
 
-        $this->assertEquals('describeQuery', AbstractQuery::getQueryType($query));
+        $this->assertEquals('describeQuery', $this->queryUtils->getQueryType($query));
     }
 
     public function testGetQueryTypeDropGraph()
     {
         $query = 'DROP GRAPH';
 
-        $this->assertEquals('graphQuery', AbstractQuery::getQueryType($query));
+        $this->assertEquals('graphQuery', $this->queryUtils->getQueryType($query));
     }
 
     public function testGetQueryTypeDropSilentGraph()
     {
         $query = 'DROP SILENT GRAPH';
 
-        $this->assertEquals('graphQuery', AbstractQuery::getQueryType($query));
+        $this->assertEquals('graphQuery', $this->queryUtils->getQueryType($query));
     }
 
     public function testGetQueryTypeInsertData()
     {
         $query = 'INSERT DATA';
 
-        $this->assertEquals('updateQuery', AbstractQuery::getQueryType($query));
+        $this->assertEquals('updateQuery', $this->queryUtils->getQueryType($query));
     }
 
     public function testGetQueryTypeInsertIntoGraph()
     {
         $query = 'INSERT INTO GRAPH';
 
-        $this->assertEquals('updateQuery', AbstractQuery::getQueryType($query));
+        $this->assertEquals('updateQuery', $this->queryUtils->getQueryType($query));
     }
 
     public function testGetQueryTypeSelect()
@@ -612,7 +619,7 @@ class AbstractQueryUnitTest extends TestCase
                   FROM <'. $this->testGraph->getUri() .'>
                   WHERE { ?x foaf:mbox <mailto:alice@org> }';
 
-        $this->assertEquals('selectQuery', AbstractQuery::getQueryType($query));
+        $this->assertEquals('selectQuery', $this->queryUtils->getQueryType($query));
     }
 
     public function testGetQueryTypeUpdate()
@@ -623,21 +630,21 @@ class AbstractQueryUnitTest extends TestCase
         $query = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                   INSERT DATA {Graph <>}';
 
-        $this->assertEquals('updateQuery', AbstractQuery::getQueryType($query));
+        $this->assertEquals('updateQuery', $this->queryUtils->getQueryType($query));
 
         /**
          * INSERT INTO GRAPH
          */
         $query = 'INSERT INTO GRAPH {}';
 
-        $this->assertEquals('updateQuery', AbstractQuery::getQueryType($query));
+        $this->assertEquals('updateQuery', $this->queryUtils->getQueryType($query));
 
         /**
          * DELETE
          */
         $query = 'DELETE {}';
 
-        $this->assertEquals('updateQuery', AbstractQuery::getQueryType($query));
+        $this->assertEquals('updateQuery', $this->queryUtils->getQueryType($query));
 
         /**
          * DELETE DATA
@@ -645,7 +652,7 @@ class AbstractQueryUnitTest extends TestCase
         $query = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                   DELETE DATA {}';
 
-        $this->assertEquals('updateQuery', AbstractQuery::getQueryType($query));
+        $this->assertEquals('updateQuery', $this->queryUtils->getQueryType($query));
     }
 
     /*

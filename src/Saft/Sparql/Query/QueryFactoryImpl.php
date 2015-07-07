@@ -2,8 +2,20 @@
 
 namespace Saft\Sparql\Query;
 
+use Saft\Sparql\Query\QueryUtils;
+
 class QueryFactoryImpl implements QueryFactory
 {
+    /**
+     * @var QueryUtils
+     */
+    protected $queryUtils;
+
+    public function __construct()
+    {
+        $this->queryUtils = new QueryUtils();
+    }
+
     /**
      * Creates an instance of Query based on given query string.
      *
@@ -12,7 +24,7 @@ class QueryFactoryImpl implements QueryFactory
      */
     public function createInstanceByQueryString($query)
     {
-        switch (AbstractQuery::getQueryType($query)) {
+        switch ($this->queryUtils->getQueryType($query)) {
             case 'askQuery':
                 return new AskQueryImpl($query);
 

@@ -14,6 +14,7 @@ use Saft\Rdf\StatementIteratorFactory;
 use Saft\Rdf\Triple;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
+use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\EmptyResult;
 use Saft\Sparql\Result\ResultFactory;
 use Saft\Sparql\Result\SetResult;
@@ -52,6 +53,11 @@ class Virtuoso extends AbstractSparqlStore
     private $queryFactory = null;
 
     /**
+     * @var QueryUtils
+     */
+    protected $queryUtils;
+
+    /**
      * @var StatementFactory
      */
     private $statementFactory = null;
@@ -82,6 +88,8 @@ class Virtuoso extends AbstractSparqlStore
         array $configuration
     ) {
         $this->checkRequirements();
+
+        $this->queryUtils = new QueryUtils();
 
         $this->configuration = $configuration;
 
@@ -308,7 +316,7 @@ class Virtuoso extends AbstractSparqlStore
         /**
          * SPARQL query (usually to fetch data)
          */
-        if ('selectQuery' === AbstractQuery::getQueryType($query)) {
+        if ('selectQuery' === $this->queryUtils->getQueryType($query)) {
             // force extended result to have detailed information about given result entries, such as datatype and
             // language information.
             $sparqlQuery = 'define output:format "JSON"' . PHP_EOL . $query;
@@ -437,7 +445,7 @@ class Virtuoso extends AbstractSparqlStore
             }
 
             // ask result
-            if ('askQuery' === AbstractQuery::getQueryType($query)) {
+            if ('askQuery' === $this->queryUtils->getQueryType($query)) {
                 $pdoResult = $pdoQuery->fetchAll(\PDO::FETCH_ASSOC);
                 return $this->resultFactory->createValueResult(true !== empty($pdoResult));
             } else {
