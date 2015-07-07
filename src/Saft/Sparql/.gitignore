@@ -1,0 +1,5 @@
+composer.lock
+test-config.yml
+/gen
+/tmp
+/vendor
