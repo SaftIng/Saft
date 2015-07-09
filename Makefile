@@ -71,11 +71,11 @@ split-subtrees:
 
 # After the call of make split-subtrees, that command pushes all the new changes to the according remotes.
 push-subtrees:
-	git push -f saft.data saft.data:master
-	git push -f saft.querycache saft.querycache:master
-	git push -f saft.rdf saft.rdf:master
-	git push -f saft.redland saft.redland:master
-	git push -f saft.sparql saft.sparql:master
-	git push -f saft.store saft.store:master
-	git push -f saft.store.http saft.store.http:master
-	git push -f saft.store.virtuoso saft.store.virtuoso:master
+	git push saft.data saft.data:master
+	git push saft.querycache saft.querycache:master
+	git push saft.rdf saft.rdf:master
+	git push saft.redland saft.redland:master
+	git push saft.sparql saft.sparql:master
+	git push saft.store saft.store:master
+	git push saft.store.http saft.store.http:master
+	git push saft.store.virtuoso saft.store.virtuoso:master
