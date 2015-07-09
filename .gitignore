@@ -1,5 +1,11 @@
 composer.lock
 test-config.yml
+composer.phar
+.idea
+/vendor
+# Eclipse specific
+.project
+.settings
+.buildpath
 /gen
 /tmp
-/vendor
