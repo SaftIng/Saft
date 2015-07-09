@@ -49,14 +49,14 @@ mrpropper: clean
 
 # Setup all remotes for Saft's subtree repositories.
 setup-subtrees:
-	git remote add saft.data git@github.com:SaftIng/Saft.data
-	git remote add saft.querycache git@github.com:SaftIng/Saft.querycache
-	git remote add saft.rdf git@github.com:SaftIng/Saft.rdf
-	git remote add saft.redland git@github.com:SaftIng/Saft.redland
-	git remote add saft.sparql git@github.com:SaftIng/Saft.sparql
-	git remote add saft.store git@github.com:SaftIng/Saft.store
-	git remote add saft.store.http git@github.com:SaftIng/Saft.store.http
-	git remote add saft.store.virtuoso git@github.com:SaftIng/Saft.store.virtuoso
+	- git remote add saft.data git@github.com:SaftIng/Saft.data
+	- git remote add saft.querycache git@github.com:SaftIng/Saft.querycache
+	- git remote add saft.rdf git@github.com:SaftIng/Saft.rdf
+	- git remote add saft.redland git@github.com:SaftIng/Saft.redland
+	- git remote add saft.sparql git@github.com:SaftIng/Saft.sparql
+	- git remote add saft.store git@github.com:SaftIng/Saft.store
+	- git remote add saft.store.http git@github.com:SaftIng/Saft.store.http
+	- git remote add saft.store.virtuoso git@github.com:SaftIng/Saft.store.virtuoso
 
 # TODO change this somehow to a loop
 split-subtrees:
