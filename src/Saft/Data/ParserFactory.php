@@ -8,6 +8,7 @@ namespace Saft\Data;
  *
  * @api
  * @package Saft\Data;
+ * @since 0.1
  */
 interface ParserFactory
 {
@@ -17,6 +18,8 @@ interface ParserFactory
      * @param string $serialization The serialization you need a parser for.
      * @return Parser Suitable parser for the requested format.
      * @throws \Exception if a parser for requested serialization is not available.
+     * @api
+     * @since 0.1
      */
     public function createParserFor($serialization);
 
@@ -24,6 +27,8 @@ interface ParserFactory
      * Returns an array which contains supported serializations.
      *
      * @return array Array of supported serializations which are understood by this parser.
+     * @api
+     * @since 0.1
      */
     public function getSupportedSerializations();
 }

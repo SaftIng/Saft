@@ -4,6 +4,7 @@ namespace Saft\Rdf;
 
 /**
  * @api
+ * @since 0.1
  */
 abstract class AbstractStatement implements Statement
 {
@@ -12,6 +13,8 @@ abstract class AbstractStatement implements Statement
      *
      * @return boolean True, if if neither subject, predicate, object nor, if available, graph, are patterns,
      *                 false otherwise.
+     * @api
+     * @since 0.1
      */
     public function isConcrete()
     {
@@ -29,6 +32,8 @@ abstract class AbstractStatement implements Statement
      *
      * @return boolean True, if at least subject, predicate, object or, if available, graph, are patterns,
      *                 false otherwise.
+     * @api
+     * @since 0.1
      */
     public function isPattern()
     {
@@ -40,6 +45,8 @@ abstract class AbstractStatement implements Statement
      *
      * @return string N-Quads string containing subject, predicate, object and graph, if available.
      * @throws \Exception if this instance is a non-concrete statement.
+     * @api
+     * @since 0.1
      */
     public function toNQuads()
     {
@@ -64,6 +71,8 @@ abstract class AbstractStatement implements Statement
      *
      * @return string N-triples string, containing subject, predicate and object.
      * @throws \Exception if this instance is a non-concrete statement.
+     * @api
+     * @since 0.1
      */
     public function toNTriples()
     {
@@ -80,7 +89,9 @@ abstract class AbstractStatement implements Statement
      * This method is ment for getting some kind of human readable string representation of the current node.
      * It returns a string which contains subject, predicate and object.
      *
-     * @return string String which contains subject, predicate and object.
+     * @return string Formated string which contains subject, predicate and object.
+     * @api
+     * @since 0.1
      */
     public function __toString()
     {
@@ -96,6 +107,8 @@ abstract class AbstractStatement implements Statement
      *
      * @param Statement $toTest Statement to check this instance against.
      * @return boolean True, if this instance is equal to the given instance, false otherwise.
+     * @api
+     * @since 0.1
      */
     public function equals(Statement $toTest)
     {
@@ -117,7 +130,9 @@ abstract class AbstractStatement implements Statement
      * Checks if this instance matches a given instance.
      *
      * @param Statement $toTest Statement instance to check for a match.
-     * @return boolean True, if this instance matches a given instance, false otherwise.
+     * @return boolean True, if this instance matches a given Statement instance, false otherwise.
+     * @api
+     * @since 0.1
      */
     public function matches(Statement $toTest)
     {

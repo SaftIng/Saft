@@ -8,6 +8,7 @@ namespace Saft\Rdf;
  *
  * @api
  * @package Saft\Rdf
+ * @since 0.1
  */
 interface StatementFactory
 {
@@ -17,8 +18,10 @@ interface StatementFactory
      * @param Node $subject Subject of the statement.
      * @param Node $predicate Predicate of the statement.
      * @param Node $object Object of the statement.
-     * @param Node $graph optional Graph of the statement. (optional)
+     * @param Node $graph Graph of the statement. (optional)
      * @return Statement Instance of Statement.
+     * @api
+     * @since 0.1
      */
     public function createStatement(Node $subject, Node $predicate, Node $object, Node $graph = null);
 }

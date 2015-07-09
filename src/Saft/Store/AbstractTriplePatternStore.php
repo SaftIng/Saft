@@ -15,6 +15,8 @@ use Saft\Sparql\Query\QueryUtils;
 /**
  * Predefined Pattern-statement Store. The Triple-methods need to be implemented in the specific statement-store.
  * The query method is defined in the abstract class and reroute to the triple-methods.
+ * @api
+ * @since 0.1
  */
 abstract class AbstractTriplePatternStore implements Store
 {
@@ -39,10 +41,14 @@ abstract class AbstractTriplePatternStore implements Store
     private $statementIteratorFactory;
 
     /**
-     * @param NodeFactory              $nodeFactory
-     * @param StatementFactory         $statementFactory
-     * @param QueryFactory             $queryFactory
-     * @param statementIteratorFactory $statementIteratorFactory
+     * Constructor.
+     *
+     * @param NodeFactory              $nodeFactory Instance of NodeFactory.
+     * @param StatementFactory         $statementFactory Instance of StatementFactory.
+     * @param QueryFactory             $queryFactory Instance of QueryFactory.
+     * @param StatementIteratorFactory $statementIteratorFactory Instance of StatementIteratorFactory.
+     * @api
+     * @since 0.1
      */
     public function __construct(
         NodeFactory $nodeFactory,
@@ -66,6 +72,8 @@ abstract class AbstractTriplePatternStore implements Store
      *                                      introductions for the store and/or its adapter(s).
      * @return Result     Returns result of the query. Its type depends on the type of the query.
      * @throws \Exception If query is no string, is malformed or an execution error occured.
+     * @api
+     * @since 0.1
      */
     public function query($query, array $options = array())
     {
@@ -133,10 +141,12 @@ abstract class AbstractTriplePatternStore implements Store
     /**
      * Create Statement instance based on a given Query instance.
      *
-     * @param  Query     $queryObject Query object which represents a SPARQL query.
-     * @return Statement Statement object
-     * @throws \Exception             If query contains more than one triple pattern.
-     * @throws \Exception             If more than one graph was found.
+     * @param Query     $queryObject Query object which represents a SPARQL query.
+     * @return Statement Statement object itself.
+     * @throws \Exception if query contains more than one triple pattern.
+     * @throws \Exception if more than one graph was found.
+     * @api
+     * @since 0.1
      */
     protected function getStatement(Query $queryObject)
     {
@@ -200,8 +210,12 @@ abstract class AbstractTriplePatternStore implements Store
     /**
      * Create statements from query.
      *
-     * @param  Query             $queryObject Query object which represents a SPARQL query.
+     * @param Query $queryObject Query object which represents a SPARQL query.
      * @return StatementIterator StatementIterator object
+     * @throws \Exception if query contains quads and triples at the same time.
+     * @throws \Exception if query contains neither quads nor triples.
+     * @api
+     * @since 0.1
      */
     protected function getStatements(Query $queryObject)
     {
@@ -255,10 +269,12 @@ abstract class AbstractTriplePatternStore implements Store
     /**
      * Creates an instance of Node by given $value and $type.
      *
-     * @param  mixed  $value
-     * @param  string $type
-     * @return Node   Instance of Node interface.
-     * @throws \Exception
+     * @param mixed  $value
+     * @param string $type
+     * @return Node Instance of Node interface.
+     * @throws \Exception if an unknown type was given.
+     * @api
+     * @since 0.1
      */
     protected function createNodeByValueAndType($value, $type)
     {

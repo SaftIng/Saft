@@ -8,6 +8,7 @@ namespace Saft\Data;
  * of Parser for each serialization you need.
  *
  * @api
+ * @since 0.1
  * @package Saft\Data
  */
 interface Parser
@@ -22,6 +23,8 @@ interface Parser
      * @return StatementIterator StatementIterator instaince containing all the Statements parsed by the
      *                           parser to far.
      * @throws \Exception If the base URI $baseUri is no valid URI.
+     * @api
+     * @since 0.1
      */
     public function parseStringToIterator($inputString, $baseUri = null);
 
@@ -34,6 +37,8 @@ interface Parser
      *                            as base URI. (optional)
      * @return StatementIterator A StatementIterator containing all the Statements parsed by the parser to far.
      * @throws \Exception if the base URI $baseUri is no valid URI.
+     * @api
+     * @since 0.1
      */
     public function parseStreamToIterator($inputStream, $baseUri = null);
 
@@ -43,6 +48,8 @@ interface Parser
      *
      * @return array An associative array with a prefix mapping of the prefixes parsed so far. The key
      *               will be the prefix, while the values contains the according namespace URI.
+     * @api
+     * @since 0.1
      */
     public function getCurrentPrefixList();
 }

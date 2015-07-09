@@ -8,6 +8,7 @@ namespace Saft\Rdf;
  *
  * @api
  * @package Saft\Rdf
+ * @since 0.1
  */
 interface NodeFactory
 {
@@ -19,6 +20,8 @@ interface NodeFactory
      * @param string|Node $datatype The datatype of the literal (NamedNode, optional)
      * @param string $lang The language tag of the literal (optional)
      * @return Literal Instance of Literal.
+     * @api
+     * @since 0.1
      */
     public function createLiteral($value, $datatype = null, $lang = null);
 
@@ -28,6 +31,8 @@ interface NodeFactory
      *
      * @param string $uri The URI of the named node
      * @return NamedNode Instance of NamedNode.
+     * @api
+     * @since 0.1
      */
     public function createNamedNode($uri);
 
@@ -37,6 +42,8 @@ interface NodeFactory
      *
      * @param string $blankId The identifier for the blank node
      * @return BlankNode Instance of BlankNode.
+     * @api
+     * @since 0.1
      */
     public function createBlankNode($blankId);
 
@@ -44,6 +51,8 @@ interface NodeFactory
      * Create a new pattern node, which matches any RDF Node instance.
      *
      * @return Node Instance of Node, which acts like an AnyPattern.
+     * @api
+     * @since 0.1
      */
     public function createAnyPattern();
 
@@ -53,6 +62,8 @@ interface NodeFactory
      * @param string $string N-triples/n-quads node string to use.
      * @return Node Node instance, which type must be one of the following: NamedNode, BlankNode, Literal
      * @throws \Exception if no node could be created e.g. because of a syntax error in the node string
+     * @api
+     * @since 0.1
      */
     public function createNodeFromNQuads($string);
 }

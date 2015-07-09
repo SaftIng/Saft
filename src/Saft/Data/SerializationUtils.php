@@ -7,6 +7,7 @@ namespace Saft\Data;
  *
  * @api
  * @package Saft\Data
+ * @since 0.1
  */
 class SerializationUtils
 {
@@ -15,6 +16,12 @@ class SerializationUtils
      */
     protected $serializationMimeTypeMap = array();
 
+    /**
+     * Constructor.
+     *
+     * @api
+     * @since 0.1
+     */
     public function __construct()
     {
         $this->serializationMimeTypeMap = array(
@@ -32,8 +39,10 @@ class SerializationUtils
     /**
      * Returns serialization pendant for a given MIME type, if available.
      *
-     * @param  string $mime
+     * @param string $mime MIME-type to transform to the serialization.
      * @return string MIME-Type, if available, null otherwise.
+     * @api
+     * @since 0.1
      */
     public function mimeToSerialization($mime)
     {
@@ -49,8 +58,10 @@ class SerializationUtils
     /**
      * Returns MIME type pendant for a given serialization, if available.
      *
-     * @param  string $serialization
-     * @return string MIME-Type, if available, null otherwise.
+     * @param string $serialization MIME-type to transform to the Serialization.
+     * @return string|null MIME-Type, if available, null otherwise.
+     * @api
+     * @since 0.1
      */
     public function serializationToMime($serialization)
     {

@@ -8,6 +8,8 @@ namespace Saft\Rdf;
  *
  * @api
  * @package Saft\Rdf
+ * @api
+ * @since 0.1
  */
 interface NamedNode extends Node
 {
@@ -15,6 +17,8 @@ interface NamedNode extends Node
      * Returns the URI of the node.
      *
      * @return string URI of the node.
+     * @api
+     * @since 0.1
      */
     public function getUri();
 }

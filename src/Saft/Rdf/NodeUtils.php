@@ -8,6 +8,7 @@ namespace Saft\Rdf;
  *
  * @api
  * @package Saft\Rdf
+ * @since 0.1
  */
 class NodeUtils
 {
@@ -22,6 +23,8 @@ class NodeUtils
      * @param string      $language    Language tag (optional)
      * @return Node Node instance, which type is one of: NamedNode, BlankNode, Literal, AnyPattern
      * @throws \Exception if an unknown type was given.
+     * @api
+     * @since 0.1
      */
     public function createNodeInstance(
         NodeFactory $nodeFactory,
@@ -56,6 +59,8 @@ class NodeUtils
      *
      * @param string $string String to check if its a URI or not.
      * @return boolean True if given string is a valid URI, false otherwise.
+     * @api
+     * @since 0.1
      */
     public function simpleCheckURI($string)
     {

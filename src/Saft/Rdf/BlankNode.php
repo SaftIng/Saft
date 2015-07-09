@@ -8,6 +8,7 @@ namespace Saft\Rdf;
  *
  * @api
  * @package Saft\Rdf
+ * @since 0.1
  */
 interface BlankNode extends Node
 {
@@ -15,6 +16,8 @@ interface BlankNode extends Node
      * Returns the blank ID of this blank node.
      *
      * @return string Blank ID.
+     * @api
+     * @since 0.1
      */
     public function getBlankId();
 }
