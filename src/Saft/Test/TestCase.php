@@ -208,13 +208,12 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             }
         }
 
-        if (!empty($actualEntriesNotFound) || !empty($notCheckedEntries)) {
-            $this->fail(
-                "The StatementIterators are not equal. "
-                . count($actualEntriesNotFound) . " Statments where not expected, while "
-                . count($notCheckedEntries) . " Statments where not present but expected."
-            );
-        }
+        $this->assertFalse(
+            !empty($actualEntriesNotFound) || !empty($notCheckedEntries),
+            "The StatementIterators are not equal. "
+            . count($actualEntriesNotFound) . " Statments where not expected, while "
+            . count($notCheckedEntries) . " Statments where not present but expected."
+        );
     }
 
     /**
