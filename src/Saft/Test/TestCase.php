@@ -8,6 +8,10 @@ use Saft\Sparql\Result\Result;
 use Saft\Sparql\Result\SetResult;
 use Symfony\Component\Yaml\Parser;
 
+/**
+ * @api
+ * @since 0.1
+ */
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -34,6 +38,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      * @param array  $expected
      * @param array  $actual
      * @param string $message  optional
+     * @api
+     * @since 0.1
      */
     protected function assertEqualsArrays($expected, $actual, $message = '')
     {
@@ -48,6 +54,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      *
      * @param object $instance         Instance to check.
      * @param string $classOrInterface Name of the class or interface to check if it is implemented by $instance.
+     * @api
+     * @since 0.1
      */
     public function assertClassOfInstanceImplements($instance, $classOrInterface)
     {
@@ -64,6 +72,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      * @param int               $expectedCount
      * @param StatementIterator $statementIterator
      * @param string            $message
+     * @api
+     * @since 0.1
      */
     public function assertCountStatementIterator($expectedCount, $statementIterator, $message = null)
     {
@@ -88,6 +98,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      *
      * @param SetResult $expected
      * @param SetResult $actual
+     * @api
+     * @since 0.1
      */
     public function assertSetIteratorEquals(SetResult $expected, SetResult $actual)
     {
@@ -155,6 +167,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      *
      * @param StatementIterator $expected
      * @param StatementIterator $actual
+     * @api
+     * @since 0.1
      */
     public function assertStatementIteratorEquals(StatementIterator $expected, StatementIterator $actual)
     {
@@ -210,6 +224,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      * @param Result $expected
      * @param Result $actual
      * @throws \Exception if unknown Result type was given.
+     * @api
+     * @since 0.1
      */
     public function assertResultEquals(Result $expected, Result $actual)
     {
@@ -242,6 +258,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      * The content of the YAML-file will be transformed into an array and stored in $config property.
      *
      * @param string $configFilePath Path to the config file.
+     * @api
+     * @since 0.1
      */
     protected function loadTestConfiguration($configFilepath)
     {
@@ -257,6 +275,9 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * Place to setup stuff for Saft related tests.
+     *
+     * @api
+     * @since 0.1
      */
     public function setUp()
     {
