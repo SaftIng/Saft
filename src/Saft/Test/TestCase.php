@@ -2,9 +2,10 @@
 
 namespace Saft\Test;
 
+use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\Result\Result;
-use Saft\Rdf\NamedNodeImpl;
+use Saft\Sparql\Result\SetResult;
 use Symfony\Component\Yaml\Parser;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase
@@ -43,22 +44,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * compares two SPARQL query strings by removing all whitespace. This method still does not ensur semantic equality
-     * and will also lose information about neccessary whitespace.
-     */
-    public function assertEqualsSparql($expected, $actual, $message = '')
-    {
-        $expected = preg_replace('/\s+/', '', $expected);
-        $actual = preg_replace('/\s+/', '', $actual);
-        $this->assertEquals($expected, $actual, $message);
-    }
-
-    /**
      * It checks of the given instance implements a certain class or interface.
      *
      * @param object $instance         Instance to check.
-     * @param string $classOrInterface Name of the class or interface to check if it is implemented
-     *                                 by $instance.
+     * @param string $classOrInterface Name of the class or interface to check if it is implemented by $instance.
      */
     public function assertClassOfInstanceImplements($instance, $classOrInterface)
     {
@@ -91,6 +80,73 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         }
         $statementIterator->next();
         $this->assertFalse($statementIterator->valid(), sprintf($message, 'at least '. $i + 1));
+    }
+
+    /**
+     * Checks two lists which implements \Iterator interface, if they contain the same Statement instances.
+     * The checks will be executed using PHPUnit's assert functions.
+     *
+     * @param SetResult $expected
+     * @param SetResult $actual
+     */
+    public function assertSetIteratorEquals(SetResult $expected, SetResult $actual)
+    {
+        $entriesToCheck = array();
+        foreach ($expected as $entry) {
+            // serialize entry and hash it afterwards to use it as key for $entriesToCheck array.
+            // later on we only check the other list that each entry, serialized and hashed, has
+            // its equal key in the list.
+
+            // the structure of each entry is an associative array which contains Node instances.
+            $entryString = '';
+            foreach ($entry as $key => $nodeInstance) {
+                if ($nodeInstance->isConcrete()) {
+                    // build a string of all entries of $entry and generate a hash based on that later on.
+                    $entryString .= $nodeInstance->toNQuads();
+                } else {
+                    throw new \Exception('Non-concrete Node instance in SetResult instance found.');
+                }
+            }
+            $entriesToCheck[hash('sha256', $entryString)] = false;
+        }
+
+        // contains a list of all entries, which were not found in $expected.
+        $actualEntriesNotFound = array();
+        foreach ($actual as $entry) {
+            $entryString = '';
+            foreach ($entry as $key => $nodeInstance) {
+                if ($nodeInstance->isConcrete()) {
+                    // build a string of all entries of $entry and generate a hash based on that later on.
+                    $entryString .= $nodeInstance->toNQuads();
+                } else {
+                    throw new \Exception('Non-concrete Node instance in SetResult instance found.');
+                }
+            }
+            $entryHash = hash('sha256', $entryString);
+            if (isset($entriesToCheck[$entryHash])) {
+                // if entry was found, mark it.
+                $entriesToCheck[$entryHash] = true;
+            } else {
+                // entry was not found
+                $actualEntriesNotFound[] = $entryHash;
+            }
+        }
+
+        $notCheckedEntries = array();
+        // check that all entries from $expected were checked
+        foreach ($entriesToCheck as $key => $value) {
+            if (!$value) {
+                $notCheckedEntries[] = $key;
+            }
+        }
+
+        if (!empty($actualEntriesNotFound) || !empty($notCheckedEntries)) {
+            $this->fail(
+                "The StatementIterators are not equal. "
+                . count($actualEntriesNotFound) . " Statments where not expected, while "
+                . count($notCheckedEntries) . " Statments where not present but expected."
+            );
+        }
     }
 
     /**
@@ -153,6 +209,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      *
      * @param Result $expected
      * @param Result $actual
+     * @throws \Exception if unknown Result type was given.
      */
     public function assertResultEquals(Result $expected, Result $actual)
     {
@@ -161,13 +218,20 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected->isStatementSetResult(), $actual->isStatementSetResult());
         $this->assertEquals($expected->isValueResult(), $actual->isValueResult());
 
+        // general result
         if ($expected->isSetResult()) {
-            $this->markTestIncomplete("This assertion resp. the classes have to be implemented correctly");
+            $this->assertSetIteratorEquals($expected, $actual);
+
+        // statement result
         } elseif ($expected->isStatementSetResult()) {
-            $this->markTestIncomplete("This assertion resp. the classes have to be implemented correctly");
             $this->assertStatementIteratorEquals($expected->getIterator(), $actual->getIterator());
+
+        // value result
         } elseif ($expected->isValueResult()) {
             $this->assertEquals($expected->getValue(), $actual->getValue());
+
+        } else {
+            throw new \Exception('Unknown Result type given.');
         }
     }
 
