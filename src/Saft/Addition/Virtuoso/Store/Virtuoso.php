@@ -380,13 +380,27 @@ class Virtuoso extends AbstractSparqlStore
                     foreach ($bindingParts as $variable => $part) {
                         switch ($part['type']) {
                             /**
-                             * Literal (language'd)
+                             * Literal (language'd) or plain literal without language tag.
+                             *
+                             * Usually Virtuoso takes that type for language-tagged literals, but if
+                             * there are triples containign literals, which were created without Saft,
+                             * they might are of type=literal, but dont have language information.
                              */
                             case 'literal':
+                                // language information set
+                                if (isset($part['xml:lang'])) {
+                                    $langString = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString';
+                                    $lang = $part['xml:lang'];
+                                // fallback to simple triple
+                                } else {
+                                    $langString = 'http://www.w3.org/2001/XMLSchema#string';
+                                    $lang = null;
+                                }
+
                                 $newEntry[$variable] = $this->nodeFactory->createLiteral(
                                     $part['value'],
-                                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
-                                    $part['xml:lang']
+                                    $langString,
+                                    $lang
                                 );
 
                                 break;

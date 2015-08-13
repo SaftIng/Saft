@@ -131,4 +131,30 @@ class VirtuosoTest extends StoreAbstractTest
 
         $this->fixture->sqlQuery('invalid query');
     }
+
+    /**
+     * Regression test for https://github.com/SaftIng/Saft/issues/61
+     * "Undefined index: xml:lang" in Virtuoso
+     */
+    public function testQueryWithoutLanguageTag()
+    {
+        // create a triple with literal, which is not typed or has a language tag
+        $this->fixture->query('INSERT INTO <'. $this->testGraph .'> {<http://a> <http://b> "foo"}');
+
+        // check if that functions throws a warning about an undefined index xml:lang
+        $result = $this->fixture->query('SELECT * FROM <'. $this->testGraph .'> WHERE {?s ?p ?o.}');
+
+        // check returned result set, to be sure to have the right mapping for the literal
+        foreach ($result as $key => $value) {
+            $this->assertTrue(isset($value['s']));
+            $this->assertTrue(isset($value['p']));
+            $this->assertTrue(isset($value['o']));
+
+            $this->assertEquals('http://a', $value['s']->getUri());
+            $this->assertEquals('http://b', $value['p']->getUri());
+            $this->assertEquals('foo', $value['o']->getValue());
+        }
+
+        $this->assertEquals(1, count($result));
+    }
 }
