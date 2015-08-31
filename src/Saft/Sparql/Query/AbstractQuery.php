@@ -114,6 +114,7 @@ abstract class AbstractQuery implements Query
         // blank node
         } elseif (false !== strpos($entity, '_:')) {
             return 'blanknode';
+
         // checks if $entity is an URL, which was written with prefix, such as rdfs:label
         } elseif (false !== strpos($entity, ':')) {
             return 'uri';
@@ -191,6 +192,8 @@ abstract class AbstractQuery implements Query
      */
     public function determineObjectValue($objectString)
     {
+        $nodeUtils = new NodeUtils();
+
         // checks if ^^< is in $objectString
         $arrowPos = strpos($objectString, '"^^<');
         $atPos = strpos($objectString, '"@');
@@ -211,6 +214,9 @@ abstract class AbstractQuery implements Query
         // checks for ? at the beginning
         } elseif ('?' === substr($objectString, 0, 1)) {
             return substr($objectString, 1);
+
+        } elseif ($nodeUtils->simpleCheckURI($objectString)) {
+            return $objectString;
 
         // malformed string, return null as datatype
         } else {
