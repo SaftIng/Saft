@@ -111,6 +111,9 @@ abstract class AbstractQuery implements Query
                 && '"' == substr($entity, strlen($entity)-1, 1))) {
             return 'typed-literal';
 
+        // blank node
+        } elseif (false !== strpos($entity, '_:')) {
+            return 'blanknode';
         // checks if $entity is an URL, which was written with prefix, such as rdfs:label
         } elseif (false !== strpos($entity, ':')) {
             return 'uri';
@@ -533,7 +536,8 @@ abstract class AbstractQuery implements Query
             '(' .
             '\<[a-z0-9\.\/\:#\-]+\>|' . // e.g. <http://foobar/a>
             '\?[a-z0-9\_]+|' .          // e.g. ?s
-            '[a-z0-9]+\:[a-z0-9]+' .    // e.g. rdfs:label
+            '[a-z0-9]+\:[a-z0-9]+|' .   // e.g. rdfs:label
+            '_:[a-z0-9]+' .             // e.g. _:foo
             ')\s*' .
             /**
              * Predicate part
