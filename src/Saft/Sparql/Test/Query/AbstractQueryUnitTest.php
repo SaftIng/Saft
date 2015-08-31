@@ -341,6 +341,40 @@ class AbstractQueryUnitTest extends TestCase
      * Tests extractTriplePattern
      */
 
+    public function testExtractTriplePatternBlankNode()
+    {
+        $this->fixture = $this->queryFactory->createInstanceByQueryString('
+            PREFIX qb:<http://purl.org/linked-data/cube#>
+            ASK FROM <http://localhost/scoreboard-potion> {
+                _:foo qb:foo qb:bar .
+            }'
+        );
+
+        $queryParts = $this->fixture->getQueryParts();
+
+        // check where part
+        $this->assertEquals(
+            '_:foo qb:foo qb:bar .',
+            $queryParts['where']
+        );
+
+        $this->assertEquals(
+            array(
+                array(
+                    's' => '_:foo',
+                    'p' => 'http://purl.org/linked-data/cube#foo',
+                    'o' => 'http://purl.org/linked-data/cube#bar',
+                    's_type' => 'blanknode',
+                    'p_type' => 'uri',
+                    'o_type' => 'uri',
+                    'o_datatype' => null,
+                    'o_lang' => null
+                )
+            ),
+            $queryParts['triple_pattern']
+        );
+    }
+
     public function testExtractTriplePatternLiteral()
     {
         $this->assertEquals(
