@@ -305,14 +305,6 @@ class Virtuoso extends AbstractSparqlStore
         $queryObject = $this->queryFactory->createInstanceByQueryString($query);
         $queryParts = $queryObject->getQueryParts();
 
-        // if a non-graph query was given, we assume triples or quads. If neither quads nor triples were found,
-        // throw an exception.
-        if (false === $queryObject->isGraphQuery()
-            && false === isset($queryParts['triple_pattern'])
-            && false === isset($queryParts['quad_pattern'])) {
-            throw new \Exception('Non-graph queries must have triples or quads.');
-        }
-
         /**
          * SPARQL query (usually to fetch data)
          */
