@@ -5,7 +5,7 @@
     "keywords": ["Saft", "Linked Data", "Semantic Web", "RDF", "Triple Store", "Parser", "Serializer", "QueryCache"],
     "homepage": "https://safting.github.io/",
     "license": "GPL-3.0",
-    "version": "0.1.0-alpha3",
+    "version": "0.1.0-beta1",
     "authors": [
         {
             "name": "Natanael Arndt",
