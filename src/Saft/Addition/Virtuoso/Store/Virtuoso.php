@@ -370,7 +370,21 @@ class Virtuoso extends AbstractSparqlStore
                      * )
                      */
                     foreach ($bindingParts as $variable => $part) {
+
+                        // it seems that Virtuoso returns type=literal for bnodes, so we manually fix that
+                        // here, otherwise it will creates a Literal instance.
+                        if (false !== strpos($part['value'], '_:')) {
+                            $part['type'] = 'bnode';
+                        }
+
                         switch ($part['type']) {
+                            /**
+                             * Blank Node
+                             */
+                            case 'bnode':
+                                $newEntry[$variable] = $this->nodeFactory->createBlankNode($part['value']);
+                                break;
+
                             /**
                              * Literal (language'd) or plain literal without language tag.
                              *
@@ -396,6 +410,7 @@ class Virtuoso extends AbstractSparqlStore
                                 );
 
                                 break;
+
                             /**
                              * Typed-Literal
                              */
@@ -412,10 +427,11 @@ class Virtuoso extends AbstractSparqlStore
                              */
                             case 'uri':
                                 $newEntry[$variable] = $this->nodeFactory->createNamedNode($part['value']);
+
                                 break;
 
                             default:
-                                throw new \Exception('Unknown type given.');
+                                throw new \Exception('Unknown type given:' . $part['type']);
                                 break;
                         }
                     }
