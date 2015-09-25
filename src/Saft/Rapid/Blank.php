@@ -90,20 +90,15 @@ class Blank extends \ArrayObject
     );
 
     /**
-     * @var Saft\Sparql\Result\SetResult
-     */
-    protected $result;
-
-    /**
+     * Init instance by a given SetResult instance.
+     *
      * @param Saft\Sparql\Result\SetResult $result
      * @param string                       $predicate Default: p (optional)
      * @param string                       $object    Default: o (optional)
      * @todo support blank nodes
      */
-    public function __construct(\Saft\Sparql\Result\SetResult $result, $predicate = 'p', $object = 'o')
+    public function initBySetResult(\Saft\Sparql\Result\SetResult $result, $predicate = 'p', $object = 'o')
     {
-        $this->result = $result;
-
         foreach ($result as $entry) {
             if ($entry[$object]->isNamed()) {
                 $value = $entry[$object]->getUri();
@@ -124,6 +119,49 @@ class Blank extends \ArrayObject
             }
 
             // TODO blank nodes
+        }
+    }
+
+    /**
+     * Init instance by a given StatementIterator instance.
+     *
+     * @param Saft\Rdf\StatementIterator   $iterator
+     * @param string                       $resourceUri URI of the resource to use
+     * @param string                       $predicate   Default: p (optional)
+     * @param string                       $object      Default: o (optional)
+     * @todo support blank nodes
+     */
+    public function initByStatementIterator(
+        \Saft\Rdf\StatementIterator $iterator,
+        $resourceUri,
+        $predicate = 'p',
+        $object = 'o'
+    ) {
+        // go through given statements
+        foreach ($iterator as $statement) {
+            // if the current statement has as subject URI the same as the given $resourceUri, integrate
+            // its property + value into this instance.
+            if ($statement->getSubject()->getUri() == $resourceUri) {
+                if ($statement->getObject()->isNamed()) {
+                    $value = $statement->getObject()->getUri();
+                } elseif ($statement->getObject()->isLiteral()) {
+                    $value = $statement->getObject()->getValue();
+                }
+
+                // set full property URI as key and object value
+                $this->setValue($statement->getPredicate()->getUri(), $value);
+
+                // furthermore, set namespace shortcut (e.g. rdf) as key and object value, to improve
+                // handling later on.
+                foreach ($this->commonNamespaces as $ns => $nsUri) {
+                    if (false !== strpos($statement->getPredicate()->getUri(), $nsUri)) {
+                        $shorterProperty = str_replace($nsUri, $ns .':', $statement->getPredicate()->getUri());
+                        $this->setValue($shorterProperty, $value);
+                    }
+                }
+
+                // TODO blank nodes
+            }
         }
     }
 
