@@ -832,10 +832,15 @@ class QueryCache implements ChainableStore
         // invalidate previous result
         $this->invalidateByQuery($queryObject);
 
-        $queryCacheContainer = array('graph_uris' => array(), 'triple_pattern' => array());
-
         $query = $queryObject->getQuery();
         $queryParts = $queryObject->getQueryParts();
+
+        // dont store result, if query contains FILTER clauses, because we can not handle them (yet)
+        if (isset($queryParts['filter_pattern']) && 0 < count($queryParts['filter_pattern'])) {
+            return;
+        }
+
+        $queryCacheContainer = array('graph_uris' => array(), 'triple_pattern' => array());
 
         /**
          * Save reference between all graphs of the given query to the query itself.
