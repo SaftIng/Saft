@@ -271,7 +271,7 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
         }
 
         // use hash to differenciate between statements (no doublings allowed)
-        $statementHash = hash('sha256', json_encode($statement));
+        $statementHash = hash('sha256', serialize($statement));
 
         // check it
         return isset($this->statements[$graphUri][$statementHash]);
