@@ -726,10 +726,28 @@ abstract class StoreAbstractTest extends TestCase
 
         $this->assertEquals(1, $this->countTriples($this->testGraph));
 
+        $iterator = $this->fixture->getMatchingStatements($this->getTestPatternStatement(), $this->testGraph);
+
+        foreach ($iterator as $statement) {
+            $this->assertTrue($statement->isQuad());
+        }
+    }
+
+    public function testGetMatchingStatementsCheckForTriplesDefaultGraph()
+    {
+        $this->fixture->createGraph($this->testGraph);
+
+        // add triples
+        $this->fixture->addStatements(array($this->getTestTriple()), $this->testGraph);
+
+        $this->assertEquals(1, $this->countTriples($this->testGraph));
+
         $iterator = $this->fixture->getMatchingStatements($this->getTestPatternStatement());
 
         foreach ($iterator as $statement) {
             $this->assertTrue($statement->isTriple());
+            // one is enough, if there are more ignore them to avoid iterating over thousands of triples
+            break;
         }
     }
 
