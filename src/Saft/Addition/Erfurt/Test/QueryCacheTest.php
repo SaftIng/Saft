@@ -16,7 +16,7 @@ use Saft\Store\BasicTriplePatternStore;
 use Saft\Store\Test\StoreAbstractTest;
 use Symfony\Component\Yaml\Parser;
 
-class QueryCacheTest extends StoreAbstractTest
+class QueryCacheTest
 {
     /**
      * @var BasicTriplePatternStore
@@ -50,7 +50,7 @@ class QueryCacheTest extends StoreAbstractTest
             $this->markTestSkipped('Array erfurtConfig is not set in the test-config.yml.');
         }
     }
-    
+
     /*
      * Tests for query method
      */
