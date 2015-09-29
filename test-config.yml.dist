@@ -21,3 +21,30 @@ virtuosoConfig: &virtuosoConfig
     dsn: "VOS"
     username: "dba"
     password: "dba"
+
+# Erfurt related
+erfurtConfig: &erfurtConfig
+    cache:
+        backend:
+            file:
+                cache_dir: "" # will be set later on
+            type: "file"
+        frontend:
+            cache_id_prefix: "saft_"
+            enable: true
+            lifetime: 0
+        query: # query cache related
+            enable: 1
+            type: "database"
+    store:
+        backend: "zenddb" # change that to virtuoso to enable Virtuoso backend
+        zenddb:
+            dbname: "saft"
+            username: "root"
+            password: "root"
+            dbtype: "mysql"
+            host: "localhost"
+        virtuoso:
+            dsn: "VOS"
+            username: "dba"
+            password: "dba"
