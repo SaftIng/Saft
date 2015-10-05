@@ -344,7 +344,11 @@ class Virtuoso extends AbstractSparqlStore
                 // in case the result was empty, Virtuoso does not return a list of variables, which are
                 // usually located in the SELECT part. so we try to extract the variables by ourselves.
                 if (0 == count($variables)) {
-                    $variables = $queryParts['variables'];
+                    if (isset($queryParts['variables'])) {
+                        $variables = $queryParts['variables'];
+                    } else {
+                        $variables = array();
+                    }
                 }
 
                 /**
