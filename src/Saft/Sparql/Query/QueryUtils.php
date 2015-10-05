@@ -16,10 +16,10 @@ class QueryUtils
         /**
          * First we get rid of all PREFIX information
          */
-        $adaptedQuery = preg_replace('/PREFIX\s+[a-z0-9]+\:\s*\<[a-z0-9\:\/\.\#\-]+\>/', '', $query);
+        $adaptedQuery = preg_replace('/PREFIX\s+[a-z0-9\-]+\:\s*\<[a-z0-9\:\/\.\#\-\~\_]+\>/si', '', $query);
 
-        // remove trailing whitespaces
-        $adaptedQuery = trim($adaptedQuery);
+        // remove whitespace lines and trailing whitespaces
+        $adaptedQuery = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "", trim($adaptedQuery));
 
         // only lower chars
         $adaptedQuery = strtolower($adaptedQuery);
@@ -92,6 +92,6 @@ class QueryUtils
                 }
         }
 
-        throw new \Exception('Unknown query type: '. $firstPart);
+        throw new \Exception('Unknown query type "'. $firstPart .'" for query: '. $adaptedQuery);
     }
 }
