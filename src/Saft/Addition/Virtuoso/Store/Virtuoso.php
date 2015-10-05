@@ -330,7 +330,7 @@ class Virtuoso extends AbstractSparqlStore
                 $pdoQuery->execute();
 
             } catch (\PDOException $e) {
-                throw new \Exception($e->getMessage());
+                throw new \Exception('For query '. $query .' > '. $e->getMessage());
             }
 
             $entries = array();
