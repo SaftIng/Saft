@@ -243,6 +243,20 @@ class Virtuoso extends AbstractSparqlStore
     }
 
     /**
+     * @param array $options
+     */
+    public function mergeOptions($options)
+    {
+        return array_merge(
+            array(
+                'default_graph_uri' => '',
+                'output_format' => null
+            ),
+            $options
+        );
+    }
+
+    /**
      * Returns the current connection resource. The resource is created lazily if it doesn't exist.
      *
      * @return \PDO Instance of \PDO representing an open PDO-ODBC connection.
@@ -302,6 +316,8 @@ class Virtuoso extends AbstractSparqlStore
      */
     public function query($query, array $options = array())
     {
+        $options = $this->mergeOptions($options);
+
         $queryObject = $this->queryFactory->createInstanceByQueryString($query);
         $queryParts = $queryObject->getQueryParts();
 
@@ -311,10 +327,23 @@ class Virtuoso extends AbstractSparqlStore
         if ('selectQuery' === $this->queryUtils->getQueryType($query)) {
             // force extended result to have detailed information about given result entries, such as datatype and
             // language information.
-            $sparqlQuery = 'define output:format "JSON"' . PHP_EOL . $query;
+            if ('json' == $options['output_format'] || false == isset($options['output_format'])) {
+                $sparqlQuery = 'define output:format "JSON"' . PHP_EOL . $query;
+            } else {
+                $sparqlQuery = $query;
+            }
 
-            // escape characters that delimit the query within the query using addcslashes
-            $graphUri = 'NULL';
+            $nodeUtils = new nodeUtils();
+
+            // make it possible to set a default graph URI
+            if (
+                isset($options['default_graph_uri']) &&
+                $nodeUtils->simpleCheckURI($options['default_graph_uri'])
+            ) {
+                $graphUri = $options['default_graph_uri'];
+            } else {
+                $graphUri = 'NULL';
+            }
             $graphSpec = '';
             // escape characters that delimit the query within the query
             $sparqlQuery = $graphSpec . 'CALL DB.DBA.SPARQL_EVAL(\''. addcslashes($sparqlQuery, '\'\\') . '\', '.
