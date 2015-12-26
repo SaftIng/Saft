@@ -1,5 +1,5 @@
 {
-    "name": "saft/saft-backend-easyrdf",
+    "name": "saft/saft-easyrdf",
     "description": "",
     "keywords": ["EasyRdf", "Parser", "Serializer"],
     "homepage": "https://safting.github.io/",

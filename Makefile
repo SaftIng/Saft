@@ -51,6 +51,7 @@ mrpropper: clean
 # Setup all remotes for Saft's subtree repositories.
 setup-subtrees:
 	- git remote add saft.data git@github.com:SaftIng/Saft.data
+	- git remote add saft.easyrdf git@github.com:SaftIng/Saft.easyrdf
 	- git remote add saft.querycache git@github.com:SaftIng/Saft.querycache
 	- git remote add saft.rdf git@github.com:SaftIng/Saft.rdf
 	- git remote add saft.redland git@github.com:SaftIng/Saft.redland
@@ -62,6 +63,7 @@ setup-subtrees:
 # TODO change this somehow to a loop
 split-subtrees:
 	git subtree split -P src/Saft/Addition/HttpStore -b saft.store.http
+	git subtree split -P src/Saft/Addition/EasyRdf -b saft.easyrdf
 	git subtree split -P src/Saft/Addition/QueryCache -b saft.querycache
 	git subtree split -P src/Saft/Addition/Redland -b saft.redland
 	git subtree split -P src/Saft/Addition/Virtuoso -b saft.store.virtuoso
@@ -73,6 +75,7 @@ split-subtrees:
 # After the call of make split-subtrees, that command pushes all the new changes to the according remotes.
 push-subtrees:
 	git push saft.data saft.data:master
+	git push saft.easyrdf saft.easyrdf:master
 	git push saft.querycache saft.querycache:master
 	git push saft.rdf saft.rdf:master
 	git push saft.redland saft.redland:master
