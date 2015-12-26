@@ -17,6 +17,7 @@ default:
 	@echo "- make setup-test-environment - Setup test-environment of Saft."
 	@echo "- make setup-subtrees - Setup all remotes for Saft's subtree repositories."
 	@echo "- make split-subtrees - Setup test-environment of Saft."
+	@echo "- make push-subtrees - Push to subtree repos."
 	@echo ""
 
 setup-test-environment:
