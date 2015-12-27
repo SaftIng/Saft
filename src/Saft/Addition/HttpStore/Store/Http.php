@@ -352,7 +352,6 @@ class Http extends AbstractSparqlStore
                  * )
                  */
                 foreach ($bindingParts as $variable => $part) {
-
                     // it seems that for instance Virtuoso returns type=literal for bnodes,
                     // so we manually fix that here to avoid that problem if other stores act
                     // the same

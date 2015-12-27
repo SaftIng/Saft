@@ -249,7 +249,6 @@ abstract class AbstractQuery implements Query
         );
 
         foreach ($matches[2] as $match) {
-
             // TODO optimize REGEX to ignore " at the end to save the lastChar check later on.
 
             /**
@@ -270,7 +269,6 @@ abstract class AbstractQuery implements Query
             );
 
             if (true == isset($parts[3][0])) {
-
                 // if last char is " or ', cut it out
                 $lastChar = substr($parts[3][0], strlen($parts[3][0])-1);
                 if ('"' == $lastChar || "'" == $lastChar) {

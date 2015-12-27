@@ -403,7 +403,6 @@ class Virtuoso extends AbstractSparqlStore
                      * )
                      */
                     foreach ($bindingParts as $variable => $part) {
-
                         // it seems that Virtuoso returns type=literal for bnodes, so we manually fix that
                         // here, otherwise it will creates a Literal instance.
                         if (false !== strpos($part['value'], '_:')) {

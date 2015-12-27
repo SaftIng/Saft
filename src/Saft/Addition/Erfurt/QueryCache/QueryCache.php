@@ -16,7 +16,8 @@ use Saft\Store\ChainableStore;
 use Saft\Store\Store;
 
 /**
- * This class provides access to Erfurt's QueryCache implementation which uses MySQL database to store information.
+ * This class provides access to Erfurt's QueryCache implementation which uses MySQL database to store
+ * information.
  */
 class QueryCache implements ChainableStore
 {
@@ -115,7 +116,9 @@ class QueryCache implements ChainableStore
 
         // dont run command by myself
         } else {
-            throw new \Exception('Addition\Erfurt\QueryCache does not support adding new statements, only by successor.');
+            throw new \Exception(
+                'Addition\Erfurt\QueryCache does not support adding new statements, only by successor.'
+            );
         }
     }
 
@@ -181,7 +184,9 @@ class QueryCache implements ChainableStore
 
         // dont run command by myself
         } else {
-            throw new \Exception('Addition\Erfurt\QueryCache does not support adding new statements, only by successor.');
+            throw new \Exception(
+                'Addition\Erfurt\QueryCache does not support adding new statements, only by successor.'
+            );
         }
     }
 
@@ -315,7 +320,9 @@ class QueryCache implements ChainableStore
 
         // dont run command by myself
         } else {
-            throw new \Exception('Addition\Erfurt\QueryCache does not support has matching statement calls, only by successor.');
+            throw new \Exception(
+                'Addition\Erfurt\QueryCache does not support has matching statement calls, only by successor.'
+            );
         }
     }
 
@@ -400,7 +407,9 @@ class QueryCache implements ChainableStore
 
         // dont run command by myself
         } else {
-            throw new \Exception('Addition\Erfurt\QueryCache does not support has matching statement calls, only by successor.');
+            throw new \Exception(
+                'Addition\Erfurt\QueryCache does not support has matching statement calls, only by successor.'
+            );
         }
     }
 
@@ -482,7 +491,9 @@ class QueryCache implements ChainableStore
 
         // dont run command by myself
         } else {
-            throw new \Exception('Addition\Erfurt\QueryCache does not support get available graphs, only by successor.');
+            throw new \Exception(
+                'Addition\Erfurt\QueryCache does not support get available graphs, only by successor.'
+            );
         }
     }
 
