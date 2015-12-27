@@ -138,6 +138,40 @@ class AbstractQueryUnitTest extends TestCase
     {
         $this->fixture = $this->queryFactory->createInstanceByQueryString(
             'PREFIX foo: <http://bar.de> SELECT ?s FROM <http://foo> WHERE {
+                ?s <http://foobar/hey> ?o. FILTER regex(?g, "aar")
+             }'
+        );
+
+        $queryParts = $this->fixture->getQueryParts();
+
+        $this->assertEquals(
+            array(
+                array(
+                    'args' => array(
+                        array(
+                            'value' => 'g',
+                            'type' => 'var',
+                            'operator' => ''
+                        ),
+                        array(
+                            'value' => 'aar',
+                            'type' => 'literal',
+                            'sub_type' => 'literal2',
+                            'operator' => ''
+                        )
+                    ),
+                    'type' => 'built_in_call',
+                    'call' => 'regex'
+                ),
+            ),
+            $queryParts['filter_pattern']
+        );
+    }
+
+    public function testExtractFilterPatternRegexWithParameter()
+    {
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
+            'PREFIX foo: <http://bar.de> SELECT ?s FROM <http://foo> WHERE {
                 ?s <http://foobar/hey> ?o. FILTER regex(?g, "aar", "i")
              }'
         );

@@ -234,13 +234,13 @@ abstract class AbstractQuery implements Query
      */
     public function extractFilterPattern($where)
     {
-        /**
+        /*
          * Remaining filter clauses to cover:
-           - FILTER (?decimal * 10 > ?minPercent )
-           - FILTER (isURI(?person) && !bound(?person))
-           - FILTER (lang(?title) = 'en')
-           - FILTER regex(?ssn, '...')
-        */
+         *  - FILTER (?decimal * 10 > ?minPercent )
+         *  - FILTER (isURI(?person) && !bound(?person))
+         *  - FILTER (lang(?title) = 'en')
+         *  - FILTER regex(?ssn, '...')
+         */
 
         $pattern = array();
 
@@ -308,7 +308,7 @@ abstract class AbstractQuery implements Query
          * - FILTER regex(?g, "aar", "i")
          */
         preg_match_all(
-            '/regex\s*\((\?[a-zA-Z0-9]*),\s*"([^"]*)"(,\s*"(.*)")*\)/',
+            '/regex\s*\((\?[a-zA-Z0-9]*),\s*"([^"]*)"(,\s*"(.*)")*\)/si',
             $where,
             $matches
         );
@@ -332,8 +332,8 @@ abstract class AbstractQuery implements Query
                 'call' => 'regex',
             );
 
-            // if optional part is set, which means the regex function gots 3 parameter
-            if (true === isset($matches[4][0])) {
+            // if optional part is set, which means the regex function got 3 parameter
+            if (0 < strlen($matches[4][0])) {
                 $entry['args'][] = array(
                     'value' => $matches[4][0],  // optional part, i
                     'type' => 'literal',
