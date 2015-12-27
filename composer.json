@@ -30,12 +30,6 @@
         "saft/saft-store-virtuoso": "self.version",
         "saft/saft-redland": "self.version"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/k00ni/Erfurt"
-        }
-    ],
     "require": {
         "php": ">=5.3.3",
         "aksw/erfurt": "dev-feature/php-composer",
