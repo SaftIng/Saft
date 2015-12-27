@@ -134,6 +134,45 @@ class AbstractQueryUnitTest extends TestCase
      * Tests extractFilterPattern
      */
 
+    public function testExtractFilterPatternLang()
+    {
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
+            'PREFIX foo: <http://bar.de> SELECT ?s FROM <http://foo> WHERE {
+                ?s <http://foobar/hey> ?o. FILTER (lang(?title) = "en")
+             }'
+        );
+
+        $queryParts = $this->fixture->getQueryParts();
+
+        $this->assertTrue(
+            isset($queryParts['filter_pattern']),
+            'Key filter_pattern in $queryParts not set.'
+        );
+
+        $this->assertEquals(
+            array(
+                array(
+                    'args' => array(
+                        array(
+                            'value' => 'title',
+                            'type' => 'var',
+                            'operator' => ''
+                        ),
+                        array(
+                            'value' => 'en',
+                            'type' => 'literal',
+                            'sub_type' => 'literal2',
+                            'operator' => ''
+                        )
+                    ),
+                    'type' => 'built_in_call',
+                    'call' => 'lang'
+                ),
+            ),
+            $queryParts['filter_pattern']
+        );
+    }
+
     public function testExtractFilterPatternRegex()
     {
         $this->fixture = $this->queryFactory->createInstanceByQueryString(

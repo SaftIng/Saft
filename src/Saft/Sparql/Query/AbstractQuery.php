@@ -238,8 +238,6 @@ abstract class AbstractQuery implements Query
          * Remaining filter clauses to cover:
          *  - FILTER (?decimal * 10 > ?minPercent )
          *  - FILTER (isURI(?person) && !bound(?person))
-         *  - FILTER (lang(?title) = 'en')
-         *  - FILTER regex(?ssn, '...')
          */
 
         $pattern = array();
@@ -251,6 +249,9 @@ abstract class AbstractQuery implements Query
         );
 
         foreach ($matches[2] as $match) {
+
+            // TODO optimize REGEX to ignore " at the end to save the lastChar check later on.
+
             /**
              * Covers filters such as:
              * - FILTER (?o < 40)
@@ -258,28 +259,35 @@ abstract class AbstractQuery implements Query
              */
             preg_match_all(
                 '/' .
-                '(\?[a-zA-Z0-9\_]+)'.   // e.g. ?s
-                '\s*' .                 // space
-                '(=|<|>|!=)' .          // operator, e.g. =
-                '\s*' .                 // space
-                '(".*"|[0-9]*)' .       // constrain, e.g. 40 or "Bar"
-                '/',
+                '\?([a-zA-Z0-9\_]+)'. // e.g. ?s
+                '\s*' .               // space
+                '(=|<|>|!=)' .        // operator, e.g. =
+                '\s*' .               // space
+                '"*(.*)"*' .          // constrain, e.g. 40 or "Bar"
+                '/si',
                 $match,
                 $parts
             );
 
             if (true == isset($parts[3][0])) {
+
+                // if last char is " or ', cut it out
+                $lastChar = substr($parts[3][0], strlen($parts[3][0])-1);
+                if ('"' == $lastChar || "'" == $lastChar) {
+                    $parts[3][0] = substr($parts[3][0], 0, strlen($parts[3][0])-1);
+                }
+
                 $entry = array(
                     'type'      => 'expression',
                     'sub_type'  => 'relational',
                     'patterns'  => array(
                         array(
-                            'value'     => substr($parts[1][0], 1), // e.g. ?s
+                            'value'     => $parts[1][0], // e.g. ?s
                             'type'      => 'var', // its always a variable
                             'operator'  => ''
                         ),
                         array(
-                            'value'     => str_replace('"', '', $parts[3][0]), // e.g. "Bar"
+                            'value'     => $parts[3][0], // e.g. "Bar"
                             'type'      => 'literal',
                             'operator'  => ''
                         )
@@ -300,49 +308,85 @@ abstract class AbstractQuery implements Query
                 // go to the next match
                 continue;
             }
-        }
 
-        /**
-         * Covers regex filters such as:
-         * - FILTER regex(?g, "aar")
-         * - FILTER regex(?g, "aar", "i")
-         */
-        preg_match_all(
-            '/regex\s*\((\?[a-zA-Z0-9]*),\s*"([^"]*)"(,\s*"(.*)")*\)/si',
-            $where,
-            $matches
-        );
+            /**
+             * Covers regex filters such as:
+             * - FILTER regex(?g, "aar")
+             * - FILTER regex(?g, "aar", "i")
+             */
+            preg_match_all(
+                '/FILTER\s+regex\s*\(\?([a-zA-Z0-9]*),\s*"([^"]*)"(,\s*"(.*)")*\)/si',
+                $where,
+                $parts
+            );
 
-        if (true == isset($matches[1][0])) {
-            $entry = array(
-                'args' => array(
-                    array(
-                        'value' => substr($matches[1][0], 1),
-                        'type' => 'var',
-                        'operator' => ''
+            if (true == isset($parts[1][0])) {
+                $entry = array(
+                    'args' => array(
+                        array(
+                            'value' => $parts[1][0],
+                            'type' => 'var',
+                            'operator' => ''
+                        ),
+                        array(
+                            'value' => $parts[2][0],
+                            'type' => 'literal',
+                            'sub_type' => 'literal2',
+                            'operator' => ''
+                        )
                     ),
-                    array(
-                        'value' => $matches[2][0],
+                    'type' => 'built_in_call',
+                    'call' => 'regex',
+                );
+
+                // if optional part is set, which means the regex function got 3 parameter
+                if (0 < strlen($parts[4][0])) {
+                    $entry['args'][] = array(
+                        'value' => $parts[4][0],  // optional part, i
                         'type' => 'literal',
                         'sub_type' => 'literal2',
                         'operator' => ''
-                    )
-                ),
-                'type' => 'built_in_call',
-                'call' => 'regex',
-            );
+                    );
+                }
 
-            // if optional part is set, which means the regex function got 3 parameter
-            if (0 < strlen($matches[4][0])) {
-                $entry['args'][] = array(
-                    'value' => $matches[4][0],  // optional part, i
-                    'type' => 'literal',
-                    'sub_type' => 'literal2',
-                    'operator' => ''
-                );
+                $pattern[] = $entry;
+
+                continue;
             }
 
-            $pattern[] = $entry;
+            /**
+             * Covers regex filters such as:
+             * - FILTER (lang(?title) = 'en')
+             */
+            preg_match_all(
+                '/lang\(\?([a-z0-9]+)\)\s*\=\s*[\'|\"]([a-z\_]+)[\'|\"]/si',
+                $match,
+                $parts
+            );
+
+            if (true == isset($parts[1][0])) {
+                $entry = array(
+                    'args' => array(
+                        array(
+                            'value' => $parts[1][0],
+                            'type' => 'var',
+                            'operator' => ''
+                        ),
+                        array(
+                            'value' => $parts[2][0],
+                            'type' => 'literal',
+                            'sub_type' => 'literal2',
+                            'operator' => ''
+                        )
+                    ),
+                    'type' => 'built_in_call',
+                    'call' => 'lang',
+                );
+
+                $pattern[] = $entry;
+
+                continue;
+            }
         }
 
         return $pattern;
