@@ -65,8 +65,6 @@ abstract class StoreAbstractTest extends TestCase
         $predicate1 = new NamedNodeImpl('http://saft/testquad/p1');
         $object1 = new NamedNodeImpl('http://saft/testquad/o1');
         $graph1 = new NamedNodeImpl('http://saft/testquad/g1');
-        $quad = new StatementImpl($subject1, $predicate1, $object1, $graph1);
-
         return new StatementImpl($subject1, $predicate1, $object1, $graph1);
     }
 
@@ -75,8 +73,6 @@ abstract class StoreAbstractTest extends TestCase
         $subject2 = new NamedNodeImpl('http://saft/testtriple/s2');
         $predicate2 = new NamedNodeImpl('http://saft/testtriple/p2');
         $object2 = new NamedNodeImpl('http://saft/testtriple/o2');
-        $triple = new StatementImpl($subject2, $predicate2, $object2);
-
         return new StatementImpl($subject2, $predicate2, $object2);
     }
 
@@ -85,7 +81,6 @@ abstract class StoreAbstractTest extends TestCase
         $subject1 = new AnyPatternImpl();
         $predicate1 = new AnyPatternImpl();
         $object1 = new AnyPatternImpl();
-
         return new StatementImpl($subject1, $predicate1, $object1);
     }
 
