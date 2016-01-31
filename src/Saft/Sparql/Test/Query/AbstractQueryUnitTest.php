@@ -416,8 +416,8 @@ class AbstractQueryUnitTest extends TestCase
 
     public function testExtractTriplePatternBlankNode()
     {
-        $this->fixture = $this->queryFactory->createInstanceByQueryString('
-            PREFIX qb:<http://purl.org/linked-data/cube#>
+        $this->fixture = $this->queryFactory->createInstanceByQueryString(
+            'PREFIX qb:<http://purl.org/linked-data/cube#>
             ASK FROM <http://localhost/scoreboard-potion> {
                 _:foo qb:foo qb:bar .
             }'
