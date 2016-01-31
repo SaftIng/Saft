@@ -12,7 +12,7 @@ class StatementIterator implements SaftStatementIterator
     protected $stream;
 
     /**
-     * @param $stream librdf_stream
+     * @param librdf_stream $stream
      */
     public function __construct($stream)
     {

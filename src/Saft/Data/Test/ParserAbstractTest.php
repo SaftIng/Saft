@@ -16,11 +16,12 @@ abstract class ParserAbstractTest extends TestCase
      */
     abstract protected function newInstance($serialization);
 
-    /**
+    /*
      * Tests for parseStreamToIterator
-     * we load here the content of a turtle file and transform it into an StatementIterator instance.
+     * we load here the content of a file and transform it into an StatementIterator instance.
      * afterwards we check if the read data are the same as expected.
      */
+
     public function testParseStreamToIteratorTurtleFile()
     {
         $this->fixture = $this->newInstance('turtle');
@@ -82,9 +83,10 @@ abstract class ParserAbstractTest extends TestCase
         $this->assertEquals($statementIteratorToCheckAgainst, $iterator);
     }
 
-    /**
+    /*
      * Tests for parseStringToIterator
      */
+
     public function testParseStringToIteratorTurtleString()
     {
         $xsdString = new NamedNodeImpl('http://www.w3.org/2001/XMLSchema#string');
