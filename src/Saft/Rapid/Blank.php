@@ -34,6 +34,7 @@ namespace Saft\Rapid;
  *
  * @api
  * @since 0.1
+ * @deprecated
  * @package Saft\Rapid
  */
 class Blank extends \ArrayObject
