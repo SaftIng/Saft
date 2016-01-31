@@ -171,20 +171,28 @@ class ARC2 extends AbstractSparqlStore
         $g2t = $this->configuration['table-prefix'] . '_g2t';
         $id2val = $this->configuration['table-prefix'] . '_id2val';
 
-        /*
-         * for id2val table
-         */
-        $query = 'INSERT INTO '. $id2val .' (val) VALUES("'. $graph->getUri() .'")';
-        $this->store->queryDB($query, $this->store->getDBCon());
-        $usedId = $this->store->getDBCon()->insert_id;
+        // check if there is already a graph with the given URI
+        $result = $this->store->queryDB(
+            'SELECT id FROM '. $id2val .' WHERE val = "'. $graph->getUri() .'";',
+            $this->store->getDBCon()
+        );
 
-        /*
-         * for g2t table
-         */
-        $newIdg2t = 1 + $this->getRowCount($g2t);
-        $query = 'INSERT INTO '. $g2t .' (t, g) VALUES('. $newIdg2t .', '. $usedId .')';
-        $this->store->queryDB($query, $this->store->getDBCon());
-        $usedId = $this->store->getDBCon()->insert_id;
+        if (0 == $result->num_rows) {
+            /*
+             * for id2val table
+             */
+            $query = 'INSERT INTO '. $id2val .' (val) VALUES("'. $graph->getUri() .'")';
+            $this->store->queryDB($query, $this->store->getDBCon());
+            $usedId = $this->store->getDBCon()->insert_id;
+
+            /*
+             * for g2t table
+             */
+            $newIdg2t = 1 + $this->getRowCount($g2t);
+            $query = 'INSERT INTO '. $g2t .' (t, g) VALUES('. $newIdg2t .', '. $usedId .')';
+            $this->store->queryDB($query, $this->store->getDBCon());
+            $usedId = $this->store->getDBCon()->insert_id;
+        }
     }
 
     /**
