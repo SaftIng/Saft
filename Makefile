@@ -48,17 +48,29 @@ commit:
 mrpropper: clean
 	rm -r ./vendor
 
+# Remove all remotes for Saft's subtree repositories.
+remove-subtrees:
+	git remote rm saft.data
+	git remote rm saft.easyrdf
+	git remote rm saft.querycache
+	git remote rm saft.rdf
+	git remote rm saft.redland
+	git remote rm saft.sparql
+	git remote rm saft.store
+	git remote rm saft.store.http
+	git remote rm saft.store.virtuoso
+
 # Setup all remotes for Saft's subtree repositories.
 setup-subtrees:
-	- git remote add saft.data git@github.com:SaftIng/Saft.data
-	- git remote add saft.easyrdf git@github.com:SaftIng/Saft.easyrdf
-	- git remote add saft.querycache git@github.com:SaftIng/Saft.querycache
-	- git remote add saft.rdf git@github.com:SaftIng/Saft.rdf
-	- git remote add saft.redland git@github.com:SaftIng/Saft.redland
-	- git remote add saft.sparql git@github.com:SaftIng/Saft.sparql
-	- git remote add saft.store git@github.com:SaftIng/Saft.store
-	- git remote add saft.store.http git@github.com:SaftIng/Saft.store.http
-	- git remote add saft.store.virtuoso git@github.com:SaftIng/Saft.store.virtuoso
+	git remote add saft.data git@github.com:SaftIng/Saft.data
+	git remote add saft.easyrdf git@github.com:SaftIng/Saft.easyrdf
+	git remote add saft.querycache git@github.com:SaftIng/Saft.querycache
+	git remote add saft.rdf git@github.com:SaftIng/Saft.rdf
+	git remote add saft.redland git@github.com:SaftIng/Saft.redland
+	git remote add saft.sparql git@github.com:SaftIng/Saft.sparql
+	git remote add saft.store git@github.com:SaftIng/Saft.store
+	git remote add saft.store.http git@github.com:SaftIng/Saft.store.http
+	git remote add saft.store.virtuoso git@github.com:SaftIng/Saft.store.virtuoso
 
 # TODO change this somehow to a loop
 split-subtrees:
