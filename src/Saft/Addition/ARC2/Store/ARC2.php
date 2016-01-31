@@ -353,6 +353,17 @@ class ARC2 extends AbstractSparqlStore
             'table-prefix' => 'saft_'
         ), $this->configuration);
 
+        /*
+         * check for missing connection credentials
+         */
+        if ('' == $this->configuration['database']) {
+            throw new \Exception('ARC2: Field database is not set.');
+        } elseif ('' == $this->configuration['username']) {
+            throw new \Exception('ARC2: Field username is not set.');
+        } elseif ('' == $this->configuration['host']) {
+            throw new \Exception('ARC2: Field host is not set.');
+        }
+
         // init store
         $this->store = \ARC2::getStore(array(
             'db_host' => $this->configuration['host'],

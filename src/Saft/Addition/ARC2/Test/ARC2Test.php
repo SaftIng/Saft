@@ -71,6 +71,52 @@ class ARC2Test extends StoreAbstractTest
         return $entry[$variable]->getValue();
     }
 
+    /*
+     * Tests openConnection
+     */
+
+    public function testOpenConnectionCheckDatabase()
+    {
+        $this->setExpectedException('Exception');
+
+        new ARC2(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl(),
+            new ResultFactoryImpl(),
+            new StatementIteratorFactoryImpl(),
+            array()
+        );
+    }
+
+    public function testOpenConnectionCheckHost()
+    {
+        $this->setExpectedException('Exception');
+
+        new ARC2(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl(),
+            new ResultFactoryImpl(),
+            new StatementIteratorFactoryImpl(),
+            array('database' => 'saft')
+        );
+    }
+
+    public function testOpenConnectionCheckUsername()
+    {
+        $this->setExpectedException('Exception');
+
+        new ARC2(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl(),
+            new ResultFactoryImpl(),
+            new StatementIteratorFactoryImpl(),
+            array('database' => 'saft', 'host' => 'localhost')
+        );
+    }
+
     /**
      * Tests for query
      */
