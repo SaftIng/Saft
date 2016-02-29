@@ -2,8 +2,6 @@
 
 namespace Saft\Addition\EasyRdf\Data;
 
-use EasyRdf\Format;
-use EasyRdf\Graph;
 use Saft\Data\Parser;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NodeFactory;
@@ -72,7 +70,7 @@ class ParserEasyRdf implements Parser
             throw new \Exception('Parameter $baseUri is not a valid URI.');
         }
 
-        $graph = new Graph();
+        $graph = new \EasyRdf_Graph();
         $graph->parse($inputString, $this->serialization, $baseUri);
 
         // transform parsed data to PHP array
@@ -96,7 +94,7 @@ class ParserEasyRdf implements Parser
             throw new \Exception('Parameter $baseUri is not a valid URI.');
         }
 
-        $graph = new Graph();
+        $graph = new \EasyRdf_Graph();
         $graph->parseFile($inputStream, $this->serialization);
 
         // transform parsed data to PHP array

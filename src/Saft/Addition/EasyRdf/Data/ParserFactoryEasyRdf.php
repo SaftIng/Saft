@@ -2,7 +2,6 @@
 
 namespace Saft\Addition\EasyRdf\Data;
 
-use EasyRdf\Format;
 use Saft\Data\ParserFactory;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\StatementFactory;
