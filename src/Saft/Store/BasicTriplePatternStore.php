@@ -289,6 +289,7 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
      */
     public function createGraph(NamedNode $graph, array $options = array())
     {
+        $this->statements[$graph->getUri()] = array();
     }
 
     /**
@@ -302,5 +303,6 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
      */
     public function dropGraph(NamedNode $graph, array $options = array())
     {
+        unset($this->statements[$graph->getUri()]);
     }
 }
