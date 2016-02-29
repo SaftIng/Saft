@@ -20,6 +20,7 @@ class SerializerEasyRdf implements Serializer
      * Constructor.
      *
      * @param string $serialization Serialization format, for instance turtle or rdfa.
+     * @throws \Exception if unknown serialization format was given.
      */
     public function __construct($serialization)
     {
