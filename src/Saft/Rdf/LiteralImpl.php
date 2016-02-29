@@ -30,11 +30,11 @@ class LiteralImpl extends AbstractLiteral
     protected $lang = null;
 
     /**
-     * @param string $value  The Literal value
-     * @param Node $datatype The datatype of the Literal (respectively defaults to xsd:string or rdf:langString)
-     * @param string $lang   The language tag of the Literal (optional)
+     * @param string $value The Literal value
+     * @param NamedNode $datatype The datatype of the Literal (respectively defaults to xsd:string or rdf:langString)
+     * @param string $lang The language tag of the Literal (optional)
      */
-    public function __construct($value, Node $datatype = null, $lang = null)
+    public function __construct($value, NamedNode $datatype = null, $lang = null)
     {
         if ($value === null) {
             throw new \Exception('Literal value can\'t be null. Please use AnyPattern if you need a variable.');
