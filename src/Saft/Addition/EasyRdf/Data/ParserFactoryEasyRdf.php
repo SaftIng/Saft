@@ -37,9 +37,9 @@ class ParserFactoryEasyRdf implements ParserFactory
     /**
      * Creates a Parser instance for a given serialization, if available.
      *
-     * @param  string     $serialization The serialization you need a parser for. In case it is not
-     *                                   available, an exception will be thrown.
-     * @return Parser     Suitable parser for the requested serialization.
+     * @param string $serialization The serialization you need a parser for. In case it is not
+     *                              available, an exception will be thrown.
+     * @return Parser Suitable parser for the requested serialization.
      * @throws \Exception If parser for requested serialization is not available.
      */
     public function createParserFor($serialization)
@@ -51,7 +51,7 @@ class ParserFactoryEasyRdf implements ParserFactory
             );
         }
 
-        return new ParserEasyRdf($this->nodeFactory, $this->statementFactory, $this->serializationMap[$serialization]);
+        return new ParserEasyRdf($this->nodeFactory, $this->statementFactory, $serialization);
     }
 
     /**

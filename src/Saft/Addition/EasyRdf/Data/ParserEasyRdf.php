@@ -21,6 +21,11 @@ class ParserEasyRdf implements Parser
     private $serialization;
 
     /**
+     * @var array
+     */
+    protected $serializationMap;
+
+    /**
      * @var StatementFactory
      */
     private $statementFactory;
@@ -31,6 +36,7 @@ class ParserEasyRdf implements Parser
      * @param NodeFactory      $nodeFactory
      * @param StatementFactory $statementFactory
      * @param string           $serialization
+     * @throws \Exception if serialization is unknown.
      */
     public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory, $serialization)
     {
@@ -39,6 +45,21 @@ class ParserEasyRdf implements Parser
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
         $this->serialization = $serialization;
+
+        $this->serializationMap = array(
+            'n-triples' => 'ntriples',
+            'rdf-json' => 'json',
+            'rdf-xml' => 'rdfxml',
+            'rdfa' => 'rdfa',
+            'turtle' => 'turtle',
+        );
+
+        if (false == isset($this->serializationMap[$serialization])) {
+            throw new \Exception(
+                'Unknown serialization format given: '. $serialization .'. Supported are only '.
+                implode(', ', array_keys($this->serializationMap))
+            );
+        }
     }
 
     /**

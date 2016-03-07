@@ -2,6 +2,7 @@
 
 namespace Saft\Addition\EasyRdf\Test;
 
+use Saft\Addition\EasyRdf\Data\ParserEasyRdf;
 use Saft\Addition\EasyRdf\Data\ParserFactoryEasyRdf;
 use Saft\Data\Test\ParserAbstractTest;
 use Saft\Rdf\NodeFactoryImpl;
@@ -15,6 +16,7 @@ class ParserEasyRdfTest extends ParserAbstractTest
     {
         $this->factory = new ParserFactoryEasyRdf(new NodeFactoryImpl(), new StatementFactoryImpl());
     }
+
     /**
      * @return Parser
      */

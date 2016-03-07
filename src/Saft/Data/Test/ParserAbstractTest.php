@@ -17,6 +17,17 @@ abstract class ParserAbstractTest extends TestCase
     abstract protected function newInstance($serialization);
 
     /*
+     * Tests for __construct
+     */
+
+    public function testConstructorInvalidSerialization()
+    {
+        $this->setExpectedException('\Exception');
+
+        $this->newInstance('unknown');
+    }
+
+    /*
      * Tests for parseStreamToIterator
      * we load here the content of a file and transform it into an StatementIterator instance.
      * afterwards we check if the read data are the same as expected.
