@@ -44,7 +44,6 @@ class ParserEasyRdf implements Parser
 
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
-        $this->serialization = $serialization;
 
         $this->serializationMap = array(
             'n-triples' => 'ntriples',
@@ -53,6 +52,8 @@ class ParserEasyRdf implements Parser
             'rdfa' => 'rdfa',
             'turtle' => 'turtle',
         );
+
+        $this->serialization = $this->serializationMap[$serialization];
 
         if (false == isset($this->serializationMap[$serialization])) {
             throw new \Exception(
