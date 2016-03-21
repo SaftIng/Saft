@@ -52,6 +52,18 @@ class NodeUtils
     }
 
     /**
+     * Checks if a given string is a blank node ID. Blank nodes are usually structured like
+     * _:foo, whereas _: comes first always.
+     *
+     * @param string $string String to check if its a blank node ID or not.
+     * @return boolean True if given string is a valid blank node ID, false otherwise.
+     */
+    public function simpleCheckBlankNodeId($string)
+    {
+        return '_:' == substr($string, 0, 2);
+    }
+
+    /**
      * Checks the general syntax of a given URI. Protocol-specific syntaxes are not checked. Instead, only
      * characters disallowed an all URIs lead to a rejection of the check. Use this function, if you need a
      * basic check and if performance is an issuse. In case you need a more precise check, that function is

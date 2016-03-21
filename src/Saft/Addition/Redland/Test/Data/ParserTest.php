@@ -52,4 +52,9 @@ class ParserTest extends ParserAbstractTest
     {
         $this->markTestSkipped('Redland quits turtle string parsing with exception.');
     }
+
+    public function testParseStringToIteratorTurtleStringSubjectBlankNode()
+    {
+        $this->markTestSkipped('Redland quits turtle string parsing with exception.');
+    }
 }

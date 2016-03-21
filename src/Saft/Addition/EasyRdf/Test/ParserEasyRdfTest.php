@@ -10,7 +10,7 @@ use Saft\Rdf\StatementFactoryImpl;
 
 class ParserEasyRdfTest extends ParserAbstractTest
 {
-    private $factory;
+    protected $factory;
 
     public function __construct()
     {

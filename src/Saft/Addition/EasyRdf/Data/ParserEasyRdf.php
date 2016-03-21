@@ -138,6 +138,8 @@ class ParserEasyRdf implements Parser
      *                          )
      *                      )
      * @return StatementIterator
+     * @throws \Exception if a non-URI or non-BlankNode is used at subject position.
+     * @throws \Exception if a non-URI or non-BlankNode is used at predicate position.
      */
     protected function rdfPhpToStatementIterator(array $rdfPhp)
     {
@@ -154,8 +156,11 @@ class ParserEasyRdf implements Parser
                      */
                     if (true === $this->nodeUtils->simpleCheckURI($subject)) {
                         $s = $this->nodeFactory->createNamedNode($subject);
+                    } elseif (true === $this->nodeUtils->simpleCheckBlankNodeId($subject)){
+                        $s = $this->nodeFactory->createBlankNode($subject);
                     } else {
-                        $s = $this->nodeFactory->createLiteral($subject);
+                        // should not be possible, because EasyRdf is able to check for invalid subjects.
+                        throw new \Exception('Only URIs and blank nodes are allowed as subjects.');
                     }
 
                     /**
@@ -163,8 +168,11 @@ class ParserEasyRdf implements Parser
                      */
                     if (true === $this->nodeUtils->simpleCheckURI($property)) {
                         $p = $this->nodeFactory->createNamedNode($property);
+                    } elseif (true === $this->nodeUtils->simpleCheckBlankNodeId($property)){
+                        $p = $this->nodeFactory->createBlankNode($property);
                     } else {
-                        $p = $this->nodeFactory->createLiteral($property);
+                        // should not be possible, because EasyRdf is able to check for invalid predicates.
+                        throw new \Exception('Only URIs and blank nodes are allowed as predicates.');
                     }
 
                     /*
