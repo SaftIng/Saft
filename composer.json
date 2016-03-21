@@ -35,7 +35,7 @@
         "easyrdf/easyrdf": "0.9.*",
         "nette/caching": "2.4.*",
         "semsol/arc2": "2.2.*",
-        "php-curl-class/php-curl-class": "4.10.*",
+        "php-curl-class/php-curl-class": "4.11.*",
         "ext-odbc": "*",
         "ext-pdo_odbc": "*",
         "ext-redland": "*"
