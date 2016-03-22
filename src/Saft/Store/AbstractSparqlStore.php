@@ -163,7 +163,10 @@ abstract class AbstractSparqlStore implements Store
             }
         }
 
-        $this->query('INSERT DATA {'. $content .'}', $options);
+        // if remaining statements are available
+        if (0 < count($batchStatements)) {
+            $this->query('INSERT DATA {'. $content .'}', $options);
+        }
     }
 
     /**

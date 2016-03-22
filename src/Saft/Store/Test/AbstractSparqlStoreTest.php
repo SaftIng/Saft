@@ -106,7 +106,7 @@ class AbstractSparqlStoreTest extends TestCase
      * Tests for addStatements
      */
 
-    public function testAddStatements2()
+    public function testAddStatements()
     {
         $statements = new ArrayStatementIteratorImpl(array(
             $this->getTestStatement('uri', 'uri', 'uri', 'uri'),
@@ -130,6 +130,35 @@ class AbstractSparqlStoreTest extends TestCase
                 '<'. $this->regexUri .'><'. $this->regexUri .'><'. $this->regexUri .'>.'.
                 '}}/si'
             ));
+
+        // use the given graphUri
+        $this->assertNull(
+            $this->mock->addStatements($statements, $this->testGraph)
+        );
+    }
+
+    // check correct behavior, when there is no batch available outside of the loop
+    public function testAddStatementsCheckBatchHandling()
+    {
+        $statementArray = array();
+
+        // generate as many statements as the batch size is
+        for ($i = 0; $i < 100; ++$i) {
+            $statementArray[] = new StatementImpl(
+                new NamedNodeImpl('http://localhost/saft/'. $i),
+                new NamedNodeImpl('http://localhost/saft/'. $i),
+                new NamedNodeImpl('http://localhost/saft/'. $i)
+            );
+        }
+
+        $statements = new ArrayStatementIteratorImpl($statementArray);
+
+        /*
+            check that query methods gets called only once.
+         */
+        $this->mock
+            ->expects($this->once())
+            ->method('query');
 
         // use the given graphUri
         $this->assertNull(
