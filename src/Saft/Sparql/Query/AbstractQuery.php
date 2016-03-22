@@ -599,12 +599,12 @@ abstract class AbstractQuery implements Query
              * Object part
              */
             '(' .
-            '\<[a-zA-Z0-9\.\/\:#\-]+\>|' .      // e.g. <http://foobar/a>
-            '[a-z0-9]+\:[a-z0-9]+|' .           // e.g. rdfs:label
-            '\?[a-z0-9\_]+|' .                  // e.g. ?s
-            '\".*\"[\s|\.|\}]|' .               // e.g. "Foo"
-            '\".*\"\^\^\<[a-z0-9\.\/\:#]+\>|' . // e.g. "Foo"^^<http://www.w3.org/2001/XMLSchema#string>
-            '\".*\"\@[a-z\-]{2,}' .             // e.g. "Foo"@en
+            '\<[a-zA-Z0-9\.\/\:#\-]+\>|' .            // e.g. <http://foobar/a>
+            '[a-z0-9]+\:[a-z0-9]+|' .                 // e.g. rdfs:label
+            '\?[a-z0-9\_]+|' .                        // e.g. ?s
+            '\".*\"[\s|\.|\}]|' .                     // e.g. "Foo"
+            '\".*\"\^\^\<[a-z0-9\.\/\:#-_+?=%]+\>|' . // e.g. "Foo"^^<http://www.w3.org/2001/XMLSchema#string>
+            '\".*\"\@[a-z\-]{2,}' .                   // e.g. "Foo"@en
             ')' .
             '/im',
             $where,
