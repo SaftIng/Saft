@@ -3,7 +3,7 @@
     "description": "Redland backend for the Saft library.",
     "keywords": ["Saft", "Linked Data", "Semantic Web", "Redland", "Parser", "RDF"],
     "homepage": "https://safting.github.io/",
-    "license": "GPL2",
+    "license": "GPL-3.0",
     "authors": [
         {
             "name": "Natanael Arndt",
@@ -15,18 +15,18 @@
     "require": {
         "php": ">=5.3.3",
         "ext-redland": "*",
-
-        "saft/saft-data": "dev-master",
-        "saft/saft-rdf": "dev-master",
-        "saft/saft-store": "dev-master"
+        "saft/saft-data": "0.*",
+        "saft/saft-rdf": "0.*",
+        "saft/saft-store": "0.*"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.3",
-        "squizlabs/php_codesniffer": "dev-master"
+        "phpunit/phpunit": "4.8.*",
+        "squizlabs/php_codesniffer": "2.5.*"
     },
     "autoload": {
         "psr-4": {
             "Saft\\Addition\\Redland\\": "."
         }
-    }
+    },
+    "prefer-stable": true
 }
