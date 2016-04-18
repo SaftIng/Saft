@@ -156,7 +156,7 @@ class ParserEasyRdf implements Parser
                      */
                     if (true === $this->nodeUtils->simpleCheckURI($subject)) {
                         $s = $this->nodeFactory->createNamedNode($subject);
-                    } elseif (true === $this->nodeUtils->simpleCheckBlankNodeId($subject)){
+                    } elseif (true === $this->nodeUtils->simpleCheckBlankNodeId($subject)) {
                         $s = $this->nodeFactory->createBlankNode($subject);
                     } else {
                         // should not be possible, because EasyRdf is able to check for invalid subjects.
@@ -168,7 +168,7 @@ class ParserEasyRdf implements Parser
                      */
                     if (true === $this->nodeUtils->simpleCheckURI($property)) {
                         $p = $this->nodeFactory->createNamedNode($property);
-                    } elseif (true === $this->nodeUtils->simpleCheckBlankNodeId($property)){
+                    } elseif (true === $this->nodeUtils->simpleCheckBlankNodeId($property)) {
                         $p = $this->nodeFactory->createBlankNode($property);
                     } else {
                         // should not be possible, because EasyRdf is able to check for invalid predicates.
