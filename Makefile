@@ -46,8 +46,8 @@ commit:
 mrpropper: clean
 	rm -r ./vendor
 
-# Remove all remotes for Saft's subtree repositories.
-remove-subtrees:
+# Remove all remotes for Saft's subpackages.
+remove-subpackage-remotes:
 	git remote rm saft.arc2
 	git remote rm saft.data
 	git remote rm saft.easyrdf
@@ -60,8 +60,8 @@ remove-subtrees:
 	git remote rm saft.store.http
 	git remote rm saft.store.virtuoso
 
-# Setup all remotes for Saft's subtree repositories.
-setup-subtrees:
+# Setup all remotes subpackages
+setup-subpackage-remotes:
 	git remote add saft.arc2 git@github.com:SaftIng/Saft.arc2
 	git remote add saft.data git@github.com:SaftIng/Saft.data
 	git remote add saft.easyrdf git@github.com:SaftIng/Saft.easyrdf
