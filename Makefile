@@ -48,8 +48,10 @@ mrpropper: clean
 
 # Remove all remotes for Saft's subtree repositories.
 remove-subtrees:
+	git remote rm saft.arc2
 	git remote rm saft.data
 	git remote rm saft.easyrdf
+	git remote rm saft.erfurt
 	git remote rm saft.querycache
 	git remote rm saft.rdf
 	git remote rm saft.redland
@@ -60,8 +62,8 @@ remove-subtrees:
 
 # Setup all remotes for Saft's subtree repositories.
 setup-subtrees:
-	git remote add saft.data git@github.com:SaftIng/Saft.data
 	git remote add saft.arc2 git@github.com:SaftIng/Saft.arc2
+	git remote add saft.data git@github.com:SaftIng/Saft.data
 	git remote add saft.easyrdf git@github.com:SaftIng/Saft.easyrdf
 	git remote add saft.erfurt git@github.com:SaftIng/Saft.erfurt
 	git remote add saft.querycache git@github.com:SaftIng/Saft.querycache
