@@ -203,7 +203,12 @@ abstract class LiteralAbstractTest extends TestCase
 
     public function testInitializationWithWrongDatatypeType()
     {
-        $this->setExpectedException('PHPUnit_Framework_Error');
+
+        if (class_exists('\TypeError')) {
+            $this->setExpectedException('TypeError');
+        } else {
+            $this->setExpectedException('PHPUnit_Framework_Error');
+        }
 
         // Should result in a PHP error becauseof wrong argument type
         $this->newInstance("foo", "http://www.w3.org/2001/XMLSchema#string");
