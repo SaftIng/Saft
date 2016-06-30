@@ -36,10 +36,7 @@
         "nette/caching": "2.4.*",
         "semsol/arc2": "2.2.*",
         "php-curl-class/php-curl-class": "4.11.*",
-        "symfony/yaml": "2.*",
-        "ext-odbc": "*",
-        "ext-pdo_odbc": "*",
-        "ext-redland": "*"
+        "symfony/yaml": "2.*"
     },
     "require-dev": {
         "phpunit/phpunit": "4.8.*",

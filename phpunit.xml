@@ -17,6 +17,8 @@
     <testsuites>
         <testsuite name="Saft">
             <directory suffix="Test.php">./src/Saft/*/Test</directory>
+        </testsuite>
+        <testsuite name="Saft-Additions">
             <directory suffix="Test.php">./src/Saft/Addition/*/Test</directory>
         </testsuite>
     </testsuites>
