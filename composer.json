@@ -31,7 +31,7 @@
     },
     "require": {
         "php": ">=5.3.3",
-        "aksw/erfurt": "dev-feature/php-composer",
+        "aksw/erfurt": "dev-develop",
         "easyrdf/easyrdf": "0.9.*",
         "nette/caching": "2.4.*",
         "semsol/arc2": "2.2.*",
