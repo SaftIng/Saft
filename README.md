@@ -1,6 +1,6 @@
 # Saft
 
-The Saft PHP framework provides RDF handling and support for Semantic Web technologies. It consists of the Saft.Library (_Saft.data_, _Saft.rdf_, _Saft.sparql_ and _Saft.store_) and Saft.Additions.
+The Saft PHP framework provides RDF handling and support for Semantic Web technologies. It consists of the Saft.Library (_Saft.data_, _Saft.rdf_, _Saft.sparql_ and _Saft.store_), Saft.Additions (e.g. adapter for triple stores) and Saft.skeleton (to jump start your project).
 
 ## Documentation
 
@@ -12,7 +12,7 @@ This project is licensed under the terms of the GNU General Public License (GPL)
 
 ## Current status
 
-Saft is under development but provides [stable releases](https://github.com/SaftIng/Saft/releases) already. Its used in different scenarios and is already performing very well for our approaches and rapid prototyping. With Erfurt in the bag, we are now supporting all major Semantic Web libraries for PHP: 
+Saft is under development but provides [stable releases](https://github.com/SaftIng/Saft/releases) already. Its used in different scenarios and is already performing very well for our approaches and rapid prototyping. With Erfurt in the bag, we are now supporting all major Semantic Web libraries for PHP:
 * Erfurt
 * ARC2
 * EasyRDF
