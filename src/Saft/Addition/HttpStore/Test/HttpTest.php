@@ -21,14 +21,14 @@ class HttpTest extends StoreAbstractTest
         /*
          * Load configuration
          */
-        if (true === isset($this->config['httpConfig'])) {
+        if (true === isset($this->configuration['httpConfig'])) {
             $this->fixture = new Http(
                 new NodeFactoryImpl(),
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
                 new ResultFactoryImpl(),
                 new StatementIteratorFactoryImpl(),
-                $this->config['httpConfig']
+                $this->configuration['httpConfig']
             );
 
             $rights = $this->fixture->getRights();

@@ -23,14 +23,14 @@ class ARC2Test extends StoreAbstractTest
     {
         parent::setUp();
 
-        if (true === isset($this->config['arc2Config'])) {
+        if (true === isset($this->configuration['arc2Config'])) {
             $this->fixture = new ARC2(
                 new NodeFactoryImpl(),
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
                 new ResultFactoryImpl(),
                 new StatementIteratorFactoryImpl(),
-                $this->config['arc2Config']
+                $this->configuration['arc2Config']
             );
 
             $this->fixture->dropGraph($this->testGraph);
