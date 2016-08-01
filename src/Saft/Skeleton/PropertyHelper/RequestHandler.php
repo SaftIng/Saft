@@ -189,7 +189,8 @@ class RequestHandler
                 'adapter' => array(
                     'name' => $configuration['name'],
                     'options' => $options
-        )));
+            )
+        ));
     }
 
     /**
