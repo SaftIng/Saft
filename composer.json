@@ -34,6 +34,7 @@
         "aksw/erfurt": "dev-develop",
         "easyrdf/easyrdf": "0.9.*",
         "level-2/dice": "dev-v2.0-PHP5.4-5.5",
+        "mockery/mockery": "0.9.*",
         "nette/caching": "2.4.*",
         "php-curl-class/php-curl-class": "4.11.*",
         "semsol/arc2": "2.2.*",

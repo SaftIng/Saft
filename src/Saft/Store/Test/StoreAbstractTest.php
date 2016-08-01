@@ -11,6 +11,7 @@ use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Result\EmptyResultImpl;
+use Saft\Sparql\Result\ResultFactoryImpl;
 use Saft\Sparql\Result\SetResultImpl;
 use Saft\Sparql\Result\StatementSetResultImpl;
 use Saft\Sparql\Result\ValueResultImpl;
@@ -50,13 +51,13 @@ abstract class StoreAbstractTest extends TestCase
     protected function countTriples(NamedNode $graph)
     {
         $result = $this->fixture->query(
-            'SELECT COUNT(*) FROM <'. $graph->getUri().'> WHERE {?s ?p ?o}'
+            'SELECT COUNT(*) as count FROM <'. $graph->getUri() .'> WHERE {?s ?p ?o}'
         );
 
         $variables = $result->getVariables();
         $variable = array_shift($variables);
         $entry = $result->current();
-        return $entry[$variable]->getValue();
+        return $entry['count']->getValue();
     }
 
     protected function getTestQuad()
@@ -598,22 +599,6 @@ abstract class StoreAbstractTest extends TestCase
      * Tests for getMatchingStatements
      */
 
-    public function testGetMatchingStatementsReturnType()
-    {
-        $statement = new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new AnyPatternImpl()
-        );
-
-        $iterator = $this->fixture->getMatchingStatements($statement);
-
-        $this->assertTrue(
-            $iterator instanceof StatementIterator,
-            "Get Matching Statements has to return a StatementIterator"
-        );
-    }
-
     public function testGetMatchingStatements()
     {
         // 2 triples
@@ -793,6 +778,22 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertEquals(2, $statementCount);
     }
 
+    public function testGetMatchingStatementsReturnType()
+    {
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new AnyPatternImpl()
+        );
+
+        $iterator = $this->fixture->getMatchingStatements($statement);
+
+        $this->assertTrue(
+            $iterator instanceof StatementIterator,
+            "Get Matching Statements has to return a StatementIterator"
+        );
+    }
+
     /*
      * Tests for getStoreDescription
      */
@@ -949,19 +950,17 @@ abstract class StoreAbstractTest extends TestCase
             <http://example.org/a> ?p ?o
         }');
 
-        $match = false;
-        foreach ($result as $row) {
-            if (
-                $row['p']->isNamedNode() &&
-                $row['p']->getUri() == "http://example.org/b" &&
-                $row['o']->isNamedNode() &&
-                $row['o']->getUri() == "http://example.org/c"
-            ) {
-                $match = true;
-            }
-        }
+        $resultFactory = new ResultFactoryImpl();
 
-        $this->assertTrue($match);
+        $this->assertEquals(
+            $resultFactory->createSetResult(array(
+                array(
+                    'p' => new NamedNodeImpl('http://example.org/b'),
+                    'o' => new NamedNodeImpl('http://example.org/c')
+                )
+            )),
+            $result
+        );
     }
 
     public function testQueryAsk()
@@ -975,11 +974,11 @@ abstract class StoreAbstractTest extends TestCase
             $this->testGraph
         );
 
-        // graph is empty
+        // check that graph is empty
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
         $this->assertCountStatementIterator(0, $statements);
 
-        // 2 triples
+        // 1 triple
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),
