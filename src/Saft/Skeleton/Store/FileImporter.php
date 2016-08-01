@@ -10,7 +10,9 @@ use Saft\Skeleton\Data\ParserFactory;
 use Saft\Store\Store;
 
 /**
+ * Please use Importer instead of FileImporter. Class will be removed in future releases.
  *
+ * @deprecated
  */
 class FileImporter
 {
