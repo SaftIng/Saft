@@ -260,6 +260,7 @@ class Virtuoso extends AbstractSparqlStore
      * Returns the current connection resource. The resource is created lazily if it doesn't exist.
      *
      * @return \PDO Instance of \PDO representing an open PDO-ODBC connection.
+     * @throws \PDOException if connection could not be established.
      */
     protected function openConnection()
     {
@@ -284,19 +285,14 @@ class Virtuoso extends AbstractSparqlStore
             /**
              * Setup ODBC connection using PDO-ODBC
              */
-            try {
-                $this->connection = new \PDO(
-                    'odbc:' . (string)$this->configuration['dsn'],
-                    (string)$this->configuration['username'],
-                    (string)$this->configuration['password']
-                );
-                $this->connection->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
-                $this->connection->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-                $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-            } catch (\PDOException $e) {
-                throw new \Exception($e->getMessage());
-            }
+            $this->connection = new \PDO(
+                'odbc:' . (string)$this->configuration['dsn'],
+                (string)$this->configuration['username'],
+                (string)$this->configuration['password']
+            );
+            $this->connection->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
+            $this->connection->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+            $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         }
 
         return $this->connection;

@@ -22,19 +22,35 @@ class VirtuosoTest extends StoreAbstractTest
     {
         parent::setUp();
 
-        if (true === isset($this->config['virtuosoConfig'])) {
+        try {
+            $this->isTestPossible();
             $this->fixture = new Virtuoso(
                 new NodeFactoryImpl(),
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
                 new ResultFactoryImpl(),
                 new StatementIteratorFactoryImpl(),
-                $this->config['virtuosoConfig']
+                $this->configuration['virtuosoConfig']
             );
+        } catch(\Exception $e) {
+            $this->markTestSkipped($e->getMessage());
+        }
+    }
+
+    protected function isTestPossible()
+    {
+        if (false === isset($this->configuration['virtuosoConfig'])) {
+            throw new \Exception('Array virtuosoConfig is not set in the test-config.yml.');
 
         } else {
-            $this->markTestSkipped('Array virtuosoConfig is not set in the test-config.yml.');
+            new \PDO(
+                'odbc:' . (string)$this->configuration['virtuosoConfig']['dsn'],
+                (string)$this->configuration['virtuosoConfig']['username'],
+                (string)$this->configuration['virtuosoConfig']['password']
+            );
         }
+
+        return true;
     }
 
     /*

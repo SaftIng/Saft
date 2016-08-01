@@ -17,7 +17,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    protected $config;
+    protected $configuration;
 
     /**
      * Contains an instance of the class to test.
@@ -269,7 +269,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
         // parse YAML file
         $yaml = new Parser();
-        $this->config = $yaml->parse(file_get_contents($configFilepath));
+        $this->configuration = $yaml->parse(file_get_contents($configFilepath));
     }
 
     /**
