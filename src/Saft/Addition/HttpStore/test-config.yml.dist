@@ -1,0 +1,10 @@
+#
+# This file contains a list with different configurations for test cases which rely on store.
+#
+# Feel free to copy it to test-config.yml and adapt. You can reuse existing configurations or you can use your own.
+
+httpConfig: &httpConfig
+    authUrl: "http://localhost:8890/sparql-auth"
+    queryUrl: "http://localhost:8890/sparql"
+    username: "dba"
+    password: "dba"

@@ -25,9 +25,9 @@ class StatementImplTest extends StatementAbstractTest
         return new StatementImpl($subject, $predicate, $object, $graph);
     }
 
-    public function newLiteralInstance($value, $lang = null, $datatype = null)
+    public function newLiteralInstance($value, $datatype = null, $lang = null)
     {
-        return new LiteralImpl($value, $lang, $datatype);
+        return new LiteralImpl($value, $datatype, $lang);
     }
 
     public function newNamedNodeInstance($uri)

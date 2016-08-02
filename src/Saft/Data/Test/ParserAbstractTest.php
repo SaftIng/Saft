@@ -3,6 +3,7 @@
 namespace Saft\Data\Test;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
@@ -14,27 +15,28 @@ abstract class ParserAbstractTest extends TestCase
     /**
      * @return Parser
      */
-    abstract protected function newInstance();
+    abstract protected function newInstance($serialization);
 
     /*
-     * Tests for getSupportedSerializations
+     * Tests for __construct
      */
 
-    // TODO what else can we test here?
-    public function testGetSupportedSerializations()
+    public function testConstructorInvalidSerialization()
     {
-        $this->assertTrue(is_array($this->newInstance()->getSupportedSerializations()));
+        $this->setExpectedException('\Exception');
+
+        $this->newInstance('unknown');
     }
 
     /*
      * Tests for parseStreamToIterator
+     * we load here the content of a file and transform it into an StatementIterator instance.
+     * afterwards we check if the read data are the same as expected.
      */
 
-    // we load here the content of a turtle file and transform it into an StatementIterator instance.
-    // afterwards we check if the read data are the same as expected.
     public function testParseStreamToIteratorTurtleFile()
     {
-        $this->fixture = $this->newInstance();
+        $this->fixture = $this->newInstance('turtle');
 
         // load iterator for a turtle file
         $inputStream = dirname(__FILE__) .'/../resources/example.ttl';
@@ -101,7 +103,7 @@ abstract class ParserAbstractTest extends TestCase
     {
         $xsdString = new NamedNodeImpl('http://www.w3.org/2001/XMLSchema#string');
 
-        $fixture = $this->newInstance();
+        $fixture = $this->newInstance('turtle');
 
         $testString = '@prefix ex: <http://saft/example/> .
             ex:Foo  ex:knows ex:Bar ; ex:name  "Foo"^^<'. $xsdString .'> .
@@ -116,6 +118,39 @@ abstract class ParserAbstractTest extends TestCase
             ),
             new StatementImpl(
                 new NamedNodeImpl('http://saft/example/Foo'),
+                new NamedNodeImpl('http://saft/example/name'),
+                new LiteralImpl('Foo', $xsdString)
+            ),
+            new StatementImpl(
+                new NamedNodeImpl('http://saft/example/Bar'),
+                new NamedNodeImpl('http://saft/example/name'),
+                new LiteralImpl('Bar', $xsdString)
+            ),
+        ));
+
+        $this->assertEquals($statementIteratorToCheckAgainst, $fixture->parseStringToIterator($testString));
+    }
+
+    // that test checks if the subject can be of type blank node
+    public function testParseStringToIteratorTurtleStringSubjectBlankNode()
+    {
+        $xsdString = new NamedNodeImpl('http://www.w3.org/2001/XMLSchema#string');
+
+        $fixture = $this->newInstance('turtle');
+
+        $testString = '@prefix ex: <http://saft/example/> .
+            _:foo  ex:knows ex:Bar ; ex:name  "Foo"^^<'. $xsdString .'> .
+            ex:Bar  ex:name  "Bar"^^<'. $xsdString .'> .';
+
+        // build StatementIterator to check against
+        $statementIteratorToCheckAgainst = new ArrayStatementIteratorImpl(array(
+            new StatementImpl(
+                new BlankNodeImpl('_:genid1'),
+                new NamedNodeImpl('http://saft/example/knows'),
+                new NamedNodeImpl('http://saft/example/Bar')
+            ),
+            new StatementImpl(
+                new BlankNodeImpl('_:genid1'),
                 new NamedNodeImpl('http://saft/example/name'),
                 new LiteralImpl('Foo', $xsdString)
             ),

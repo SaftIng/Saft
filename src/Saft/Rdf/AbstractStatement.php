@@ -2,10 +2,19 @@
 
 namespace Saft\Rdf;
 
+/**
+ * @api
+ * @since 0.1
+ */
 abstract class AbstractStatement implements Statement
 {
     /**
-     * @return boolean
+     * Returns true if neither subject, predicate, object nor, if available, graph, are patterns.
+     *
+     * @return boolean True, if if neither subject, predicate, object nor, if available, graph, are patterns,
+     *                 false otherwise.
+     * @api
+     * @since 0.1
      */
     public function isConcrete()
     {
@@ -19,7 +28,12 @@ abstract class AbstractStatement implements Statement
     }
 
     /**
-     * @return boolean
+     * Returns true if at least subject, predicate, object or, if available, graph, are patterns.
+     *
+     * @return boolean True, if at least subject, predicate, object or, if available, graph, are patterns,
+     *                 false otherwise.
+     * @api
+     * @since 0.1
      */
     public function isPattern()
     {
@@ -29,7 +43,10 @@ abstract class AbstractStatement implements Statement
     /**
      * Transforms content of the Statement to n-quads form.
      *
-     * @return string
+     * @return string N-Quads string containing subject, predicate, object and graph, if available.
+     * @throws \Exception if this instance is a non-concrete statement.
+     * @api
+     * @since 0.1
      */
     public function toNQuads()
     {
@@ -52,7 +69,10 @@ abstract class AbstractStatement implements Statement
     /**
      * Transforms content of the Statement to n-triples form.
      *
-     * @return string
+     * @return string N-triples string, containing subject, predicate and object.
+     * @throws \Exception if this instance is a non-concrete statement.
+     * @api
+     * @since 0.1
      */
     public function toNTriples()
     {
@@ -65,6 +85,14 @@ abstract class AbstractStatement implements Statement
         }
     }
 
+    /**
+     * This method is ment for getting some kind of human readable string representation of the current node.
+     * It returns a string which contains subject, predicate and object.
+     *
+     * @return string Formated string which contains subject, predicate and object.
+     * @api
+     * @since 0.1
+     */
     public function __toString()
     {
         $string = sprintf("s: %s, p: %s, o: %s", $this->getSubject(), $this->getPredicate(), $this->getObject());
@@ -74,6 +102,14 @@ abstract class AbstractStatement implements Statement
         return $string;
     }
 
+    /**
+     * Checks if a given statement is equal to this instance.
+     *
+     * @param Statement $toTest Statement to check this instance against.
+     * @return boolean True, if this instance is equal to the given instance, false otherwise.
+     * @api
+     * @since 0.1
+     */
     public function equals(Statement $toTest)
     {
         if ($toTest instanceof Statement &&
@@ -91,7 +127,12 @@ abstract class AbstractStatement implements Statement
     }
 
     /**
-     * {@inheritdoc}
+     * Checks if this instance matches a given instance.
+     *
+     * @param Statement $toTest Statement instance to check for a match.
+     * @return boolean True, if this instance matches a given Statement instance, false otherwise.
+     * @api
+     * @since 0.1
      */
     public function matches(Statement $toTest)
     {
@@ -106,7 +147,7 @@ abstract class AbstractStatement implements Statement
         ) {
             if ($this->isQuad() && $toTest->isQuad() && $this->getGraph()->matches($toTest->getGraph())) {
                 return true;
-            } elseif ($this->isQuad() && $this->getGraph()->isVariable()) {
+            } elseif ($this->isQuad() && $this->getGraph()->isPattern()) {
                 /*
                  * This case also matches the default graph i.e. if the graph is set to a variable it also matches the
                  * defaultgraph

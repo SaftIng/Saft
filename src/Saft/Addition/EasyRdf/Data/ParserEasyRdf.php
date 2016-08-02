@@ -2,14 +2,11 @@
 
 namespace Saft\Addition\EasyRdf\Data;
 
-use EasyRdf\Format;
-use EasyRdf\Graph;
 use Saft\Data\Parser;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactory;
-use Streamer\Stream;
 
 class ParserEasyRdf implements Parser
 {
@@ -17,6 +14,11 @@ class ParserEasyRdf implements Parser
      * @var NodeFactory
      */
     private $nodeFactory;
+
+    /**
+     * @var string
+     */
+    private $serialization;
 
     /**
      * @var array
@@ -33,15 +35,16 @@ class ParserEasyRdf implements Parser
      *
      * @param NodeFactory      $nodeFactory
      * @param StatementFactory $statementFactory
+     * @param string           $serialization
+     * @throws \Exception if serialization is unknown.
      */
-    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory)
+    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory, $serialization)
     {
+        $this->nodeUtils = new NodeUtils();
+
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
 
-        /**
-         * Map of serializations. It maps the Saft term on according the EasyRdf format.
-         */
         $this->serializationMap = array(
             'n-triples' => 'ntriples',
             'rdf-json' => 'json',
@@ -49,6 +52,15 @@ class ParserEasyRdf implements Parser
             'rdfa' => 'rdfa',
             'turtle' => 'turtle',
         );
+
+        $this->serialization = $this->serializationMap[$serialization];
+
+        if (false == isset($this->serializationMap[$serialization])) {
+            throw new \Exception(
+                'Unknown serialization format given: '. $serialization .'. Supported are only '.
+                implode(', ', array_keys($this->serializationMap))
+            );
+        }
     }
 
     /**
@@ -64,50 +76,24 @@ class ParserEasyRdf implements Parser
     }
 
     /**
-     * Returns an array which contains supported serializations.
+     * Parses a given string and returns an iterator containing Statement instances representing the read data.
      *
-     * @return array Array of supported serializations which are understood by this parser.
-     */
-    public function getSupportedSerializations()
-    {
-        return array_keys($this->serializationMap);
-    }
-
-    /**
-     * Parses a given string and returns an iterator containing Statement instances representing the
-     * previously read data.
-     *
-     * @param  string            $inputString   Data string containing RDF serialized data.
-     * @param  string            $baseUri       The base URI of the parsed content. If this URI is null the
-     *                                          inputStreams URL is taken as base URI.
-     * @param  string            $serialization The serialization of the inputStream. If null is given the
-     *                                          parser will either apply some standard serialization, or the
-     *                                          only one it is supporting, or will try to guess the correct
-     *                                          serialization, or will throw an Exception.
-     *                                          For more information have a look here:
-     *                                          http://safting.github.io/doc/phpframework/data/
+     * @param  string $inputString Data string containing RDF serialized data.
+     * @param  string $baseUri     The base URI of the parsed content. If this URI is null the inputStreams URL
+     *                             is taken as base URI.
      * @return StatementIterator StatementIterator instaince containing all the Statements parsed by the
      *                           parser to far
-     * @throws \Exception        If the base URI $baseUri is no valid URI.
+     * @throws \Exception if the base URI $baseUri is no valid URI.
      */
-    public function parseStringToIterator($inputString, $baseUri = null, $serialization = null)
+    public function parseStringToIterator($inputString, $baseUri = null)
     {
-        $graph = new Graph();
-
-        // let EasyRdf guess the format
-        if ($serialization === null) {
-            $serialization = Format::guessFormat($inputString);
-
-        } else {
-            $serialization = Format::getFormat($serialization);
+        // check $baseUri
+        if (null !== $baseUri && false == $this->nodeUtils->simpleCheckURI($baseUri)) {
+            throw new \Exception('Parameter $baseUri is not a valid URI.');
         }
 
-        // if format is still null, throw exception, because we dont know what format the given stream is
-        if (null === $serialization) {
-            throw new \Exception('Either given $serialization is unknown or the parser could not guess the format.');
-        }
-
-        $graph->parse($inputString, $serialization->getName());
+        $graph = new \EasyRdf_Graph();
+        $graph->parse($inputString, $this->serialization, $baseUri);
 
         // transform parsed data to PHP array
         return $this->rdfPhpToStatementIterator($graph->toRdfPhp());
@@ -117,42 +103,21 @@ class ParserEasyRdf implements Parser
      * Parses a given stream and returns an iterator containing Statement instances representing the
      * previously read data. The stream parses the data not as a whole but in chunks.
      *
-     * @param  string            $inputStream   Filename of the stream to parse which contains RDF
-     *                                          serialized data.
-     * @param  string            $baseUri       The base URI of the parsed content. If this URI is null
-     *                                          the inputStreams URL is taken as base URI.
-     * @param  string            $serialization The serialization of the inputStream. If null is given
-     *                                          the parser will either apply some standard serialization,
-     *                                          or the only one it is supporting, or will try to guess
-     *                                          the correct serialization, or will throw an Exception.
-     *                                          Supported formats are a subset of the following:
-     *                                          json, rdfxml, sparql-xml, rdfa, turtle, ntriples, n3
-     * @return StatementIterator A StatementIterator containing all the Statements parsed by the parser to
-     *                           far.
-     * @throws \Exception        If the base URI $baseUri is no valid URI.
+     * @param  string $inputStream Filename of the stream to parse which contains RDF serialized data.
+     * @param  string $baseUri     The base URI of the parsed content. If this URI is null the inputStreams URL
+     *                             is taken as base URI.
+     * @return StatementIterator A StatementIterator containing all the Statements parsed by the parser to far.
+     * @throws \Exception if the base URI $baseUri is no valid URI.
      */
-    public function parseStreamToIterator($inputStream, $baseUri = null, $serialization = null)
+    public function parseStreamToIterator($inputStream, $baseUri = null)
     {
-        $graph = new Graph();
-
-        // let EasyRdf guess the format
-        if ($serialization === null) {
-            // use PHP's file:// stream, if its a local file
-            if (false === strpos($inputStream, '://')) {
-                $inputStream = 'file://'. $inputStream;
-            }
-            $serialization = Format::guessFormat(file_get_contents($inputStream));
-
-        } else {
-            $serialization = Format::getFormat($serialization);
+        // check $baseUri
+        if (null !== $baseUri && false == $this->nodeUtils->simpleCheckURI($baseUri)) {
+            throw new \Exception('Parameter $baseUri is not a valid URI.');
         }
 
-        // if format is still null, throw exception, because we dont know what format the given stream is
-        if (null === $serialization) {
-            throw new Exception('Either given $format is unknown or i could not guess format.');
-        }
-
-        $graph->parseFile($inputStream, $serialization->getName());
+        $graph = new \EasyRdf_Graph();
+        $graph->parseFile($inputStream, $this->serialization);
 
         // transform parsed data to PHP array
         return $this->rdfPhpToStatementIterator($graph->toRdfPhp());
@@ -161,8 +126,20 @@ class ParserEasyRdf implements Parser
     /**
      * Transforms a statement array given by EasyRdf to a Saft StatementIterator instance.
      *
-     * @param  array             $rdfPhp
+     * @param array $rdfPhp RDF data structured as array. It structure looks like:
+     *                      array(
+     *                         $subject => array(
+     *                             $predicate => array (
+     *                                 // object information
+     *                                 'datatype' => ...,
+     *                                 'lang' => ...,
+     *                                 'value' => ...
+     *                             )
+     *                          )
+     *                      )
      * @return StatementIterator
+     * @throws \Exception if a non-URI or non-BlankNode is used at subject position.
+     * @throws \Exception if a non-URI or non-BlankNode is used at predicate position.
      */
     protected function rdfPhpToStatementIterator(array $rdfPhp)
     {
@@ -177,26 +154,32 @@ class ParserEasyRdf implements Parser
                     /**
                      * Create subject node
                      */
-                    if (true === NodeUtils::simpleCheckURI($subject)) {
+                    if (true === $this->nodeUtils->simpleCheckURI($subject)) {
                         $s = $this->nodeFactory->createNamedNode($subject);
+                    } elseif (true === $this->nodeUtils->simpleCheckBlankNodeId($subject)) {
+                        $s = $this->nodeFactory->createBlankNode($subject);
                     } else {
-                        $s = $this->nodeFactory->createLiteral($subject);
+                        // should not be possible, because EasyRdf is able to check for invalid subjects.
+                        throw new \Exception('Only URIs and blank nodes are allowed as subjects.');
                     }
 
                     /**
                      * Create predicate node
                      */
-                    if (true === NodeUtils::simpleCheckURI($property)) {
+                    if (true === $this->nodeUtils->simpleCheckURI($property)) {
                         $p = $this->nodeFactory->createNamedNode($property);
+                    } elseif (true === $this->nodeUtils->simpleCheckBlankNodeId($property)) {
+                        $p = $this->nodeFactory->createBlankNode($property);
                     } else {
-                        $p = $this->nodeFactory->createLiteral($property);
+                        // should not be possible, because EasyRdf is able to check for invalid predicates.
+                        throw new \Exception('Only URIs and blank nodes are allowed as predicates.');
                     }
 
                     /*
                      * Create object node
                      */
                     // URI
-                    if (NodeUtils::simpleCheckURI($object['value'])) {
+                    if ($this->nodeUtils->simpleCheckURI($object['value'])) {
                         $o = $this->nodeFactory->createNamedNode($object['value']);
 
                     // datatype set
@@ -210,6 +193,7 @@ class ParserEasyRdf implements Parser
                             'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
                             $object['lang']
                         );
+                    // if no information about the object was provided, assume its a simple string
                     } else {
                         $o = $this->nodeFactory->createLiteral($object['value']);
                     }

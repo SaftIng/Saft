@@ -2,20 +2,26 @@
 
 namespace Saft\Addition\HttpStore\Store;
 
-use Saft\Addition\HttpStore\Net\Client;
+use Curl\Curl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
+use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
+use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
+use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
+use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Sparql\Query\QueryUtils;
+use Saft\Sparql\Result\ResultFactory;
+use Saft\Sparql\Result\ResultFactoryImpl;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Store;
-use Saft\Store\Result\ResultFactory;
 
 /**
  * SparqlStore implementation of a client which handles store operations via HTTP. It is able to determine some
@@ -31,9 +37,9 @@ class Http extends AbstractSparqlStore
     protected $configuration = null;
 
     /**
-     * @var Client
+     * @var Curl\Curl
      */
-    protected $client = null;
+    protected $httpClient = null;
 
     /**
      * @var NodeFactory
@@ -41,9 +47,19 @@ class Http extends AbstractSparqlStore
     private $nodeFactory;
 
     /**
+     * @var NodeUtils
+     */
+    protected $nodeUtils;
+
+    /**
      * @var QueryFactory
      */
     private $queryFactory;
+
+    /**
+     * @var QueryUtils
+     */
+    protected $queryUtils;
 
     /**
      * @var ResultFactory
@@ -61,7 +77,7 @@ class Http extends AbstractSparqlStore
     private $statementIteratorFactory;
 
     /**
-     * Constructor.
+     * Constructor. Dont forget to call setClient and provide a working GuzzleHttp\Client instance.
      *
      * @param NodeFactory              $nodeFactory
      * @param StatementFactory         $statementFactory
@@ -79,9 +95,10 @@ class Http extends AbstractSparqlStore
         StatementIteratorFactory $statementIteratorFactory,
         array $configuration
     ) {
-        $this->configuration = $configuration;
+        $this->nodeUtils = new NodeUtils();
+        $this->queryUtils = new QueryUtils();
 
-        $this->checkRequirements();
+        $this->configuration = $configuration;
 
         // Open connection and, if possible, authenticate on server
         $this->openConnection();
@@ -102,14 +119,6 @@ class Http extends AbstractSparqlStore
     }
 
     /**
-     * Destructor
-     */
-    public function __destruct()
-    {
-        $this->closeConnection();
-    }
-
-    /**
      * Using digest authentication to authenticate user on the server.
      *
      * @param  string $authUrl  URL to authenticate.
@@ -119,39 +128,19 @@ class Http extends AbstractSparqlStore
      */
     protected function authenticateOnServer($authUrl, $username, $password)
     {
-        $this->client->setUrl($authUrl);
-        $this->client->sendDigestAuthentication($username, $password);
+        $response = $this->sendDigestAuthentication($authUrl, $username, $password);
 
-        $curlInfo = curl_getinfo($this->client->getClient()->curl);
+        $httpCode = $response->getHttpCode();
 
         // If status code is not 200, something went wrong
-        if (200 !== $curlInfo['http_code']) {
-            throw new \Exception('Response with Status Code [' . $curlInfo['http_code'] . '].', 500);
+        if (200 !== $httpCode) {
+            throw new \Exception('Response with Status Code [' . $httpCode . '].', 500);
         }
     }
 
-    /**
-     * Checks that all requirements for queries via HTTP are fullfilled.
-     *
-     * @return boolean True, if all requirements are fullfilled.
-     * @throws \Exception If PHP CURL extension was not loaded.
-     */
-    public function checkRequirements()
+    public function getHttpClient()
     {
-        // check for odbc extension
-        if (false === extension_loaded('curl')) {
-            throw new \Exception('Http store requires the PHP ODBC extension to be loaded.');
-        }
-
-        return true;
-    }
-
-    /**
-     * Closes a current connection.
-     */
-    protected function closeConnection()
-    {
-        $this->client->getClient()->close();
+        return $this->httpClient;
     }
 
     /**
@@ -194,7 +183,8 @@ class Http extends AbstractSparqlStore
             $this->query('SELECT ?g { GRAPH ?g {?s ?p ?o} } LIMIT 1');
             $rights['tripleQuerying'] = true;
         } catch (\Exception $e) {
-            // ignore exception here and assume we could not query anything.
+            // ignore exception here and assume we could not query anything.e
+            echo PHP_EOL . $e->getMessage();
         }
 
         /*
@@ -218,10 +208,6 @@ class Http extends AbstractSparqlStore
             }
         } catch (\Exception $e) {
             // ignore exception here and assume we could not update a triple.
-            echo $e->getMessage() ."
-
-            ";
-
             // whatever happens, try to remove the fresh graph.
             try {
                 $this->query('DROP GRAPH <'. $graph .'>');
@@ -259,9 +245,11 @@ class Http extends AbstractSparqlStore
      *
      * @return Client Setup HTTP client.
      */
-    protected function openConnection()
+    public function openConnection()
     {
-        $this->client = new Client();
+        if (null == $this->httpClient) {
+            return false;
+        }
 
         $configuration = array_merge(array(
             'authUrl' => '',
@@ -271,7 +259,7 @@ class Http extends AbstractSparqlStore
         ), $this->configuration);
 
         // authenticate only if an authUrl was given.
-        if (NodeUtils::simpleCheckURI($configuration['authUrl'])) {
+        if ($this->nodeUtils->simpleCheckURI($configuration['authUrl'])) {
             $this->authenticateOnServer(
                 $configuration['authUrl'],
                 $configuration['username'],
@@ -280,11 +268,9 @@ class Http extends AbstractSparqlStore
         }
 
         // check query URL
-        if (false === NodeUtils::simpleCheckUri($configuration['queryUrl'])) {
+        if (false === $this->nodeUtils->simpleCheckUri($configuration['queryUrl'])) {
             throw new \Exception('Parameter queryUrl is not an URI or empty: '. $configuration['queryUrl']);
         }
-
-        $this->client->setUrl($configuration['queryUrl']);
     }
 
     /**
@@ -307,8 +293,17 @@ class Http extends AbstractSparqlStore
         /**
          * SPARQL query (usually to fetch data)
          */
-        if ('selectQuery' == AbstractQuery::getQueryType($query)) {
-            $resultArray = json_decode($this->client->sendSparqlSelectQuery($query), true);
+        if ('selectQuery' == $this->queryUtils->getQueryType($query)) {
+            $receivedResult = $this->sendSparqlSelectQuery($this->configuration['queryUrl'], $query);
+
+            // transform object to array
+            if (is_object($receivedResult)) {
+                $resultArray = json_decode(json_encode($receivedResult), true);
+            // transform json string to array
+            } else {
+                $resultArray = json_decode($receivedResult, true);
+            }
+
             $entries = array();
 
             /**
@@ -333,7 +328,15 @@ class Http extends AbstractSparqlStore
                  *      'value' => '...'
                  * )
                  */
+
                 foreach ($bindingParts as $variable => $part) {
+                    // it seems that for instance Virtuoso returns type=literal for bnodes,
+                    // so we manually fix that here to avoid that problem if other stores act
+                    // the same
+                    if (true === is_string($part['value']) && false !== strpos($part['value'], '_:')) {
+                        $part['type'] = 'bnode';
+                    }
+
                     switch ($part['type']) {
                         /**
                          * Literal (language'd)
@@ -393,26 +396,30 @@ class Http extends AbstractSparqlStore
          * SPARPQL Update query
          */
         } else {
-            $result = $this->client->sendSparqlUpdateQuery($query);
-            $decodedResult = json_decode($result, true);
+            $receivedResult = $this->sendSparqlUpdateQuery($this->configuration['queryUrl'], $query);
+            // transform object to array
+            if (is_object($receivedResult)) {
+                $decodedResult = json_decode(json_encode($receivedResult), true);
+            // transform json string to array
+            } else {
+                $decodedResult = json_decode($receivedResult, true);
+            }
 
-            if ('askQuery' === AbstractQuery::getQueryType($query)) {
-                $askResult = json_decode($result, true);
-
-                if (true === isset($askResult['boolean'])) {
-                    $return = $this->resultFactory->createValueResult($askResult['boolean']);
+            if ('askQuery' === $this->queryUtils->getQueryType($query)) {
+                if (true === isset($decodedResult['boolean'])) {
+                    $return = $this->resultFactory->createValueResult($decodedResult['boolean']);
 
                 // assumption here is, if a string was returned, something went wrong.
-                } elseif (0 < strlen($result)) {
-                    throw new \Exception($result);
+                } elseif (0 < strlen($receivedResult)) {
+                    throw new \Exception($receivedResult);
 
                 } else {
                     $return = $this->resultFactory->createEmptyResult();
                 }
 
             // usually a SPARQL result does not return a string. if it does anyway, assume there is an error.
-            } elseif (null === $decodedResult && 0 < strlen($result)) {
-                throw new \Exception($result);
+            } elseif (null === $decodedResult && 0 < strlen($receivedResult)) {
+                throw new \Exception($receivedResult);
 
             } else {
                 $return = $this->resultFactory->createEmptyResult();
@@ -420,5 +427,78 @@ class Http extends AbstractSparqlStore
         }
 
         return $return;
+    }
+
+    /**
+     * Send digest authentication to the server via GET.
+     *
+     * @param  string $username
+     * @param  string $password optional
+     * @return string
+     */
+    public function sendDigestAuthentication($url, $username, $password = null)
+    {
+        $this->httpClient->setDigestAuthentication($username, $password);
+
+        return $this->httpClient->get($url);
+    }
+
+    /**
+     * Sends a SPARQL select query to the server.
+     *
+     * @param string $url
+     * @param string $query
+     * @return string Response of the POST request.
+     */
+    public function sendSparqlSelectQuery($url, $query)
+    {
+        // because you can't just fire multiple requests with the same CURL class instance
+        // we have to be creative and re-create the class everytime a request is to be send.
+        // FYI: https://github.com/php-curl-class/php-curl-class/issues/326
+        $class = get_class($this->httpClient);
+        $phpVersionToOld = version_compare(phpversion(), '5.5.11', '<=');
+        // only reinstance the class if its not mocked
+        if ($phpVersionToOld && false === strpos($class, 'Mockery')) {
+            $this->httpClient = new $class();
+        }
+
+        $this->httpClient->setHeader('Accept', 'application/sparql-results+json');
+        $this->httpClient->setHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        return $this->httpClient->post($url, array('query' => $query));
+    }
+
+    /**
+     * Sends a SPARQL update query to the server.
+     *
+     * @param string $url
+     * @param string $query
+     * @return string Response of the GET request.
+     */
+    public function sendSparqlUpdateQuery($url, $query)
+    {
+        // because you can't just fire multiple requests with the same CURL class instance
+        // we have to be creative and re-create the class everytime a request is to be send.
+        // FYI: https://github.com/php-curl-class/php-curl-class/issues/326
+        $class = get_class($this->httpClient);
+        $phpVersionToOld = version_compare(phpversion(), '5.5.11', '<=');
+        // only reinstance the class if its not mocked
+        if ($phpVersionToOld && false === strpos($class, 'Mockery')) {
+            $this->httpClient = new $class;
+        }
+
+        // TODO extend Accept headers to further formats
+        $this->httpClient->setHeader('Accept', 'application/sparql-results+json');
+        $this->httpClient->setHeader('Content-Type', 'application/sparql-update');
+
+        return $this->httpClient->get($url, array('query' => $query));
+    }
+
+    /**
+     * @param \Curl\Curl $httpClient
+     */
+    public function setClient(Curl $httpClient)
+    {
+        $this->httpClient = $httpClient;
     }
 }

@@ -2,17 +2,17 @@
 
 namespace Saft\Addition\QueryCache;
 
-use Saft\Cache\CacheFactory;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
-use Saft\Store\ChainableStore;
-use Saft\Store\Store;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\Query;
 use Saft\Sparql\Query\QueryFactory;
+use Saft\Store\ChainableStore;
+use Saft\Store\Store;
+use Zend\Cache\Storage\Adapter\AbstractAdapter;
 
 /**
  * This class implements a SPARQL query cache, which was described in the following paper:
@@ -30,17 +30,12 @@ use Saft\Sparql\Query\QueryFactory;
  * The implementation here uses a key-value-pair based cache mechanism. The original approach was using a
  * relation database to store and manage query cache related entities.
  */
-class QueryCache implements Store, ChainableStore
+class QueryCache implements ChainableStore
 {
     /**
-     * @var Cache
+     * @var AbstractAdapter
      */
     protected $cache;
-
-    /**
-     * @var CacheFactory
-     */
-    private $cacheFactory;
 
     /**
      * @var array
@@ -70,7 +65,7 @@ class QueryCache implements Store, ChainableStore
     /**
      * @var StatementIteratorFactory
      */
-    private $statementIteratorFactory;
+    protected $statementIteratorFactory;
 
     /**
      * @var Store
@@ -80,30 +75,21 @@ class QueryCache implements Store, ChainableStore
     /**
      * Constructor
      *
-     * @param CacheFactory             $cacheFactory
+     * @param IStorage                 $storage
      * @param QueryFactory             $queryFactory
      * @param StatementIteratorFactory $statementIteratorFactory
-     * @param array                    $config Configuration array.
      */
     public function __construct(
-        CacheFactory $cacheFactory,
+        AbstractAdapter $cache,
         QueryFactory $queryFactory,
-        StatementIteratorFactory $statementIteratorFactory,
-        array $config
+        StatementIteratorFactory $statementIteratorFactory
     ) {
-        if (isset($config['cacheConfig']) && is_array($config['cacheConfig'])) {
-            $this->cacheFactory = $cacheFactory;
-            $this->queryFactory = $queryFactory;
-            $this->statementIteratorFactory = $statementIteratorFactory;
+        $this->queryFactory = $queryFactory;
+        $this->statementIteratorFactory = $statementIteratorFactory;
+        $this->cache = $cache;
 
-            $this->cache = $cacheFactory->createCache($config['cacheConfig']);
-
-            $this->log = array();
-            $this->separator = '__.__';
-
-        } else {
-            throw new \Exception('No cacheConfig array inside the config given.');
-        }
+        $this->log = array();
+        $this->separator = '__.__';
     }
 
     /**
@@ -340,7 +326,7 @@ class QueryCache implements Store, ChainableStore
         // if successor is set, ask it first before run the command yourself.
         if ($this->successor instanceof Store) {
             $this->invalidateByTriplePattern(
-                $this->statementIteratorFactory->createIteratorFromArray(array($statement)),
+                $this->statementIteratorFactory->createStatementIteratorFromArray(array($statement)),
                 $graphUri
             );
 
@@ -474,7 +460,7 @@ class QueryCache implements Store, ChainableStore
 
         $query = 'SELECT ?s ?p ?o FROM <'. $graphUri .'> WHERE { ?s ?p ?o '. $query .'}';
 
-        $queryCacheContainer = $this->cache->get($query);
+        $queryCacheContainer = $this->cache->getItem($query);
 
         // check, if there is a cache entry for this statement
         if (null !== $queryCacheContainer) {
@@ -505,11 +491,11 @@ class QueryCache implements Store, ChainableStore
     {
         // instance of Query was given
         if ($query instanceof Query) {
-            return $this->cache->get((string)$query);
+            return $this->cache->getItem((string)$query);
 
         // string was given
         } elseif (true === is_string($query)) {
-            return $this->cache->get($query);
+            return $this->cache->getItem($query);
 
         // invalid $query parameter
         } else {
@@ -596,7 +582,7 @@ class QueryCache implements Store, ChainableStore
         }
 
         $query = 'ASK FROM <'. $graphUri .'> { ?s ?p ?o '. $query .'}';
-        $queryCacheContainer = $this->cache->get($query);
+        $queryCacheContainer = $this->cache->getItem($query);
 
         // check, if there is a cache entry for this statement
         if (null !== $queryCacheContainer) {
@@ -630,7 +616,7 @@ class QueryCache implements Store, ChainableStore
             )
         ));
 
-        $queryList = $this->cache->get($graphUri);
+        $queryList = $this->cache->getItem($graphUri);
 
         // if a cache entry for this graph URI was found.
         if (null !== $queryList) {
@@ -658,7 +644,7 @@ class QueryCache implements Store, ChainableStore
         $query = $queryObject->getQuery();
 
         // load query cache container by given query
-        $queryCacheContainer = $this->cache->get($query);
+        $queryCacheContainer = $this->cache->getItem($query);
 
         /**
          * remove according query from the query list which belongs to one of the graph URI's in the query
@@ -666,17 +652,17 @@ class QueryCache implements Store, ChainableStore
          */
         if (true === is_array($queryCacheContainer['graph_uris'])) {
             foreach ($queryCacheContainer['graph_uris'] as $graphUri) {
-                $queryList = $this->cache->get($graphUri);
+                $queryList = $this->cache->getItem($graphUri);
 
                 unset($queryList[$query]);
 
                 // if graphUri entry is empty after the operation, remove it from the cache
                 if (0 == count($queryList)) {
-                    $this->cache->delete($graphUri);
+                    $this->cache->removeItem($graphUri);
 
                 // otherwise save updated entry
                 } else {
-                    $this->cache->set($graphUri, $queryList);
+                    $this->cache->setItem($graphUri, $queryList);
                 }
             }
         }
@@ -684,17 +670,17 @@ class QueryCache implements Store, ChainableStore
         // check for according triple pattern
         if (true === is_array($queryCacheContainer['triple_pattern'])) {
             foreach ($queryCacheContainer['triple_pattern'] as $patternKey) {
-                $queryList = $this->cache->get($patternKey);
+                $queryList = $this->cache->getItem($patternKey);
 
                 unset($queryList[$query]);
 
                 // if patternKey entry is empty after the operation, remove it from the cache
                 if (0 == count($queryList)) {
-                    $this->cache->delete($patternKey);
+                    $this->cache->removeItem($patternKey);
 
                 // otherwise save updated entry
                 } else {
-                    $this->cache->set($patternKey, $queryList);
+                    $this->cache->setItem($patternKey, $queryList);
                 }
             }
         }
@@ -702,7 +688,7 @@ class QueryCache implements Store, ChainableStore
         /**
          * Remove query cache container
          */
-        $this->cache->delete($query);
+        $this->cache->removeItem($query);
     }
 
     /**
@@ -753,7 +739,7 @@ class QueryCache implements Store, ChainableStore
          * go through query list for each pattern and invalidate according query
          */
         foreach ($patternList as $pattern) {
-            $queryList = $this->cache->get($pattern);
+            $queryList = $this->cache->getItem($pattern);
             if (null !== $queryList) {
                 foreach ($queryList as $query) {
                     $this->invalidateByQuery($this->queryFactory->createInstanceByQueryString($query));
@@ -788,7 +774,7 @@ class QueryCache implements Store, ChainableStore
         /**
          * run command by myself and check, if the cache already contains the result to this query.
          */
-        $queryCacheContainer = $this->cache->get($query);
+        $queryCacheContainer = $this->cache->getItem($query);
 
         // if a cache entry was found. usually at the beginning, no cache entry is available. so ask the
         // successor and save its result as query result in the cache. the next call of this function will
@@ -833,10 +819,15 @@ class QueryCache implements Store, ChainableStore
         // invalidate previous result
         $this->invalidateByQuery($queryObject);
 
-        $queryCacheContainer = array('graph_uris' => array(), 'triple_pattern' => array());
-
         $query = $queryObject->getQuery();
         $queryParts = $queryObject->getQueryParts();
+
+        // dont store result, if query contains FILTER clauses, because we can not handle them (yet)
+        if (isset($queryParts['filter_pattern']) && 0 < count($queryParts['filter_pattern'])) {
+            return;
+        }
+
+        $queryCacheContainer = array('graph_uris' => array(), 'triple_pattern' => array());
 
         /**
          * Save reference between all graphs of the given query to the query itself.
@@ -848,7 +839,7 @@ class QueryCache implements Store, ChainableStore
          */
         if (true === isset($queryParts['graphs'])) {
             foreach ($queryParts['graphs'] as $graphUri) {
-                $queryList = $this->cache->get($graphUri);
+                $queryList = $this->cache->getItem($graphUri);
 
                 if (null === $queryList) {
                     $queryList = array();
@@ -856,7 +847,7 @@ class QueryCache implements Store, ChainableStore
 
                 $queryList[$query] = $query;
 
-                $this->cache->set($graphUri, $queryList);
+                $this->cache->setItem($graphUri, $queryList);
 
                 // save reference to this graph URI in later query cache container
                 $queryCacheContainer['graph_uris'][$graphUri] = $graphUri;
@@ -891,7 +882,7 @@ class QueryCache implements Store, ChainableStore
                 $patternKey = $graphUri . $this->separator . $subjectHash . $this->separator . $predicateHash .
                     $this->separator . $objectHash;
 
-                $queryList = $this->cache->get($patternKey);
+                $queryList = $this->cache->getItem($patternKey);
 
                 if (null === $queryList) {
                     $queryList = array();
@@ -899,7 +890,7 @@ class QueryCache implements Store, ChainableStore
 
                 $queryList[$query] = $query;
 
-                $this->cache->set($patternKey, $queryList);
+                $this->cache->setItem($patternKey, $queryList);
 
                 // save reference to this pattern in later query cache container
                 $queryCacheContainer['triple_pattern'][$patternKey] = $patternKey;
@@ -915,7 +906,7 @@ class QueryCache implements Store, ChainableStore
         $queryCacheContainer['result'] = $result;
         $queryCacheContainer['query'] = $query;
 
-        $this->cache->set($query, $queryCacheContainer);
+        $this->cache->setItem($query, $queryCacheContainer);
 
         $this->latestQueryCacheContainer[] = $queryCacheContainer;
     }

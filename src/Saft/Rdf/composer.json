@@ -4,7 +4,7 @@
     "description": "RDF library from the Saft project.",
     "keywords": ["Saft", "Linked Data", "Semantic Web", "RDF"],
     "homepage": "https://safting.github.io/",
-    "license": "GPL2",
+    "license": "GPL-3.0",
     "authors": [
         {
             "name": "Natanael Arndt",
@@ -28,12 +28,13 @@
         "php": ">5.3.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.3",
-        "squizlabs/php_codesniffer": "dev-master"
+        "phpunit/phpunit": ">=4.8",
+        "squizlabs/php_codesniffer": ">=2.5"
     },
     "autoload": {
         "psr-4": {
             "Saft\\Rdf\\": "."
         }
-    }
+    },
+    "prefer-stable": true
 }

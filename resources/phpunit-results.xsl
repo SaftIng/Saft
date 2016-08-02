@@ -144,8 +144,10 @@
             <hr size="1" width="100%" align="left"/>
 
             <!-- For each package create its part -->
+            <!--//
             <xsl:call-template name="packages"/>
             <hr size="1" width="100%" align="left"/>
+            //-->
 
             <!-- For each class create the  part -->
             <xsl:call-template name="classes"/>
@@ -167,11 +169,16 @@
         <table class="details sortable" border="0" cellpadding="5" cellspacing="2" width="100%">
             <xsl:call-template name="testsuite.test.header"/>
             <!-- list all packages recursively -->
-            <xsl:for-each select="./testsuite[not(./@package = preceding-sibling::testsuite/@package)]">
+            <xsl:for-each select="./testsuite/testsuite[not(./@name = preceding-sibling::testsuite/@name)]">
                 <xsl:sort select="@package"/>
-                <xsl:variable name="testsuites-in-package" select="/testsuites/testsuite[./@package = current()/@package]"/>
+                <xsl:variable name="testsuites-in-package" select="/testsuites/testsuite/testsuite[./@name = current()/@name]"/>
                 <xsl:variable name="testCount" select="sum($testsuites-in-package/@tests)"/>
-                <xsl:variable name="errorCount" select="sum($testsuites-in-package/@errors)"/>
+
+                <xsl:variable name="incompleteCount" select="count($testsuites-in-package/testcase/error[@type = 'PHPUnit_Framework_IncompleteTestError'])" />
+                <xsl:variable name="skippedCount" select="count($testsuites-in-package/testcase/error[@type = 'PHPUnit_Framework_SkippedTestError'])" />
+                <xsl:variable name="riskyCount" select="count($testsuites-in-package/testcase/error[@type = 'PHPUnit_Framework_RiskyTestError'])" />
+
+                <xsl:variable name="errorCount" select="(sum($testsuites-in-package/@errors) - ($skippedCount + $incompleteCount))"/>
                 <xsl:variable name="failureCount" select="sum($testsuites-in-package/@failures)"/>
                 <xsl:variable name="timeCount" select="sum($testsuites-in-package/@time)"/>
 
@@ -182,10 +189,16 @@
                         <xsl:choose>
                             <xsl:when test="$failureCount &gt; 0">Failure</xsl:when>
                             <xsl:when test="$errorCount &gt; 0">Error</xsl:when>
+                            <xsl:when test="$riskyCount &gt; 0">Risky</xsl:when>
+                            <xsl:when test="$skippedCount &gt; 0">Skipped</xsl:when>
+                            <xsl:when test="$incompleteCount &gt; 0">Incomplete</xsl:when>
                         </xsl:choose>
                     </xsl:attribute>
-                    <td><a href="#{@package}"><xsl:value-of select="@package"/></a></td>
+                    <td><a href="#{@name}"><xsl:value-of select="@name"/></a></td>
                     <td><xsl:value-of select="$testCount"/></td>
+                    <td><xsl:value-of select="$incompleteCount"/></td>
+                    <td><xsl:value-of select="$skippedCount"/></td>
+                    <td><xsl:value-of select="$riskyCount"/></td>
                     <td><xsl:value-of select="$errorCount"/></td>
                     <td><xsl:value-of select="$failureCount"/></td>
                     <td>
@@ -250,28 +263,43 @@
     </xsl:template>
 
     <xsl:template name="summary">
-        <h2>Summary</h2>
+        <h2>Summary for <em><xsl:value-of select="testsuite/@name"/></em></h2>
         <xsl:variable name="testCount" select="sum(testsuite/@tests)"/>
-        <xsl:variable name="errorCount" select="sum(testsuite/@errors)"/>
+        <xsl:variable name="incompleteCount" select="count(//testcase/error[@type = 'PHPUnit_Framework_IncompleteTestError'])" />
+        <xsl:variable name="skippedCount" select="count(//testcase/error[@type = 'PHPUnit_Framework_SkippedTestError'])" />
+        <xsl:variable name="execCount" select="($testCount - ($skippedCount + $incompleteCount))" />
+        <xsl:variable name="riskyCount" select="count(//testcase/error[@type = 'PHPUnit_Framework_RiskyTestError'])" />
+        <xsl:variable name="errorCount" select="(sum(testsuite/@errors) - ($skippedCount + $incompleteCount))"/>
         <xsl:variable name="failureCount" select="sum(testsuite/@failures)"/>
         <xsl:variable name="timeCount" select="sum(testsuite/@time)"/>
-        <xsl:variable name="successRate" select="($testCount - $failureCount - $errorCount) div $testCount"/>
+        <xsl:variable name="successRate" select="($execCount - $failureCount - $errorCount) div $execCount"/>
         <table class="details" border="0" cellpadding="5" cellspacing="2" width="100%">
         <tr valign="top">
             <th>Tests</th>
+            <th>Incomplete</th>
+            <th>Skipped</th>
+            <th>Executed</th>
+            <th>Risky</th>
             <th>Failures</th>
             <th>Errors</th>
             <th>Success rate</th>
-            <th>Time</th>
+            <th>Time (s)</th>
         </tr>
         <tr valign="top">
             <xsl:attribute name="class">
                 <xsl:choose>
                     <xsl:when test="$failureCount &gt; 0">Failure</xsl:when>
                     <xsl:when test="$errorCount &gt; 0">Error</xsl:when>
+                    <xsl:when test="$riskyCount &gt; 0">Risky</xsl:when>
+                    <xsl:when test="$skippedCount &gt; 0">Skipped</xsl:when>
+                    <xsl:when test="$incompleteCount &gt; 0">Incomplete</xsl:when>
                 </xsl:choose>
             </xsl:attribute>
             <td><xsl:value-of select="$testCount"/></td>
+            <td><xsl:value-of select="$incompleteCount"/></td>
+            <td><xsl:value-of select="$skippedCount"/></td>
+            <td><xsl:value-of select="$execCount"/></td>
+            <td><xsl:value-of select="$riskyCount"/></td>
             <td><xsl:value-of select="$failureCount"/></td>
             <td><xsl:value-of select="$errorCount"/></td>
             <td>
@@ -322,7 +350,7 @@
         <th>Tests</th>
         <th>Errors</th>
         <th>Failures</th>
-        <th nowrap="nowrap">Time(s)</th>
+        <th nowrap="nowrap">Time (s)</th>
     </tr>
 </xsl:template>
 
@@ -331,9 +359,12 @@
     <tr valign="top">
         <th width="80%">Name</th>
         <th>Tests</th>
+        <th>Incomplete</th>
+        <th>Skipped</th>
+        <th>Risky</th>
         <th>Errors</th>
         <th>Failures</th>
-        <th nowrap="nowrap">Time(s)</th>
+        <th nowrap="nowrap">Time (s)</th>
     </tr>
 </xsl:template>
 

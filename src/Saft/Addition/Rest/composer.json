@@ -1,0 +1,42 @@
+{
+    "name": "saft/saft-rest",
+    "description": "Provides a REST interface for SPARQL endpoints.",
+    "keywords": ["REST", "SPARQL endpoint"],
+    "homepage": "https://safting.github.io/",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Natanael Arndt",
+            "homepage": "http://aksw.org/NatanaelArndt",
+            "email": "arndtn@gmail.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Konrad Abicht",
+            "homepage": "http://www.inspirito.de",
+            "email": "hi@inspirito.de",
+            "role": "Developer"
+        },
+        {
+            "name": "Viktor Befort",
+            "email": "viktor.befort@stud.htwk-leipzig.de",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "saft/saft-rdf": ">=0.4",
+        "saft/saft-store": ">=0.4",
+        "saft/saft-test": ">=0.6",
+        "zendframework/zend-diactoros": "1.3.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": ">=4.8",
+        "squizlabs/php_codesniffer": ">=2.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Saft\\Addition\\Rest\\": "."
+        }
+    }
+}

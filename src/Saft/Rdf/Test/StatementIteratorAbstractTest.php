@@ -67,7 +67,7 @@ abstract class StatementIteratorAbstractTest extends TestCase
         new StatementImpl(
             new NamedNodeImpl('http://s/'),
             new NamedNodeImpl('http://p/'),
-            new LiteralImpl(42)
+            new LiteralImpl("42")
         )];
 
         $iterator = $this->createInstanceWithArray($statements);
@@ -108,7 +108,7 @@ abstract class StatementIteratorAbstractTest extends TestCase
         new StatementImpl(
             new NamedNodeImpl('http://s/'),
             new NamedNodeImpl('http://p/'),
-            new LiteralImpl(42)
+            new LiteralImpl("42")
         )];
 
         $iterator = $this->createInstanceWithArray($statements);

@@ -34,7 +34,7 @@ class GraphQueryImpl extends AbstractQuery
 
         $firstPart = substr($adaptedQuery, 0, 8);
 
-        switch($firstPart) {
+        switch ($firstPart) {
             // CLEAR GRAPH
             case 'clear gr':
                 return 'clearGraph';

@@ -17,7 +17,7 @@ class SparqlUtils
      *                                             graph as the default.
      * @return string, part of query
      */
-    public static function statementIteratorToSparqlFormat($statements, Node $graph = null)
+    public function statementIteratorToSparqlFormat($statements, Node $graph = null)
     {
         $query = '';
         foreach ($statements as $statement) {
@@ -52,11 +52,11 @@ class SparqlUtils
      * @param  string $graphUri   Use if each statement is a triple and to use another graph as the default.
      * @return string Part of query
      */
-    public static function statementsToSparqlFormat(array $statements, Node $graph = null)
+    public function statementsToSparqlFormat(array $statements, Node $graph = null)
     {
         // TODO make it more flexible by move $factory to parameter list?
         $factory = new StatementIteratorFactoryImpl();
-        $iterator = $factory->createIteratorFromArray($statements);
+        $iterator = $factory->createStatementIteratorFromArray($statements);
         return self::statementIteratorToSparqlFormat($iterator, $graph);
     }
 
@@ -67,7 +67,7 @@ class SparqlUtils
      * @param  string $var The variablename, which should be used, if the node is not concrete
      * @return string Either NQuad notation (if node is concrete) or as variable.
      */
-    public static function getNodeInSparqlFormat(Node $node, $var = null)
+    public function getNodeInSparqlFormat(Node $node, $var = null)
     {
         if ($node->isConcrete()) {
             return $node->toNQuads();

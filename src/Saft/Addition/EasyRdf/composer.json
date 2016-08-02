@@ -1,9 +1,9 @@
 {
-    "name": "saft/saft-backend-easyrdf",
+    "name": "saft/saft-easyrdf",
     "description": "",
     "keywords": ["EasyRdf", "Parser", "Serializer"],
     "homepage": "https://safting.github.io/",
-    "license": "GPL2",
+    "license": "GPL-3.0",
     "authors": [
         {
             "name": "Natanael Arndt",
@@ -20,18 +20,17 @@
     ],
     "require": {
         "php": ">=5.3.3",
-
-        "easyrdf/easyrdf": "*",
-        "saft/saft-data": "dev-master"
+        "easyrdf/easyrdf": "0.9.*",
+        "saft/saft-data": ">=0.4"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.5.x",
-        "squizlabs/php_codesniffer": "dev-master"
+        "phpunit/phpunit": ">=4.8",
+        "squizlabs/php_codesniffer": ">=2.5"
     },
     "autoload": {
         "psr-4": {
             "Saft\\Addition\\EasyRdf\\": "."
         }
     },
-    "minimum-stability":"dev"
+    "prefer-stable": true
 }

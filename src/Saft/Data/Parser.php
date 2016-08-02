@@ -3,9 +3,13 @@
 namespace Saft\Data;
 
 /**
- * @note We have to decide how the ParserInterface should be implemented. One option
- * could be that a parser can accept multiple files/streams which are handled as one
- * graph and all statements are combined in the resulting StatementIterator.
+ * The Parser interface describes what methods a RDF parser should provide. An instance of Parser must be initialized
+ * with a certain serialization the parser is able to parse. That means, that you have to create different instances
+ * of Parser for each serialization you need.
+ *
+ * @api
+ * @since 0.1
+ * @package Saft\Data
  */
 interface Parser
 {
@@ -13,53 +17,39 @@ interface Parser
      * Parses a given string and returns an iterator containing Statement instances representing the
      * previously read data.
      *
-     * @param  string            $inputString   Data string containing RDF serialized data.
-     * @param  string            $baseUri       The base URI of the parsed content. If this URI is null the
-     *                                          inputStreams URL is taken as base URI.
-     * @param  string            $serialization The serialization of the inputStream. If null is given the
-     *                                          parser will either apply some standard serialization, or the
-     *                                          only one it is supporting, or will try to guess the correct
-     *                                          serialization, or will throw an Exception.
-     *                                          Supported formats are a subset of the following:
-     *                                          json, rdfxml, sparql-xml, rdfa, turtle, ntriples, n3
+     * @param string $inputString Data string containing RDF serialized data.
+     * @param string $baseUri     The base URI of the parsed content. If this URI is null the inputStreams URL
+     *                            is taken as base URI.
      * @return StatementIterator StatementIterator instaince containing all the Statements parsed by the
-     *                           parser to far
-     * @throws \Exception        If the base URI $baseUri is no valid URI.
+     *                           parser to far.
+     * @throws \Exception If the base URI $baseUri is no valid URI.
+     * @api
+     * @since 0.1
      */
-    public function parseStringToIterator($inputString, $baseUri = null, $serialization = null);
+    public function parseStringToIterator($inputString, $baseUri = null);
 
     /**
      * Parses a given stream and returns an iterator containing Statement instances representing the
      * previously read data. The stream parses the data not as a whole but in chunks.
      *
-     * @param  string            $inputStream   Filename of the stream to parse which contains RDF serialized
-     *                                          data.
-     * @param  string            $baseUri       The base URI of the parsed content. If this URI is null
-     *                                          the inputStreams URL is taken as base URI.
-     * @param  string            $serialization The serialization of the inputStream. If null is given the
-     *                                          parser will either apply some standard serialization, or the
-     *                                          only one it is supporting, or will try to guess the correct
-     *                                          serialization, or will throw an Exception.
-     *                                          Supported formats are a subset of the following:
-     *                                          json, rdfxml, sparql-xml, rdfa, turtle, ntriples, n3
-     * @return StatementIterator A StatementIterator containing all the Statements parsed by the parser to
-     *                           far.
-     * @throws \Exception        If the base URI $baseUri is no valid URI.
+     * @param string $inputStream Filename of the stream to parse which contains RDF serialized data.
+     * @param string $baseUri     The base URI of the parsed content. If this URI is null, the inputStreams URL is taken
+     *                            as base URI. (optional)
+     * @return StatementIterator A StatementIterator containing all the Statements parsed by the parser to far.
+     * @throws \Exception if the base URI $baseUri is no valid URI.
+     * @api
+     * @since 0.1
      */
-    public function parseStreamToIterator($inputStream, $baseUri = null, $serialization = null);
+    public function parseStreamToIterator($inputStream, $baseUri = null);
 
     /**
-     * Returns an array of prefixes which where found during the last parsing.
+     * Returns an array of prefixes which where found during the last parsing. Might also be any other prefix list
+     * depending on the implementation. Might even be empty.
      *
      * @return array An associative array with a prefix mapping of the prefixes parsed so far. The key
      *               will be the prefix, while the values contains the according namespace URI.
+     * @api
+     * @since 0.1
      */
     public function getCurrentPrefixList();
-
-    /**
-     * Returns an array which contains supported serializations.
-     *
-     * @return array Array of supported serializations which are understood by this parser.
-     */
-    public function getSupportedSerializations();
 }

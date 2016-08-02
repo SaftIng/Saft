@@ -2,7 +2,11 @@
 
 namespace Saft\Store;
 
-interface ChainableStore
+/**
+ * @api
+ * @since 0.1
+ */
+interface ChainableStore extends Store
 {
     /**
      * Set successor instance. This method is useful, if you wanna build chain of instances which implement
@@ -12,6 +16,8 @@ interface ChainableStore
      * the query cache first, but if no cache entry was found, the virtuoso instance gets called.
      *
      * @param Store $successor An instance of a class which implements Store interface.
+     * @api
+     * @since 0.1
      */
     public function setChainSuccessor(Store $successor);
 }

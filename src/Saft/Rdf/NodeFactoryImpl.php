@@ -42,6 +42,12 @@ class NodeFactoryImpl implements NodeFactory
         return new AnyPatternImpl();
     }
 
+    /**
+     * Creates an RDF Node based on a N-Triples/N-Quads node string.
+     *
+     * @param $string string the N-Triples/N-Quads node string
+     * @throws \Exception if no node could be created e.g. because of a syntax error in the node string
+     */
     public function createNodeFromNQuads($string)
     {
         if (preg_match(self::NAMED_NODE_REGEX, $string, $matches)) {
@@ -55,5 +61,6 @@ class NodeFactoryImpl implements NodeFactory
         } elseif (preg_match(self::LITERAL_REGEX, $string, $matches)) {
             return $this->createLiteral($matches[1]);
         }
+        throw new \Exception("The given string (\"$string\") is not valid or doesn't represent any RDF node");
     }
 }

@@ -78,12 +78,12 @@ abstract class BlankNodeAbstractTest extends TestCase
     }
 
     /*
-     * Tests for isVariable
+     * Tests for isPattern
      */
 
-    public function testIsVariable()
+    public function testIsPattern()
     {
-        $this->assertFalse($this->newInstance('foo')->isVariable());
+        $this->assertFalse($this->newInstance('foo')->isPattern());
     }
 
     /*

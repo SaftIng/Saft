@@ -55,4 +55,12 @@ abstract class NodeFactoryAbstractTest extends TestCase
         $this->assertTrue($node->isBlank());
         $this->assertEquals("1234", $node->getBlankId());
     }
+
+    public function testWrongStringFromNQuads()
+    {
+        $fixture = $this->getFixture();
+
+        $this->setExpectedException('Exception');
+        $fixture->createNodeFromNQuads('http://example.org/blabla?argument=value#something');
+    }
 }

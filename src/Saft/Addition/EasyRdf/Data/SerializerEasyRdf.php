@@ -2,15 +2,12 @@
 
 namespace Saft\Addition\EasyRdf\Data;
 
-use EasyRdf\Format;
-use EasyRdf\Graph;
 use Saft\Data\Serializer;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
-use Streamer\Stream;
 
 class SerializerEasyRdf implements Serializer
 {
@@ -21,8 +18,11 @@ class SerializerEasyRdf implements Serializer
 
     /**
      * Constructor.
+     *
+     * @param string $serialization Serialization format, for instance turtle or rdfa.
+     * @throws \Exception if unknown serialization format was given.
      */
-    public function __construct()
+    public function __construct($serialization)
     {
         /**
          * Map of serializations. It maps the Saft term on according the EasyRdf format.
@@ -34,6 +34,17 @@ class SerializerEasyRdf implements Serializer
             'rdfa' => 'rdfa',
             'turtle' => 'turtle',
         );
+
+        if (false == isset($this->serializationMap[$serialization])) {
+            throw new \Exception(
+                'Unknown serialization format given: '. $serialization .'. Supported are only '.
+                implode(', ', array_keys($this->serializationMap))
+            );
+        }
+
+        // dont save the given serialization here, but the according one which EasyRdf understands.
+        // there might be some small differences.
+        $this->serialization = $this->serializationMap[$serialization];
     }
 
     /**
@@ -50,29 +61,28 @@ class SerializerEasyRdf implements Serializer
     /**
      * Transforms the statements of a StatementIterator instance into a stream, a file for instance.
      *
-     * @param  StatementIterator $statements    The StatementIterator containing all the Statements which
-     *                                          should be serialized by the serializer.
-     * @param  string            $outputStream  filename of the stream to where the serialization should be
-     *                                          written.
-     * @param  string            $serialization The serialization which should be used. If null is given the
-     *                                          serializer will either apply some default serialization, or
-     *                                          the only one it is supporting, or will throw an Exception.
-     * @throws \Exception If unknown serilaization was given.
+     * @param StatementIterator $statements   The StatementIterator containing all the Statements which
+     *                                        should be serialized by the serializer.
+     * @param string|resource   $outputStream Filename or file pointer to the stream to where the serialization
+     *                                        should be written.
+     * @throws \Exception if unknown serilaization was given.
      */
-    public function serializeIteratorToStream(StatementIterator $statements, $outputStream, $serialization = null)
+    public function serializeIteratorToStream(StatementIterator $statements, $outputStream)
     {
-        $stream = new Stream(fopen($outputStream, 'w'));
+        /*
+         * check parameter $outputStream
+         */
+        if (is_resource($outputStream)) {
+            // use it as it is
 
-        // if no format was given, serialize to turtle.
-        if (null == $serialization) {
-            $format = 'turtle';
+        } elseif (is_string($outputStream)) {
+            $outputStream = fopen($outputStream, 'w');
+
+        } else {
+            throw new \Exception('Parameter $outputStream is neither a string nor resource.');
         }
 
-        if (false === isset($this->serializationMap[$serialization])) {
-            throw new \Exception ('Unknown serialization given: '. $serialization);
-        }
-
-        $graph = new Graph();
+        $graph = new \EasyRdf_Graph();
 
         // go through all statements
         foreach ($statements as $statement) {
@@ -115,9 +125,7 @@ class SerializerEasyRdf implements Serializer
             $graph->add($s, $p, $o);
         }
 
-        $stream->write($graph->serialise($this->serializationMap[$serialization]) . PHP_EOL);
-
-        $stream->close();
+        fwrite($outputStream, $graph->serialise($this->serialization) . PHP_EOL);
     }
 
     /**

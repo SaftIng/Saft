@@ -12,10 +12,13 @@ use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Store\BasicTriplePatternStore;
 use Saft\Test\TestCase;
 
 class AbstractTriplePatternStoreTest extends TestCase
 {
+    protected $sparqlUtils;
+
     public function setUp()
     {
         $this->fixture = new BasicTriplePatternStore(
@@ -24,6 +27,8 @@ class AbstractTriplePatternStoreTest extends TestCase
             new QueryFactoryImpl(),
             new StatementIteratorFactoryImpl()
         );
+
+        $this->sparqlUtils = new SparqlUtils();
     }
 
     /*
@@ -121,7 +126,7 @@ class AbstractTriplePatternStoreTest extends TestCase
         $st = $this->getTestStatementWithLiteral();
         $triple = $this->getTestTriple();
 
-        $graphPattern = SparqlUtils::statementsToSparqlFormat([$st, $triple]);
+        $graphPattern = $this->sparqlUtils->statementsToSparqlFormat([$st, $triple]);
         $query = 'DELETE DATA { ' . $graphPattern . '}';
 
         $this->fixture->query($query);
@@ -130,7 +135,7 @@ class AbstractTriplePatternStoreTest extends TestCase
     public function testDeleteMultipleStatementsQuadRecognition()
     {
         $quad = $this->getTestQuad();
-        $graphPattern = SparqlUtils::statementsToSparqlFormat(array($quad));
+        $graphPattern = $this->sparqlUtils->statementsToSparqlFormat(array($quad));
         $query = 'DELETE DATA { ' . $graphPattern . '}';
 
         $this->assertNull($this->fixture->query($query));
@@ -139,17 +144,17 @@ class AbstractTriplePatternStoreTest extends TestCase
     public function testDeleteMultipleStatementsTripleRecognition()
     {
         $triple = $this->getTestTriple();
-        $graphPattern = SparqlUtils::statementsToSparqlFormat([$triple]);
-        $query = 'DELETE DATA { ' . $graphPattern . '}';
+
+        $query = 'DELETE DATA { ' . $this->sparqlUtils->statementsToSparqlFormat([$triple]) . '}';
 
         $this->assertNull($this->fixture->query($query));
     }
 
     public function testDeleteMultipleStatementsVariablePatterns()
     {
-        $this->markTestSkipped('TODO implement test store which expects certain things on query');
         $statement = $this->getTestPatternStatement();
-        $query = 'DELETE DATA { '. SparqlUtils::statementsToSparqlFormat([$statement]) .'}';
+
+        $query = 'DELETE DATA { '. $this->sparqlUtils->statementsToSparqlFormat([$statement]) .'}';
 
         $this->assertNull($this->fixture->query($query));
     }
@@ -158,7 +163,7 @@ class AbstractTriplePatternStoreTest extends TestCase
     {
         $statement = $this->getTestStatementWithLiteral();
 
-        $query = 'DELETE DATA { '. SparqlUtils::statementsToSparqlFormat([$statement]) .'}';
+        $query = 'DELETE DATA { '. $this->sparqlUtils->statementsToSparqlFormat([$statement]) .'}';
 
         $this->assertNull($this->fixture->query($query));
     }
@@ -174,7 +179,7 @@ class AbstractTriplePatternStoreTest extends TestCase
 
         $this->fixture->addStatements(array($triple), $this->testGraph);
 
-        $query = 'ASK { '. SparqlUtils::statementsToSparqlFormat(array($triple), $this->testGraph) .'}';
+        $query = 'ASK { '. $this->sparqlUtils->statementsToSparqlFormat(array($triple), $this->testGraph) .'}';
 
         $this->assertTrue($this->fixture->query($query));
     }

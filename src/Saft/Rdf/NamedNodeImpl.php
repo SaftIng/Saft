@@ -15,7 +15,9 @@ class NamedNodeImpl extends AbstractNamedNode
      */
     public function __construct($uri)
     {
-        if ($uri == null || !NodeUtils::simpleCheckURI($uri)) {
+        $nodeUtils = new NodeUtils();
+
+        if ($uri == null || !$nodeUtils->simpleCheckURI($uri)) {
             throw new \Exception('Parameter $uri is not a valid URI: '. $uri);
         }
 

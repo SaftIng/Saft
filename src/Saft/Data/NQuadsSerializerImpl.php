@@ -3,10 +3,19 @@
 namespace Saft\Data;
 
 use Saft\Rdf\StatementIterator;
-use Streamer\Stream;
 
 class NQuadsSerializerImpl implements Serializer
 {
+    public function __construct($serialization)
+    {
+        if ('n-quads' != $serialization && 'n-triples' != $serialization) {
+            throw new \Exception(
+                'Unknown format given: '. $serialization .'. This serializer only supports n-quads and n-triples.'
+            );
+        }
+
+        $this->serialization = $serialization;
+    }
 
     /**
      * Set the prefixes which the serializer can/should use when generating the serialization.
@@ -22,38 +31,43 @@ class NQuadsSerializerImpl implements Serializer
     /**
      * Transforms the statements of a StatementIterator instance into a stream, a file for instance.
      *
-     * @param  StatementIterator $statements    The StatementIterator containing all the Statements which
-     *                                          should be serialized by the serializer.
-     * @param  string            $outputStream  filename of the stream to where the serialization should be
-     *                                          written.
-     * @param  string            $serialization The serialization which should be used. If null is given
-     *                                          the serializer will either apply some default serialization,
-     *                                          or the only one it is supporting, or will throw an Exception.
-     * @throws \Exception If unknown serialization was given.
+     * @param StatementIterator $statements   The StatementIterator containing all the Statements which
+     *                                        should be serialized by the serializer.
+     * @param string|resource   $outputStream Filename or file pointer to the stream to where the serialization
+     *                                        should be written.
+     * @throws \Exception if unknown serialization was given.
      */
-    public function serializeIteratorToStream(
-        StatementIterator $statements,
-        $outputStream,
-        $serialization = null
-    ) {
-        $stream = new Stream(fopen($outputStream, 'w'));
+    public function serializeIteratorToStream(StatementIterator $statements, $outputStream)
+    {
+        /*
+         * check parameter $outputStream
+         */
+        if (is_resource($outputStream)) {
+            // use it as it is
+
+        } elseif (is_string($outputStream)) {
+            $outputStream = fopen($outputStream, 'w');
+
+        } else {
+            throw new \Exception('Parameter $outputStream is neither a string nor resource.');
+        }
 
         /*
          * Handle format
          */
-        if ('n-quads' == $serialization) {
+        if ('n-quads' == $this->serialization) {
             $function = 'toNQuads';
-        } elseif ('n-triples' == $serialization) {
+        } elseif ('n-triples' == $this->serialization) {
             $function = 'toNTriples';
-        } else {
-            throw new \Exception('Unknown format given: '. $serialization);
         }
+        // no else need here, because there is a check in the constructor
 
         foreach ($statements as $statement) {
-            $stream->write($statement->$function() . PHP_EOL);
+            fwrite($outputStream, $statement->$function() . PHP_EOL);
         }
 
-        $stream->close();
+        // Do not close the stream, because ... it is a stream and not a file! Well, maybe the user uses a
+        // file, but its handler will be closed by PHP automatically at the end anyway.
     }
 
     /**

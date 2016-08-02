@@ -12,7 +12,7 @@ use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
-use Saft\Store\Result\ResultFactoryImpl;
+use Saft\Sparql\Result\ResultFactoryImpl;
 use Saft\Store\Test\StoreAbstractTest;
 use Symfony\Component\Yaml\Parser;
 
@@ -22,28 +22,35 @@ class VirtuosoTest extends StoreAbstractTest
     {
         parent::setUp();
 
-        if (true === isset($this->config['virtuosoConfig'])) {
+        try {
+            $this->isTestPossible();
             $this->fixture = new Virtuoso(
                 new NodeFactoryImpl(),
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
                 new ResultFactoryImpl(),
                 new StatementIteratorFactoryImpl(),
-                $this->config['virtuosoConfig']
+                $this->configuration['virtuosoConfig']
             );
-
-        } else {
-            $this->markTestSkipped('Array virtuosoConfig is not set in the test-config.yml.');
+        } catch(\Exception $e) {
+            $this->markTestSkipped($e->getMessage());
         }
     }
 
-    public function tearDown()
+    protected function isTestPossible()
     {
-        if (null !== $this->fixture) {
-            $this->fixture->dropGraph($this->testGraph);
+        if (false === isset($this->configuration['virtuosoConfig'])) {
+            throw new \Exception('Array virtuosoConfig is not set in the test-config.yml.');
+
+        } else {
+            new \PDO(
+                'odbc:' . (string)$this->configuration['virtuosoConfig']['dsn'],
+                (string)$this->configuration['virtuosoConfig']['username'],
+                (string)$this->configuration['virtuosoConfig']['password']
+            );
         }
 
-        parent::tearDown();
+        return true;
     }
 
     /*
@@ -113,6 +120,17 @@ class VirtuosoTest extends StoreAbstractTest
     }
 
     /*
+     * Tests for query
+     */
+
+    // override test from parent class because Virtuoso does not support what we want to test.
+    public function testQueryAddAndQueryStatementsDefaultGraph()
+    {
+        // See: https://github.com/openlink/virtuoso-opensource/issues/417
+        $this->markTestSkipped('Virtuoso does not grant write access to the default graph.');
+    }
+
+    /*
      * Tests for sqlQuery
      */
 
@@ -130,4 +148,29 @@ class VirtuosoTest extends StoreAbstractTest
         $this->fixture->sqlQuery('invalid query');
     }
 
+    /**
+     * Regression test for https://github.com/SaftIng/Saft/issues/61
+     * "Undefined index: xml:lang" in Virtuoso
+     */
+    public function testQueryWithoutLanguageTag()
+    {
+        // create a triple with literal, which is not typed or has a language tag
+        $this->fixture->query('INSERT INTO <'. $this->testGraph .'> {<http://a> <http://b> "foo"}');
+
+        // check if that functions throws a warning about an undefined index xml:lang
+        $result = $this->fixture->query('SELECT * FROM <'. $this->testGraph .'> WHERE {?s ?p ?o.}');
+
+        // check returned result set, to be sure to have the right mapping for the literal
+        foreach ($result as $key => $value) {
+            $this->assertTrue(isset($value['s']));
+            $this->assertTrue(isset($value['p']));
+            $this->assertTrue(isset($value['o']));
+
+            $this->assertEquals('http://a', $value['s']->getUri());
+            $this->assertEquals('http://b', $value['p']->getUri());
+            $this->assertEquals('foo', $value['o']->getValue());
+        }
+
+        $this->assertEquals(1, count($result));
+    }
 }

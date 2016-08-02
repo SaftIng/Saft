@@ -4,9 +4,15 @@ namespace Saft\Addition\Redland\Rdf;
 
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactoryImpl as SaftNodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
 
 class NodeFactory extends SaftNodeFactoryImpl
 {
+    /**
+     * @var NodeUtils
+     */
+    protected $nodeUtils;
+
     /**
      * @var string
      */
@@ -16,6 +22,11 @@ class NodeFactory extends SaftNodeFactoryImpl
      * @var string
      */
     protected static $rdfLangString = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString';
+
+    public function __construct()
+    {
+        $this->nodeUtils = new NodeUtils();
+    }
 
     /**
      * @param  string $value
@@ -27,6 +38,8 @@ class NodeFactory extends SaftNodeFactoryImpl
     {
         if ($value === null) {
             throw new \Exception('Can\'t initialize literal with null as value.');
+        } elseif (!is_string($value)) {
+            throw new \Exception("The literal value has to be of type string");
         }
 
         $datatypeUri = null;
@@ -75,6 +88,10 @@ class NodeFactory extends SaftNodeFactoryImpl
     {
         if ($uri === null) {
             throw new \Exception('Can\'t initialize node with null.');
+        }
+
+        if (!$this->nodeUtils->simpleCheckURI($uri)) {
+            throw new \Exception('Invalid URI was given for RDF NamedNode creation.');
         }
 
         // TODO catch invalid URIs

@@ -10,13 +10,15 @@ use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
+use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
+use Saft\Sparql\Query\QueryUtils;
+use Saft\Sparql\Result\EmptyResult;
+use Saft\Sparql\Result\ResultFactory;
+use Saft\Sparql\Result\SetResult;
+use Saft\Sparql\Result\ValueResult;
 use Saft\Store\AbstractSparqlStore;
-use Saft\Store\Result\EmptyResult;
-use Saft\Store\Result\ResultFactory;
-use Saft\Store\Result\SetResult;
-use Saft\Store\Result\ValueResult;
 
 class ARC2 extends AbstractSparqlStore
 {
@@ -36,6 +38,16 @@ class ARC2 extends AbstractSparqlStore
      * @var QueryFactory
      */
     private $queryFactory = null;
+
+    /**
+     * @var QueryUtils
+     */
+    protected $queryUtils;
+
+    /**
+     * @var SparqlUtils
+     */
+    private $sparqlUtils = null;
 
     /**
      * @var StatementFactory
@@ -80,6 +92,10 @@ class ARC2 extends AbstractSparqlStore
             $this->store->setUp();
         }
 
+        $this->nodeUtils = new NodeUtils();
+        $this->queryUtils = new QueryUtils();
+        $this->sparqlUtils = new SparqlUtils();
+
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
         $this->queryFactory = $queryFactory;
@@ -113,64 +129,31 @@ class ARC2 extends AbstractSparqlStore
     {
         $graphUriToUse = null;
 
-        /**
-         * Create batches out of given statements to improve statement throughput.
-         */
-        $counter = 0;
-        $batchSize = 100;
-        $batchStatements = array();
-
         foreach ($statements as $statement) {
-            // non-concrete Statement instances not allowed
-            if (false === $statement->isConcrete()) {
+            if (!$statement->isConcrete()) {
+                // non-concrete Statement instances not allowed
+                // we have to undo the transaction somehow
                 throw new \Exception('At least one Statement is not concrete');
             }
 
-            // given $graph forces usage of it and not the graph from the statement instance
             if (null !== $graph) {
+                // given $graph forces usage of it and not the graph from the statement instance
                 $graphUriToUse = $graph->getUri();
-                // reuse $graph instance later on.
 
-            // use graphUri from statement
             } elseif (null !== $statement->getGraph()) {
-                $graph = $statement->getGraph();
-                $graphUriToUse = $graph->getUri();
-
-            // no graph instance was found
+                // use graphUri from statement
+                $graphUriToUse = $statement->getGraph()->getUri();
             }
+            // else: non-concrete Statement instances not allowed
 
-            // init batch entry for the current graph URI, if not set yet.
-            if (false === isset($batchStatements[$graphUriToUse])) {
-                $batchStatements[$graphUriToUse] = array();
-            }
-
-            $batchStatements[$graphUriToUse][] = $this->statementFactory->createStatement(
-                $statement->getSubject(),
-                $statement->getPredicate(),
-                $statement->getObject()
+            $this->query(
+                'INSERT INTO <'. $graphUriToUse .'> {'
+                . $this->sparqlUtils->getNodeInSparqlFormat($statement->getSubject()) . ' '
+                . $this->sparqlUtils->getNodeInSparqlFormat($statement->getPredicate()) . ' '
+                . $this->sparqlUtils->getNodeInSparqlFormat($statement->getObject()) . ' . '
+                . '}',
+                $options
             );
-
-            // after batch is full, execute collected statements all at once
-            if (0 === $counter % $batchSize) {
-                /**
-                 * $batchStatements is an array with graphUri('s) as key(s) and iterator instances as value
-                 * Each entry is related to a certain graph and contains a bunch of statement instances.
-                 */
-                foreach ($batchStatements as $graphUriToUse => $statementBatch) {
-                    $this->query(
-                        'INSERT INTO <'. $graphUriToUse .'> {'.
-                        $this->sparqlFormat(
-                            $this->statementIteratorFactory->createIteratorFromArray(
-                                $statementBatch
-                            )
-                        ) .'}',
-                        $options
-                    );
-                }
-
-                // re-init variables
-                $batchStatements = array();
-            }
         }
     }
 
@@ -188,20 +171,28 @@ class ARC2 extends AbstractSparqlStore
         $g2t = $this->configuration['table-prefix'] . '_g2t';
         $id2val = $this->configuration['table-prefix'] . '_id2val';
 
-        /*
-         * for id2val table
-         */
-        $query = 'INSERT INTO '. $id2val .' (val) VALUES("'. $graph->getUri() .'")';
-        $this->store->queryDB($query, $this->store->getDBCon());
-        $usedId = $this->store->getDBCon()->insert_id;
+        // check if there is already a graph with the given URI
+        $result = $this->store->queryDB(
+            'SELECT id FROM '. $id2val .' WHERE val = "'. $graph->getUri() .'";',
+            $this->store->getDBCon()
+        );
 
-        /*
-         * for g2t table
-         */
-        $newIdg2t = 1 + $this->getRowCount($g2t);
-        $query = 'INSERT INTO '. $g2t .' (t, g) VALUES('. $newIdg2t .', '. $usedId .')';
-        $this->store->queryDB($query, $this->store->getDBCon());
-        $usedId = $this->store->getDBCon()->insert_id;
+        if (0 == $result->num_rows) {
+            /*
+             * for id2val table
+             */
+            $query = 'INSERT INTO '. $id2val .' (val) VALUES("'. $graph->getUri() .'")';
+            $this->store->queryDB($query, $this->store->getDBCon());
+            $usedId = $this->store->getDBCon()->insert_id;
+
+            /*
+             * for g2t table
+             */
+            $newIdg2t = 1 + $this->getRowCount($g2t);
+            $query = 'INSERT INTO '. $g2t .' (t, g) VALUES('. $newIdg2t .', '. $usedId .')';
+            $this->store->queryDB($query, $this->store->getDBCon());
+            $usedId = $this->store->getDBCon()->insert_id;
+        }
     }
 
     /**
@@ -234,7 +225,7 @@ class ARC2 extends AbstractSparqlStore
             $statement->getObject()
         );
 
-        $statementIterator = $this->statementIteratorFactory->createIteratorFromArray(
+        $statementIterator = $this->statementIteratorFactory->createStatementIteratorFromArray(
             array($tripleStatement)
         );
 
@@ -315,7 +306,7 @@ class ARC2 extends AbstractSparqlStore
 
         // collect graph URI's
         while ($row = $result->fetch_assoc()) {
-            if (NodeUtils::simpleCheckURI($row['graphUri'])) {
+            if ($this->nodeUtils->simpleCheckURI($row['graphUri'])) {
                 $graphs[$row['graphUri']] = $this->nodeFactory->createNamedNode($row['graphUri']);
             }
         }
@@ -362,6 +353,17 @@ class ARC2 extends AbstractSparqlStore
             'table-prefix' => 'saft_'
         ), $this->configuration);
 
+        /*
+         * check for missing connection credentials
+         */
+        if ('' == $this->configuration['database']) {
+            throw new \Exception('ARC2: Field database is not set.');
+        } elseif ('' == $this->configuration['username']) {
+            throw new \Exception('ARC2: Field username is not set.');
+        } elseif ('' == $this->configuration['host']) {
+            throw new \Exception('ARC2: Field host is not set.');
+        }
+
         // init store
         $this->store = \ARC2::getStore(array(
             'db_host' => $this->configuration['host'],
@@ -381,6 +383,8 @@ class ARC2 extends AbstractSparqlStore
      * @return Result     Returns result of the query. Its type depends on the type of the query.
      * @throws \Exception If query is no string.
      * @throws \Exception If query is malformed.
+     * @throws \Exception If query is a DELETE query and contains quads, where the graph of one quad is of type var
+     * @throws \Exception If a non-graph query contains no triples and quads.
      * @todo handle multiple graphs in FROM clause
      */
     public function query($query, array $options = array())
@@ -399,8 +403,104 @@ class ARC2 extends AbstractSparqlStore
         // execute query on the store
         $result = $this->store->query($query);
 
-        if ('selectQuery' === AbstractQuery::getQueryType($query)) {
-            /**
+        /*
+         * special case: if you execute a SELECT COUNT(*) query, ARC2 will return the number of triples
+                       instead of a result set
+         */
+        $countCheck = preg_match(
+            '/selectcount\([a-z*]\)(from|where)/si',
+            preg_replace('/\s+/', '', $query) // remove all whitespaces
+        );
+        if (1 == $countCheck) {
+            $variable = 'callret-0';
+            // build a set result, because the user expects it as result type because a SELECT query
+            // was sent.
+            $setResult = $this->resultFactory->createSetResult(
+                array(
+                    array(
+                        $variable => $this->nodeFactory->createLiteral(
+                            $result,
+                            'http://www.w3.org/2001/XMLSchema#int'
+                        )
+                    )
+                )
+            );
+            $setResult->setVariables(array($variable));
+            return $setResult;
+
+        /*
+         * ARC2 does not support quads, especially not in DELETE queries. The following code construct
+         * tries to close that gap by transforming the query in a one which ARC2 can understand.
+         *
+         * This part transform queries of the kind:
+         *
+         *      DELETE WHERE {
+         *          Graph <http://localhost/Saft/TestGraph/> {
+         *              ?s ?p ?o .
+         *          }
+         *      }
+         *
+         * to SPARQL+ ones:
+         *
+         *      DELETE FROM <http://localhost/Saft/TestGraph/> {
+         *          ?s ?p ?o .
+         *      }
+         *      WHERE {
+         *          ?s ?p ?o .
+         *      }
+         *
+         *
+         * IMPORTANT: Please adapt
+         *            https://github.com/SaftIng/safting.github.io/blob/master/doc/phpframework/addition/ARC2.md
+         *            if you change the support for SPARQL 1.0/1.1 here!
+         */
+        } elseif (
+            $queryObject->isUpdateQuery() &&
+            isset($queryParts['quad_pattern']) &&
+            'deleteWhere' === $queryParts['sub_type']
+        ) {
+            foreach ($queryParts['quad_pattern'] as $quad) {
+                if ('uri' != $quad['g_type']) {
+                    throw new \Exception('The graph of a quad must be an URI here.');
+                }
+
+                // subject
+                $s = $this->nodeUtils->createNodeInstance(
+                    $this->nodeFactory,
+                    $quad['s'],
+                    $quad['s_type']
+                );
+                $s = $this->sparqlUtils->getNodeInSparqlFormat($s);
+
+                // predicate
+                $p = $this->nodeUtils->createNodeInstance(
+                    $this->nodeFactory,
+                    $quad['p'],
+                    $quad['p_type']
+                );
+                $p = $this->sparqlUtils->getNodeInSparqlFormat($p);
+
+                // object
+                $o = $this->nodeUtils->createNodeInstance(
+                    $this->nodeFactory,
+                    $quad['o'],
+                    $quad['o_type'],
+                    $quad['o_datatype'],
+                    $quad['o_lang']
+                );
+                $o = $this->sparqlUtils->getNodeInSparqlFormat($o);
+
+                return $this->query(
+                    'DELETE FROM <'. $quad['g'] .'> {'. $s .' '. $p .' '. $o .' }
+                    WHERE {'. $s .' '. $p .' '. $o .' }'
+                );
+            }
+
+        /*
+         * SELECT query
+         */
+        } elseif ('selectQuery' === $this->queryUtils->getQueryType($query)) {
+            /*
              * For a SELECT query the result looks like:
              *
              * array(
@@ -426,7 +526,7 @@ class ARC2 extends AbstractSparqlStore
                 foreach ($result['result']['variables'] as $variable) {
                     // checks for variable type
                     // example: $row['s type']
-                    switch($row[$variable .' type']) {
+                    switch ($row[$variable .' type']) {
                         // ARC2 does not differenciate between typed literal and literal, like Virtuoso does
                         // for instance. You have to check for lang and datatype key by yourself.
                         case 'literal':
@@ -471,7 +571,7 @@ class ARC2 extends AbstractSparqlStore
             return $setResult;
 
         } else {
-            if ('askQuery' === AbstractQuery::getQueryType($query)) {
+            if ('askQuery' === $this->queryUtils->getQueryType($query)) {
                 return $this->resultFactory->createValueResult($result['result']);
 
             } else {

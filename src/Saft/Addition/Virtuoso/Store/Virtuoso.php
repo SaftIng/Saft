@@ -14,13 +14,14 @@ use Saft\Rdf\StatementIteratorFactory;
 use Saft\Rdf\Triple;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
+use Saft\Sparql\Query\QueryUtils;
+use Saft\Sparql\Result\EmptyResult;
+use Saft\Sparql\Result\ResultFactory;
+use Saft\Sparql\Result\SetResult;
+use Saft\Sparql\Result\StatementResult;
+use Saft\Sparql\Result\ValueResult;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Store;
-use Saft\Store\Result\EmptyResult;
-use Saft\Store\Result\ResultFactory;
-use Saft\Store\Result\SetResult;
-use Saft\Store\Result\StatementResult;
-use Saft\Store\Result\ValueResult;
 
 /**
  * SparqlStore implementation of OpenLink Virtuoso. It supports version 6.1.8+
@@ -50,6 +51,11 @@ class Virtuoso extends AbstractSparqlStore
      * @var QueryFactory
      */
     private $queryFactory = null;
+
+    /**
+     * @var QueryUtils
+     */
+    protected $queryUtils;
 
     /**
      * @var StatementFactory
@@ -82,6 +88,8 @@ class Virtuoso extends AbstractSparqlStore
         array $configuration
     ) {
         $this->checkRequirements();
+
+        $this->queryUtils = new QueryUtils();
 
         $this->configuration = $configuration;
 
@@ -235,9 +243,24 @@ class Virtuoso extends AbstractSparqlStore
     }
 
     /**
+     * @param array $options
+     */
+    public function mergeOptions($options)
+    {
+        return array_merge(
+            array(
+                'default_graph_uri' => '',
+                'output_format' => null
+            ),
+            $options
+        );
+    }
+
+    /**
      * Returns the current connection resource. The resource is created lazily if it doesn't exist.
      *
      * @return \PDO Instance of \PDO representing an open PDO-ODBC connection.
+     * @throws \PDOException if connection could not be established.
      */
     protected function openConnection()
     {
@@ -262,19 +285,14 @@ class Virtuoso extends AbstractSparqlStore
             /**
              * Setup ODBC connection using PDO-ODBC
              */
-            try {
-                $this->connection = new \PDO(
-                    'odbc:' . (string)$this->configuration['dsn'],
-                    (string)$this->configuration['username'],
-                    (string)$this->configuration['password']
-                );
-                $this->connection->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
-                $this->connection->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-                $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-            } catch (\PDOException $e) {
-                throw new \Exception($e->getMessage());
-            }
+            $this->connection = new \PDO(
+                'odbc:' . (string)$this->configuration['dsn'],
+                (string)$this->configuration['username'],
+                (string)$this->configuration['password']
+            );
+            $this->connection->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
+            $this->connection->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+            $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         }
 
         return $this->connection;
@@ -294,27 +312,34 @@ class Virtuoso extends AbstractSparqlStore
      */
     public function query($query, array $options = array())
     {
+        $options = $this->mergeOptions($options);
+
         $queryObject = $this->queryFactory->createInstanceByQueryString($query);
         $queryParts = $queryObject->getQueryParts();
-
-        // if a non-graph query was given, we assume triples or quads. If neither quads nor triples were found,
-        // throw an exception.
-        if (false === $queryObject->isGraphQuery()
-            && false === isset($queryParts['triple_pattern'])
-            && false === isset($queryParts['quad_pattern'])) {
-            throw new \Exception('Non-graph queries must have triples or quads.');
-        }
 
         /**
          * SPARQL query (usually to fetch data)
          */
-        if ('selectQuery' === AbstractQuery::getQueryType($query)) {
+        if ('selectQuery' === $this->queryUtils->getQueryType($query)) {
             // force extended result to have detailed information about given result entries, such as datatype and
             // language information.
-            $sparqlQuery = 'define output:format "JSON"' . PHP_EOL . $query;
+            if ('json' == $options['output_format'] || false == isset($options['output_format'])) {
+                $sparqlQuery = 'define output:format "JSON"' . PHP_EOL . $query;
+            } else {
+                $sparqlQuery = $query;
+            }
 
-            // escape characters that delimit the query within the query using addcslashes
-            $graphUri = 'NULL';
+            $nodeUtils = new nodeUtils();
+
+            // make it possible to set a default graph URI
+            if (
+                isset($options['default_graph_uri']) &&
+                $nodeUtils->simpleCheckURI($options['default_graph_uri'])
+            ) {
+                $graphUri = $options['default_graph_uri'];
+            } else {
+                $graphUri = 'NULL';
+            }
             $graphSpec = '';
             // escape characters that delimit the query within the query
             $sparqlQuery = $graphSpec . 'CALL DB.DBA.SPARQL_EVAL(\''. addcslashes($sparqlQuery, '\'\\') . '\', '.
@@ -330,7 +355,7 @@ class Virtuoso extends AbstractSparqlStore
                 $pdoQuery->execute();
 
             } catch (\PDOException $e) {
-                throw new \Exception($e->getMessage());
+                throw new \Exception('For query '. $query .' > '. $e->getMessage());
             }
 
             $entries = array();
@@ -344,7 +369,11 @@ class Virtuoso extends AbstractSparqlStore
                 // in case the result was empty, Virtuoso does not return a list of variables, which are
                 // usually located in the SELECT part. so we try to extract the variables by ourselves.
                 if (0 == count($variables)) {
-                    $variables = $queryParts['variables'];
+                    if (isset($queryParts['variables'])) {
+                        $variables = $queryParts['variables'];
+                    } else {
+                        $variables = array();
+                    }
                 }
 
                 /**
@@ -370,18 +399,46 @@ class Virtuoso extends AbstractSparqlStore
                      * )
                      */
                     foreach ($bindingParts as $variable => $part) {
+                        // it seems that Virtuoso returns type=literal for bnodes, so we manually fix that
+                        // here, otherwise it will creates a Literal instance.
+                        if (false !== strpos($part['value'], '_:')) {
+                            $part['type'] = 'bnode';
+                        }
+
                         switch ($part['type']) {
                             /**
-                             * Literal (language'd)
+                             * Blank Node
+                             */
+                            case 'bnode':
+                                $newEntry[$variable] = $this->nodeFactory->createBlankNode($part['value']);
+                                break;
+
+                            /**
+                             * Literal (language'd) or plain literal without language tag.
+                             *
+                             * Usually Virtuoso takes that type for language-tagged literals, but if
+                             * there are triples containign literals, which were created without Saft,
+                             * they might are of type=literal, but dont have language information.
                              */
                             case 'literal':
+                                // language information set
+                                if (isset($part['xml:lang'])) {
+                                    $langString = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString';
+                                    $lang = $part['xml:lang'];
+                                // fallback to simple triple
+                                } else {
+                                    $langString = 'http://www.w3.org/2001/XMLSchema#string';
+                                    $lang = null;
+                                }
+
                                 $newEntry[$variable] = $this->nodeFactory->createLiteral(
                                     $part['value'],
-                                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
-                                    $part['xml:lang']
+                                    $langString,
+                                    $lang
                                 );
 
                                 break;
+
                             /**
                              * Typed-Literal
                              */
@@ -398,10 +455,11 @@ class Virtuoso extends AbstractSparqlStore
                              */
                             case 'uri':
                                 $newEntry[$variable] = $this->nodeFactory->createNamedNode($part['value']);
+
                                 break;
 
                             default:
-                                throw new \Exception('Unknown type given.');
+                                throw new \Exception('Unknown type given:' . $part['type']);
                                 break;
                         }
                     }
@@ -437,7 +495,7 @@ class Virtuoso extends AbstractSparqlStore
             }
 
             // ask result
-            if ('askQuery' === AbstractQuery::getQueryType($query)) {
+            if ('askQuery' === $this->queryUtils->getQueryType($query)) {
                 $pdoResult = $pdoQuery->fetchAll(\PDO::FETCH_ASSOC);
                 return $this->resultFactory->createValueResult(true !== empty($pdoResult));
             } else {

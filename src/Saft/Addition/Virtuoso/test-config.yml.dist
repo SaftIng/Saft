@@ -1,0 +1,9 @@
+#
+# This file contains a list with different configurations for test cases which rely on store.
+#
+# Feel free to copy it to test-config.yml and adapt. You can reuse existing configurations or you can use your own.
+
+virtuosoConfig: &virtuosoConfig
+    dsn: "VOS"
+    username: "dba"
+    password: "dba"

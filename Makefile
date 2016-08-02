@@ -11,9 +11,11 @@ default:
 	@echo ""
 	@echo "Saft - CLI"
 	@echo ""
-	@echo "- make codebeautifier"
-	@echo "- make codesniffer"
-	@echo "- make setup-test-environment"
+	@echo "You can execute:"
+	@echo "- make codebeautifier - Clean and format code."
+	@echo "- make codesniffer - Check code format."
+	@echo "- make setup-test-environment - Setup test-environment of Saft."
+	@echo "- make setup-subtrees - Setup all remotes for Saft's subtree repositories."
 	@echo ""
 
 setup-test-environment:
@@ -44,29 +46,34 @@ commit:
 mrpropper: clean
 	rm -r ./vendor
 
-# TODO change this somehow to a loop
-split-subtrees:
-	git subtree split -P src/Saft/Cache -b saft.cache
-	git subtree split -P src/Saft/Backend/FileCache -b saft.cache.file
-	git subtree split -P src/Saft/Backend/MemcacheD -b saft.cache.memcached
-	git subtree split -P src/Saft/Data -b saft.data
-	git subtree split -P src/Saft/QueryCache -b saft.querycache
-	git subtree split -P src/Saft/Rdf -b saft.rdf
-	git subtree split -P src/Saft/Sparql -b saft.sparql
-	git subtree split -P src/Saft/Store -b saft.store
-	git subtree split -P src/Saft/Backend/HttpStore -b saft.store.http
-	git subtree split -P src/Saft/Backend/Virtuoso -b saft.store.virtuoso
-	git subtree split -P src/Saft/Backend/Redland -b saft.redland
+# Remove all remotes for Saft's subpackages.
+remove-subpackage-remotes:
+	git remote rm saft.arc2
+	git remote rm saft.data
+	git remote rm saft.easyrdf
+	git remote rm saft.erfurt
+	git remote rm saft.querycache
+	git remote rm saft.rdf
+	git remote rm saft.redland
+	git remote rm saft.skeleton
+	git remote rm saft.sparql
+	git remote rm saft.store
+	git remote rm saft.store.http
+	git remote rm saft.store.virtuoso
+	git remote rm saft.test
 
-push-subtrees:
-	git push saft.cache saft.cache:master
-	git push saft.cache.file saft.cache.file:master
-	git push saft.cache.memcached saft.cache.memcached:master
-	git push saft.data saft.data:master
-	git push saft.querycache saft.querycache:master
-	git push saft.rdf saft.rdf:master
-	git push saft.sparql saft.sparql:master
-	git push saft.store saft.store:master
-	git push saft.store.http saft.store.http:master
-	git push saft.store.virtuoso saft.store.virtuoso:master
-	git push saft.redland saft.redland:master
+# Setup all remotes subpackages
+setup-subpackage-remotes:
+	git remote add saft.arc2 git@github.com:SaftIng/Saft.arc2
+	git remote add saft.data git@github.com:SaftIng/Saft.data
+	git remote add saft.easyrdf git@github.com:SaftIng/Saft.easyrdf
+	git remote add saft.erfurt git@github.com:SaftIng/Saft.erfurt
+	git remote add saft.querycache git@github.com:SaftIng/Saft.querycache
+	git remote add saft.rdf git@github.com:SaftIng/Saft.rdf
+	git remote add saft.redland git@github.com:SaftIng/Saft.redland
+	git remote add saft.skeleton git@github.com:SaftIng/Saft.skeleton
+	git remote add saft.sparql git@github.com:SaftIng/Saft.sparql
+	git remote add saft.store git@github.com:SaftIng/Saft.store
+	git remote add saft.store.http git@github.com:SaftIng/Saft.store.http
+	git remote add saft.store.virtuoso git@github.com:SaftIng/Saft.store.virtuoso
+	git remote add saft.test git@github.com:SaftIng/Saft.test

@@ -16,16 +16,18 @@ class SparqlUtilsTest extends TestCase
 
     public function testStatementIteratorToSparqlFormatGraphGivenWithTripleAndQuad()
     {
+        $sparqlUtils = new SparqlUtils();
+
         $triple = new StatementImpl(
             new NamedNodeImpl('http://saft/test/s1'),
             new NamedNodeImpl('http://saft/test/p1'),
-            new LiteralImpl(42)
+            new LiteralImpl("42")
         );
 
         $quad = new StatementImpl(
             new NamedNodeImpl('http://saft/test/s2'),
             new NamedNodeImpl('http://saft/test/p2'),
-            new LiteralImpl(43),
+            new LiteralImpl("43"),
             new NamedNodeImpl('http://some/other/graph/2')
         );
 
@@ -35,23 +37,25 @@ class SparqlUtilsTest extends TestCase
             'Graph <http://localhost/Saft/TestGraph/> {<http://saft/test/s2> <http://saft/test/p2> '.
             '"43"^^<http://www.w3.org/2001/XMLSchema#string> . }',
             trim(
-                SparqlUtils::statementIteratorToSparqlFormat(array($triple, $quad), $this->testGraph)
+                $sparqlUtils->statementIteratorToSparqlFormat(array($triple, $quad), $this->testGraph)
             )
         );
     }
 
     public function testStatementIteratorToSparqlFormatTripleAndQuad()
     {
+        $sparqlUtils = new SparqlUtils();
+
         $triple = new StatementImpl(
             new NamedNodeImpl('http://saft/test/s1'),
             new NamedNodeImpl('http://saft/test/p1'),
-            new LiteralImpl(42)
+            new LiteralImpl("42")
         );
 
         $quad = new StatementImpl(
             new NamedNodeImpl('http://saft/test/s1'),
             new NamedNodeImpl('http://saft/test/p1'),
-            new LiteralImpl(42),
+            new LiteralImpl("42"),
             $this->testGraph
         );
 
@@ -59,7 +63,7 @@ class SparqlUtilsTest extends TestCase
             '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#string> .  '.
             'Graph <http://localhost/Saft/TestGraph/> {<http://saft/test/s1> <http://saft/test/p1> '.
             '"42"^^<http://www.w3.org/2001/XMLSchema#string> . }',
-            trim(SparqlUtils::statementIteratorToSparqlFormat(array($triple, $quad)))
+            trim($sparqlUtils->statementIteratorToSparqlFormat(array($triple, $quad)))
         );
     }
 }

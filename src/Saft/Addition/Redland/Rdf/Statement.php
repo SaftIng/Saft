@@ -85,36 +85,4 @@ class Statement extends AbstractStatement
             return new BlankNode($redlandNode);
         }
     }
-
-    /**
-     * @param NamedNode|Variable $graph
-     */
-    public function setGraph(Node $graph)
-    {
-        // TODO
-    }
-
-    /**
-     * @param Node $object
-     */
-    public function setObject(Node $object)
-    {
-        // TODO
-    }
-
-    /**
-     * @param NamedNode|Variable $predicate
-     */
-    public function setPredicate(Node $predicate)
-    {
-        // TODO
-    }
-
-    /**
-     * @param BlankNode|NamedNode $subject
-     */
-    public function setSubject(Node $subject)
-    {
-        // TODO
-    }
 }
