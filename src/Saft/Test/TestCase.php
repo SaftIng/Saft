@@ -81,15 +81,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             $message = 'Assertion about count of statements. Expected: '. $expectedCount .', Actual: %s';
         }
 
-        for ($i = 0; $i < $expectedCount; ++$i) {
-            $this->assertTrue(
-                $statementIterator->valid(),
-                sprintf($message, $i)
-            );
-            $statementIterator->next();
+        $i = 0;
+        foreach ($statementIterator as $statement) {
+            ++$i;
         }
-        $statementIterator->next();
-        $this->assertFalse($statementIterator->valid(), sprintf($message, 'at least '. $i + 1));
+        $this->assertEquals($i, $expectedCount, sprintf($message, $i));
     }
 
     /**
