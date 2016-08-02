@@ -42,5 +42,5 @@ do
     git tag -a $newTag -m "add version tag $newTag" $i
 
     # push latest state to related remote with tags
-    git push $i master --tags
+    git push -f $i $i:master --tags
 done
