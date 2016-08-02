@@ -16,8 +16,7 @@
         "php": ">=5.3.3",
         "saft/saft-data": ">=0.4",
         "saft/saft-rdf": ">=0.4",
-        "saft/saft-store": ">=0.4",
-        "ext-redland": "*"
+        "saft/saft-store": ">=0.4"
     },
     "require-dev": {
         "phpunit/phpunit": ">=4.8",
