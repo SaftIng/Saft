@@ -60,11 +60,6 @@ abstract class AbstractIndexTest extends TestCase
                     new NamedNodeImpl('http://saft/test/s2'),
                     new NamedNodeImpl('http://purl.org/dc/terms/title'),
                     new LiteralImpl('s2 dcterms title')
-                ),
-                new StatementImpl(
-                    new NamedNodeImpl('http://saft/test/s2'),
-                    new NamedNodeImpl('http://purl.org/dc/terms/title'),
-                    new LiteralImpl('s2 dcterms title - 2')
                 )
             ),
             $this->testGraph
@@ -96,8 +91,10 @@ abstract class AbstractIndexTest extends TestCase
                             'uri' => 'http://www.w3.org/2000/01/rdf-schema#label',
                             'title' => 's2 rdfs label'
                         ),
-                        array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title'),
-                        array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title - 2'),
+                        array(
+                            'uri' => 'http://purl.org/dc/terms/title',
+                            'title' => 's2 dcterms title'
+                        )
                     )
                 )
             ),
@@ -121,18 +118,16 @@ abstract class AbstractIndexTest extends TestCase
 
         $this->assertTrue(isset($resultArray['titles']));
 
-        uasort($resultArray, function($a, $b) {
-            if ($a['title'] == $b['title']) {
-                return 0;
-            }
-            return ($a['title'] < $b['title']) ? -1 : 1;
-        });
-
-        $this->assertEquals(
+        $this->assertEqualsArrays(
             array(
-                array('uri' => 'http://www.w3.org/2000/01/rdf-schema#label', 'title' => 's2 rdfs label'),
-                array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title - 2'),
-                array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title'),
+                array(
+                    'uri' => 'http://www.w3.org/2000/01/rdf-schema#label',
+                    'title' => 's2 rdfs label'
+                ),
+                array(
+                    'uri' => 'http://purl.org/dc/terms/title',
+                    'title' => 's2 dcterms title'
+                )
             ),
             $resultArray['titles']
         );
@@ -172,8 +167,7 @@ abstract class AbstractIndexTest extends TestCase
                             'uri' => 'http://www.w3.org/2000/01/rdf-schema#label',
                             'title' => 's2 rdfs label'
                         ),
-                        array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title'),
-                        array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title - 2'),
+                        array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title')
                     )
                 )
             ),
@@ -198,7 +192,6 @@ abstract class AbstractIndexTest extends TestCase
         $this->assertTrue(isset($resultArray['titles']));
         $this->assertEqualsArrays(
             array(
-                array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title - 2'),
                 array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title'),
                 array('uri' => 'http://www.w3.org/2000/01/rdf-schema#label', 'title' => 's2 rdfs label')
             ),
