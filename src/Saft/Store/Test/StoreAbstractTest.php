@@ -11,6 +11,7 @@ use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Result\EmptyResultImpl;
+use Saft\Sparql\Result\ResultFactoryImpl;
 use Saft\Sparql\Result\SetResultImpl;
 use Saft\Sparql\Result\StatementSetResultImpl;
 use Saft\Sparql\Result\ValueResultImpl;
@@ -50,13 +51,14 @@ abstract class StoreAbstractTest extends TestCase
     protected function countTriples(NamedNode $graph)
     {
         $result = $this->fixture->query(
-            'SELECT COUNT(*) FROM <'. $graph->getUri().'> WHERE {?s ?p ?o}'
+            'SELECT COUNT(*) FROM <'. $graph->getUri() .'> WHERE {?s ?p ?o}'
         );
 
         $variables = $result->getVariables();
         $variable = array_shift($variables);
         $entry = $result->current();
-        return $entry[$variable]->getValue();
+        $keys = array_keys($entry);
+        return $entry[array_shift($keys)]->getValue();
     }
 
     protected function getTestQuad()
@@ -113,7 +115,7 @@ abstract class StoreAbstractTest extends TestCase
         }
 
         // 2 triples
-        $statements = new ArrayStatementIteratorImpl([$stmtOne, $stmtTwo]);
+        $statements = new ArrayStatementIteratorImpl(array($stmtOne, $stmtTwo));
 
         // add triples
         $this->fixture->addStatements($statements);
@@ -163,44 +165,6 @@ abstract class StoreAbstractTest extends TestCase
                 new LiteralImpl('test literal')
             ),
         ));
-
-        // add triples
-        $this->fixture->addStatements($statements, $this->testGraph);
-
-        // graph has two entries
-        $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(2, $statements);
-    }
-
-    public function testAddStatementsWithArray()
-    {
-        // clear test graph
-        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
-
-        $anyStatement = new StatementImpl(
-            new AnyPatternImpl(),
-            new AnyPatternImpl(),
-            new AnyPatternImpl(),
-            $this->testGraph
-        );
-
-        // graph is empty
-        $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
-        $this->assertCountStatementIterator(0, $statements);
-
-        // 2 triples
-        $statements = array(
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/'),
-                new NamedNodeImpl('http://o/')
-            ),
-            new StatementImpl(
-                new NamedNodeImpl('http://s/'),
-                new NamedNodeImpl('http://p/'),
-                new LiteralImpl('test literal')
-            ),
-        );
 
         // add triples
         $this->fixture->addStatements($statements, $this->testGraph);
@@ -260,6 +224,30 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertCountStatementIterator(2, $statements);
     }
 
+    public function testAddStatementsNoTriplesAndQuads()
+    {
+        // it throws an error because query contains NO triples or quads.
+        $this->setExpectedException('\Exception');
+
+        $query = 'INSERT DATA {  }';
+        $this->fixture->query($query);
+    }
+
+    public function testAddStatementsTriples()
+    {
+        $statement = $this->getTestStatementWithLiteral();
+        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $query = 'INSERT DATA {
+            Graph <http://graph/> {
+                '. $statement->getSubject()->toNQuads() .'
+                '. $statement->getPredicate()->toNQuads() .'
+                '. $statement->getObject()->toNQuads() .'
+            }
+        }';
+
+        $this->assertEquals(new EmptyResultImpl(), $this->fixture->query($query));
+    }
+
     public function testAddStatementsUseStatementGraph()
     {
         // remove all triples from the test graph
@@ -299,28 +287,42 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertCountStatementIterator(2, $statements);
     }
 
-    public function testAddStatementsNoTriplesAndQuads()
+    public function testAddStatementsWithArray()
     {
-        // it throws an error because query contains NO triples or quads.
-        $this->setExpectedException('\Exception');
+        // clear test graph
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
 
-        $query = 'INSERT DATA {  }';
-        $this->fixture->query($query);
-    }
+        $anyStatement = new StatementImpl(
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            new AnyPatternImpl(),
+            $this->testGraph
+        );
 
-    public function testAddStatementsTriples()
-    {
-        $statement = $this->getTestStatementWithLiteral();
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
-        $query = 'INSERT DATA {
-            Graph <http://graph/> {
-                '. $statement->getSubject()->toNQuads() .'
-                '. $statement->getPredicate()->toNQuads() .'
-                '. $statement->getObject()->toNQuads() .'
-            }
-        }';
+        // graph is empty
+        $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
+        $this->assertCountStatementIterator(0, $statements);
 
-        $this->assertEquals(new EmptyResultImpl(), $this->fixture->query($query));
+        // 2 triples
+        $statements = array(
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new NamedNodeImpl('http://o/')
+            ),
+            new StatementImpl(
+                new NamedNodeImpl('http://s/'),
+                new NamedNodeImpl('http://p/'),
+                new LiteralImpl('test literal')
+            ),
+        );
+
+        // add triples
+        $this->fixture->addStatements($statements, $this->testGraph);
+
+        // graph has two entries
+        $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
+        $this->assertCountStatementIterator(2, $statements);
     }
 
     /*
@@ -371,7 +373,7 @@ abstract class StoreAbstractTest extends TestCase
      * Tests for deleteMatchingStatements
      */
 
-    public function testDeleteMatchingStatements2()
+    public function testDeleteMatchingStatements()
     {
         /*
          * Create some test data
@@ -485,6 +487,7 @@ abstract class StoreAbstractTest extends TestCase
             $this->testGraph
         );
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
+
         $this->assertCountStatementIterator(0, $statements);
 
         // 2 triples
@@ -520,10 +523,6 @@ abstract class StoreAbstractTest extends TestCase
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
         $this->assertCountStatementIterator(0, $statements);
     }
-
-    /*
-     * Tests for deleteMatchingStatements
-     */
 
     public function testDeleteMatchingStatementsQuadRecognition()
     {
@@ -591,28 +590,15 @@ abstract class StoreAbstractTest extends TestCase
 
         // check, that our test graph is part of the array
         $this->assertTrue(isset($availableGraphs[$graphUri]), "The test graph is not available");
-        $this->assertTrue($this->testGraph->equals($availableGraphs[$graphUri]), "The test graph object is not valid");
+        $this->assertTrue(
+            $this->testGraph->equals($availableGraphs[$graphUri]),
+            "Graph object is not equal to the test graph."
+        );
     }
 
     /*
      * Tests for getMatchingStatements
      */
-
-    public function testGetMatchingStatementsReturnType()
-    {
-        $statement = new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new AnyPatternImpl()
-        );
-
-        $iterator = $this->fixture->getMatchingStatements($statement);
-
-        $this->assertTrue(
-            $iterator instanceof StatementIterator,
-            "Get Matching Statements has to return a StatementIterator"
-        );
-    }
 
     public function testGetMatchingStatements()
     {
@@ -793,6 +779,22 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertEquals(2, $statementCount);
     }
 
+    public function testGetMatchingStatementsReturnType()
+    {
+        $statement = new StatementImpl(
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new AnyPatternImpl()
+        );
+
+        $iterator = $this->fixture->getMatchingStatements($statement);
+
+        $this->assertTrue(
+            $iterator instanceof StatementIterator,
+            "Get Matching Statements has to return a StatementIterator"
+        );
+    }
+
     /*
      * Tests for getStoreDescription
      */
@@ -949,19 +951,17 @@ abstract class StoreAbstractTest extends TestCase
             <http://example.org/a> ?p ?o
         }');
 
-        $match = false;
-        foreach ($result as $row) {
-            if (
-                $row['p']->isNamedNode() &&
-                $row['p']->getUri() == "http://example.org/b" &&
-                $row['o']->isNamedNode() &&
-                $row['o']->getUri() == "http://example.org/c"
-            ) {
-                $match = true;
-            }
-        }
+        $resultFactory = new ResultFactoryImpl();
 
-        $this->assertTrue($match);
+        $this->assertEquals(
+            $resultFactory->createSetResult(array(
+                array(
+                    'p' => new NamedNodeImpl('http://example.org/b'),
+                    'o' => new NamedNodeImpl('http://example.org/c')
+                )
+            )),
+            $result
+        );
     }
 
     public function testQueryAsk()
@@ -975,11 +975,11 @@ abstract class StoreAbstractTest extends TestCase
             $this->testGraph
         );
 
-        // graph is empty
+        // check that graph is empty
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
         $this->assertCountStatementIterator(0, $statements);
 
-        // 2 triples
+        // 1 triple
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
                 new NamedNodeImpl('http://s/'),

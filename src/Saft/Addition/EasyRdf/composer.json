@@ -21,11 +21,11 @@
     "require": {
         "php": ">=5.3.3",
         "easyrdf/easyrdf": "0.9.*",
-        "saft/saft-data": "0.*"
+        "saft/saft-data": ">=0.4"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.8.*",
-        "squizlabs/php_codesniffer": "2.5.*"
+        "phpunit/phpunit": ">=4.8",
+        "squizlabs/php_codesniffer": ">=2.5"
     },
     "autoload": {
         "psr-4": {

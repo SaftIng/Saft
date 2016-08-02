@@ -27,7 +27,7 @@ class QueryCacheTest
     {
         parent::setUp();
 
-        if (true === isset($this->config['erfurtConfig'])) {
+        if (true === isset($this->configuration['erfurtConfig'])) {
             // create mockstore to store triples in memory
             $this->mockStore = new BasicTriplePatternStore(
                 new NodeFactoryImpl(),
@@ -39,7 +39,7 @@ class QueryCacheTest
             // setup Erfurts QueryCache
             $this->fixture = new \Saft\Addition\Erfurt\QueryCache\QueryCache(
                 new QueryFactoryImpl(),
-                $this->config['erfurtConfig']
+                $this->configuration['erfurtConfig']
             );
             $this->fixture->setChainSuccessor($this->mockStore);
 
@@ -82,7 +82,7 @@ class QueryCacheTest
         );
         $this->fixture = new \Saft\Addition\Erfurt\QueryCache\QueryCache(
             new QueryFactoryImpl(),
-            $this->config['erfurtConfig']
+            $this->configuration['erfurtConfig']
         );
         $this->fixture->setChainSuccessor($this->mockStore);
 

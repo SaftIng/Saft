@@ -12,9 +12,10 @@ fi
 typeset -A repos
 # core packages
 repos[saft.data]=src/Saft/Data
-repos[saft.rdf]=src/Saft/RDF
+repos[saft.rdf]=src/Saft/Rdf
 repos[saft.sparql]=src/Saft/Sparql
 repos[saft.store]=src/Saft/Store
+repos[saft.test]=src/Saft/Test
 
 # additional packages
 repos[saft.arc2]=src/Saft/Addition/ARC2
@@ -22,6 +23,8 @@ repos[saft.easyrdf]=src/Saft/Addition/EasyRdf
 repos[saft.erfurt]=src/Saft/Addition/Erfurt
 repos[saft.querycache]=src/Saft/Addition/QueryCache
 repos[saft.redland]=src/Saft/Addition/Redland
+repos[saft.rest]=src/Saft/Addition/Rest
+repos[saft.skeleton]=src/Saft/Skeleton
 repos[saft.store.http]=src/Saft/Addition/HttpStore
 repos[saft.store.virtuoso]=src/Saft/Addition/Virtuoso
 
@@ -41,5 +44,5 @@ do
     git tag -a $newTag -m "add version tag $newTag" $i
 
     # push latest state to related remote with tags
-    git push $i master --tags
+    git push -f $i $i:master --tags
 done

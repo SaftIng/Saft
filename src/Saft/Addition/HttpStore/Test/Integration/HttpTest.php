@@ -1,7 +1,8 @@
 <?php
 
-namespace Saft\Addition\HttpStore\Test;
+namespace Saft\Addition\HttpStore\Test\Integration;
 
+use Curl\Curl;
 use Saft\Addition\HttpStore\Store\Http;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementFactoryImpl;
@@ -21,15 +22,16 @@ class HttpTest extends StoreAbstractTest
         /*
          * Load configuration
          */
-        if (true === isset($this->config['httpConfig'])) {
+        if (true === isset($this->configuration['httpConfig'])) {
             $this->fixture = new Http(
                 new NodeFactoryImpl(),
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(),
                 new ResultFactoryImpl(),
                 new StatementIteratorFactoryImpl(),
-                $this->config['httpConfig']
+                $this->configuration['httpConfig']
             );
+            $this->fixture->setClient(new Curl());
 
             $rights = $this->fixture->getRights();
 
@@ -82,7 +84,7 @@ class HttpTest extends StoreAbstractTest
         $this->setExpectedException('\Exception');
 
         $config = array('authUrl' => 'http://not existend');
-        new Http(
+        $http = new Http(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
             new QueryFactoryImpl(),
@@ -90,6 +92,8 @@ class HttpTest extends StoreAbstractTest
             new StatementIteratorFactoryImpl(),
             $config
         );
+        $http->setClient(new Curl());
+        $http->openConnection();
     }
 
     public function testOpenConnectionInvalidQueryUrl()
@@ -98,7 +102,7 @@ class HttpTest extends StoreAbstractTest
         $this->setExpectedException('\Exception');
 
         $config = array('queryUrl' => 'http://not existend');
-        new Http(
+        $http = new Http(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
             new QueryFactoryImpl(),
@@ -106,6 +110,8 @@ class HttpTest extends StoreAbstractTest
             new StatementIteratorFactoryImpl(),
             $config
         );
+        $http->setClient(new Curl());
+        $http->openConnection();
     }
 
     /*
@@ -125,6 +131,8 @@ class HttpTest extends StoreAbstractTest
             new StatementIteratorFactoryImpl(),
             $config
         );
+        $fixture->setClient(new Curl());
+        $fixture->openConnection();
 
         $this->assertEquals(
             array(

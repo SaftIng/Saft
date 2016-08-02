@@ -55,10 +55,13 @@ remove-subpackage-remotes:
 	git remote rm saft.querycache
 	git remote rm saft.rdf
 	git remote rm saft.redland
+	git remote rm saft.rest
+	git remote rm saft.skeleton
 	git remote rm saft.sparql
 	git remote rm saft.store
 	git remote rm saft.store.http
 	git remote rm saft.store.virtuoso
+	git remote rm saft.test
 
 # Setup all remotes subpackages
 setup-subpackage-remotes:
@@ -69,7 +72,10 @@ setup-subpackage-remotes:
 	git remote add saft.querycache git@github.com:SaftIng/Saft.querycache
 	git remote add saft.rdf git@github.com:SaftIng/Saft.rdf
 	git remote add saft.redland git@github.com:SaftIng/Saft.redland
+	git remote add saft.rest git@github.com:SaftIng/Saft.rest
+	git remote add saft.skeleton git@github.com:SaftIng/Saft.skeleton
 	git remote add saft.sparql git@github.com:SaftIng/Saft.sparql
 	git remote add saft.store git@github.com:SaftIng/Saft.store
 	git remote add saft.store.http git@github.com:SaftIng/Saft.store.http
 	git remote add saft.store.virtuoso git@github.com:SaftIng/Saft.store.virtuoso
+	git remote add saft.test git@github.com:SaftIng/Saft.test
