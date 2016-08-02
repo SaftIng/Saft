@@ -20,8 +20,10 @@
         }
     ],
     "replace": {
+        "saft/saft-arc2": "self.version",
         "saft/saft-data": "self.version",
         "saft/saft-easyrdf": "self.version",
+        "saft/saft-erfurt": "self.version",
         "saft/saft-querycache": "self.version",
         "saft/saft-rdf": "self.version",
         "saft/saft-redland": "self.version",
@@ -29,7 +31,8 @@
         "saft/saft-sparql": "self.version",
         "saft/saft-store": "self.version",
         "saft/saft-store-http": "self.version",
-        "saft/saft-store-virtuoso": "self.version"
+        "saft/saft-store-virtuoso": "self.version",
+        "saft/saft-test": "self.version"
     },
     "require": {
         "php": ">=5.3.3",

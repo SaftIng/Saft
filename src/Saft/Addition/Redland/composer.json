@@ -14,14 +14,14 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "ext-redland": "*",
-        "saft/saft-data": "0.*",
-        "saft/saft-rdf": "0.*",
-        "saft/saft-store": "0.*"
+        "saft/saft-data": ">=0.4",
+        "saft/saft-rdf": ">=0.4",
+        "saft/saft-store": ">=0.4",
+        "ext-redland": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.8.*",
-        "squizlabs/php_codesniffer": "2.5.*"
+        "phpunit/phpunit": ">=4.8",
+        "squizlabs/php_codesniffer": ">=2.5.*"
     },
     "autoload": {
         "psr-4": {
