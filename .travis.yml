@@ -16,4 +16,4 @@ install:
 before_script:
   - cp test-config.yml.dist test-config.yml
 
-script: vendor/bin/phpunit --testsuite Saft
+script: vendor/bin/phpunit
