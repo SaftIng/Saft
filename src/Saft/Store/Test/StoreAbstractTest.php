@@ -51,13 +51,14 @@ abstract class StoreAbstractTest extends TestCase
     protected function countTriples(NamedNode $graph)
     {
         $result = $this->fixture->query(
-            'SELECT COUNT(*) as count FROM <'. $graph->getUri() .'> WHERE {?s ?p ?o}'
+            'SELECT COUNT(*) FROM <'. $graph->getUri() .'> WHERE {?s ?p ?o}'
         );
 
         $variables = $result->getVariables();
         $variable = array_shift($variables);
         $entry = $result->current();
-        return $entry['count']->getValue();
+        $keys = array_keys($entry);
+        return $entry[array_shift($keys)]->getValue();
     }
 
     protected function getTestQuad()

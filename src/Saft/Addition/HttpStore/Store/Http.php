@@ -6,15 +6,20 @@ use Curl\Curl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
+use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
+use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
+use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
+use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\ResultFactory;
+use Saft\Sparql\Result\ResultFactoryImpl;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Store;
 
@@ -178,7 +183,8 @@ class Http extends AbstractSparqlStore
             $this->query('SELECT ?g { GRAPH ?g {?s ?p ?o} } LIMIT 1');
             $rights['tripleQuerying'] = true;
         } catch (\Exception $e) {
-            // ignore exception here and assume we could not query anything.
+            // ignore exception here and assume we could not query anything.e
+            echo PHP_EOL . $e->getMessage();
         }
 
         /*
@@ -438,12 +444,24 @@ class Http extends AbstractSparqlStore
     }
 
     /**
+     * Sends a SPARQL select query to the server.
      *
+     * @param string $url
      * @param string $query
-     * @return
+     * @return string Response of the POST request.
      */
     public function sendSparqlSelectQuery($url, $query)
     {
+        // because you can't just fire multiple requests with the same CURL class instance
+        // we have to be creative and re-create the class everytime a request is to be send.
+        // FYI: https://github.com/php-curl-class/php-curl-class/issues/326
+        $class = get_class($this->httpClient);
+        $phpVersionToOld = version_compare(phpversion(), '5.5.11', '<=');
+        // only reinstance the class if its not mocked
+        if ($phpVersionToOld && false === strpos($class, 'Mockery')) {
+            $this->httpClient = new $class();
+        }
+
         $this->httpClient->setHeader('Accept', 'application/sparql-results+json');
         $this->httpClient->setHeader('Content-Type', 'application/x-www-form-urlencoded');
 
@@ -451,13 +469,24 @@ class Http extends AbstractSparqlStore
     }
 
     /**
+     * Sends a SPARQL update query to the server.
      *
+     * @param string $url
      * @param string $query
-     * @return
-     * @throw
+     * @return string Response of the GET request.
      */
     public function sendSparqlUpdateQuery($url, $query)
     {
+        // because you can't just fire multiple requests with the same CURL class instance
+        // we have to be creative and re-create the class everytime a request is to be send.
+        // FYI: https://github.com/php-curl-class/php-curl-class/issues/326
+        $class = get_class($this->httpClient);
+        $phpVersionToOld = version_compare(phpversion(), '5.5.11', '<=');
+        // only reinstance the class if its not mocked
+        if ($phpVersionToOld && false === strpos($class, 'Mockery')) {
+            $this->httpClient = new $class;
+        }
+
         // TODO extend Accept headers to further formats
         $this->httpClient->setHeader('Accept', 'application/sparql-results+json');
         $this->httpClient->setHeader('Content-Type', 'application/sparql-update');
@@ -466,7 +495,7 @@ class Http extends AbstractSparqlStore
     }
 
     /**
-     * @param \Curl\Curl $client
+     * @param \Curl\Curl $httpClient
      */
     public function setClient(Curl $httpClient)
     {
