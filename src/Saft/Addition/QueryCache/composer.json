@@ -21,7 +21,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "zendframework/zend-cache": "2.6.*",
+        "zendframework/zend-cache": "2.5.1",
         "saft/saft-store": ">=0.4"
     },
     "require-dev": {

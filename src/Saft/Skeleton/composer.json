@@ -21,7 +21,7 @@
         "saft/saft": ">=0.4",
         "slim/slim": "2.6.*",
         "zendframework/zend-diactoros": "1.3.*",
-        "zendframework/zend-cache": "2.6.*"
+        "zendframework/zend-cache": "2.5.1"
     },
     "suggest": {
         "ext-apc": "Enables usage of APC cache (until PHP 5.5).",
