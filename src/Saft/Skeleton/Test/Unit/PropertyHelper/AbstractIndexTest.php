@@ -116,15 +116,17 @@ abstract class AbstractIndexTest extends TestCase
             ),
             unserialize($this->cache->getItem(md5('http://saft/test/s1')))
         );
-        $this->assertEqualsArrays(
+
+        $resultArray = unserialize($this->cache->getItem(md5('http://saft/test/s2')));
+
+        $this->assertTrue(isset($resultArray['titles']));
+        $this->assertEquals(
             array(
-                'titles' => array(
-                    array('uri' => 'http://www.w3.org/2000/01/rdf-schema#label', 'title' => 's2 rdfs label'),
-                    array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title - 2'),
-                    array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title'),
-                )
+                array('uri' => 'http://www.w3.org/2000/01/rdf-schema#label', 'title' => 's2 rdfs label'),
+                array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title - 2'),
+                array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title')
             ),
-            unserialize($this->cache->getItem(md5('http://saft/test/s2')))
+            array_values($resultArray['titles'])
         );
     }
 
@@ -182,15 +184,17 @@ abstract class AbstractIndexTest extends TestCase
             ),
             unserialize($this->cache->getItem(md5('http://saft/test/s1')))
         );
+
+        $resultArray = unserialize($this->cache->getItem(md5('http://saft/test/s2')));
+
+        $this->assertTrue(isset($resultArray['titles']));
         $this->assertEqualsArrays(
             array(
-                'titles' => array(
-                    array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title - 2'),
-                    array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title'),
-                    array('uri' => 'http://www.w3.org/2000/01/rdf-schema#label', 'title' => 's2 rdfs label'),
-                )
+                array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title - 2'),
+                array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title'),
+                array('uri' => 'http://www.w3.org/2000/01/rdf-schema#label', 'title' => 's2 rdfs label')
             ),
-            unserialize($this->cache->getItem(md5('http://saft/test/s2')))
+            array_values($resultArray['titles'])
         );
     }
 
