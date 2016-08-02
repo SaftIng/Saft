@@ -24,14 +24,18 @@ class ARC2Test extends StoreAbstractTest
         parent::setUp();
 
         if (true === isset($this->configuration['arc2Config'])) {
-            $this->fixture = new ARC2(
-                new NodeFactoryImpl(),
-                new StatementFactoryImpl(),
-                new QueryFactoryImpl(),
-                new ResultFactoryImpl(),
-                new StatementIteratorFactoryImpl(),
-                $this->configuration['arc2Config']
-            );
+            try {
+                $this->fixture = new ARC2(
+                    new NodeFactoryImpl(),
+                    new StatementFactoryImpl(),
+                    new QueryFactoryImpl(),
+                    new ResultFactoryImpl(),
+                    new StatementIteratorFactoryImpl(),
+                    $this->configuration['arc2Config']
+                );
+            } catch (\Exception $e) {
+                $this->markTestSkipped($e->getMessage());
+            }
 
             $this->fixture->dropGraph($this->testGraph);
             $this->fixture->createGraph($this->testGraph);
