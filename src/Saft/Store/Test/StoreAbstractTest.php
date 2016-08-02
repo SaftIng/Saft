@@ -372,7 +372,7 @@ abstract class StoreAbstractTest extends TestCase
      * Tests for deleteMatchingStatements
      */
 
-    public function testDeleteMatchingStatements2()
+    public function testDeleteMatchingStatements()
     {
         /*
          * Create some test data
@@ -486,6 +486,7 @@ abstract class StoreAbstractTest extends TestCase
             $this->testGraph
         );
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
+
         $this->assertCountStatementIterator(0, $statements);
 
         // 2 triples
@@ -521,10 +522,6 @@ abstract class StoreAbstractTest extends TestCase
         $statements = $this->fixture->getMatchingStatements($anyStatement, $this->testGraph);
         $this->assertCountStatementIterator(0, $statements);
     }
-
-    /*
-     * Tests for deleteMatchingStatements
-     */
 
     public function testDeleteMatchingStatementsQuadRecognition()
     {
@@ -592,7 +589,10 @@ abstract class StoreAbstractTest extends TestCase
 
         // check, that our test graph is part of the array
         $this->assertTrue(isset($availableGraphs[$graphUri]), "The test graph is not available");
-        $this->assertTrue($this->testGraph->equals($availableGraphs[$graphUri]), "The test graph object is not valid");
+        $this->assertTrue(
+            $this->testGraph->equals($availableGraphs[$graphUri]),
+            "Graph object is not equal to the test graph."
+        );
     }
 
     /*

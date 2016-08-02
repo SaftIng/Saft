@@ -111,6 +111,337 @@ class HttpTest extends StoreAbstractTest
     }
 
     /*
+     * Tests for deleteMatchingStatements
+     */
+
+    public function testDeleteMatchingStatements()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('post')
+            ->andReturn(
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array('bindings' => array())
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                's' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://s/'
+                                ),
+                                'p' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://p/'
+                                ),
+                                'o' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://o/'
+                                ),
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            ),
+                            array(
+                                's' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://s/'
+                                ),
+                                'p' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://p/'
+                                ),
+                                'o' => array(
+                                    'type' => 'typed-literal',
+                                    'value' => 'test literal',
+                                    'datatype' => 'http://www.w3.org/2001/XMLSchema#string'
+                                ),
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            )
+                        )
+                    )
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array('bindings' => array())
+                ))
+            );
+
+        parent::testDeleteMatchingStatements();
+    }
+
+    public function testDeleteMatchingStatementsQuadRecognition()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('post')
+            ->andReturn(
+                json_encode(array(
+                    'head' => array('vars' => array('count')),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                'count' => array(
+                                    'type' => 'typed-literal',
+                                    'value' => '0',
+                                    'datatype' => 'http://www.w3.org/2001/XMLSchema#integer'
+                                )
+                            )
+                        )
+                    )
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('count')),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                'count' => array(
+                                    'type' => 'typed-literal',
+                                    'value' => '1',
+                                    'datatype' => 'http://www.w3.org/2001/XMLSchema#integer'
+                                )
+                            )
+                        )
+                    )
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('count')),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                'count' => array(
+                                    'type' => 'typed-literal',
+                                    'value' => '0',
+                                    'datatype' => 'http://www.w3.org/2001/XMLSchema#integer'
+                                )
+                            )
+                        )
+                    )
+                ))
+            );
+
+        parent::testDeleteMatchingStatementsQuadRecognition();
+    }
+
+    public function testDeleteMatchingStatementsStatementsWithLiteral()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('post')
+            ->andReturn(
+                json_encode(array(
+                    'head' => array('vars' => array('count')),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                'count' => array(
+                                    'type' => 'typed-literal',
+                                    'value' => '0',
+                                    'datatype' => 'http://www.w3.org/2001/XMLSchema#integer'
+                                )
+                            )
+                        )
+                    )
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('count')),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                'count' => array(
+                                    'type' => 'typed-literal',
+                                    'value' => '2',
+                                    'datatype' => 'http://www.w3.org/2001/XMLSchema#integer'
+                                )
+                            )
+                        )
+                    )
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('count')),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                'count' => array(
+                                    'type' => 'typed-literal',
+                                    'value' => '0',
+                                    'datatype' => 'http://www.w3.org/2001/XMLSchema#integer'
+                                )
+                            )
+                        )
+                    )
+                ))
+            );
+
+        parent::testDeleteMatchingStatementsStatementsWithLiteral();
+    }
+
+    public function testDeleteMatchingStatementsUseStatementGraph()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('post')
+            ->andReturn(
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array('bindings' => array())
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                's' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://s/'
+                                ),
+                                'p' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://p/'
+                                ),
+                                'o' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://o/'
+                                ),
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            ),
+                            array(
+                                's' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://s/'
+                                ),
+                                'p' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://p/'
+                                ),
+                                'o' => array(
+                                    'type' => 'typed-literal',
+                                    'value' => 'test literal',
+                                    'datatype' => 'http://www.w3.org/2001/XMLSchema#string'
+                                ),
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            )
+                        )
+                    )
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array('bindings' => array())
+                ))
+            );
+
+        parent::testDeleteMatchingStatementsUseStatementGraph();
+    }
+
+    public function testDeleteMatchingStatementsWithVariables()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('post')
+            ->andReturn(
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array('bindings' => array())
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                's' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://s/'
+                                ),
+                                'p' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://p/'
+                                ),
+                                'o' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://o/'
+                                ),
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            ),
+                            array(
+                                's' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://s/'
+                                ),
+                                'p' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://p/'
+                                ),
+                                'o' => array(
+                                    'type' => 'typed-literal',
+                                    'value' => 'test literal',
+                                    'datatype' => 'http://www.w3.org/2001/XMLSchema#string'
+                                ),
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            )
+                        )
+                    )
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array('bindings' => array())
+                ))
+            );
+
+        parent::testDeleteMatchingStatementsWithVariables();
+    }
+
+    /*
+     * Tests for getMatchingStatements
+     */
+
+    public function testGetGraphs()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('post')
+            ->andReturn(
+                json_encode(array(
+                    'head' => array(
+                        'vars' => array(
+                            'g'
+                        )
+                    ),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                )
+                            )
+                        )
+                    )
+                ))
+            );
+
+        parent::testGetGraphs();
+    }
+
+    /*
      * Tests for getMatchingStatements
      */
 
