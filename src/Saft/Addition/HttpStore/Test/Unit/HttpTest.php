@@ -55,8 +55,11 @@ class HttpTest extends StoreAbstractTest
         // We expect that authentication fails, because the auth url is not valid
         $this->setExpectedException('\Exception');
 
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+
         $config = array('authUrl' => 'http://not existend');
-        new Http(
+        $client = new Http(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
             new QueryFactoryImpl(),
@@ -64,6 +67,8 @@ class HttpTest extends StoreAbstractTest
             new StatementIteratorFactoryImpl(),
             $config
         );
+        $client->setClient($this->httpClient);
+        $client->openConnection();
     }
 
     public function testOpenConnectionInvalidQueryUrl()
@@ -71,8 +76,11 @@ class HttpTest extends StoreAbstractTest
         // We expect that openConnection fails, because the query URL is not valid
         $this->setExpectedException('\Exception');
 
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+
         $config = array('queryUrl' => 'http://not existend');
-        new Http(
+        $client = new Http(
             new NodeFactoryImpl(),
             new StatementFactoryImpl(),
             new QueryFactoryImpl(),
@@ -80,34 +88,398 @@ class HttpTest extends StoreAbstractTest
             new StatementIteratorFactoryImpl(),
             $config
         );
+        $client->setClient($this->httpClient);
+        $client->openConnection();
+    }
+
+    /**
+     * Tests add and delete statements on default graph
+     */
+    public function testAddAndDeleteStatementsOnDefaultGraph()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get')
+            ->andReturn(
+                json_encode(array(
+                    'boolean' => false
+                )),
+                json_encode(array(
+                    'boolean' => false
+                )),
+                json_encode(array(
+                    'boolean' => true
+                )),
+                json_encode(array(
+                    'boolean' => true
+                )),
+                json_encode(array(
+                    'boolean' => true
+                )),
+                json_encode(array(
+                    'boolean' => false
+                ))
+            );
+
+        parent::testAddAndDeleteStatementsOnDefaultGraph();
     }
 
     /*
-     * Tests for getRights
+     * Tests for createGraph
      */
 
-    // this test depends on that dbpedia DOES NOT give you SPARQL UPDATE rights to create/drop graphs or triples.
-    public function testGetRights()
+    public function testAddStatements()
     {
-        $config = array('queryUrl' => 'http://dbpedia.org/sparql');
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('post')
+            ->andReturn(
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array('bindings' => array())
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                's' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://s/'
+                                ),
+                                'p' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://p/'
+                                ),
+                                'o' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://o/'
+                                ),
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            ),
+                            array(
+                                's' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://s/'
+                                ),
+                                'p' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://p/'
+                                ),
+                                'o' => array(
+                                    'type' => 'typed-literal',
+                                    'value' => 'test literal',
+                                    'datatype' => 'http://www.w3.org/2001/XMLSchema#string'
+                                ),
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            )
+                        )
+                    )
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array('bindings' => array())
+                ))
+            );
 
-        $fixture = new Http(
-            new NodeFactoryImpl(),
-            new StatementFactoryImpl(),
-            new QueryFactoryImpl(),
-            new ResultFactoryImpl(),
-            new StatementIteratorFactoryImpl(),
-            $config
-        );
+        parent::testAddStatements();
+    }
 
-        $this->assertEquals(
-            array(
-                'graphUpdate' => false,
-                'tripleQuerying' => true,
-                'tripleUpdate' => false,
-            ),
-            $fixture->getRights()
-        );
+    public function testAddStatementsInvalidStatements()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('post');
+
+        parent::testAddStatementsInvalidStatements();
+    }
+
+    public function testAddStatementsLanguageTags()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('post')
+            ->andReturn(
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array('bindings' => array())
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                's' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://s/'
+                                ),
+                                'p' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://p/'
+                                ),
+                                'o' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://o/'
+                                ),
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            ),
+                            array(
+                                's' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://s/'
+                                ),
+                                'p' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://p/'
+                                ),
+                                'o' => array(
+                                    'type' => 'typed-literal',
+                                    'value' => 'test literal',
+                                    'datatype' => 'http://www.w3.org/2001/XMLSchema#string'
+                                ),
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            )
+                        )
+                    )
+                ))
+            );
+
+        parent::testAddStatementsLanguageTags();
+    }
+
+    public function testAddStatementsNoTriplesAndQuads()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('post')
+            ->andReturn(
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array('bindings' => array())
+                ))
+            );
+
+        parent::testAddStatementsNoTriplesAndQuads();
+    }
+
+    public function testAddStatementsTriples()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('post')
+            ->andReturn(
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array('bindings' => array())
+                ))
+            );
+
+        parent::testAddStatementsTriples();
+    }
+
+    public function testAddStatementsUseStatementGraph()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('post')
+            ->andReturn(
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array('bindings' => array())
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                's' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://s/'
+                                ),
+                                'p' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://p/'
+                                ),
+                                'o' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://o/'
+                                ),
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            ),
+                            array(
+                                's' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://s/'
+                                ),
+                                'p' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://p/'
+                                ),
+                                'o' => array(
+                                    'type' => 'typed-literal',
+                                    'value' => 'test literal',
+                                    'datatype' => 'http://www.w3.org/2001/XMLSchema#string'
+                                ),
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            )
+                        )
+                    )
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array('bindings' => array())
+                ))
+            );
+
+        parent::testAddStatementsUseStatementGraph();
+    }
+
+    public function testAddStatementsWithArray()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('post')
+            ->andReturn(
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array('bindings' => array())
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                's' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://s/'
+                                ),
+                                'p' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://p/'
+                                ),
+                                'o' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://o/'
+                                ),
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            ),
+                            array(
+                                's' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://s/'
+                                ),
+                                'p' => array(
+                                    'type' => 'uri',
+                                    'value' => 'http://p/'
+                                ),
+                                'o' => array(
+                                    'type' => 'typed-literal',
+                                    'value' => 'test literal',
+                                    'datatype' => 'http://www.w3.org/2001/XMLSchema#string'
+                                ),
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            )
+                        )
+                    )
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('s', 'p', 'o', 'g')),
+                    'results' => array('bindings' => array())
+                ))
+            );
+
+        parent::testAddStatementsWithArray();
+    }
+
+    /*
+     * Tests for createGraph
+     */
+
+    public function testCreateGraph()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('post')
+            ->andReturn(
+                json_encode(array(
+                    'head' => array('vars' => array('g')),
+                    'results' => array(
+                        'bindings' => array()
+                    )
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('g')),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            )
+                        )
+                    )
+                ))
+            );
+
+        parent::testCreateGraph();
+    }
+
+    /*
+     * Tests for dropGraph
+     */
+
+    public function testDropGraph()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('post')
+            ->andReturn(
+                json_encode(array(
+                    'head' => array('vars' => array('g')),
+                    'results' => array(
+                        'bindings' => array(
+                            array(
+                                'g' => array(
+                                    'type' => 'uri',
+                                    'value' => $this->testGraph->getUri()
+                                ),
+                            )
+                        )
+                    )
+                )),
+                json_encode(array(
+                    'head' => array('vars' => array('g')),
+                    'results' => array(
+                        'bindings' => array()
+                    )
+                ))
+            );
+
+        parent::testDropGraph();
     }
 
     /*
@@ -745,6 +1117,58 @@ class HttpTest extends StoreAbstractTest
     }
 
     /*
+     * Tests for getRights
+     */
+
+    public function testGetRights()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('post')
+            ->andReturn(
+                json_encode(array(
+                    'head' => array('vars' => array()),
+                    'results' => array('bindings' => array())
+                ))
+            );
+        $this->httpClient->shouldReceive('get')
+            ->andReturn(
+                'Error with graphUpdate', // provokes raising an exception
+                json_encode(array()),
+                'Error with tripleUpdate' // provokes raising an exception
+            );
+
+        $config = array('queryUrl' => 'http://dbpedia.org/sparql');
+
+        $fixture = new Http(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new QueryFactoryImpl(),
+            new ResultFactoryImpl(),
+            new StatementIteratorFactoryImpl(),
+            $config
+        );
+        $fixture->setClient($this->httpClient);
+
+        $this->assertEquals(
+            array(
+                'graphUpdate' => false,
+                'tripleQuerying' => true,
+                'tripleUpdate' => false,
+            ),
+            $fixture->getRights()
+        );
+    }
+
+
+    public function testGetStoreDescription()
+    {
+        $this->httpClient->shouldReceive('setHeader');
+        $this->httpClient->shouldReceive('get');
+
+        parent::testGetStoreDescription();
+    }
+
+    /*
      * Tests for hasMatchingStatement
      */
 
@@ -784,7 +1208,12 @@ class HttpTest extends StoreAbstractTest
     public function testHasMatchingStatementTripleRecognition()
     {
         $this->httpClient->shouldReceive('setHeader')->times(2);
-        $this->httpClient->shouldReceive('get');
+        $this->httpClient->shouldReceive('get')
+            ->andReturn(
+                json_encode(array(
+                    'boolean' => false
+                ))
+            );
         $this->httpClient->shouldReceive('post');
 
         parent::testHasMatchingStatementTripleRecognition();

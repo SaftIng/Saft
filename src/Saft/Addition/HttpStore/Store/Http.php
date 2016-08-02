@@ -239,7 +239,7 @@ class Http extends AbstractSparqlStore
      *
      * @return Client Setup HTTP client.
      */
-    protected function openConnection()
+    public function openConnection()
     {
         if (null == $this->httpClient) {
             return false;
@@ -289,6 +289,7 @@ class Http extends AbstractSparqlStore
          */
         if ('selectQuery' == $this->queryUtils->getQueryType($query)) {
             $receivedResult = $this->sendSparqlSelectQuery($this->configuration['queryUrl'], $query);
+
             // transform object to array
             if (is_object($receivedResult)) {
                 $resultArray = json_decode(json_encode($receivedResult), true);
