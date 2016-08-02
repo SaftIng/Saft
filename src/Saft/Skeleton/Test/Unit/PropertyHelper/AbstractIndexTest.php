@@ -80,14 +80,22 @@ abstract class AbstractIndexTest extends TestCase
         $this->fillStoreWithTestData();
 
         // create property index
-        $this->assertEquals(
+        $this->assertEqualsArrays(
             array(
                 'http://saft/test/s1' => array(
-                    'titles' => array(array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's1 dcterms title'))
+                    'titles' => array(
+                        array(
+                            'uri' => 'http://purl.org/dc/terms/title',
+                            'title' => 's1 dcterms title'
+                        )
+                    )
                 ),
                 'http://saft/test/s2' => array(
                     'titles' => array(
-                        array('uri' => 'http://www.w3.org/2000/01/rdf-schema#label', 'title' => 's2 rdfs label'),
+                        array(
+                            'uri' => 'http://www.w3.org/2000/01/rdf-schema#label',
+                            'title' => 's2 rdfs label'
+                        ),
                         array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title'),
                         array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title - 2'),
                     )
@@ -97,13 +105,18 @@ abstract class AbstractIndexTest extends TestCase
         );
 
         // test created cache entries
-        $this->assertEquals(
+        $this->assertEqualsArrays(
             array(
-                'titles' => array(array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's1 dcterms title'))
+                'titles' => array(
+                    array(
+                        'uri' => 'http://purl.org/dc/terms/title',
+                        'title' => 's1 dcterms title'
+                    )
+                )
             ),
             unserialize($this->cache->getItem(md5('http://saft/test/s1')))
         );
-        $this->assertEquals(
+        $this->assertEqualsArrays(
             array(
                 'titles' => array(
                     array('uri' => 'http://www.w3.org/2000/01/rdf-schema#label', 'title' => 's2 rdfs label'),
@@ -133,14 +146,22 @@ abstract class AbstractIndexTest extends TestCase
         );
 
         // create property index
-        $this->assertEquals(
+        $this->assertEqualsArrays(
             array(
                 'http://saft/test/s1' => array(
-                    'titles' => array(array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's1 dcterms title'))
+                    'titles' => array(
+                        array(
+                            'uri' => 'http://purl.org/dc/terms/title',
+                            'title' => 's1 dcterms title'
+                        )
+                    )
                 ),
                 'http://saft/test/s2' => array(
                     'titles' => array(
-                        array('uri' => 'http://www.w3.org/2000/01/rdf-schema#label', 'title' => 's2 rdfs label'),
+                        array(
+                            'uri' => 'http://www.w3.org/2000/01/rdf-schema#label',
+                            'title' => 's2 rdfs label'
+                        ),
                         array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title'),
                         array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title - 2'),
                     )
@@ -150,13 +171,18 @@ abstract class AbstractIndexTest extends TestCase
         );
 
         // test created cache entries
-        $this->assertEquals(
+        $this->assertEqualsArrays(
             array(
-                'titles' => array(array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's1 dcterms title'))
+                'titles' => array(
+                    array(
+                        'uri' => 'http://purl.org/dc/terms/title',
+                        'title' => 's1 dcterms title'
+                    )
+                )
             ),
             unserialize($this->cache->getItem(md5('http://saft/test/s1')))
         );
-        $this->assertEquals(
+        $this->assertEqualsArrays(
             array(
                 'titles' => array(
                     array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title - 2'),
@@ -180,7 +206,7 @@ abstract class AbstractIndexTest extends TestCase
         $this->fixture->createIndex();
 
         // test created cache entries
-        $this->assertEquals(
+        $this->assertEqualsArrays(
             array(
                 'http://saft/test/s1' => 's1 dcterms title'
             ),
@@ -200,7 +226,7 @@ abstract class AbstractIndexTest extends TestCase
         $this->fixture->createIndex();
 
         // test created cache entries
-        $this->assertEquals(
+        $this->assertEqualsArrays(
             array(
                 'http://not_available' => ''
             ),
@@ -220,7 +246,7 @@ abstract class AbstractIndexTest extends TestCase
         $this->fixture->createIndex();
 
         // test created cache entries
-        $this->assertEquals(
+        $this->assertEqualsArrays(
             array(),
             $this->fixture->fetchValues(
                 array()
