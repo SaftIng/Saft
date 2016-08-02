@@ -183,8 +183,7 @@ class Http extends AbstractSparqlStore
             $this->query('SELECT ?g { GRAPH ?g {?s ?p ?o} } LIMIT 1');
             $rights['tripleQuerying'] = true;
         } catch (\Exception $e) {
-            // ignore exception here and assume we could not query anything.e
-            echo PHP_EOL . $e->getMessage();
+            // ignore exception here and assume we could not query anything.
         }
 
         /*

@@ -17,6 +17,18 @@ class HttpTest extends StoreAbstractTest
     {
         parent::setUp();
 
+        /*
+         * first check, if target server is online
+         */
+        $curl = new Curl();
+        $curl->get($this->configuration['httpConfig']['queryUrl']);
+        if (false == $curl->response) {
+            $this->markTestSkipped(
+                'Query URL ' . $this->configuration['httpConfig']['queryUrl'] . ' is not reachable. '
+                . 'Ignore integration test.'
+            );
+        }
+
         $rights = array();
 
         /*
