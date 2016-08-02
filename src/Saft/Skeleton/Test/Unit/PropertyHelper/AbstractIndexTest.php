@@ -120,13 +120,21 @@ abstract class AbstractIndexTest extends TestCase
         $resultArray = unserialize($this->cache->getItem(md5('http://saft/test/s2')));
 
         $this->assertTrue(isset($resultArray['titles']));
+
+        uasort($resultArray, function($a, $b) {
+            if ($a['title'] == $b['title']) {
+                return 0;
+            }
+            return ($a['title'] < $b['title']) ? -1 : 1;
+        });
+
         $this->assertEquals(
             array(
                 array('uri' => 'http://www.w3.org/2000/01/rdf-schema#label', 'title' => 's2 rdfs label'),
                 array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title - 2'),
-                array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title')
+                array('uri' => 'http://purl.org/dc/terms/title', 'title' => 's2 dcterms title'),
             ),
-            array_values($resultArray['titles'])
+            $resultArray['titles']
         );
     }
 
