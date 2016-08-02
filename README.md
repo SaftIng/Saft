@@ -1,5 +1,7 @@
 # Saft
 
+[![Build Status](https://travis-ci.org/SaftIng/Saft.svg?branch=master)](https://travis-ci.org/SaftIng/Saft)
+
 The Saft PHP framework provides RDF handling and support for Semantic Web technologies. It consists of the Saft.Library (_Saft.data_, _Saft.rdf_, _Saft.sparql_ and _Saft.store_), Saft.Additions (e.g. adapter for triple stores) and Saft.skeleton (to jump start your project).
 
 ## Documentation
