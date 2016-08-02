@@ -68,16 +68,12 @@ abstract class AbstractRequestHandlerTest extends TestCase
         );
     }
 
-    protected abstract function isTestPossible();
-
     /*
      * Tests for handle
      */
 
     public function testHandleActionCreateIndex()
     {
-        $this->isTestPossible();
-
         $this->fillStoreWithTestData();
 
         // setup cache
@@ -105,8 +101,6 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     public function testHandleActionFetchValues()
     {
-        $this->isTestPossible();
-
         $this->fillStoreWithTestData();
 
         // setup cache using memory

@@ -4,20 +4,20 @@ namespace Saft\Skeleton\Test\Integration\PropertyHelper;
 
 class RequestHandlerApcCacheTest extends AbstractRequestHandlerTest
 {
-    public function isTestPossible()
+    public function setupCache()
     {
-        if (false === extension_loaded('apc')) {
+        if (false === extension_loaded('apcu') && false === extension_loaded('apc')) {
             $this->markTestSkipped('PHP-extension APC is not loaded. Try sudo apt-get install php-apc');
             return false;
         }
 
-        return true;
-    }
+        try {
+            $this->fixture->setupCache(array(
+                'name' => 'apc'
+            ));
+        } catch (\Exception $e) {
+            $this->markTestSkipped($e->getMessage());
+        }
 
-    public function setupCache()
-    {
-        $this->fixture->setupCache(array(
-            'name' => 'apc'
-        ));
     }
 }
