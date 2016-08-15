@@ -27,6 +27,7 @@
         "saft/saft-querycache": "self.version",
         "saft/saft-rdf": "self.version",
         "saft/saft-redland": "self.version",
+        "saft/saft-rest": "self.version",
         "saft/saft-skeleton": "self.version",
         "saft/saft-sparql": "self.version",
         "saft/saft-store": "self.version",
