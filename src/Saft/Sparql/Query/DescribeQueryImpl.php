@@ -95,6 +95,16 @@ class DescribeQueryImpl extends AbstractQuery
     /**
      * Represents it a Describe Query?
      *
+     * @return boolean False
+     */
+    public function isConstructQuery()
+    {
+        return false;
+    }
+
+    /**
+     * Represents it a Describe Query?
+     *
      * @return boolean True
      */
     public function isDescribeQuery()

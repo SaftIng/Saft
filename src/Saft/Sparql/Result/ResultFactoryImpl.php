@@ -13,19 +13,19 @@ class ResultFactoryImpl implements ResultFactory
     }
 
     /**
-     * @param  \Iterator|array|null $list optional
+     * @param  \Iterator|array|null $list optional, default is array()
      * @return SetResult
      */
-    public function createSetResult($list)
+    public function createSetResult($list = array())
     {
         return new SetResultImpl($list);
     }
 
     /**
-     * @param  \Iterator|array|null $list optional
+     * @param  \Iterator|array|null $list optional, default is array()
      * @return SetResult
      */
-    public function createStatementResult($list)
+    public function createStatementResult($list = array())
     {
         return new StatementSetResultImpl($list);
     }

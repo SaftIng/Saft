@@ -409,4 +409,77 @@ abstract class AbstractSparqlStore implements Store
         $sparqlUtils = new SparqlUtils();
         return $sparqlUtils->statementIteratorToSparqlFormat($statements, $graph);
     }
+
+    /**
+     * Helper function which transforms an result entry to its proper Node instance.
+     *
+     * @param array $entry
+     * @return Node Instance of Node.
+     * @unstable
+     */
+    public function transformEntryToNode($entry)
+    {
+        /*
+         * An $entry looks like:
+         * array(
+         *      'type' => 'uri',
+         *      'value' => '...'
+         * )
+         */
+
+        // it seems that for instance Virtuoso returns type=literal for bnodes,
+        // so we manually fix that here to avoid that problem if other stores act
+        // the same
+        if (true === is_string($entry['value']) && false !== strpos($entry['value'], '_:')) {
+            $entry['type'] = 'bnode';
+        }
+
+        $newEntry = null;
+
+        switch ($entry['type']) {
+            /**
+             * Literal (language'd)
+             */
+            case 'literal':
+                $lang = null;
+                if (isset($entry['xml:lang'])) {
+                    $lang = $entry['xml:lang'];
+                }
+
+                $newEntry = $this->nodeFactory->createLiteral(
+                    $entry['value'],
+                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
+                    $lang
+                );
+
+                break;
+
+            /**
+             * Typed-Literal
+             */
+            case 'typed-literal':
+                $newEntry = $this->nodeFactory->createLiteral($entry['value'], $entry['datatype']);
+                break;
+
+            /**
+             * NamedNode
+             */
+            case 'uri':
+                $newEntry = $this->nodeFactory->createNamedNode($entry['value']);
+                break;
+
+            /**
+             * BlankNode
+             */
+            case 'bnode':
+                $newEntry = $this->nodeFactory->createBlankNode($entry['value']);
+                break;
+
+            default:
+                throw new \Exception('Unknown type given: ' . $entry['type']);
+                break;
+        }
+
+        return $newEntry;
+    }
 }

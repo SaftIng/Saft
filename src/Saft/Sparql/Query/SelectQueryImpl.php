@@ -173,6 +173,16 @@ class SelectQueryImpl extends AbstractQuery
     }
 
     /**
+     * Represents it a CONSTRUCT query?
+     *
+     * @return boolean False
+     */
+    public function isConstructQuery()
+    {
+        return false;
+    }
+
+    /**
      * Is instance of DescribeQuery?
      *
      * @return boolean False

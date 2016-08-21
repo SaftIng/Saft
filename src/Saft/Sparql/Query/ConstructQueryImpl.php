@@ -5,9 +5,9 @@ namespace Saft\Sparql\Query;
 use Saft\Sparql\Query\AbstractQuery;
 
 /**
- * Represents an ASK query.
+ * Represents an Construct query.
  */
-class AskQueryImpl extends AbstractQuery
+class ConstructQueryImpl extends AbstractQuery
 {
     /**
      * Constructor.
@@ -50,7 +50,6 @@ class AskQueryImpl extends AbstractQuery
         $this->queryParts['graphs'] = $this->extractGraphs($prefixlessQuery);
         $this->queryParts['namespaces'] = $this->extractNamespacesFromQuery($this->queryParts['where']);
         $this->queryParts['prefixes'] = $this->extractPrefixesFromQuery($this->getQuery());
-        $this->queryParts['quad_pattern'] = $this->extractQuads($this->queryParts['where']);
         $this->queryParts['triple_pattern'] = $this->extractTriplePattern($this->queryParts['where']);
         $this->queryParts['variables'] = $this->extractVariablesFromQuery($this->getQuery());
 
@@ -66,7 +65,7 @@ class AskQueryImpl extends AbstractQuery
      */
     public function isAskQuery()
     {
-        return true;
+        return false;
     }
 
     /**
@@ -76,7 +75,7 @@ class AskQueryImpl extends AbstractQuery
      */
     public function isConstructQuery()
     {
-        return false;
+        return true;
     }
 
     /**

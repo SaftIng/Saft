@@ -163,6 +163,16 @@ class GraphQueryImpl extends AbstractQuery
     }
 
     /**
+     * Represents it a CONSTRUCT query?
+     *
+     * @return boolean False
+     */
+    public function isConstructQuery()
+    {
+        return false;
+    }
+
+    /**
      * Represents it a Describe Query?
      *
      * @return boolean False

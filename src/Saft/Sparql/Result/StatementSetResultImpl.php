@@ -25,7 +25,7 @@ class StatementSetResultImpl extends SetResultImpl
         $parentClass = $parentClass->getParentClass()->getParentClass()->getName();
         $parentClass::__construct($array, $flags);
 
-        // check that each entry of $array is an array to
+        // check that each entry of $array is a Statement
         foreach ($array as $entry) {
             if (false === $entry instanceof Statement) {
                 throw new \Exception('Parameter $array must only contain Statement instances.');

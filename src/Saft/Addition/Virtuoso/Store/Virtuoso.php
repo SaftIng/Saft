@@ -309,6 +309,7 @@ class Virtuoso extends AbstractSparqlStore
      * @throws \Exception If query is malformed.
      * @throws \Exception If PDO query is false.
      * @todo handle multiple graphs in FROM clause
+     * @todo handle construct query
      */
     public function query($query, array $options = array())
     {
@@ -316,11 +317,12 @@ class Virtuoso extends AbstractSparqlStore
 
         $queryObject = $this->queryFactory->createInstanceByQueryString($query);
         $queryParts = $queryObject->getQueryParts();
+        $queryType = $this->queryUtils->getQueryType($query);
 
         /**
          * SPARQL query (usually to fetch data)
          */
-        if ('selectQuery' === $this->queryUtils->getQueryType($query)) {
+        if ('selectQuery' == $queryType || 'constructQuery' == $queryType) {
             // force extended result to have detailed information about given result entries, such as datatype and
             // language information.
             if ('json' == $options['output_format'] || false == isset($options['output_format'])) {
@@ -329,7 +331,7 @@ class Virtuoso extends AbstractSparqlStore
                 $sparqlQuery = $query;
             }
 
-            $nodeUtils = new nodeUtils();
+            $nodeUtils = new NodeUtils();
 
             // make it possible to set a default graph URI
             if (
@@ -342,8 +344,9 @@ class Virtuoso extends AbstractSparqlStore
             }
             $graphSpec = '';
             // escape characters that delimit the query within the query
-            $sparqlQuery = $graphSpec . 'CALL DB.DBA.SPARQL_EVAL(\''. addcslashes($sparqlQuery, '\'\\') . '\', '.
-                           '\''. $graphUri . '\', 0)';
+            $sparqlQuery = $graphSpec
+                . 'CALL DB.DBA.SPARQL_EVAL(\''. addcslashes($sparqlQuery, '\'\\') . '\', '
+                . '\''. $graphUri . '\', 0)';
 
             // execute query
             try {
@@ -361,7 +364,55 @@ class Virtuoso extends AbstractSparqlStore
             $entries = array();
 
             // transform result to array in case we fired a non-UPDATE query
-            if (false !== $pdoQuery) {
+            if (false !== $pdoQuery && 'constructQuery' == $queryType) {
+                // TODO test empty CONSTRUCT query results
+                $result = json_decode(current(current($pdoQuery->fetchAll(\PDO::FETCH_ASSOC))), true);
+                $statements = array();
+
+                /*
+
+                Basic structure of $result is:
+
+                array(2) {
+                  ["http://saft/testquad/o1"]=>
+                  array(1) {
+                    ["http://saft/testquad/p1"]=>
+                    array(1) {
+                      [0]=>
+                      array(2) {
+                        ["type"]=>
+                        string(3) "uri"
+                        ["value"]=>
+                        string(23) "http://saft/testquad/s1"
+                      }
+                    }
+                  }
+                  [...]
+                }
+
+                */
+
+                foreach ($result as $subjectUri => $predicates) {
+                    foreach ($predicates as $predicateUri => $objects) {
+                        foreach ($objects as $objectUri => $objectArray) {
+                            // build statement s-p-o
+                            // TODO handle blank nodes
+                            $statements[] = $this->statementFactory->createStatement(
+                                $this->nodeFactory->createNamedNode($subjectUri),
+                                $this->nodeFactory->createNamedNode($predicateUri),
+                                $this->transformEntryToNode($objectArray)
+                            );
+                        }
+                    }
+                }
+
+                if (0 == count($statements)) {
+                    return $this->resultFactory->createEmptyResult();
+                }
+
+                return $this->resultFactory->createStatementResult($statements);
+
+            } elseif (false !== $pdoQuery && 'selectQuery' == $queryType) {
                 $resultArray = json_decode(current(current($pdoQuery->fetchAll(\PDO::FETCH_ASSOC))), true);
 
                 $variables = $resultArray['head']['vars'];
@@ -399,69 +450,7 @@ class Virtuoso extends AbstractSparqlStore
                      * )
                      */
                     foreach ($bindingParts as $variable => $part) {
-                        // it seems that Virtuoso returns type=literal for bnodes, so we manually fix that
-                        // here, otherwise it will creates a Literal instance.
-                        if (false !== strpos($part['value'], '_:')) {
-                            $part['type'] = 'bnode';
-                        }
-
-                        switch ($part['type']) {
-                            /**
-                             * Blank Node
-                             */
-                            case 'bnode':
-                                $newEntry[$variable] = $this->nodeFactory->createBlankNode($part['value']);
-                                break;
-
-                            /**
-                             * Literal (language'd) or plain literal without language tag.
-                             *
-                             * Usually Virtuoso takes that type for language-tagged literals, but if
-                             * there are triples containign literals, which were created without Saft,
-                             * they might are of type=literal, but dont have language information.
-                             */
-                            case 'literal':
-                                // language information set
-                                if (isset($part['xml:lang'])) {
-                                    $langString = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString';
-                                    $lang = $part['xml:lang'];
-                                // fallback to simple triple
-                                } else {
-                                    $langString = 'http://www.w3.org/2001/XMLSchema#string';
-                                    $lang = null;
-                                }
-
-                                $newEntry[$variable] = $this->nodeFactory->createLiteral(
-                                    $part['value'],
-                                    $langString,
-                                    $lang
-                                );
-
-                                break;
-
-                            /**
-                             * Typed-Literal
-                             */
-                            case 'typed-literal':
-                                $newEntry[$variable] = $this->nodeFactory->createLiteral(
-                                    $part['value'],
-                                    $part['datatype']
-                                );
-
-                                break;
-
-                            /**
-                             * NamedNode
-                             */
-                            case 'uri':
-                                $newEntry[$variable] = $this->nodeFactory->createNamedNode($part['value']);
-
-                                break;
-
-                            default:
-                                throw new \Exception('Unknown type given:' . $part['type']);
-                                break;
-                        }
+                        $newEntry[$variable] = $this->transformEntryToNode($part);
                     }
 
                     $entries[] = $newEntry;
@@ -495,7 +484,7 @@ class Virtuoso extends AbstractSparqlStore
             }
 
             // ask result
-            if ('askQuery' === $this->queryUtils->getQueryType($query)) {
+            if ('askQuery' == $queryType) {
                 $pdoResult = $pdoQuery->fetchAll(\PDO::FETCH_ASSOC);
                 return $this->resultFactory->createValueResult(true !== empty($pdoResult));
             } else {

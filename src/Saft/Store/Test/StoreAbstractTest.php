@@ -999,6 +999,43 @@ abstract class StoreAbstractTest extends TestCase
         );
     }
 
+    // checks if query returns a statements list for the given CONSTRUCT query
+    public function testQueryConstruct()
+    {
+        // add test data
+        $statements = array($this->getTestTriple(), $this->getTestQuad());
+        $this->fixture->addStatements($statements, $this->testGraph);
+
+        $resultFactory = new ResultFactoryImpl();
+
+        $this->assertEquals(
+            $resultFactory->createStatementResult(array(
+                new StatementImpl(
+                    new NamedNodeImpl('http://saft/testquad/p1'),
+                    new NamedNodeImpl('http://saft/testquad/s1'),
+                    new NamedNodeImpl('http://saft/testquad/o1')
+                ),
+                new StatementImpl(
+                    new NamedNodeImpl('http://saft/testtriple/p2'),
+                    new NamedNodeImpl('http://saft/testtriple/s2'),
+                    new NamedNodeImpl('http://saft/testtriple/o2')
+                )
+            )),
+            $this->fixture->query('CONSTRUCT { ?p1 ?s1 ?o1 } FROM <'. $this->testGraph->getUri() .'> WHERE {?s1 ?p1 ?o1.}')
+        );
+    }
+
+    // graph is empty; check result for a given CONSTRUCT query
+    public function testQueryConstructEmptyGraph()
+    {
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph .'>');
+
+        $this->assertEquals(
+            new EmptyResultImpl(),
+            $this->fixture->query('CONSTRUCT { ?p1 ?s1 ?o1 } FROM <'. $this->testGraph->getUri() .'> WHERE {?s1 ?p1 ?o1.}')
+        );
+    }
+
     public function testQueryEmptyResult()
     {
         // clear test graph

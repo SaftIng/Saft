@@ -22,6 +22,13 @@ interface Query
     public function isAskQuery();
 
     /**
+     * Is instance of ConstructQuery?
+     *
+     * @return boolean
+     */
+    public function isConstructQuery();
+
+    /**
      * Is instance of DescribeQuery?
      *
      * @return boolean

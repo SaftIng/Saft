@@ -288,20 +288,43 @@ class Http extends AbstractSparqlStore
     {
         $queryObject = $this->queryFactory->createInstanceByQueryString($query);
         $queryParts = $queryObject->getQueryParts();
+        $queryType = $this->queryUtils->getQueryType($query);
 
         /**
-         * SPARQL query (usually to fetch data)
+         * CONSTRUCT query
          */
-        if ('selectQuery' == $this->queryUtils->getQueryType($query)) {
+        if ('constructQuery' == $queryType) {
             $receivedResult = $this->sendSparqlSelectQuery($this->configuration['queryUrl'], $query);
 
-            // transform object to array
-            if (is_object($receivedResult)) {
-                $resultArray = json_decode(json_encode($receivedResult), true);
-            // transform json string to array
-            } else {
-                $resultArray = json_decode($receivedResult, true);
+            $resultArray = $this->transformResultToArray($receivedResult);
+
+            if (isset($resultArray['results']['bindings'])) {
+                if (0 < count($resultArray['results']['bindings'])) {
+
+                    $statements = array();
+
+                    // important: we assume the bindings list is ORDERED!
+                    foreach ($resultArray['results']['bindings'] as $entries) {
+                        $statements[] = $this->statementFactory->createStatement(
+                            $this->transformEntryToNode($entries['s']),
+                            $this->transformEntryToNode($entries['p']),
+                            $this->transformEntryToNode($entries['o'])
+                        );
+                    }
+
+                    return $this->resultFactory->createStatementResult($statements);
+                }
             }
+
+            return $this->resultFactory->createEmptyResult();
+
+        /**
+         * SELECT query
+         */
+        } elseif ('selectQuery' == $queryType) {
+            $receivedResult = $this->sendSparqlSelectQuery($this->configuration['queryUrl'], $query);
+
+            $resultArray = $this->transformResultToArray($receivedResult);
 
             $entries = array();
 
@@ -320,69 +343,8 @@ class Http extends AbstractSparqlStore
             foreach ($resultArray['results']['bindings'] as $bindingParts) {
                 $newEntry = array();
 
-                /**
-                 * A part looks like:
-                 * array(
-                 *      'type' => 'uri',
-                 *      'value' => '...'
-                 * )
-                 */
-
                 foreach ($bindingParts as $variable => $part) {
-                    // it seems that for instance Virtuoso returns type=literal for bnodes,
-                    // so we manually fix that here to avoid that problem if other stores act
-                    // the same
-                    if (true === is_string($part['value']) && false !== strpos($part['value'], '_:')) {
-                        $part['type'] = 'bnode';
-                    }
-
-                    switch ($part['type']) {
-                        /**
-                         * Literal (language'd)
-                         */
-                        case 'literal':
-                            $lang = null;
-                            if (isset($part['xml:lang'])) {
-                                $lang = $part['xml:lang'];
-                            }
-
-                            $newEntry[$variable] = $this->nodeFactory->createLiteral(
-                                $part['value'],
-                                'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
-                                $lang
-                            );
-
-                            break;
-
-                        /**
-                         * Typed-Literal
-                         */
-                        case 'typed-literal':
-                            $newEntry[$variable] = $this->nodeFactory->createLiteral(
-                                $part['value'],
-                                $part['datatype']
-                            );
-
-                            break;
-
-                        /**
-                         * NamedNode
-                         */
-                        case 'uri':
-                            $newEntry[$variable] = $this->nodeFactory->createNamedNode($part['value']);
-                            break;
-
-                        /**
-                         * BlankNode
-                         */
-                        case 'bnode':
-                            $newEntry[$variable] = $this->nodeFactory->createBlankNode($part['value']);
-                            break;
-
-                        default:
-                            throw new \Exception('Unknown type given.');
-                            break;
-                    }
+                    $newEntry[$variable] = $this->transformEntryToNode($part);
                 }
 
                 $entries[] = $newEntry;
@@ -390,6 +352,7 @@ class Http extends AbstractSparqlStore
 
             $return = $this->resultFactory->createSetResult($entries);
             $return->setVariables($resultArray['head']['vars']);
+            return $return;
 
         /**
          * SPARPQL Update query
@@ -404,16 +367,16 @@ class Http extends AbstractSparqlStore
                 $decodedResult = json_decode($receivedResult, true);
             }
 
-            if ('askQuery' === $this->queryUtils->getQueryType($query)) {
+            if ('askQuery' === $queryType) {
                 if (true === isset($decodedResult['boolean'])) {
-                    $return = $this->resultFactory->createValueResult($decodedResult['boolean']);
+                    return $this->resultFactory->createValueResult($decodedResult['boolean']);
 
                 // assumption here is, if a string was returned, something went wrong.
                 } elseif (0 < strlen($receivedResult)) {
                     throw new \Exception($receivedResult);
 
                 } else {
-                    $return = $this->resultFactory->createEmptyResult();
+                    return $this->resultFactory->createEmptyResult();
                 }
 
             // usually a SPARQL result does not return a string. if it does anyway, assume there is an error.
@@ -421,11 +384,9 @@ class Http extends AbstractSparqlStore
                 throw new \Exception($receivedResult);
 
             } else {
-                $return = $this->resultFactory->createEmptyResult();
+                return $this->resultFactory->createEmptyResult();
             }
         }
-
-        return $return;
     }
 
     /**
@@ -499,5 +460,22 @@ class Http extends AbstractSparqlStore
     public function setClient(Curl $httpClient)
     {
         $this->httpClient = $httpClient;
+    }
+
+    /**
+     * Transforms server result to aray.
+     *
+     * @param mixed $receivedResult
+     * @return array
+     */
+    public function transformResultToArray($receivedResult)
+    {
+        // transform object to array
+        if (is_object($receivedResult)) {
+            return json_decode(json_encode($receivedResult), true);
+        // transform json string to array
+        } else {
+            return json_decode($receivedResult, true);
+        }
     }
 }

@@ -28,6 +28,9 @@ class QueryFactoryImpl implements QueryFactory
             case 'askQuery':
                 return new AskQueryImpl($query);
 
+            case 'constructQuery':
+                return new ConstructQueryImpl($query);
+
             case 'describeQuery':
                 return new DescribeQueryImpl($query);
 

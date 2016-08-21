@@ -747,6 +747,11 @@ abstract class AbstractQuery implements Query
         $this->query = $query;
     }
 
+    public function setQueryPart($part, $value)
+    {
+        $this->queryParts[$part] = $value;
+    }
+
     /**
      * Unsets values if its is empty
      *

@@ -1353,6 +1353,84 @@ class HttpTest extends StoreAbstractTest
         parent::testQueryAsk();
     }
 
+    public function testQueryConstruct()
+    {
+        $this->httpClient->shouldReceive('setHeader')->times(8);
+
+        $this->httpClient
+            ->shouldReceive('get')
+            ->times(3)
+            ->andReturn(
+                json_encode(array()),
+                json_encode(array()),
+                json_encode(array(
+                    'boolean' => true
+                ))
+            );
+
+        $this->httpClient
+            ->shouldReceive('post')
+            ->once()
+            ->andReturn(json_encode(array(
+                'head' => array(
+                    'vars' => array(
+                        's', 'p', 'o'
+                    )
+                ),
+                'results' => array(
+                    'distinct' => false,
+                    'ordered' => true,
+                    'bindings' => array(
+                        array(
+                            's' => array('type' => 'uri', 'value' => 'http://saft/testquad/p1'),
+                            'p' => array('type' => 'uri', 'value' => 'http://saft/testquad/s1'),
+                            'o' => array('type' => 'uri', 'value' => 'http://saft/testquad/o1')
+                        ),
+                        array(
+                            's' => array('type' => 'uri', 'value' => 'http://saft/testtriple/p2'),
+                            'p' => array('type' => 'uri', 'value' => 'http://saft/testtriple/s2'),
+                            'o' => array('type' => 'uri', 'value' => 'http://saft/testtriple/o2')
+                        )
+                    )
+                )
+            )));
+
+        parent::testQueryConstruct();
+    }
+
+    public function testQueryConstructEmptyGraph()
+    {
+        $this->httpClient->shouldReceive('setHeader')->times(8);
+
+        $this->httpClient
+            ->shouldReceive('get')
+            ->times(3)
+            ->andReturn(
+                json_encode(array()),
+                json_encode(array()),
+                json_encode(array(
+                    'boolean' => true
+                ))
+            );
+
+        $this->httpClient
+            ->shouldReceive('post')
+            ->once()
+            ->andReturn(json_encode(array(
+                'head' => array(
+                    'vars' => array(
+                        's', 'p', 'o', 'g'
+                    )
+                ),
+                'results' => array(
+                    'bindings' => array(
+                    )
+                )
+            )));
+
+        parent::testQueryConstructEmptyGraph();
+    }
+
     public function testQueryEmptyResult()
     {
         $this->httpClient->shouldReceive('setHeader')->times(2);

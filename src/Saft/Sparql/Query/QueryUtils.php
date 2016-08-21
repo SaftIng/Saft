@@ -34,6 +34,10 @@ class QueryUtils
             case 'ask':
                 return 'askQuery';
 
+            // CONSTRUCT
+            case 'con':
+                return 'constructQuery';
+
             // DESCRIBE
             case 'des':
                 return 'describeQuery';
