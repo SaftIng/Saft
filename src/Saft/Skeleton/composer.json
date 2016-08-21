@@ -47,7 +47,7 @@
     "autoload": {
         "psr-4": {
             "Saft\\Skeleton\\": [
-                "src/Saft/Skeleton/"
+                "*"
             ]
         }
     }
