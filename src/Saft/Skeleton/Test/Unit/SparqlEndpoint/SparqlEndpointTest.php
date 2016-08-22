@@ -11,6 +11,7 @@ use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Sparql\Query\QueryUtils;
 use Saft\Store\BasicTriplePatternStore;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,7 +37,7 @@ class SparqlEndpointTest extends TestCase
 
         $serializerFactory = new SerializerFactory(new NodeFactoryImpl(), new StatementFactoryImpl());
 
-        $this->fixture = new SparqlEndpoint($this->store, $serializerFactory);
+        $this->fixture = new SparqlEndpoint($this->store, $serializerFactory, new QueryUtils());
     }
 
     // test GET request with query parameter

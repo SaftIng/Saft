@@ -64,4 +64,24 @@ class StatementSetResultImpl extends SetResultImpl
     {
         return false;
     }
+
+    /**
+     * @return SetResult
+     */
+    public function toSetResult()
+    {
+        $setEntries = array();
+
+        foreach ($this as $statement) {
+            $setEntries[] = array(
+                's' => $statement->getSubject(),
+                'p' => $statement->getPredicate(),
+                'o' => $statement->getObject()
+            );
+        }
+
+        $result = new SetResultImpl($setEntries);
+        $result->setVariables(array('s', 'p', 'o'));
+        return $result;
+    }
 }
