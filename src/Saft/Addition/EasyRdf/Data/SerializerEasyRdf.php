@@ -117,7 +117,11 @@ class SerializerEasyRdf implements Serializer
             } elseif ($stmtObject->isBlank()) {
                 $o = array('type' => 'bnode', 'value' => '_:' . $stmtObject->getBlankId());
             } elseif ($stmtObject->isLiteral()) {
-                $o = array('type' => 'literal', 'value' => $stmtObject->getValue());
+                $o = array(
+                    'type' => 'literal',
+                    'value' => $stmtObject->getValue(),
+                    'datatype' => $stmtObject->getDataType()->getUri()
+                );
             } else {
                 throw new \Exception('Object can either be a blank node, an URI or literal.');
             }
