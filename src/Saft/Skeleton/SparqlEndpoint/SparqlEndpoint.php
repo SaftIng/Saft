@@ -158,7 +158,7 @@ class SparqlEndpoint
         if ('selectQuery' == $queryType) {
             return $this->transformSetResultToResultSet($rawResult);
         } elseif ('constructQuery' == $queryType) {
-            return $this->transformStatementSetResultToSetResult($rawResult);
+            return $this->transformStatementResultSetToStatementIterator($rawResult);
         } elseif ('askQuery' == $queryType) {
             return $this->transformValueResultToResultSet($rawResult);
         } else {
@@ -312,6 +312,25 @@ class SparqlEndpoint
         $result = new SetResultImpl($setEntries);
         $result->setVariables(array('s', 'p', 'o'));
         return $result;
+    }
+
+    /**
+     * @param SetResult Instance of SetResult which is similar or equal to StatementSetResult.
+     * @return SetResult
+     */
+    public function transformStatementResultSetToStatementIterator(SetResult $statementSetResult)
+    {
+        if (false == $statementSetResult->isStatementSetResult()) {
+            throw new \Exception('Given instance is not of type SetResult and no StatementResultSet.');
+        }
+
+        $statements = array();
+
+        foreach ($statementSetResult as $statement) {
+            $statements[] = $statement;
+        }
+
+        return new ArrayStatementIteratorImpl($statements);
     }
 
     /**
