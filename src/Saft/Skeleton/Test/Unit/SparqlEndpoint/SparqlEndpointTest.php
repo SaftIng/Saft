@@ -74,7 +74,21 @@ class SparqlEndpointTest extends TestCase
          * response
          */
         $expectedResponse = new Response(
-            '',
+        '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+[]
+  a <http://www.w3.org/2005/sparql-results#ResultSet> ;
+  rdf:resultVariable "s", "p", "o" ;
+  rdf:solution [ rdf:binding [
+      rdf:variable "s" ;
+      rdf:value <http://s>
+    ], [
+      rdf:variable "p" ;
+      rdf:value <http://p>
+    ], [
+      rdf:variable "o" ;
+      rdf:value <http://o>
+    ] ] .'  ,
             Response::HTTP_OK,
             array(
                 'Content-Type' => 'application/x-turtle'
@@ -82,7 +96,7 @@ class SparqlEndpointTest extends TestCase
         );
 
         $response = $this->fixture->handleRequest($request);
-        $this->assertEquals($response, $expectedResponse);
+        $this->assertEquals($expectedResponse, $response);
     }
 
     // test GET request with query parameter and accept headers
@@ -120,7 +134,21 @@ class SparqlEndpointTest extends TestCase
          * response
          */
         $expectedResponse = new Response(
-            '',
+            '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+[]
+  a <http://www.w3.org/2005/sparql-results#ResultSet> ;
+  rdf:resultVariable "s", "p", "o" ;
+  rdf:solution [ rdf:binding [
+      rdf:variable "s" ;
+      rdf:value <http://s>
+    ], [
+      rdf:variable "p" ;
+      rdf:value <http://p>
+    ], [
+      rdf:variable "o" ;
+      rdf:value <http://o>
+    ] ] .'  ,
             Response::HTTP_OK,
             array(
                 'Content-Type' => 'application/x-turtle'
@@ -128,7 +156,7 @@ class SparqlEndpointTest extends TestCase
         );
 
         $response = $this->fixture->handleRequest($request);
-        $this->assertEquals($response, $expectedResponse);
+        $this->assertEquals($expectedResponse, $response);
     }
 
     // test GET request with no query parameter
@@ -155,6 +183,6 @@ class SparqlEndpointTest extends TestCase
         );
 
         $response = $this->fixture->handleRequest($request);
-        $this->assertEquals($response, $expectedResponse);
+        $this->assertEquals($expectedResponse, $response);
     }
 }

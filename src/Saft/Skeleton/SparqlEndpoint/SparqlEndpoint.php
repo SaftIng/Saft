@@ -122,9 +122,16 @@ class SparqlEndpoint
 
             $statusCode = 200;
 
-            $serializer->serializeIteratorToStream($result, 'php://memory');
+            // transform iterator to a string and write it to temp file
+            // afterwards read content and save it into $content
+            // TODO find a more performant solution
+            $filepath = tempnam(sys_get_temp_dir(), 'saft_');
+            $testFile = fopen('file://' . $filepath, 'w+');
 
-            $content = file_get_contents('php://memory');
+            $serializer->serializeIteratorToStream($result, $testFile);
+
+            $content = trim(file_get_contents($filepath));
+            fclose($testFile);
 
         } catch (\Exception $e) {
             // https://www.w3.org/TR/sparql11-protocol/#query-failure
@@ -190,7 +197,7 @@ class SparqlEndpoint
 
          */
         $statements = array();
-        $resultSetNode = new BlankNodeImpl('ResultSet' . rand(0, 1000));
+        $resultSetNode = new BlankNodeImpl('ResultSet');
 
         $statements[] = new StatementImpl(
             $resultSetNode,
