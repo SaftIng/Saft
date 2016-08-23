@@ -41,7 +41,7 @@ class SparqlEndpointTest extends TestCase
     }
 
     // test GET request with query parameter
-    public function testHandleRequestQueryGET()
+    public function testHandleRequestQueryGETSelectQuery()
     {
         // add test data to graph
         $this->store->addStatements(
@@ -74,21 +74,69 @@ class SparqlEndpointTest extends TestCase
          * response
          */
         $expectedResponse = new Response(
-        '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 []
   a <http://www.w3.org/2005/sparql-results#ResultSet> ;
-  rdf:resultVariable "s", "p", "o" ;
+  rdf:resultVariable "s"^^xsd:string, "p"^^xsd:string, "o"^^xsd:string ;
   rdf:solution [ rdf:binding [
-      rdf:variable "s" ;
+      rdf:variable "s"^^xsd:string ;
       rdf:value <http://s>
     ], [
-      rdf:variable "p" ;
+      rdf:variable "p"^^xsd:string ;
       rdf:value <http://p>
     ], [
-      rdf:variable "o" ;
+      rdf:variable "o"^^xsd:string ;
       rdf:value <http://o>
     ] ] .'  ,
+            Response::HTTP_OK,
+            array(
+                'Content-Type' => 'application/x-turtle'
+            )
+        );
+
+        $response = $this->fixture->handleRequest($request);
+        $this->assertEquals($expectedResponse, $response);
+    }
+
+    // test GET request with query parameter
+    public function testHandleRequestQueryGETAskQuery()
+    {
+        // add test data to graph
+        $this->store->addStatements(
+            array(
+                new StatementImpl(
+                    new NamedNodeImpl('http://s'),
+                    new NamedNodeImpl('http://p'),
+                    new NamedNodeImpl('http://o')
+                )
+            ),
+            $this->testGraph
+        );
+
+        /*
+         * request
+         */
+        $request = Request::create(
+            '/',
+            'GET',
+            array(
+                'query' => 'ASK%20where%20%7B%3Fs%20%3Fp%20%3Chttp%3A%2F%2Fo%3E.%7D'
+            )
+        );
+        $request->headers->set('Content-Type', 'application/json');
+        $request->headers->set('User-agent', 'my-sparql-client/0.1');
+
+        /*
+         * response
+         */
+        $expectedResponse = new Response(
+            '@prefix ns0: <http://www.w3.org/2005/sparql-results#> .
+
+[]
+  a <http://www.w3.org/2005/sparql-results#results> ;
+  ns0:boolean true .',
             Response::HTTP_OK,
             array(
                 'Content-Type' => 'application/x-turtle'
@@ -134,19 +182,21 @@ class SparqlEndpointTest extends TestCase
          * response
          */
         $expectedResponse = new Response(
-            '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            '@prefix ns0: <http://www.w3.org/2005/sparql-results#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 []
-  a <http://www.w3.org/2005/sparql-results#ResultSet> ;
-  rdf:resultVariable "s", "p", "o" ;
+  a ns0:ResultSet ;
+  rdf:resultVariable "s"^^xsd:string, "p"^^xsd:string, "o"^^xsd:string ;
   rdf:solution [ rdf:binding [
-      rdf:variable "s" ;
+      rdf:variable "s"^^xsd:string ;
       rdf:value <http://s>
     ], [
-      rdf:variable "p" ;
+      rdf:variable "p"^^xsd:string ;
       rdf:value <http://p>
     ], [
-      rdf:variable "o" ;
+      rdf:variable "o"^^xsd:string ;
       rdf:value <http://o>
     ] ] .'  ,
             Response::HTTP_OK,

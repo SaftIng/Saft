@@ -14,6 +14,8 @@ use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\Result;
 use Saft\Sparql\Result\SetResult;
 use Saft\Sparql\Result\SetResultImpl;
+use Saft\Sparql\Result\ValueResult;
+use Saft\Sparql\Result\ValueResultImpl;
 use Saft\Store\Store;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -156,7 +158,9 @@ class SparqlEndpoint
         if ('selectQuery' == $queryType) {
             return $this->transformSetResultToResultSet($rawResult);
         } elseif ('constructQuery' == $queryType) {
-            return $this->transformStatementSetResulttoSetResult($rawResult);
+            return $this->transformStatementSetResultToSetResult($rawResult);
+        } elseif ('askQuery' == $queryType) {
+            return $this->transformValueResultToResultSet($rawResult);
         } else {
             throw new \Exception('TODO: implement non-select and non-construct query types');
         }
@@ -169,9 +173,7 @@ class SparqlEndpoint
     {
         // transform StatementSetResult to SetResult instance
         if ($_result instanceof SetResult && true == $_result->isStatementSetResult()) {
-            $result = $this->transformStatementSetResulttoSetResult($_result);
-        } else if ($_result instanceof StatementIterator) {
-            $result = $this->transformStatementIteratorToSetResult($_result);
+            $result = $this->transformStatementSetResultToSetResult($_result);
         } else if ($_result instanceof SetResult) {
             $result = $_result;
         } else {
@@ -267,6 +269,7 @@ class SparqlEndpoint
 
     /**
      * @param StatementIterator $result
+     * @return SetResult
      */
     public function transformStatementIteratorToSetResult(StatementIterator $statementIterator)
     {
@@ -290,7 +293,7 @@ class SparqlEndpoint
      * @param SetResult Instance of SetResult which is similar or equal to StatementSetResult.
      * @return SetResult
      */
-    public function transformStatementSetResulttoSetResult(SetResult $statementSetResult)
+    public function transformStatementSetResultToSetResult(SetResult $statementSetResult)
     {
         if ($statementSetResult->isSetResult()) {
             return $statementSetResult;
@@ -309,5 +312,35 @@ class SparqlEndpoint
         $result = new SetResultImpl($setEntries);
         $result->setVariables(array('s', 'p', 'o'));
         return $result;
+    }
+
+    /**
+     * @param ValueResult $result
+     * @return StatementIterator
+     */
+    public function transformValueResultToResultSet(ValueResult $result)
+    {
+        $statements = array();
+        $resultSetNode = new BlankNodeImpl('ResultSet');
+
+        // [] rdf:type rs:results ;
+        $statements[] = new StatementImpl(
+            $resultSetNode,
+            new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+            new NamedNodeImpl('http://www.w3.org/2005/sparql-results#results')
+        );
+
+        // .. ; rs:boolean true .
+        // assuming that only boolean as value are possible
+        $statements[] = new StatementImpl(
+            $resultSetNode,
+            new NamedNodeImpl('http://www.w3.org/2005/sparql-results#boolean'),
+            new LiteralImpl(
+                true === $result->getValue() ? 'true' : 'false',
+                new NamedNodeImpl('http://www.w3.org/2001/XMLSchema#boolean')
+            )
+        );
+
+        return new ArrayStatementIteratorImpl($statements);
     }
 }
