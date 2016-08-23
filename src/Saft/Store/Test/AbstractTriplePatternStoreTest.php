@@ -3,7 +3,6 @@
 namespace Saft\Store\Test;
 
 use Saft\Rdf\AnyPatternImpl;
-use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;

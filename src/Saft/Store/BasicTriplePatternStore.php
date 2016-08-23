@@ -2,7 +2,6 @@
 
 namespace Saft\Store;
 
-use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
@@ -11,6 +10,7 @@ use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
 use Saft\Sparql\Query\QueryFactory;
+use Saft\Sparql\Result\StatementSetResultImpl;
 use Saft\Store\AbstractTriplePatternStore;
 use Saft\Store\Store;
 
@@ -184,13 +184,12 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
     /**
      * It basically returns all stored statements.
      *
-     * @param  Statement         $Statement          It can be either a concrete or pattern-statement.
-     * @param  Node              $graph     optional Overrides target graph. If set, you will get all
-     *                                               matching statements of that graph.
-     * @param  array             $options   optional It contains key-value pairs and should provide additional
-     *                                               introductions for the store and/or its adapter(s).
-     * @return StatementIterator It contains Statement instances  of all matching statements of the given
-     *                           graph.
+     * @param  Statement $statement          It can be either a concrete or pattern-statement.
+     * @param  Node      $graph     optional Overrides target graph. If set, you will get all
+     *                                       matching statements of that graph.
+     * @param  array     $options   optional It contains key-value pairs and should provide additional
+     *                                       introductions for the store and/or its adapter(s).
+     * @return SetResult It contains Statement instances of all matching statements of the given graph.
      */
     public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
     {
@@ -216,7 +215,7 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
 
         // if not default graph was requested
         if ('http://saft/defaultGraph/' != $graphUri) {
-            return new ArrayStatementIteratorImpl($this->statements[$graphUri]);
+            return new StatementSetResultImpl($this->statements[$graphUri]);
 
         // if default graph was requested, return matching statements from all graphs
         } else {
@@ -239,7 +238,7 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
                 }
             }
 
-            return new ArrayStatementIteratorImpl($_statements);
+            return new StatementSetResultImpl($_statements);
         }
     }
 

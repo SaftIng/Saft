@@ -4,9 +4,11 @@ namespace Saft\Skeleton\Rest;
 
 use Saft\Data\SerializationUtils;
 use Saft\Data\Serializer;
+use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactory;
+use Saft\Sparql\Result\SetResult;
 use Saft\Store\Store;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -363,7 +365,7 @@ class Hub
 
         //
         $this->serializer->serializeIteratorToStream(
-            $resultStatements,
+            $this->transformStatementSetResultToStatementIterator($resultStatements),
             // create temporary file to write result to
             $tempFile,
             $serialization
@@ -418,5 +420,25 @@ class Hub
         if (false === isset($this->preallocateParameters['graphUri'])) {
             $this->preallocateParameters['graphUri'] = '*';
         }
+    }
+
+    /**
+     * @param SetResult Instance of SetResult, which contains only instances of Statement. $iterator
+     * @return StatementIterator
+     * @todo transform according code part to a more clear solution to avoid obsolete transformations
+     */
+    protected function transformStatementSetResultToStatementIterator(SetResult $result)
+    {
+        if (false == $result->isStatementSetResult()) {
+            throw new Exception('Instance of SetResult is not a StatementSetResult.');
+        }
+
+        $statements = array();
+
+        foreach ($result as $statement) {
+            $statements[] = $statement;
+        }
+
+        return new ArrayStatementIteratorImpl($statements);
     }
 }

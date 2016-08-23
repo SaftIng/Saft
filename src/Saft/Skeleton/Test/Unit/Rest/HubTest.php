@@ -7,6 +7,7 @@ use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
+use Saft\Skeleton\Data\SerializerFactory;
 use Saft\Skeleton\Rest\Hub;
 use Saft\Skeleton\Test\TestCase;
 use Saft\Sparql\Query\QueryFactoryImpl;
@@ -15,6 +16,13 @@ use Zend\Diactoros\ServerRequest;
 
 class HubTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->serializerFactory = new SerializerFactory(new NodeFactoryImpl(), new StatementFactoryImpl());
+    }
+
     /**
      * @return Store Returns a basic store implementation which emulates a basic tripple store.
      */
@@ -39,7 +47,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
 
@@ -77,7 +85,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
 
@@ -110,7 +118,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
 
@@ -150,7 +158,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
 
@@ -173,7 +181,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
 
@@ -196,7 +204,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
 
@@ -231,7 +239,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);
@@ -255,7 +263,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);
@@ -275,7 +283,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);
@@ -299,7 +307,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);
@@ -323,7 +331,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);
@@ -347,7 +355,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);
@@ -371,7 +379,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);
@@ -395,7 +403,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);
@@ -420,7 +428,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);
@@ -445,7 +453,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);
@@ -469,7 +477,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);
@@ -493,7 +501,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);
@@ -516,7 +524,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);
@@ -537,7 +545,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);
@@ -556,7 +564,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
 
@@ -579,7 +587,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
 
@@ -611,7 +619,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);
@@ -642,7 +650,7 @@ class HubTest extends TestCase
             $this->getMockStore(),
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
-            new NQuadsSerializerImpl('n-quads'),
+            $this->serializerFactory->createSerializerFor('n-triples'),
             new NodeUtils()
         );
         $response = $fixture->computeRequest($request);

@@ -34,22 +34,14 @@ class SerializerFactory
 
     /**
      * @param string $serialization
+     * @return Serializer Instance of Serializer if available, null otherwise.
      */
     public function createSerializerFor($serialization)
     {
-        $serializerFactoryImpl = new SerializerFactoryImpl($this->nodeFactory, $this->statementFactory);
+        $serializerFactoryEasyRdf = new SerializerFactoryEasyRdf();
 
-        // try Saft's own implementation first
-        if (in_array($serialization, $serializerFactoryImpl->getSupportedSerializations())) {
-            return $serializerFactoryImpl->createSerializerFor($serialization);
-
-        // try EasyRdf next
-        } else {
-            $serializerFactoryEasyRdf = new SerializerFactoryEasyRdf();
-
-            if (in_array($serialization, $serializerFactoryEasyRdf->getSupportedSerializations())) {
-                return $serializerFactoryEasyRdf->createSerializerFor($serialization);
-            }
+        if (in_array($serialization, $serializerFactoryEasyRdf->getSupportedSerializations())) {
+            return $serializerFactoryEasyRdf->createSerializerFor($serialization);
         }
 
         return null;

@@ -130,6 +130,13 @@ abstract class AbstractTriplePatternStore implements Store
              */
             $statement = $this->getStatement($queryObject);
             return $this->getMatchingStatements($statement);
+        } elseif ('constructQuery' == $this->queryUtils->getQueryType($query)) {
+            /*
+             * CONSTRUCT query
+             * TODO how to handle it here?
+             */
+            $statement = $this->getStatement($queryObject);
+            return $this->getMatchingStatements($statement);
         } else {
             /*
              * Unsupported query

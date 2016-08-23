@@ -4,6 +4,9 @@ namespace Saft\Data;
 
 use Saft\Rdf\StatementIterator;
 
+/**
+ * @deprecated
+ */
 class NQuadsSerializerImpl implements Serializer
 {
     public function __construct($serialization)

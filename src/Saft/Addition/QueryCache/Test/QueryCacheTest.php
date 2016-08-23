@@ -14,6 +14,7 @@ use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Sparql\Result\ResultFactoryImpl;
+use Saft\Sparql\Result\StatementSetResultImpl;
 use Saft\Store\BasicTriplePatternStore;
 use Saft\Test\TestCase;
 use Zend\Cache\Storage\Adapter\Memory;
@@ -71,7 +72,7 @@ class QueryCacheTest extends TestCase
 
         // build testdata
         $statement = new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl());
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $statementIterator = new StatementSetResultImpl(array($statement));
 
         // assumption is that all given parameter will be returned
         $this->assertNull($this->fixture->addStatements($statementIterator, $this->testGraph, array(1)));
@@ -83,7 +84,7 @@ class QueryCacheTest extends TestCase
         $this->setExpectedException('\Exception');
 
         $statement = new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl());
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $statementIterator = new StatementSetResultImpl(array($statement));
 
         $this->fixture->addStatements($statementIterator);
     }
@@ -353,7 +354,7 @@ class QueryCacheTest extends TestCase
 
         // build testdata
         $statement = new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl());
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $statementIterator = new StatementSetResultImpl(array($statement));
 
         $options = array(1);
 
@@ -508,7 +509,7 @@ class QueryCacheTest extends TestCase
             new AnyPatternImpl('?p'),
             new AnyPatternImpl('?o')
         );
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $statementIterator = new StatementSetResultImpl(array($statement));
         $options = array(1);
 
         $query = 'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE { ?s ?p ?o }';
@@ -532,7 +533,7 @@ class QueryCacheTest extends TestCase
                     'method' => 'saveResult',
                     'parameter' => array(
                         'queryObject' => $queryObject,
-                        'result' => new ArrayStatementIteratorImpl(array())
+                        'result' => new StatementSetResultImpl(array())
                     )
                 ),
                 array(
@@ -583,7 +584,7 @@ class QueryCacheTest extends TestCase
 
         // build testdata
         $statement = new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl());
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $statementIterator = new StatementSetResultImpl(array($statement));
         $options = array(1);
 
         // save result of the function call
@@ -739,7 +740,7 @@ class QueryCacheTest extends TestCase
          * Invalidate everything via a invalidateByTriplePattern call
          */
         $statement = new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl());
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $statementIterator = new StatementSetResultImpl(array($statement));
 
         $this->fixture->invalidateByTriplePattern($statementIterator, $this->testGraph->getUri());
 
@@ -830,7 +831,7 @@ class QueryCacheTest extends TestCase
                     'method' => 'saveResult',
                     'parameter' => array(
                         'queryObject' => $queryObject,
-                        'result' => new ArrayStatementIteratorImpl(array())
+                        'result' => new StatementSetResultImpl(array())
                     )
                 ),
                 // invalidate previous saved result, if available
@@ -866,12 +867,12 @@ class QueryCacheTest extends TestCase
             new NamedNodeImpl('http://p/'),
             new NamedNodeImpl('http://o/')
         );
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $statementIterator = new StatementSetResultImpl(array($statement));
         $options = array(1);
 
         // assumption is that all given parameter will be returned
         $this->assertEquals(
-            new ArrayStatementIteratorImpl(array()),
+            new StatementSetResultImpl(array()),
             $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
         );
 
@@ -886,7 +887,7 @@ class QueryCacheTest extends TestCase
                                     'FILTER (str(?p) = "'. $statement->getPredicate()->getUri() .'") '.
                                     'FILTER (str(?o) = "'. $statement->getObject()->getUri() .'") '.
                                 '}',
-                    'result' => new ArrayStatementIteratorImpl(array()),
+                    'result' => new StatementSetResultImpl(array()),
                     'triple_pattern' => array(
                         $this->testGraph->getUri() .
                         $this->separator .'*'. $this->separator .'*'. $this->separator .'*' =>
@@ -916,12 +917,12 @@ class QueryCacheTest extends TestCase
             new NamedNodeImpl('http://p/'),
             new LiteralImpl('test literal')
         );
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $statementIterator = new StatementSetResultImpl(array($statement));
         $options = array(1);
 
         // assumption is that all given parameter will be returned
         $this->assertEquals(
-            new ArrayStatementIteratorImpl(array()),
+            new StatementSetResultImpl(array()),
             $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
         );
 
@@ -936,7 +937,7 @@ class QueryCacheTest extends TestCase
                                     'FILTER (str(?p) = "'. $statement->getPredicate()->getUri() .'") '.
                                     'FILTER (str(?o) = "'. $statement->getObject()->getValue() .'") '.
                                 '}',
-                    'result' => new ArrayStatementIteratorImpl(array()),
+                    'result' => new StatementSetResultImpl(array()),
                     'triple_pattern' => array(
                         $this->testGraph->getUri() .
                         $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
@@ -959,7 +960,7 @@ class QueryCacheTest extends TestCase
             new NamedNodeImpl('http://p/'),
             new LiteralImpl('test literal')
         );
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $statementIterator = new StatementSetResultImpl(array($statement));
         $options = array(1);
 
         $this->fixture->getMatchingStatements($statement, $this->testGraph, $options);
@@ -982,18 +983,18 @@ class QueryCacheTest extends TestCase
             new NamedNodeImpl('http://p/'),
             new NamedNodeImpl('http://o/')
         );
-        $statementIterator = new ArrayStatementIteratorImpl(array($statement));
+        $statementIterator = new StatementSetResultImpl(array($statement));
         $options = array(1);
 
         // assumption is that all given parameter will be returned
         $this->assertEquals(
-            new ArrayStatementIteratorImpl(array()),
+            new StatementSetResultImpl(array()),
             $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
         );
 
         // call getMatchingStatements again and see what happens
         $this->assertEquals(
-            new ArrayStatementIteratorImpl(array()),
+            new StatementSetResultImpl(array()),
             $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
         );
 
@@ -1009,7 +1010,7 @@ class QueryCacheTest extends TestCase
                                     'FILTER (str(?p) = "'. $statement->getPredicate()->getUri() .'") '.
                                     'FILTER (str(?o) = "'. $statement->getObject()->getUri() .'") '.
                                 '}',
-                    'result' => new ArrayStatementIteratorImpl(array()),
+                    'result' => new StatementSetResultImpl(array()),
                     'triple_pattern' => array(
                         $this->testGraph->getUri() .
                         $this->separator .'*'. $this->separator .'*'. $this->separator .'*'
@@ -1039,7 +1040,7 @@ class QueryCacheTest extends TestCase
 
         // assumption is that all given parameter will be returned
         $this->assertEquals(
-            new ArrayStatementIteratorImpl(array()),
+            new StatementSetResultImpl(array()),
             $this->fixture->getMatchingStatements($statement, $this->testGraph, $options)
         );
     }
@@ -1336,7 +1337,7 @@ class QueryCacheTest extends TestCase
         /**
          * Invalidate everything via a invalidateByTriplePattern call
          */
-        $statementIterator = new ArrayStatementIteratorImpl(
+        $statementIterator = new StatementSetResultImpl(
             array(new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl()))
         );
 
@@ -1383,7 +1384,7 @@ class QueryCacheTest extends TestCase
         $options = array();
 
         $this->assertEquals(
-            new ArrayStatementIteratorImpl(array()),
+            new StatementSetResultImpl(array()),
             $this->fixture->query($query, $options)
         );
     }
