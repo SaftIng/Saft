@@ -11,6 +11,8 @@ use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Skeleton\Data\SerializerFactory;
 use Saft\Sparql\Query\QueryUtils;
+use Saft\Sparql\Result\Result;
+use Saft\Sparql\Result\SetResult;
 use Saft\Sparql\Result\SetResultImpl;
 use Saft\Store\Store;
 use Symfony\Component\HttpFoundation\Request;
@@ -88,6 +90,7 @@ class SparqlEndpoint
              * check accept header
              */
             $negotiator = new Negotiator();
+            // what media types we do support
             $serverPriorities = array('application/x-turtle');
             $mediaType = $negotiator->getBest($request->headers->get('accept'), $serverPriorities);
             if (null !== $mediaType) {
@@ -113,14 +116,9 @@ class SparqlEndpoint
                 $query = urldecode($request->query->get('query'));
             }
 
-            $result = $this->store->query($query);
-            $queryType = $this->queryUtils->getQueryType($query);
+            $rawResult = $this->store->query($query);
 
-            if ('selectQuery' == $queryType || 'constructQuery' == $queryType) {
-                $result = $this->transformSetResultToResultSet($result);
-            } else {
-                throw new \Exception('TODO: implement non-select and non-construct query types');
-            }
+            $result = $this->transformResultToResultSet($rawResult, $query);
 
             $statusCode = 200;
 
@@ -142,24 +140,19 @@ class SparqlEndpoint
     }
 
     /**
-     * @param StatementIterator $result
+     * @param Result $result
      */
-    public function transformStatementIteratorToSetResult(StatementIterator $statementIterator)
+    public function transformResultToResultSet(Result $rawResult, $usedQuery)
     {
-        $setEntries = array();
+        $queryType = $this->queryUtils->getQueryType($usedQuery);
 
-        foreach ($statementIterator as $statement) {
-            $setEntries[] = array(
-                's' => $statement->getSubject(),
-                'p' => $statement->getPredicate(),
-                'o' => $statement->getObject()
-            );
+        if ('selectQuery' == $queryType) {
+            return $this->transformSetResultToResultSet($rawResult);
+        } elseif ('constructQuery' == $queryType) {
+            return $this->transformStatementSetResulttoSetResult($rawResult);
+        } else {
+            throw new \Exception('TODO: implement non-select and non-construct query types');
         }
-
-        $result = new SetResultImpl($setEntries);
-        $result->setVariables(array('s', 'p', 'o'));
-
-        return $result;
     }
 
     /**
@@ -168,8 +161,8 @@ class SparqlEndpoint
     public function transformSetResultToResultSet($_result)
     {
         // transform StatementSetResult to SetResult instance
-        if ($_result instanceof StatementSetResult && $_result->isStatementSetResult()) {
-            $result = $_result->toSetResult();
+        if ($_result instanceof SetResult && true == $_result->isStatementSetResult()) {
+            $result = $this->transformStatementSetResulttoSetResult($_result);
         } else if ($_result instanceof StatementIterator) {
             $result = $this->transformStatementIteratorToSetResult($_result);
         } else if ($_result instanceof SetResult) {
@@ -263,5 +256,51 @@ class SparqlEndpoint
         }
 
         return new ArrayStatementIteratorImpl($statements);
+    }
+
+    /**
+     * @param StatementIterator $result
+     */
+    public function transformStatementIteratorToSetResult(StatementIterator $statementIterator)
+    {
+        $setEntries = array();
+
+        foreach ($statementIterator as $statement) {
+            $setEntries[] = array(
+                's' => $statement->getSubject(),
+                'p' => $statement->getPredicate(),
+                'o' => $statement->getObject()
+            );
+        }
+
+        $result = new SetResultImpl($setEntries);
+        $result->setVariables(array('s', 'p', 'o'));
+
+        return $result;
+    }
+
+    /**
+     * @param SetResult Instance of SetResult which is similar or equal to StatementSetResult.
+     * @return SetResult
+     */
+    public function transformStatementSetResulttoSetResult(SetResult $statementSetResult)
+    {
+        if ($statementSetResult->isSetResult()) {
+            return $statementSetResult;
+        }
+
+        $setEntries = array();
+
+        foreach ($statementSetResult as $statement) {
+            $setEntries[] = array(
+                's' => $statement->getSubject(),
+                'p' => $statement->getPredicate(),
+                'o' => $statement->getObject()
+            );
+        }
+
+        $result = new SetResultImpl($setEntries);
+        $result->setVariables(array('s', 'p', 'o'));
+        return $result;
     }
 }
