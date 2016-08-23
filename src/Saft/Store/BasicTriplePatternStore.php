@@ -11,6 +11,7 @@ use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
 use Saft\Sparql\Query\QueryFactory;
 use Saft\Sparql\Result\StatementSetResultImpl;
+use Saft\Sparql\Result\ValueResultImpl;
 use Saft\Store\AbstractTriplePatternStore;
 use Saft\Store\Store;
 
@@ -269,11 +270,80 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
             $graphUri = 'http://saft/defaultGraph/';
         }
 
-        // use hash to differenciate between statements (no doublings allowed)
-        $statementHash = hash('sha256', serialize($statement));
+        // exception if at least one statement is already stored, use according graphURI
+        if (0 < count($this->statements)) {
+            $graphs = array_keys($this->statements);
+            $graphUri = array_shift($graphs);
+        }
 
-        // check it
-        return isset($this->statements[$graphUri][$statementHash]);
+        // if statement consists if only concrete nodes, so no anypattern instances
+        if ($statement->isConcrete()) {
+            // use hash to differenciate between statements (no doublings allowed)
+            $statementHash = hash('sha256', serialize($statement));
+            return new ValueResultImpl(isset($this->statements[$graphUri][$statementHash]));
+
+        } else {
+            // if at least one any pattern instance is part of the list
+            $sMatches = false;
+            $pMatches = false;
+            $oMatches = false;
+            $relevantStatements = $_relevantStatements = array();
+
+            // check if there is one statement which has the given subject
+            if ($statement->getSubject()->isPattern()) {
+                $sMatches = true;
+                $relevantStatements = $this->statements[$graphUri];
+            } else {
+                foreach ($this->statements[$graphUri] as $storedStatement) {
+                    if ($statement->getSubject()->equals($storedStatement->getSubject())) {
+                        $sMatches = true;
+                        $relevantStatements[] = $storedStatement;
+                    }
+                }
+                if (false == $sMatches) {
+                    return new ValueResultImpl(false);
+                }
+            }
+
+            // check if there is one statement which has the given predicate
+            if ($statement->getPredicate()->isPattern()) {
+                $pMatches = true;
+            } else {
+                foreach ($relevantStatements as $statementWithMatchedSubject) {
+                    if ($statement->getPredicate()->equals($statementWithMatchedSubject->getPredicate())) {
+                        $pMatches = true;
+                        $_relevantStatements[] = $statementWithMatchedSubject;
+                    }
+                }
+                if (false == $pMatches) {
+                    return new ValueResultImpl(false);
+                }
+
+                // now are in $relevantStatements all statements with matches subject and predicate
+                $relevantStatements = $_relevantStatements;
+            }
+
+            // check if there is one statement which has the given object
+            if ($statement->getObject()->isPattern()) {
+                $oMatches = true;
+            } else {
+                foreach ($relevantStatements as $stmtWithMatchedSubjectAndPredicate) {
+                    if ($statement->getObject()->equals($stmtWithMatchedSubjectAndPredicate->getObject())) {
+                        $oMatches = true;
+
+                        // we found at least one S P O, lets stop and return true
+                        break;
+                    }
+                }
+                if (false == $oMatches) {
+                    return new ValueResultImpl(false);
+                }
+
+                $relevantStatements = $_relevantStatements;
+            }
+
+            return new ValueResultImpl($sMatches && $pMatches && $oMatches);
+        }
     }
 
     /**
