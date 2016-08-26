@@ -45,4 +45,15 @@ class ParserFactory
 
         return null;
     }
+
+    /**
+     * Returns supported serializations of all used parsers.
+     *
+     * @return array
+     */
+    public function getSupportedSerializations()
+    {
+        $easyRdfParserFactory = new ParserFactoryEasyRdf($this->nodeFactory, $this->statementFactory);
+        return $easyRdfParserFactory->getSupportedSerializations();
+    }
 }

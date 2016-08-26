@@ -17,9 +17,9 @@ use Saft\Store\Store;
 class FileImporter
 {
     /**
-     * @var Parser
+     * @var array of Parser
      */
-    protected $parser;
+    protected $parsers;
 
     /**
      * @var ParserFactory
@@ -38,25 +38,36 @@ class FileImporter
     {
         $this->store = $store;
 
+        $this->parsers = array();
+
         // create suitable parser
         $this->parserFactory = new ParserFactory(new NodeFactoryImpl(), new StatementFactoryImpl());
-        $this->parser = $this->parserFactory->createParserFor('n-triples');
+    }
+
+    /**
+     * Don't use it anymore, will be removed soon.
+     *
+     * @deprecated
+     */
+    public function getFileSerialization($file)
+    {
+        return $this->getSerialization($file);
     }
 
     /**
      * @param string|resource $file
      * @throws \Exception if parameter $file is not of type string or resource.
      */
-    public function getFileSerialization($file)
+    public function getSerialization($file)
     {
         $format = null;
 
         if (is_resource($file)) {
-            $format = \EasyRdf_Format::guessFormat(fread($file, 1024));
+            $format = \EasyRdf_Format::guessFormat('', fread($file, 1024));
             // set file pointer to position 0;
             rewind($file);
         } elseif (is_string($file)) {
-            $format = \EasyRdf_Format::guessFormat('', $file);
+            $format = \EasyRdf_Format::guessFormat($file);
         } else {
             throw new \Exception('Parameter $file must be of type string or resource.');
         }
@@ -103,10 +114,10 @@ class FileImporter
             throw new \Exception('Parameter $file must be of type string or resource.');
         }
 
-        $fileSerialization = $this->getFileSerialization($file);
+        $serialization = $this->getFileSerialization($file);
 
-        if ('n-triples' !== $fileSerialization) {
-            throw new \Exception('Currently only n-triple files can be imported. Yours is: '. $fileSerialization);
+        if (null == $serialization) {
+            throw new \Exception('Your file/string has an unknown serialization: '. $serialization);
         }
 
         try {
@@ -122,14 +133,14 @@ class FileImporter
                 // after the threshold was reached, import collected lines
                 // and reset line counter
                 if (++$collectedLineNumber == $containerSize) {
-                    $this->importString($collectedLines, $graph);
+                    $this->importString($collectedLines, $graph, $serialization);
                     $collectedLines = '';
                     $collectedLineNumber = 0;
                 }
             }
 
             // import remaining lines also
-            $this->importString($collectedLines, $graph);
+            $this->importString($collectedLines, $graph, $serialization);
 
             if ($locallyOpened) {
                 fclose ($file);
@@ -151,12 +162,21 @@ class FileImporter
      *
      * @param string $string
      * @param NamedNode $graph
+     * @param string $serialization
      * @throws \Exception if parameter $graph is null.
      */
-    public function importString($string, $graph)
+    public function importString($string, $graph, $serialization = 'n-triples')
     {
+        if (in_array($serialization, $this->parserFactory->getSupportedSerializations())) {
+            if (false == isset($this->parsers[$serialization])) {
+                $this->parsers[$serialization] = $this->parserFactory->createParserFor($serialization);
+            }
+        } else {
+            throw new \Exception('Given serialization is unknown: '. $serialization);
+        }
+
         // parse string
-        $iterator = $this->parser->parseStringToIterator($string);
+        $iterator = $this->parsers[$serialization]->parseStringToIterator($string);
 
         // import its statements into the store
         $this->store->addStatements($iterator, $graph);
