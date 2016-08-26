@@ -2,14 +2,14 @@
 
 namespace Saft\Skeleton\Test\Unit\SparqlEndpoint;
 
-use Saft\Skeleton\Data\SerializerFactory;
-use Saft\Skeleton\SparqlEndpoint\SparqlEndpoint;
-use Saft\Skeleton\Test\TestCase;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
+use Saft\Skeleton\Data\SerializerFactory;
+use Saft\Skeleton\SparqlEndpoint\SparqlEndpoint;
+use Saft\Skeleton\Test\TestCase;
 use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Sparql\Query\QueryUtils;
 use Saft\Store\BasicTriplePatternStore;
