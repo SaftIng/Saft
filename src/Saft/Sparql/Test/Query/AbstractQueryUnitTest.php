@@ -559,6 +559,29 @@ class AbstractQueryUnitTest extends TestCase
         );
     }
 
+    public function testExtractTriplePatternUrisWithUnderscore()
+    {
+        $this->assertEquals(
+            array(
+                array(
+                    's' => 'http://aksw.org/Partner/TomTom_pl',
+                    'p' => 'http://example.org/prop_1',
+                    'o' => 'http://example.org/value_1',
+                    's_type' => 'uri',
+                    'p_type' => 'uri',
+                    'o_type' => 'uri',
+                    'o_datatype' => null,
+                    'o_lang' => null
+                )
+            ),
+            $this->fixture->extractTriplePattern(
+                '<http://aksw.org/Partner/TomTom_pl> ' .
+                '<http://example.org/prop_1> ' .
+                '<http://example.org/value_1> .'
+            )
+        );
+    }
+
     public function testExtractTriplePatternVariables()
     {
         $this->assertEquals(
