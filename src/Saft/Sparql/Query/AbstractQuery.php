@@ -582,7 +582,7 @@ abstract class AbstractQuery implements Query
              * Subject part
              */
             '(' .
-            '\<[a-z0-9\.\/\:#\-]+\>|' . // e.g. <http://foobar/a>
+            '\<[a-z0-9\.\/\:#\-_]+\>|' . // e.g. <http://foobar/a>
             '\?[a-z0-9\_]+|' .          // e.g. ?s
             '[a-z0-9]+\:[a-z0-9]+|' .   // e.g. rdfs:label
             '_:[a-z0-9]+' .             // e.g. _:foo
@@ -591,7 +591,7 @@ abstract class AbstractQuery implements Query
              * Predicate part
              */
             '(' .
-            '\<[a-z0-9\.\/\:#\-]+\>|' . // e.g. <http://foobar/a>
+            '\<[a-z0-9\.\/\:#\-_]+\>|' . // e.g. <http://foobar/a>
             '\?[a-z0-9\_]+|' .          // e.g. ?s
             '[a-z0-9]+\:[a-z0-9]+' .    // e.g. rdfs:label
             ')\s*' .
@@ -599,7 +599,7 @@ abstract class AbstractQuery implements Query
              * Object part
              */
             '(' .
-            '\<[a-zA-Z0-9\.\/\:#\-]+\>|' .            // e.g. <http://foobar/a>
+            '\<[a-zA-Z0-9\.\/\:#\-_]+\>|' .            // e.g. <http://foobar/a>
             '[a-z0-9]+\:[a-z0-9]+|' .                 // e.g. rdfs:label
             '\?[a-z0-9\_]+|' .                        // e.g. ?s
             '\".*\"[\s|\.|\}]|' .                     // e.g. "Foo"
