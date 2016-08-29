@@ -79,4 +79,15 @@ class NodeUtils
         $regEx = '/^([a-zA-Z][a-zA-Z0-9+.-]+):([^\x00-\x0f\x20\x7f<>{}|\[\]`"^\\\\])+$/';
         return (1 === preg_match($regEx, (string)$string));
     }
+
+    public function encodeStringLitralForNQuads($s)
+    {
+        $s = str_replace('\\', '\\\\', $s);
+        $s = str_replace("\t", '\t', $s);
+        $s = str_replace("\n", '\n', $s);
+        $s = str_replace("\r", '\r', $s);
+        $s = str_replace('"', '\"', $s);
+
+        return $s;
+    }
 }

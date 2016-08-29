@@ -2,6 +2,8 @@
 
 namespace Saft\Rdf;
 
+use Saft\Rdf\NodeUtils;
+
 /**
  * @api
  * @since 0.1
@@ -122,7 +124,9 @@ abstract class AbstractLiteral implements Literal
      */
     public function toNQuads()
     {
-        $string = '"' . $this->getValue() . '"';
+        $nodeUtils = new NodeUtils();
+
+        $string = '"' . $nodeUtils->encodeStringLitralForNQuads($this->getValue()) . '"';
 
         if ($this->getLanguage() !== null) {
             $string .= '@' . $this->getLanguage();
@@ -132,4 +136,6 @@ abstract class AbstractLiteral implements Literal
 
         return $string;
     }
+
+
 }
