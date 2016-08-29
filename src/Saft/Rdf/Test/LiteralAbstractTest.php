@@ -352,6 +352,23 @@ abstract class LiteralAbstractTest extends TestCase
         );
     }
 
+    public function testToNTEscaping()
+    {
+        // https://www.w3.org/TR/n-quads/#sec-grammar
+        // STRING_LITERAL_QUOTE ::= '"' ([^#x22#x5C#xA#xD] | ECHAR | UCHAR)* '"'
+        // #x22 = "
+        // #x5C = \
+        // #xA = LF
+        // #xD = CR
+
+        $fixture = $this->newInstance("foo \" \\ \n \r");
+
+        $this->assertEquals(
+            '"foo \" \\\\ \n \r"^^<http://www.w3.org/2001/XMLSchema#string>',
+            $fixture->toNQuads()
+        );
+    }
+
     /*
      * Tests for toString
      */
