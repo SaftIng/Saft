@@ -139,7 +139,7 @@ class SparqlEndpoint
             // https://www.w3.org/TR/sparql11-protocol/#query-failure
             // TODO distinguish between "SPARQL update request string is not a legal sequence of characters"
             //      and "if the service fails to execute the update request"
-            $statusCode = Response::HTTP_OK < $e->getCode()
+            $statusCode = Response::HTTP_OK < $e->getCode() && $e->getCode() < 600
                 ? $e->getCode()
                 : Response::HTTP_INTERNAL_SERVER_ERROR;
             $content = $e->getMessage();
@@ -149,9 +149,9 @@ class SparqlEndpoint
     }
 
     /**
-     * @param Result $result
+     * @param Result|boolean $result
      */
-    public function transformResultToResultSet(Result $rawResult, $usedQuery)
+    public function transformResultToResultSet($rawResult, $usedQuery)
     {
         $queryType = $this->queryUtils->getQueryType($usedQuery);
 
@@ -337,7 +337,7 @@ class SparqlEndpoint
      * @param ValueResult $result
      * @return StatementIterator
      */
-    public function transformValueResultToResultSet(ValueResult $result)
+    public function transformValueResultToResultSet($result)
     {
         $statements = array();
         $resultSetNode = new BlankNodeImpl('ResultSet');
@@ -355,7 +355,7 @@ class SparqlEndpoint
             $resultSetNode,
             new NamedNodeImpl('http://www.w3.org/2005/sparql-results#boolean'),
             new LiteralImpl(
-                true === $result->getValue() ? 'true' : 'false',
+                true === $result ? 'true' : 'false',
                 new NamedNodeImpl('http://www.w3.org/2001/XMLSchema#boolean')
             )
         );
