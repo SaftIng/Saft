@@ -58,16 +58,16 @@ class FileImporter
      * @param string|resource $file
      * @throws \Exception if parameter $file is not of type string or resource.
      */
-    public function getSerialization($file)
+    public function getSerialization($target)
     {
         $format = null;
 
-        if (is_resource($file)) {
-            $format = \EasyRdf_Format::guessFormat('', fread($file, 1024));
+        if (is_resource($target)) {
+            $format = \EasyRdf_Format::guessFormat(fread($target, 1024));
             // set file pointer to position 0;
-            rewind($file);
-        } elseif (is_string($file)) {
-            $format = \EasyRdf_Format::guessFormat($file);
+            rewind($target);
+        } elseif (is_string($target)) {
+            $format = \EasyRdf_Format::guessFormat($target);
         } else {
             throw new \Exception('Parameter $file must be of type string or resource.');
         }
