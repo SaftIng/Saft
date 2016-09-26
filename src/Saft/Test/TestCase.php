@@ -234,8 +234,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             $this->assertSetIteratorEquals($expected, $actual);
 
         // statement result
-        } elseif ($expected->isStatementSetResult()) {
-            $this->assertStatementIteratorEquals($expected->getIterator(), $actual->getIterator());
+        } elseif ($actual->isStatementSetResult() && $expected->isStatementSetResult()) {
+            $this->assertStatementIteratorEquals($expected, $actual);
 
         // value result
         } elseif ($expected->isValueResult()) {

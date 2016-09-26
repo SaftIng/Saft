@@ -45,9 +45,6 @@ class ARC2Test extends StoreAbstractTest
         }
     }
 
-    /**
-     *
-     */
     public function tearDown()
     {
         if (null !== $this->fixture) {
@@ -79,6 +76,7 @@ class ARC2Test extends StoreAbstractTest
      * Tests openConnection
      */
 
+    // expect exception because of missing database
     public function testOpenConnectionCheckDatabase()
     {
         $this->setExpectedException('Exception');
@@ -93,6 +91,7 @@ class ARC2Test extends StoreAbstractTest
         );
     }
 
+    // expect exception because of missing host
     public function testOpenConnectionCheckHost()
     {
         $this->setExpectedException('Exception');
@@ -107,6 +106,7 @@ class ARC2Test extends StoreAbstractTest
         );
     }
 
+    // expect exception because of missing username
     public function testOpenConnectionCheckUsername()
     {
         $this->setExpectedException('Exception');
@@ -130,5 +130,81 @@ class ARC2Test extends StoreAbstractTest
     {
         // See: https://github.com/openlink/virtuoso-opensource/issues/417
         $this->markTestSkipped('ARC2 does not grant read and write access to the default graph.');
+    }
+
+    /**
+     * Further test cases
+     */
+
+    // tests, if the adapter successfully removed all triples after a dropGraph call
+    // related to https://github.com/SaftIng/Saft/issues/72
+    public function testRemovalOfTriplesAfterDropGraph()
+    {
+        /*
+         * Count rows of all relevant ARC2 tables
+         */
+        $tablesToCheck = array();
+        $tablesToCheck[] = $this->configuration['arc2Config']['table-prefix'] . '_g2t';
+        $tablesToCheck[] = $this->configuration['arc2Config']['table-prefix'] . '_id2val';
+        $tablesToCheck[] = $this->configuration['arc2Config']['table-prefix'] . '_o2val';
+        $tablesToCheck[] = $this->configuration['arc2Config']['table-prefix'] . '_s2val';
+        $tablesToCheck[] = $this->configuration['arc2Config']['table-prefix'] . '_triple';
+
+        $rowCount = array();
+        foreach ($tablesToCheck as $table) {
+            $rowCount[$table] = $this->fixture->getRowCount($table);
+
+            // hacky, but neccessary, because for each test we first remove the testgraph and create it new.
+            // but after this test, we remove it, so the first entries from before are gone too. thats the
+            // reason why the number of entries differ.
+            if ($this->configuration['arc2Config']['table-prefix'] . '_g2t' == $table) {
+                --$rowCount[$table];
+            } elseif ($this->configuration['arc2Config']['table-prefix'] . '_id2val' == $table) {
+                --$rowCount[$table];
+            }
+        }
+
+        // add test triples to graph
+        $this->fixture->addStatements(
+            array(
+                new StatementImpl(
+                    $this->testGraph,
+                    $this->testGraph,
+                    $this->testGraph,
+                    $this->testGraph
+                ),
+                new StatementImpl(
+                    $this->testGraph,
+                    new NamedNodeImpl('http://foobar/1'),
+                    new NamedNodeImpl('http://foobar/2'),
+                    $this->testGraph
+                )
+            )
+        );
+
+        // check that the graph contains 1 triple
+        $statements = $this->fixture->getMatchingStatements(new StatementImpl(
+            new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl(), $this->testGraph
+        ), $this->testGraph);
+        $this->assertCountStatementIterator(2, $statements);
+
+        // drop graph
+        $this->fixture->dropGraph($this->testGraph);
+
+        // check via API for matching statements of this graph
+        $statements = $this->fixture->getMatchingStatements(new StatementImpl(
+            new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl(), $this->testGraph
+        ), $this->testGraph);
+        $this->assertCountStatementIterator(0, $statements);
+
+        // check tables manually, that they only contain as many rows as before this test
+        foreach ($tablesToCheck as $table) {
+            $this->assertEquals(
+                $this->fixture->getRowCount($table),
+                $rowCount[$table],
+                'In table '. $table .' are more rows as before this test, which means some were '.
+                'not removed properly.'
+            );
+        }
     }
 }
