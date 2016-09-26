@@ -3,11 +3,12 @@
 namespace Saft\Sparql\Result;
 
 use Saft\Rdf\Statement;
+use Saft\Rdf\StatementIterator;
 
 /**
  * This class is a certain kind of SetResult, it only contains Statements.
  */
-class StatementSetResultImpl extends SetResultImpl
+class StatementSetResultImpl extends SetResultImpl implements StatementIterator
 {
     /**
      * Constructor.

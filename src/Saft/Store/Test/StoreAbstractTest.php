@@ -350,7 +350,7 @@ abstract class StoreAbstractTest extends TestCase
      * Tests for dropGraph
      */
 
-    // We can drop the graph and create a graph, but we can't asume any action since a store might
+    // We can drop the graph and create a graph, but we can't assume any action since a store might
     // not support empty graphs.
     public function testDropGraph()
     {
@@ -583,7 +583,8 @@ abstract class StoreAbstractTest extends TestCase
     {
         $this->fixture->createGraph($this->testGraph);
 
-        // FYI: $availableGraphs is an array containing graph URI strings as key and a respective NamedNode as value.
+        // FYI: $availableGraphs is an array containing graph URI strings as key and a
+        // respective NamedNode as value.
         $availableGraphs = $this->fixture->getGraphs();
 
         $graphUri = $this->testGraph->getUri();
@@ -1008,7 +1009,7 @@ abstract class StoreAbstractTest extends TestCase
 
         $resultFactory = new ResultFactoryImpl();
 
-        $this->assertEquals(
+        $this->assertResultEquals(
             $resultFactory->createStatementResult(array(
                 new StatementImpl(
                     new NamedNodeImpl('http://saft/testquad/p1'),
@@ -1021,7 +1022,9 @@ abstract class StoreAbstractTest extends TestCase
                     new NamedNodeImpl('http://saft/testtriple/o2')
                 )
             )),
-            $this->fixture->query('CONSTRUCT { ?p1 ?s1 ?o1 } FROM <'. $this->testGraph->getUri() .'> WHERE {?s1 ?p1 ?o1.}')
+            $this->fixture->query(
+                'CONSTRUCT { ?p1 ?s1 ?o1 } FROM <'. $this->testGraph->getUri() .'> WHERE {?s1 ?p1 ?o1.}'
+            )
         );
     }
 
@@ -1032,7 +1035,9 @@ abstract class StoreAbstractTest extends TestCase
 
         $this->assertEquals(
             new EmptyResultImpl(),
-            $this->fixture->query('CONSTRUCT { ?p1 ?s1 ?o1 } FROM <'. $this->testGraph->getUri() .'> WHERE {?s1 ?p1 ?o1.}')
+            $this->fixture->query(
+                'CONSTRUCT { ?p1 ?s1 ?o1 } FROM <'. $this->testGraph->getUri() .'> WHERE {?s1 ?p1 ?o1.}'
+            )
         );
     }
 

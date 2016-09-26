@@ -252,24 +252,81 @@ class ARC2 extends AbstractSparqlStore
         // table names
         $g2t = $this->configuration['table-prefix'] . '_g2t';
         $id2val = $this->configuration['table-prefix'] . '_id2val';
+        $s2val = $this->configuration['table-prefix'] . '_s2val';
+        $o2val = $this->configuration['table-prefix'] . '_o2val';
+        $triple = $this->configuration['table-prefix'] . '_triple';
 
         /*
-         * ask for all entries with the given graph URI
+         * get ID of the graph entry
+         */
+        $query = 'SELECT id FROM '. $id2val .' WHERE val = "'. $graph->getUri() .'"';
+        $result = $this->store->queryDB($query, $this->store->getDBCon());
+        $graphIds = array();
+        while ($row = $result->fetch_assoc()) {
+            $graphIds[] = $row['id'];
+        }
+
+        if (0 == count($graphIds)) {
+            new \Exception('Graph does not exist anymore: ' . $graph->getUri());
+        }
+
+        /*
+         * get ID of the graph to drop
          */
         $query = 'SELECT id FROM '. $id2val .' WHERE val = "'. $graph->getUri() .'"';
         $result = $this->store->queryDB($query, $this->store->getDBCon());
 
         /*
-         * go through all given entries and remove all according entries in the g2t table
+         * remove according data
          */
-        while ($row = $result->fetch_assoc()) {
-            $query = 'DELETE FROM '. $g2t .' WHERE t="'. $row['id'] .'"';
-            $this->store->queryDB($query, $this->store->getDBCon());
+        $id2ValRow = $result->fetch_assoc();
+
+        // get all t-values by given g-value in g2t
+        $g2tEntries = $this->store->queryDB(
+            'SELECT t FROM '. $g2t .' WHERE g="'. $id2ValRow['id'] .'"',
+            $this->store->getDBCon()
+        );
+
+        // get all s-, p- and o-values by given t-value
+        $tripleTs = array();
+        while ($g2tRow = $g2tEntries->fetch_assoc()) {
+            $tripleTs[] = $g2tRow['t'];
         }
 
-        // remove entry/entries in the id2val table too
-        $query = 'DELETE FROM '. $id2val .' WHERE val = "'. $graph->getUri() .'"';
-        $this->store->queryDB($query, $this->store->getDBCon());
+        // no triples to remove
+        if (0 == count($tripleTs)) {
+            return;
+        }
+
+        $tripleEntries = $this->store->queryDB(
+            'SELECT s, p, o, o_lang_dt FROM '. $triple .' WHERE t IN ('. implode(',', $tripleTs) .')',
+            $this->store->getDBCon()
+        );
+
+        // remove id2val entries by $row['id'] and s- and p-value
+        $this->store->queryDB('DELETE FROM '. $id2val .' WHERE id = '. $id2ValRow['id'], $this->store->getDBCon());
+
+        // remove g2t entries by given g-value
+        $this->store->queryDB('DELETE FROM '. $g2t .' WHERE g = '. $id2ValRow['id'], $this->store->getDBCon());
+
+        // remove triple entries by given t-value
+        foreach ($tripleTs as $id) {
+            $this->store->queryDB('DELETE FROM '. $triple .' WHERE t = '. $id, $this->store->getDBCon());
+        }
+
+        foreach ($tripleEntries as $entry) {
+            // remove s2val entries by given s-value
+            $this->store->queryDB('DELETE FROM '. $s2val .' WHERE id = '. $entry['s'], $this->store->getDBCon());
+
+            // remove id2val entriey by p-value or o_lang_dt
+            $this->store->queryDB(
+                'DELETE FROM '. $id2val .' WHERE id = '. $entry['p'] . ' OR id = ' . $entry['o_lang_dt'],
+                $this->store->getDBCon()
+            );
+
+            // remove o2val entries by given o-value
+            $this->store->queryDB('DELETE FROM '. $o2val .' WHERE id = '. $entry['o'], $this->store->getDBCon());
+        }
     }
 
     /**
@@ -278,6 +335,14 @@ class ARC2 extends AbstractSparqlStore
     public function emptyAllTables()
     {
         $this->store->reset();
+    }
+
+    /**
+     * Returns the currently active connection to the database.
+     */
+    public function getConnection()
+    {
+        return $this->store->getDBCon();
     }
 
     /**
@@ -320,7 +385,7 @@ class ARC2 extends AbstractSparqlStore
      * @param  string $tableName
      * @return int Number of rows in the target table.
      */
-    protected function getRowCount($tableName)
+    public function getRowCount($tableName)
     {
         $result = $this->store->queryDB(
             'SELECT COUNT(*) as count FROM '. $tableName,
@@ -328,6 +393,16 @@ class ARC2 extends AbstractSparqlStore
         );
         $row = $result->fetch_assoc();
         return $row['count'];
+    }
+
+    /**
+     * Allows access of the ARC2 instance.
+     *
+     * @return ARC2_Store
+     */
+    public function getStore()
+    {
+        return $this->store;
     }
 
     /**
@@ -411,6 +486,7 @@ class ARC2 extends AbstractSparqlStore
             '/selectcount\([a-z*]\)(from|where)/si',
             preg_replace('/\s+/', '', $query) // remove all whitespaces
         );
+
         if (1 == $countCheck) {
             $variable = 'callret-0';
             // build a set result, because the user expects it as result type because a SELECT query
@@ -494,6 +570,36 @@ class ARC2 extends AbstractSparqlStore
                     'DELETE FROM <'. $quad['g'] .'> {'. $s .' '. $p .' '. $o .' }
                     WHERE {'. $s .' '. $p .' '. $o .' }'
                 );
+            }
+
+        /**
+         * CONSTRUCT query
+         */
+        } elseif ('constructQuery' === $this->queryUtils->getQueryType($query)) {
+            $statements = array();
+            foreach ($result['result'] as $subjectUri => $predicates) {
+                foreach ($predicates as $predicateUri => $objects) {
+                    foreach ($objects as $objectArray) {
+                        // is subject blank node or not
+                        if ('_:' == substr($subjectUri, 0, 2)) {
+                            $subjectNode = $this->nodeFactory->createBlankNode($subjectUri);
+                        } else {
+                            $subjectNode = $this->nodeFactory->createNamedNode($subjectUri);
+                        }
+
+                        $statements[] = $this->statementFactory->createStatement(
+                            $subjectNode,
+                            $this->nodeFactory->createNamedNode($predicateUri),
+                            $this->transformEntryToNode($objectArray)
+                        );
+                    }
+                }
+            }
+
+            if (0 == count($statements)) {
+                return $this->resultFactory->createEmptyResult();
+            } else {
+                return $this->resultFactory->createStatementResult($statements);
             }
 
         /*
