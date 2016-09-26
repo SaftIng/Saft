@@ -280,7 +280,7 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
         if ($statement->isConcrete()) {
             // use hash to differenciate between statements (no doublings allowed)
             $statementHash = hash('sha256', serialize($statement));
-            return new ValueResultImpl(isset($this->statements[$graphUri][$statementHash]));
+            return isset($this->statements[$graphUri][$statementHash]);
 
         } else {
             // if at least one any pattern instance is part of the list
@@ -292,7 +292,9 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
             // check if there is one statement which has the given subject
             if ($statement->getSubject()->isPattern()) {
                 $sMatches = true;
-                $relevantStatements = $this->statements[$graphUri];
+                if (isset($this->statements[$graphUri])) {
+                    $relevantStatements = $this->statements[$graphUri];
+                }
             } else {
                 foreach ($this->statements[$graphUri] as $storedStatement) {
                     if ($statement->getSubject()->equals($storedStatement->getSubject())) {
@@ -301,7 +303,7 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
                     }
                 }
                 if (false == $sMatches) {
-                    return new ValueResultImpl(false);
+                    return true;
                 }
             }
 
@@ -316,7 +318,7 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
                     }
                 }
                 if (false == $pMatches) {
-                    return new ValueResultImpl(false);
+                    return false;
                 }
 
                 // now are in $relevantStatements all statements with matches subject and predicate
@@ -336,13 +338,13 @@ class BasicTriplePatternStore extends AbstractTriplePatternStore
                     }
                 }
                 if (false == $oMatches) {
-                    return new ValueResultImpl(false);
+                    return false;
                 }
 
                 $relevantStatements = $_relevantStatements;
             }
 
-            return new ValueResultImpl($sMatches && $pMatches && $oMatches);
+            return $sMatches && $pMatches && $oMatches;
         }
     }
 
