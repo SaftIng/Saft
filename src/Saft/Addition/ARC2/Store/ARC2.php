@@ -663,7 +663,17 @@ class ARC2 extends AbstractSparqlStore
                             break;
 
                         case 'uri':
-                            $newEntry[$variable] = $this->nodeFactory->createNamedNode($row[$variable]);
+                            // ARC2 seems to think that an email is a valid URI.
+                            if ($this->nodeUtils->simpleCheckURI($row[$variable])
+                                || $this->nodeUtils->simpleCheckBlankNodeId($row[$variable])) {
+                                $newEntry[$variable] = $this->nodeFactory->createNamedNode($row[$variable]);
+                            // we force such things as literal
+                            } else {
+                                $newEntry[$variable] = $this->nodeFactory->createLiteral(
+                                    $row[$variable],
+                                    'http://www.w3.org/2001/XMLSchema#string'
+                                );
+                            }
                             break;
                     }
                 }
