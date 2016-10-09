@@ -43,6 +43,9 @@ class NodeUtils
             case 'literal':
                 return $nodeFactory->createLiteral($value, $datatype, $language);
 
+            case 'typed-literal':
+                return $nodeFactory->createLiteral($value, $datatype, $language);
+
             case 'var':
                 return $nodeFactory->createAnyPattern();
 

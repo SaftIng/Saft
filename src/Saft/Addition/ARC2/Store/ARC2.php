@@ -3,10 +3,12 @@
 namespace Saft\Addition\ARC2\Store;
 
 use Saft\Rdf\NamedNode;
+use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\Statement;
+use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
@@ -14,7 +16,7 @@ use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
 use Saft\Sparql\Query\QueryUtils;
-use Saft\Sparql\Result\EmptyResult;
+use Saft\Sparql\Result\EmptyResultImpl;
 use Saft\Sparql\Result\ResultFactory;
 use Saft\Sparql\Result\SetResult;
 use Saft\Sparql\Result\ValueResult;
@@ -546,7 +548,6 @@ class ARC2 extends AbstractSparqlStore
                     $quad['s'],
                     $quad['s_type']
                 );
-                $s = $this->sparqlUtils->getNodeInSparqlFormat($s);
 
                 // predicate
                 $p = $this->nodeUtils->createNodeInstance(
@@ -554,7 +555,6 @@ class ARC2 extends AbstractSparqlStore
                     $quad['p'],
                     $quad['p_type']
                 );
-                $p = $this->sparqlUtils->getNodeInSparqlFormat($p);
 
                 // object
                 $o = $this->nodeUtils->createNodeInstance(
@@ -564,15 +564,58 @@ class ARC2 extends AbstractSparqlStore
                     $quad['o_datatype'],
                     $quad['o_lang']
                 );
-                $o = $this->sparqlUtils->getNodeInSparqlFormat($o);
 
-                return $this->query(
-                    'DELETE FROM <'. $quad['g'] .'> {'. $s .' '. $p .' '. $o .' }
-                    WHERE {'. $s .' '. $p .' '. $o .' }'
-                );
+                $this->deleteMatchingStatements(new StatementImpl($s, $p, $o, new NamedNodeImpl($quad['g'])));
             }
 
-        /**
+            return new EmptyResultImpl();
+
+        /*
+         * Add support for INSERT DATA queries. Transform them to INSERT INTO queries so that ARC2 can understand them.
+         */
+        } elseif (
+            $queryObject->isUpdateQuery() &&
+            isset($queryParts['quad_pattern']) &&
+            'insertData' === $queryParts['sub_type']
+        ) {
+            $statements = array();
+
+            foreach ($queryParts['quad_pattern'] as $quad) {
+                if ('uri' != $quad['g_type']) {
+                    throw new \Exception('The graph of a quad must be an URI here.');
+                }
+
+                // subject
+                $s = $this->nodeUtils->createNodeInstance(
+                    $this->nodeFactory,
+                    $quad['s'],
+                    $quad['s_type']
+                );
+
+                // predicate
+                $p = $this->nodeUtils->createNodeInstance(
+                    $this->nodeFactory,
+                    $quad['p'],
+                    $quad['p_type']
+                );
+
+                // object
+                $o = $this->nodeUtils->createNodeInstance(
+                    $this->nodeFactory,
+                    $quad['o'],
+                    $quad['o_type'],
+                    $quad['o_datatype'],
+                    $quad['o_lang']
+                );
+
+                $statements[] = new StatementImpl($s, $p, $o, new NamedNodeImpl($quad['g']));
+            }
+
+            $this->addStatements($statements);
+
+            return new EmptyResultImpl();
+
+        /*
          * CONSTRUCT query
          */
         } elseif ('constructQuery' === $this->queryUtils->getQueryType($query)) {

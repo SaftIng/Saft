@@ -107,7 +107,15 @@ class AbstractTriplePatternStoreTest extends TestCase
 
         $resultStatements = $this->fixture->getMatchingStatements($statement);
 
-        $this->assertEquals($statement, $resultStatements->current());
+        $this->assertEquals(
+            new StatementImpl(
+                $statement->getSubject(),
+                $statement->getPredicate(),
+                $statement->getObject(),
+                new NamedNodeImpl('http://graph/')
+            ),
+            $resultStatements->current()
+        );
         $this->assertEmpty($resultStatements->next());
     }
 

@@ -400,7 +400,7 @@ abstract class AbstractQuery implements Query
     {
         $graphs = array();
 
-        $result = preg_match_all('/\FROM\s*\<(.*)\\>/', $queryPart, $matches);
+        $result = preg_match_all('/\FROM\s*\<(.*)\>/', $queryPart, $matches);
 
         if (false !== $result && true === isset($matches[1][0])) {
             $graphs[] = $matches[1][0];
@@ -525,7 +525,7 @@ abstract class AbstractQuery implements Query
          * Whereas ?s ?p ?o stands for any triple, so also for an URI. It also matches multi line strings
          * which have { and triple on different lines.
          */
-        $result = preg_match_all('/GRAPH\s*\<(.*)\>\s*\{\n*(.*)\s*\n*\}/mi', $query, $matches);
+        $result = preg_match_all('/GRAPH\s*\<(.*?)\>\s*\{\n*(.*?)\s*\n*\}/si', $query, $matches);
 
         // if no errors occour and graphs and triple where found
         if (false !== $result
@@ -599,12 +599,13 @@ abstract class AbstractQuery implements Query
              * Object part
              */
             '(' .
-            '\<[a-zA-Z0-9\.\/\:#\-_]+\>|' .            // e.g. <http://foobar/a>
+            '\<[a-zA-Z0-9\.\/\:#\-_]+\>|' .           // e.g. <http://foobar/a>
             '[a-z0-9]+\:[a-z0-9]+|' .                 // e.g. rdfs:label
             '\?[a-z0-9\_]+|' .                        // e.g. ?s
             '\".*\"[\s|\.|\}]|' .                     // e.g. "Foo"
             '\".*\"\^\^\<[a-z0-9\.\/\:#-_+?=%]+\>|' . // e.g. "Foo"^^<http://www.w3.org/2001/XMLSchema#string>
-            '\".*\"\@[a-z\-]{2,}' .                   // e.g. "Foo"@en
+            '\".*\"\@[a-z\-]{2,}|' .                  // e.g. "Foo"@en
+            '[0-9]{1,}' .                             // e.g. 42
             ')' .
             '/im',
             $where,
