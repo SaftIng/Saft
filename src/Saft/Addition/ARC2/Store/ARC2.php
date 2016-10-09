@@ -571,6 +571,47 @@ class ARC2 extends AbstractSparqlStore
             return new EmptyResultImpl();
 
         /*
+         * Add support for DELETE DATA queries. Transform them to DELETE FROM queries so that ARC2 can understand them.
+         */
+        } elseif (
+            $queryObject->isUpdateQuery() &&
+            isset($queryParts['quad_pattern']) &&
+            'deleteData' === $queryParts['sub_type']
+        ) {
+            foreach ($queryParts['quad_pattern'] as $quad) {
+                if ('uri' != $quad['g_type']) {
+                    throw new \Exception('The graph of a quad must be an URI here.');
+                }
+
+                // subject
+                $s = $this->nodeUtils->createNodeInstance(
+                    $this->nodeFactory,
+                    $quad['s'],
+                    $quad['s_type']
+                );
+
+                // predicate
+                $p = $this->nodeUtils->createNodeInstance(
+                    $this->nodeFactory,
+                    $quad['p'],
+                    $quad['p_type']
+                );
+
+                // object
+                $o = $this->nodeUtils->createNodeInstance(
+                    $this->nodeFactory,
+                    $quad['o'],
+                    $quad['o_type'],
+                    $quad['o_datatype'],
+                    $quad['o_lang']
+                );
+
+                $this->deleteMatchingStatements(new StatementImpl($s, $p, $o, new NamedNodeImpl($quad['g'])));
+            }
+
+            return new EmptyResultImpl();
+
+        /*
          * Add support for INSERT DATA queries. Transform them to INSERT INTO queries so that ARC2 can understand them.
          */
         } elseif (
