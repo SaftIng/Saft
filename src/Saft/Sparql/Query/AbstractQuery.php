@@ -602,8 +602,8 @@ abstract class AbstractQuery implements Query
             '\<[a-zA-Z0-9\.\/\:#\-_]+\>|' .           // e.g. <http://foobar/a>
             '[a-z0-9]+\:[a-z0-9]+|' .                 // e.g. rdfs:label
             '\?[a-z0-9\_]+|' .                        // e.g. ?s
-            '\".*\"[\s|\.|\}]|' .                     // e.g. "Foo"
             '\".*\"\^\^\<[a-z0-9\.\/\:#-_+?=%]+\>|' . // e.g. "Foo"^^<http://www.w3.org/2001/XMLSchema#string>
+            '\".*?\"[\s|\.|\n|\}]|' .                 // e.g. "Foo"
             '\".*\"\@[a-z\-]{2,}|' .                  // e.g. "Foo"@en
             '[0-9]{1,}' .                             // e.g. 42
             ')' .
