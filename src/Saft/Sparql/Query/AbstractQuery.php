@@ -400,7 +400,7 @@ abstract class AbstractQuery implements Query
     {
         $graphs = array();
 
-        $result = preg_match_all('/\FROM\s*\<(.*)\>/', $queryPart, $matches);
+        $result = preg_match_all('/\FROM\s*\<(.*?)\>/', $queryPart, $matches);
 
         if (false !== $result && true === isset($matches[1][0])) {
             $graphs[] = $matches[1][0];
@@ -419,7 +419,7 @@ abstract class AbstractQuery implements Query
     {
         $graphs = array();
 
-        $result = preg_match_all('/\FROM NAMED\s*\<(.*)\\>/', $queryPart, $matches);
+        $result = preg_match_all('/\FROM NAMED\s*\<(.*?)\\>/', $queryPart, $matches);
 
         if (false !== $result && true === isset($matches[1][0])) {
             $graphs[] = $matches[1][0];
