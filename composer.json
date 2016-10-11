@@ -36,7 +36,7 @@
         "saft/saft-test": "self.version"
     },
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.4",
         "aksw/erfurt": ">=1.8.0",
         "easyrdf/easyrdf": "0.9.*",
         "level-2/dice": "dev-v2.0-PHP5.4-5.5",
