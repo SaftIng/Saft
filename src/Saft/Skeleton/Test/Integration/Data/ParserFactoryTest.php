@@ -3,6 +3,7 @@
 namespace Saft\Skeleton\Test\Integration\Data;
 
 use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Skeleton\Data\ParserFactory;
 use Saft\Skeleton\Test\TestCase;
@@ -13,7 +14,7 @@ class ParserFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->fixture = new ParserFactory(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $this->fixture = new ParserFactory(new NodeFactoryImpl(), new StatementFactoryImpl(), new NodeUtils());
     }
 
     /*

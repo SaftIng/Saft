@@ -181,6 +181,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
         // contains a list of all entries, which were not found in $expected.
         $actualEntriesNotFound = array();
+        $foundEntries = array();
         foreach ($actual as $statement) {
             if (!$statement->isConcrete()) {
                 $this->markTestIncomplete("Comparison of variable statements in iterators not yet implemented.");
@@ -190,6 +191,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             if (isset($entriesToCheck[$statmentHash])) {
                 // if entry was found, mark it.
                 $entriesToCheck[$statmentHash] = true;
+                $foundEntries[] = $statement->toNQuads();
             } else {
                 // entry was not found
                 $actualEntriesNotFound[] = $statement->toNQuads();

@@ -3,7 +3,9 @@
 namespace Saft\Skeleton\Data;
 
 use Saft\Addition\EasyRdf\Data\ParserFactoryEasyRdf;
+use Saft\Data\RDFXMLParser;
 use Saft\Rdf\NodeFactory;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactory;
 
 /**
@@ -17,6 +19,11 @@ class ParserFactory
     protected $nodeFactory;
 
     /**
+     * @var NodeUtils
+     */
+    protected $nodeUtils;
+
+    /**
      * @var StatementFactory
      */
     protected $statementFactory;
@@ -24,18 +31,25 @@ class ParserFactory
     /**
      * @param NodeFactory $nodeFactory
      * @param StatementFactory $statementFactory
+     * @param NodeUtils $nodeUtils
      */
-    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory)
+    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory, NodeUtils $nodeUtils)
     {
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
+        $this->nodeUtils = $nodeUtils;
     }
 
     /**
      * @param string $serialization
+     * @return null|Parser
      */
     public function createParserFor($serialization)
     {
+        if ('rdf-xml' == $serialization) {
+            return new RDFXMLParser($this->nodeFactory, $this->statementFactory, $this->nodeUtils);
+        }
+
         $easyRdfParserFactory = new ParserFactoryEasyRdf($this->nodeFactory, $this->statementFactory);
 
         // if EasyRdf supports the given serialization

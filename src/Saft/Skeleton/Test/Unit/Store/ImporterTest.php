@@ -5,12 +5,12 @@ namespace Saft\Skeleton\Test\Unit\Store;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
-use Saft\Skeleton\Store\FileImporter;
+use Saft\Skeleton\Store\Importer;
 use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Store\BasicTriplePatternStore;
 use Saft\Skeleton\Test\TestCase;
 
-class FileImporterTest extends TestCase
+class ImporterTest extends TestCase
 {
     /**
      * @var Store
@@ -29,25 +29,17 @@ class FileImporterTest extends TestCase
             new StatementIteratorFactoryImpl()
         );
 
-        $this->fixture = new FileImporter($this->store);
+        $this->fixture = new Importer($this->store);
     }
 
     /*
      * Tests for importFile
      */
 
-    public function testImportFileFileHandleGiven()
+    // RDF/XML
+    public function testImportXMLFileFilenameGiven()
     {
-        $file = fopen(__DIR__ . '/../../assets/bsbm-dataset-5-products.nt', 'r');
-
-        $this->assertEquals(3239, $this->fixture->importFile($file, $this->testGraph));
-    }
-
-    public function testImportFileFilenameGiven()
-    {
-        $file = __DIR__ . '/../../assets/bsbm-dataset-5-products.nt';
-
-        $this->assertEquals(3239, $this->fixture->importFile($file, $this->testGraph));
+        $this->assertTrue($this->fixture->importFile(__DIR__ . '/../../assets/dbpedia-leipzig-part.rdf', $this->testGraph));
     }
 
     public function testImportFileInvalidFilenameGiven()
@@ -67,10 +59,8 @@ class FileImporterTest extends TestCase
 
         file_put_contents($filepath, '{');
 
-        $file = fopen($filepath, 'r');
-
         $this->setExpectedException('\Exception');
 
-        $this->fixture->importFile($file, $this->testGraph);
+        $this->fixture->importFile($filepath, $this->testGraph);
     }
 }

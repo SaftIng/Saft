@@ -5,6 +5,7 @@ namespace Saft\Skeleton\Store;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Skeleton\Data\ParserFactory;
 use Saft\Store\Store;
@@ -41,7 +42,7 @@ class FileImporter
         $this->parsers = array();
 
         // create suitable parser
-        $this->parserFactory = new ParserFactory(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $this->parserFactory = new ParserFactory(new NodeFactoryImpl(), new StatementFactoryImpl(), new NodeUtils());
     }
 
     /**
@@ -56,20 +57,42 @@ class FileImporter
 
     /**
      * @param string|resource $file
+     * @return string
      * @throws \Exception if parameter $file is not of type string or resource.
      */
     public function getSerialization($target)
     {
         $format = null;
+        $short = null;
 
-        if (is_resource($target)) {
-            $format = \EasyRdf_Format::guessFormat(fread($target, 1024));
-            // set file pointer to position 0;
-            rewind($target);
+        // filename given
+        if (is_string($target) && file_exists($target)) {
+            $short = file_get_contents($target);
+            $format = \EasyRdf_Format::guessFormat($short);
+
+        // string given
         } elseif (is_string($target)) {
+            $short = $target;
             $format = \EasyRdf_Format::guessFormat($target);
         } else {
-            throw new \Exception('Parameter $file must be of type string or resource.');
+            throw new \Exception('Parameter $file must be the string itself or a filename.');
+        }
+
+        // TODO: hot patch, as long as https://github.com/njh/easyrdf/pull/272 is not merged.
+        // in case you have a DOCTYPE element with many ENTITY elements, you should check
+        // further parts of the file
+        // first make sure that we have XML
+        if (0 < preg_match('/\<\?xml/si', $short)) {
+            // get the next portion of the data
+            if (is_resource($target)) {
+                $short = fread($target, 10000);
+            } elseif (is_string($target)) {
+                $short = substr($short, 1024, 10000);
+            }
+            // check again for <rdf:
+            if (0 < preg_match('/<rdf:/i', $short)) {
+                $format = 'rdfxml';
+            }
         }
 
         if (null != $format) {
@@ -88,73 +111,22 @@ class FileImporter
     }
 
     /**
-     * @param string|resource $file
+     * @param string $filepath
      * @param NamedNode $graph Graph to import data into.
-     * @param int $containerSize Number of lines you want to read before importing them.
+     * @param true
      * @throws \Exception if parameter $file is not of type string or resource.
      * @throws \Exception if a non-n-triples file is to import.
      * @unstable
      */
-    public function importFile($file, NamedNode $graph, $containerSize = 10)
+    public function importFile($filename, NamedNode $graph)
     {
-        $locallyOpened = false;
-        $containerSize = (int)$containerSize;
-
-        if ($containerSize < 1) {
-            $containerSize = 10;
-        }
-
-        if (is_resource($file)) {
-            // OK
-        } elseif (is_string($file)) {
-            $file = fopen($file, 'r');
-            // relevant later on. we close only locally opened file references after import is done.
-            $locallyOpened = true;
-        } else {
-            throw new \Exception('Parameter $file must be of type string or resource.');
-        }
-
-        $serialization = $this->getFileSerialization($file);
-
+        $content = file_get_contents($filename);
+        $serialization = $this->getSerialization($content);
         if (null == $serialization) {
             throw new \Exception('Your file/string has an unknown serialization: '. $serialization);
         }
 
-        try {
-            $collectedLineNumber = 0;
-            $collectedLines = '';
-            $importedLines = 0;
-
-            // iterator abouot lines of the file
-            while (!feof($file)) {
-                ++$importedLines;
-                $collectedLines .= fgets($file);
-
-                // after the threshold was reached, import collected lines
-                // and reset line counter
-                if (++$collectedLineNumber == $containerSize) {
-                    $this->importString($collectedLines, $graph, $serialization);
-                    $collectedLines = '';
-                    $collectedLineNumber = 0;
-                }
-            }
-
-            // import remaining lines also
-            $this->importString($collectedLines, $graph, $serialization);
-
-            if ($locallyOpened) {
-                fclose ($file);
-            }
-
-            return $importedLines;
-
-        } catch(\Exception $e) {
-            // if we created a file reference, close it, before reporting the exception
-            if ($locallyOpened) {
-                fclose ($file);
-            }
-            throw $e;
-        }
+        return $this->importString($content, $graph, $serialization);
     }
 
     /**
@@ -163,6 +135,7 @@ class FileImporter
      * @param string $string
      * @param NamedNode $graph
      * @param string $serialization
+     * @param true
      * @throws \Exception if parameter $graph is null.
      */
     public function importString($string, $graph, $serialization = 'n-triples')
@@ -180,5 +153,7 @@ class FileImporter
 
         // import its statements into the store
         $this->store->addStatements($iterator, $graph);
+
+        return true;
     }
 }

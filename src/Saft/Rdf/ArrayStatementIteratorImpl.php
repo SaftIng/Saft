@@ -15,14 +15,30 @@ class ArrayStatementIteratorImpl implements StatementIterator
      */
     public function __construct(array $statements)
     {
+        $checkedStatements = array();
+
         // check that each entry of the array is of type Statement
         foreach ($statements as $statement) {
             if (false === $statement instanceof Statement) {
                 throw new \Exception('Parameter $statements must contain Statement instances.');
             }
+
+            // check for statement doublings
+            if ($statement->isConcrete()) {
+                $hash = $statement->toNQuads();
+            } else {
+                $hash = (string)$statement->getSubject()
+                    . (string)$statement->getPredicate()
+                    . (string)$statement->getObject();
+            }
+            if (isset($checkedStatements[$hash])) {
+                // we already have that statement, go to the next one
+            } else {
+                $checkedStatements[$hash] = $statement;
+            }
         }
 
-        $this->arrayIterator = new \ArrayIterator($statements);
+        $this->arrayIterator = new \ArrayIterator(array_values($checkedStatements));
     }
 
     /**

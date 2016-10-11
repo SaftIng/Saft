@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:dbo="http://dbpedia.org/ontology/"
+	xmlns:dbp="http://dbpedia.org/property/"
+	xmlns:dct="http://purl.org/dc/terms/"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+	xmlns:prov="http://www.w3.org/ns/prov#"
+	xmlns:ns9="http://dbpedia.org/ontology/PopulatedPlace/"
+	xmlns:georss="http://www.georss.org/georss/" >
+  <rdf:Description rdf:about="http://dbpedia.org/resource/2015–16_MSV_Duisburg_season">
+    <dbp:location rdf:resource="http://dbpedia.org/resource/Leipzig" />
+  </rdf:Description>
+  <rdf:Description rdf:about="http://dbpedia.org/resource/Leipzig">
+    <rdfs:label xml:lang="de">Leipzig</rdfs:label>
+    <rdfs:label xml:lang="en">Leipzig</rdfs:label>
+    <rdfs:comment xml:lang="en">Leipzig (/ˈlaɪpsɪɡ/; German: [ˈlaɪptsɪç]) is the largest city in the federal state of Saxony, Germany. It has a population of 544,479 inhabitants (1,001,220 residents in the larger urban zone). Leipzig is located about 150 kilometers (93 miles) south of Berlin at the confluence of the White Elster, Pleisse, and Parthe rivers at the southerly end of the North German Plain.Leipzig has been a trade city since at least the time of the Holy Roman Empire.</rdfs:comment>
+    <rdf:type rdf:resource="http://umbel.org/umbel/rc/PopulatedPlace" />
+    <rdf:type rdf:resource="http://umbel.org/umbel/rc/Location_Underspecified" />
+    <dbo:wikiPageID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">17955</dbo:wikiPageID>
+    <dbp:align xml:lang="en">right</dbp:align>
+	<dbp:febHighC rdf:datatype="http://www.w3.org/2001/XMLSchema#double">4.3</dbp:febHighC>
+    <dbp:febLowC rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">-2</dbp:febLowC>
+  </rdf:Description>
+</rdf:RDF>

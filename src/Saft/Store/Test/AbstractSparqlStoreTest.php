@@ -109,7 +109,6 @@ class AbstractSparqlStoreTest extends TestCase
     public function testAddStatements()
     {
         $statements = new ArrayStatementIteratorImpl(array(
-            $this->getTestStatement('uri', 'uri', 'uri', 'uri'),
             $this->getTestStatement('uri', 'uri', 'uri', 'uri')
         ));
 
@@ -125,8 +124,6 @@ class AbstractSparqlStoreTest extends TestCase
             ->method('query')
             ->with(new RegexMatchConstraint(
                 '/INSERTDATA{Graph<'. $this->regexUri .'>{'.
-                '<'. $this->regexUri .'><'. $this->regexUri .'><'. $this->regexUri .'>.'.
-                '}Graph<'. $this->regexUri .'>{'.
                 '<'. $this->regexUri .'><'. $this->regexUri .'><'. $this->regexUri .'>.'.
                 '}}/si'
             ));
