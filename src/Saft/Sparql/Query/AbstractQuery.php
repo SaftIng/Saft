@@ -2,7 +2,9 @@
 
 namespace Saft\Sparql\Query;
 
+use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\NodeUtils;
+use Saft\Rdf\NodeFactoryImpl;
 
 /**
  * Represents a SPARQL query.
@@ -94,7 +96,7 @@ abstract class AbstractQuery implements Query
      */
     public function determineEntityType($entity)
     {
-        $nodeUtils = new NodeUtils();
+        $nodeUtils = new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils());
 
         // remove braces at the beginning (only if $entity looks like <http://...>)
         if ('<' == substr($entity, 0, 1)) {
@@ -192,7 +194,7 @@ abstract class AbstractQuery implements Query
      */
     public function determineObjectValue($objectString)
     {
-        $nodeUtils = new NodeUtils();
+        $nodeUtils = new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils());
 
         // checks if ^^< is in $objectString
         $arrowPos = strpos($objectString, '"^^<');

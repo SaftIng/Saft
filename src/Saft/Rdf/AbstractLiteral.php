@@ -2,6 +2,7 @@
 
 namespace Saft\Rdf;
 
+use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\NodeUtils;
 
 /**
@@ -124,7 +125,7 @@ abstract class AbstractLiteral implements Literal
      */
     public function toNQuads()
     {
-        $nodeUtils = new NodeUtils();
+        $nodeUtils = new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils());
 
         $string = '"' . $nodeUtils->encodeStringLitralForNQuads($this->getValue()) . '"';
 
@@ -136,6 +137,4 @@ abstract class AbstractLiteral implements Literal
 
         return $string;
     }
-
-
 }

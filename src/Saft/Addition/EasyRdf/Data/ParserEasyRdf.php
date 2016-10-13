@@ -3,6 +3,7 @@
 namespace Saft\Addition\EasyRdf\Data;
 
 use Saft\Data\Parser;
+use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
@@ -40,7 +41,8 @@ class ParserEasyRdf implements Parser
      */
     public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory, $serialization)
     {
-        $this->nodeUtils = new NodeUtils();
+        // TODO move that to parameter list later on
+        $this->nodeUtils = new NodeUtils($nodeFactory, new ParserSerializerUtils());
 
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;

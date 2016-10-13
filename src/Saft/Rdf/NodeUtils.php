@@ -2,6 +2,8 @@
 
 namespace Saft\Rdf;
 
+use Saft\Data\ParserSerializerUtils;
+
 /**
  * Helper class which provides useful methods for Node related operations, for instance node creation or URI
  * checks.
@@ -12,11 +14,22 @@ namespace Saft\Rdf;
  */
 class NodeUtils
 {
+    protected $nodeFactory;
+    protected $parserSerializerUtils;
+
     /**
-     * Helper function which is useful, if you have all the meta information about a Node and want to create
+     * @param NodeFactory $nodeFactory
+     */
+    public function __construct(NodeFactory $nodeFactory, ParserSerializerUtils $parserSerializerUtils)
+    {
+        $this->nodeFactory = $nodeFactory;
+        $this->parserSerializerUtils = $parserSerializerUtils;
+    }
+
+    /**
+     * Helper function, which is useful, if you have all the meta information about a Node and want to create
      * the according Node instance. It utilizes a NodeFactory instance to create Node instances.
      *
-     * @param NodeFactory $nodeFactory Instance of the NodeFactory to use.
      * @param string      $value       Value of the node.
      * @param string      $type        Can be uri, bnode, var or literal
      * @param string      $datatype    URI of the datatype (optional)
@@ -26,28 +39,23 @@ class NodeUtils
      * @api
      * @since 0.1
      */
-    public function createNodeInstance(
-        NodeFactory $nodeFactory,
-        $value,
-        $type,
-        $datatype = null,
-        $language = null
-    ) {
+    public function createNodeInstance($value, $type, $datatype = null, $language = null)
+    {
         switch ($type) {
             case 'uri':
-                return $nodeFactory->createNamedNode($value);
+                return $this->nodeFactory->createNamedNode($value);
 
             case 'bnode':
-                return $nodeFactory->createBlankNode($value);
+                return $this->nodeFactory->createBlankNode($value);
 
             case 'literal':
-                return $nodeFactory->createLiteral($value, $datatype, $language);
+                return $this->nodeFactory->createLiteral($value, $datatype, $language);
 
             case 'typed-literal':
-                return $nodeFactory->createLiteral($value, $datatype, $language);
+                return $this->nodeFactory->createLiteral($value, $datatype, $language);
 
             case 'var':
-                return $nodeFactory->createAnyPattern();
+                return $this->nodeFactory->createAnyPattern();
 
             default:
                 throw new \Exception('Unknown $type given: '. $type);
@@ -83,6 +91,10 @@ class NodeUtils
         return (1 === preg_match($regEx, (string)$string));
     }
 
+    /**
+     * @param string $s
+     * @return string encoded string for n-quads
+     */
     public function encodeStringLitralForNQuads($s)
     {
         $s = str_replace('\\', '\\\\', $s);

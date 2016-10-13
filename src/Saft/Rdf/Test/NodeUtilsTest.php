@@ -2,6 +2,7 @@
 
 namespace Saft\Rdf\Test;
 
+use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
@@ -15,7 +16,7 @@ class NodeUtilsTest extends TestCase
     {
         parent::setUp();
 
-        $this->fixture = new NodeUtils();
+        $this->fixture = new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils());
     }
 
     /*
@@ -25,7 +26,6 @@ class NodeUtilsTest extends TestCase
     public function testCreateNodeInstanceBNode()
     {
         $node = $this->fixture->createNodeInstance(
-            new NodeFactoryImpl(),
             'bid',
             'bnode'
         );
@@ -36,7 +36,6 @@ class NodeUtilsTest extends TestCase
     public function testCreateNodeInstanceLiteral()
     {
         $node = $this->fixture->createNodeInstance(
-            new NodeFactoryImpl(),
             '42',
             'literal',
             'xsd:int'
@@ -51,7 +50,6 @@ class NodeUtilsTest extends TestCase
         $this->setExpectedException('\Exception');
 
         $node = $this->fixture->createNodeInstance(
-            new NodeFactoryImpl(),
             null,
             'unknown'
         );
@@ -60,7 +58,6 @@ class NodeUtilsTest extends TestCase
     public function testCreateNodeInstanceUri()
     {
         $node = $this->fixture->createNodeInstance(
-            new NodeFactoryImpl(),
             'http://foo',
             'uri'
         );

@@ -2,6 +2,7 @@
 
 namespace Saft\Addition\Redland\Rdf;
 
+use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactoryImpl as SaftNodeFactoryImpl;
 use Saft\Rdf\NodeUtils;
@@ -25,7 +26,7 @@ class NodeFactory extends SaftNodeFactoryImpl
 
     public function __construct()
     {
-        $this->nodeUtils = new NodeUtils();
+        $this->nodeUtils = new NodeUtils($this, new ParserSerializerUtils());
     }
 
     /**

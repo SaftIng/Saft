@@ -3,6 +3,7 @@
 namespace Saft\Data\Test\Unit;
 
 use Saft\Data\RDFXMLParser;
+use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
@@ -16,7 +17,11 @@ class RDFXMLParserTest extends TestCase
 {
     public function setUp()
     {
-        $this->fixture = new RDFXMLParser(new NodeFactoryImpl(), new StatementFactoryImpl(), new NodeUtils());
+        $this->fixture = new RDFXMLParser(
+            new NodeFactoryImpl(),
+            new StatementFactoryImpl(),
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
+        );
     }
 
     /*

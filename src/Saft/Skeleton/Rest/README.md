@@ -51,7 +51,7 @@ $restHub = new Hub(
     new StatementFactoryImpl(),
     new NodeFactoryImpl(),
     new NQuadsSerializerImpl('n-triples'),
-    new NodeUtils()
+    new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
 );
 
 // create PSR-7 request

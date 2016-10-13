@@ -3,6 +3,7 @@
 namespace Saft\Addition\Rest\Test\Unit;
 
 use Saft\Addition\Rest\Hub;
+use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementFactoryImpl;
@@ -18,7 +19,10 @@ class HubTest extends TestCase
     {
         parent::setUp();
 
-        $this->fixture = new Hub($this->getMockStore(), new NodeUtils());
+        $this->fixture = new Hub(
+            $this->getMockStore(),
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
+        );
     }
 
     /**

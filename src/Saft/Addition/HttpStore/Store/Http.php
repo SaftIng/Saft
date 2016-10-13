@@ -3,6 +3,7 @@
 namespace Saft\Addition\HttpStore\Store;
 
 use Curl\Curl;
+use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
@@ -95,7 +96,7 @@ class Http extends AbstractSparqlStore
         StatementIteratorFactory $statementIteratorFactory,
         array $configuration
     ) {
-        $this->nodeUtils = new NodeUtils();
+        $this->nodeUtils = new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils());
         $this->queryUtils = new QueryUtils();
 
         $this->configuration = $configuration;

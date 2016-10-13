@@ -2,6 +2,7 @@
 
 namespace Saft\Addition\Virtuoso\Store;
 
+use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\AbstractLiteral;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Node;
@@ -331,7 +332,7 @@ class Virtuoso extends AbstractSparqlStore
                 $sparqlQuery = $query;
             }
 
-            $nodeUtils = new NodeUtils();
+            $nodeUtils = new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils());
 
             // make it possible to set a default graph URI
             if (

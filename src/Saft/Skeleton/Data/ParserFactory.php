@@ -4,6 +4,7 @@ namespace Saft\Skeleton\Data;
 
 use Saft\Addition\EasyRdf\Data\ParserFactoryEasyRdf;
 use Saft\Data\RDFXMLParser;
+use Saft\Data\ParserFactory as ParserFactoryInterface;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactory;
@@ -11,7 +12,7 @@ use Saft\Rdf\StatementFactory;
 /**
  * This factory creates the most suitable parser instance for a given serialization.
  */
-class ParserFactory
+class ParserFactory implements ParserFactoryInterface
 {
     /**
      * @var NodeFactory

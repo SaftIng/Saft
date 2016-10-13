@@ -2,9 +2,12 @@
 
 namespace Saft\Skeleton\Test\Unit\Store;
 
+use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
+use Saft\Skeleton\Data\ParserFactory;
 use Saft\Skeleton\Store\Importer;
 use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Store\BasicTriplePatternStore;
@@ -29,7 +32,14 @@ class ImporterTest extends TestCase
             new StatementIteratorFactoryImpl()
         );
 
-        $this->fixture = new Importer($this->store);
+        $this->fixture = new Importer(
+            $this->store,
+            new ParserFactory(
+                new NodeFactoryImpl(),
+                new StatementFactoryImpl(),
+                new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
+            )
+        );
     }
 
     /*

@@ -56,7 +56,7 @@ class RDFXMLParser implements Parser
      *                           parser to far
      * @throws \Exception if the base URI $baseUri is no valid URI.
      */
-    public function parseStringToIterator($xmlString, $baseUri = null)
+    public function parseStringToIterator($inputString, $baseUri = null)
     {
         // check $baseUri
         if (null !== $baseUri && false == $this->nodeUtils->simpleCheckURI($baseUri)) {
@@ -64,7 +64,7 @@ class RDFXMLParser implements Parser
         }
 
         $service = new Service();
-        $xmlArray = $service->parse($xmlString);
+        $xmlArray = $service->parse($inputString);
 
         $rdfAboutString = '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about';
         $rdfDatatypeString = '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}datatype';

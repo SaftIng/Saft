@@ -2,6 +2,8 @@
 
 namespace Saft\Rdf;
 
+use Saft\Data\ParserSerializerUtils;
+
 class NamedNodeImpl extends AbstractNamedNode
 {
     /**
@@ -15,7 +17,7 @@ class NamedNodeImpl extends AbstractNamedNode
      */
     public function __construct($uri)
     {
-        $nodeUtils = new NodeUtils();
+        $nodeUtils = new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils());
 
         if ($uri == null || !$nodeUtils->simpleCheckURI($uri)) {
             throw new \Exception('Parameter $uri is not a valid URI: '. $uri);

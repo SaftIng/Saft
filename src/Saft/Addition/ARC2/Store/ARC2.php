@@ -2,6 +2,7 @@
 
 namespace Saft\Addition\ARC2\Store;
 
+use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\Node;
@@ -94,7 +95,7 @@ class ARC2 extends AbstractSparqlStore
             $this->store->setUp();
         }
 
-        $this->nodeUtils = new NodeUtils();
+        $this->nodeUtils = new NodeUtils($nodeFactory, new ParserSerializerUtils());
         $this->queryUtils = new QueryUtils();
         $this->sparqlUtils = new SparqlUtils();
 
@@ -544,21 +545,18 @@ class ARC2 extends AbstractSparqlStore
 
                 // subject
                 $s = $this->nodeUtils->createNodeInstance(
-                    $this->nodeFactory,
                     $quad['s'],
                     $quad['s_type']
                 );
 
                 // predicate
                 $p = $this->nodeUtils->createNodeInstance(
-                    $this->nodeFactory,
                     $quad['p'],
                     $quad['p_type']
                 );
 
                 // object
                 $o = $this->nodeUtils->createNodeInstance(
-                    $this->nodeFactory,
                     $quad['o'],
                     $quad['o_type'],
                     $quad['o_datatype'],
@@ -585,21 +583,18 @@ class ARC2 extends AbstractSparqlStore
 
                 // subject
                 $s = $this->nodeUtils->createNodeInstance(
-                    $this->nodeFactory,
                     $quad['s'],
                     $quad['s_type']
                 );
 
                 // predicate
                 $p = $this->nodeUtils->createNodeInstance(
-                    $this->nodeFactory,
                     $quad['p'],
                     $quad['p_type']
                 );
 
                 // object
                 $o = $this->nodeUtils->createNodeInstance(
-                    $this->nodeFactory,
                     $quad['o'],
                     $quad['o_type'],
                     $quad['o_datatype'],
@@ -628,21 +623,18 @@ class ARC2 extends AbstractSparqlStore
 
                 // subject
                 $s = $this->nodeUtils->createNodeInstance(
-                    $this->nodeFactory,
                     $quad['s'],
                     $quad['s_type']
                 );
 
                 // predicate
                 $p = $this->nodeUtils->createNodeInstance(
-                    $this->nodeFactory,
                     $quad['p'],
                     $quad['p_type']
                 );
 
                 // object
                 $o = $this->nodeUtils->createNodeInstance(
-                    $this->nodeFactory,
                     $quad['o'],
                     $quad['o_type'],
                     $quad['o_datatype'],

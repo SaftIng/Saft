@@ -3,6 +3,7 @@
 namespace Saft\Addition\Virtuoso\Test;
 
 use Saft\Addition\Virtuoso\Store\Virtuoso;
+use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;

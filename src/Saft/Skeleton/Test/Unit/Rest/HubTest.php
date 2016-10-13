@@ -3,6 +3,7 @@
 namespace Saft\Skeleton\Test\Unit\Rest;
 
 use Saft\Data\NQuadsSerializerImpl;
+use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactoryImpl;
@@ -48,7 +49,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
 
         // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
@@ -86,7 +87,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
 
         // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
@@ -119,7 +120,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
 
         // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
@@ -159,7 +160,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
 
         // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
@@ -182,7 +183,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
 
         // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
@@ -205,7 +206,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
 
         // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
@@ -240,7 +241,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -264,7 +265,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -284,7 +285,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -308,7 +309,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -332,7 +333,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -356,7 +357,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -380,7 +381,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -404,7 +405,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -429,7 +430,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -454,7 +455,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -478,7 +479,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -502,7 +503,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -525,7 +526,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -546,7 +547,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -565,7 +566,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
 
         // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
@@ -588,7 +589,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
 
         // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
@@ -620,7 +621,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -651,7 +652,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             $this->serializerFactory->createSerializerFor('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
         $response = $fixture->computeRequest($request);
 
@@ -685,7 +686,7 @@ class HubTest extends TestCase
             new StatementFactoryImpl(),
             new NodeFactoryImpl(),
             new NQuadsSerializerImpl('n-triples'),
-            new NodeUtils()
+            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
         );
 
         // s, p and o must be set, otherwise we would get an error concerning missing s or p or o
