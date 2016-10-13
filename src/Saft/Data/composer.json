@@ -19,7 +19,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.4",
+        "sabre/xml": "1.*",
         "saft/saft-rdf": ">=0.4"
     },
     "require-dev": {
