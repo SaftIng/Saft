@@ -101,7 +101,6 @@ class Virtuoso extends AbstractSparqlStore
         $this->statementFactory = $statementFactory;
         $this->queryFactory = $queryFactory;
         $this->resultFactory = $resultFactory;
-        $this->resultFactory = $resultFactory;
         $this->statementIteratorFactory = $statementIteratorFactory;
 
         parent::__construct(
@@ -332,7 +331,8 @@ class Virtuoso extends AbstractSparqlStore
                 $sparqlQuery = $query;
             }
 
-            $nodeUtils = new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils());
+            // TODO move that to the constructor
+            $nodeUtils = new NodeUtils($this->nodeFactory, new ParserSerializerUtils());
 
             // make it possible to set a default graph URI
             if (
