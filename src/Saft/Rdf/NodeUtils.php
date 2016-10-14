@@ -63,6 +63,36 @@ class NodeUtils
     }
 
     /**
+     * Helper function to create a valid Node instance for a given string like "foo"@en.
+     *
+     * @param string $string
+     * @param array $namespaceAssignment Array with namespace keys and their full URI as value.
+     * @return Node
+     */
+    public function createNodeInstanceFromString($string, $namespaceAssignment = array())
+    {
+        $regex = '/' . $this->parserSerializerUtils->getRegexStringForNodeRecognition(true, true, true, true) .'/si';
+
+        preg_match($regex, $string, $matches);
+
+        // <http://...>
+        if ('<' == substr($matches[1], 0, 1)) {
+            return $this->nodeFactory->createNamedNode(str_replace(array('<', '>'), '', $matches[1]));
+        // ".."^^<
+        } elseif (false !== strpos($matches[1], '"^^<')) {
+            return $this->nodeFactory->createLiteral($matches[3], $matches[4]);
+        // "foo"@en
+        } elseif (false !== strpos($matches[1], '"@')) {
+            return $this->nodeFactory->createLiteral($matches[5], null, $matches[6]);
+        // _:foo
+        } elseif ($this->simpleCheckBlankNodeId($matches[1])) {
+            return $this->nodeFactory->createBlankNode($matches[9]);
+        } else {
+            throw new \Exception('Unknown case for: '. $matches[1]);
+        }
+    }
+
+    /**
      * Checks if a given string is a blank node ID. Blank nodes are usually structured like
      * _:foo, whereas _: comes first always.
      *
