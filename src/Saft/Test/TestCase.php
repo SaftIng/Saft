@@ -149,11 +149,20 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         }
 
         if (!empty($actualEntriesNotFound) || !empty($notCheckedEntries)) {
-            $this->fail(
-                "The StatementIterators are not equal. "
-                . count($actualEntriesNotFound) . " Statments where not expected, while "
-                . count($notCheckedEntries) . " Statments where not present but expected."
-            );
+
+            $message = 'The StatementIterators are not equal.';
+
+            if (!empty($actualEntriesNotFound)) {
+                print_r($actualEntriesNotFound);
+                $message .= ' ' . count($actualEntriesNotFound) . ' Statements where not expected.';
+            }
+
+            if (!empty($notCheckedEntries)) {
+                print_r($notCheckedEntries);
+                $message .= ' ' . count($notCheckedEntries) . ' Statements where not present but expected.';
+            }
+
+            $this->fail($message);
         }
     }
 
@@ -163,11 +172,15 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      *
      * @param StatementIterator $expected
      * @param StatementIterator $actual
+     * @param boolean $debug optional, default: false
      * @api
      * @since 0.1
      */
-    public function assertStatementIteratorEquals(StatementIterator $expected, StatementIterator $actual)
-    {
+    public function assertStatementIteratorEquals(
+        StatementIterator $expected,
+        StatementIterator $actual,
+        $debug = false
+    ) {
         $entriesToCheck = array();
         foreach ($expected as $statement) {
             // serialize entry and hash it afterwards to use it as key for $entriesToCheck array.
@@ -181,7 +194,9 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
         // contains a list of all entries, which were not found in $expected.
         $actualEntriesNotFound = array();
+        $notCheckedEntries = array();
         $foundEntries = array();
+
         foreach ($actual as $statement) {
             if (!$statement->isConcrete()) {
                 $this->markTestIncomplete("Comparison of variable statements in iterators not yet implemented.");
@@ -191,27 +206,40 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             if (isset($entriesToCheck[$statmentHash])) {
                 // if entry was found, mark it.
                 $entriesToCheck[$statmentHash] = true;
-                $foundEntries[] = $statement->toNQuads();
+                $foundEntries[] = $statement;
             } else {
                 // entry was not found
-                $actualEntriesNotFound[] = $statement->toNQuads();
+                $actualEntriesNotFound[] = $statement;
+                $notCheckedEntries[] = $statement;
             }
         }
 
-        $notCheckedEntries = array();
-        // check that all entries from $expected were checked
-        foreach ($entriesToCheck as $key => $value) {
-            if (!$value) {
-                $notCheckedEntries[] = $key;
-            }
-        }
+        if (!empty($actualEntriesNotFound) || !empty($notCheckedEntries)) {
 
-        $this->assertFalse(
-            !empty($actualEntriesNotFound) || !empty($notCheckedEntries),
-            "The StatementIterators are not equal. "
-            . count($actualEntriesNotFound) . " Statments where not expected, while "
-            . count($notCheckedEntries) . " Statments where not present but expected."
-        );
+            $message = 'The StatementIterators are not equal.';
+
+            if (!empty($actualEntriesNotFound)) {
+                if ($debug) {
+                    echo PHP_EOL . 'Following statements where not expected, but found: ';
+                    var_dump($actualEntriesNotFound);
+                }
+
+                $message .= ' ' . count($actualEntriesNotFound) . ' Statements where not expected.';
+            }
+
+            if (!empty($notCheckedEntries)) {
+                if ($debug) {
+                    echo PHP_EOL . 'Following statements where not present, but expected: ';
+                    var_dump($notCheckedEntries);
+                }
+
+                $message .= ' ' . count($notCheckedEntries) . ' Statements where not present but expected.';
+            }
+
+            $this->assertFalse(!empty($actualEntriesNotFound) || !empty($notCheckedEntries), $message);
+        } else {
+            $this->assertTrue(true);
+        }
     }
 
     /**

@@ -75,18 +75,18 @@ class NodeUtils
 
         preg_match($regex, $string, $matches);
 
-        // <http://...>
-        if ('<' == substr($matches[1], 0, 1)) {
+        // http://...
+        if ('<' == substr($matches[0], 0, 1)) {
             return $this->nodeFactory->createNamedNode(str_replace(array('<', '>'), '', $matches[1]));
         // ".."^^<
-        } elseif (false !== strpos($matches[1], '"^^<')) {
-            return $this->nodeFactory->createLiteral($matches[3], $matches[4]);
+        } elseif (false !== strpos($matches[0], '"^^<')) {
+            return $this->nodeFactory->createLiteral($matches[9], $matches[10]);
         // "foo"@en
-        } elseif (false !== strpos($matches[1], '"@')) {
-            return $this->nodeFactory->createLiteral($matches[5], null, $matches[6]);
+        } elseif (false !== strpos($matches[0], '"@')) {
+            return $this->nodeFactory->createLiteral($matches[12], null, $matches[13]);
         // _:foo
-        } elseif ($this->simpleCheckBlankNodeId($matches[1])) {
-            return $this->nodeFactory->createBlankNode($matches[9]);
+        } elseif ($this->simpleCheckBlankNodeId($matches[0])) {
+            return $this->nodeFactory->createBlankNode($matches[4]);
         } else {
             throw new \Exception('Unknown case for: '. $matches[1]);
         }

@@ -74,22 +74,32 @@ class NQuadsParser implements Parser
 
         $statements = array();
 
-        preg_match_all(
-            '/' .
-            $this->parserSerializerUtils->getRegexStringForNodeRecognition(true) .'\s*\t*'.
-            $this->parserSerializerUtils->getRegexStringForNodeRecognition() .'\s*\t*'.
-            $this->parserSerializerUtils->getRegexStringForNodeRecognition(true, true, true, true) .
-            '/im',
-            $inputString,
-            $matches
-        );
+        $pattern = '/' .
+            $this->parserSerializerUtils->getRegexStringForNodeRecognition(true) .'\s*|\t*'.
+            $this->parserSerializerUtils->getRegexStringForNodeRecognition() .'\s*|\t*'.
+            $this->parserSerializerUtils->getRegexStringForNodeRecognition(true, true, true, true) . '\s*|\t*'.
+            $this->parserSerializerUtils->getRegexStringForNodeRecognition() .
+            '/is';
 
-        $matchCount = count($matches[0]);
-        for ($i = 0; $i < $matchCount; ++$i) {
+        foreach (explode(PHP_EOL, $inputString) as $line) {
+
+            if (empty($line)) {
+                continue;
+            }
+
+            preg_match_all($pattern, $line, $matches);
+
+            if (isset($matches[0][3]) && false == empty($matches[0][3])) {
+                $graph = $this->nodeUtils->createNodeInstanceFromString($matches[0][3]);
+            } else {
+                $graph = null;
+            }
+
             $statements[] = $this->statementFactory->createStatement(
-                $this->nodeUtils->createNodeInstanceFromString($matches[1][$i]),
-                $this->nodeUtils->createNodeInstanceFromString($matches[4][$i]),
-                $this->nodeUtils->createNodeInstanceFromString($this->unescapeString($matches[6][$i]))
+                $this->nodeUtils->createNodeInstanceFromString($matches[0][0]),
+                $this->nodeUtils->createNodeInstanceFromString($matches[0][1]),
+                $this->nodeUtils->createNodeInstanceFromString($this->unescapeString($matches[0][2])),
+                $graph
             );
         }
 
@@ -139,6 +149,8 @@ class NQuadsParser implements Parser
         foreach ($mappings as $in => $out) {
             $str = preg_replace('/\x5c([' . $in . '])/', $out, $str);
         }
+
+        // if no \u was found, stop here and return given string
         if (stripos($str, '\u') === false) {
             return $str;
         }
