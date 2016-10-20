@@ -267,81 +267,25 @@ class ARC2 extends AbstractSparqlStore
         // table names
         $g2t = $this->configuration['table-prefix'] . '_g2t';
         $id2val = $this->configuration['table-prefix'] . '_id2val';
-        $s2val = $this->configuration['table-prefix'] . '_s2val';
-        $o2val = $this->configuration['table-prefix'] . '_o2val';
-        $triple = $this->configuration['table-prefix'] . '_triple';
 
+        // table names
+        $g2t = $this->configuration['table-prefix'] . '_g2t';
+        $id2val = $this->configuration['table-prefix'] . '_id2val';
         /*
-         * get ID of the graph entry
+         * ask for all entries with the given graph URI
          */
         $query = 'SELECT id FROM '. $id2val .' WHERE val = "'. $graph->getUri() .'"';
         $result = $this->store->queryDB($query, $this->store->getDBCon());
-        $graphIds = array();
+        /*
+         * go through all given entries and remove all according entries in the g2t table
+         */
         while ($row = $result->fetch_assoc()) {
-            $graphIds[] = $row['id'];
+            $query = 'DELETE FROM '. $g2t .' WHERE t="'. $row['id'] .'"';
+            $this->store->queryDB($query, $this->store->getDBCon());
         }
-
-        if (0 == count($graphIds)) {
-            new \Exception('Graph does not exist anymore: ' . $graph->getUri());
-        }
-
-        /*
-         * get ID of the graph to drop
-         */
-        $query = 'SELECT id FROM '. $id2val .' WHERE val = "'. $graph->getUri() .'"';
-        $result = $this->store->queryDB($query, $this->store->getDBCon());
-
-        /*
-         * remove according data
-         */
-        $id2ValRow = $result->fetch_assoc();
-
-        // get all t-values by given g-value in g2t
-        $g2tEntries = $this->store->queryDB(
-            'SELECT t FROM '. $g2t .' WHERE g="'. $id2ValRow['id'] .'"',
-            $this->store->getDBCon()
-        );
-
-        // get all s-, p- and o-values by given t-value
-        $tripleTs = array();
-        while ($g2tRow = $g2tEntries->fetch_assoc()) {
-            $tripleTs[] = $g2tRow['t'];
-        }
-
-        // no triples to remove
-        if (0 == count($tripleTs)) {
-            return;
-        }
-
-        $tripleEntries = $this->store->queryDB(
-            'SELECT s, p, o, o_lang_dt FROM '. $triple .' WHERE t IN ('. implode(',', $tripleTs) .')',
-            $this->store->getDBCon()
-        );
-
-        // remove id2val entries by $row['id'] and s- and p-value
-        $this->store->queryDB('DELETE FROM '. $id2val .' WHERE id = '. $id2ValRow['id'], $this->store->getDBCon());
-
-        // remove g2t entries by given g-value
-        $this->store->queryDB('DELETE FROM '. $g2t .' WHERE g = '. $id2ValRow['id'], $this->store->getDBCon());
-
-        // remove triple entries by given t-value
-        foreach ($tripleTs as $id) {
-            $this->store->queryDB('DELETE FROM '. $triple .' WHERE t = '. $id, $this->store->getDBCon());
-        }
-
-        foreach ($tripleEntries as $entry) {
-            // remove s2val entries by given s-value
-            $this->store->queryDB('DELETE FROM '. $s2val .' WHERE id = '. $entry['s'], $this->store->getDBCon());
-
-            // remove id2val entriey by p-value or o_lang_dt
-            $this->store->queryDB(
-                'DELETE FROM '. $id2val .' WHERE id = '. $entry['p'] . ' OR id = ' . $entry['o_lang_dt'],
-                $this->store->getDBCon()
-            );
-
-            // remove o2val entries by given o-value
-            $this->store->queryDB('DELETE FROM '. $o2val .' WHERE id = '. $entry['o'], $this->store->getDBCon());
-        }
+        // remove entry/entries in the id2val table too
+        $query = 'DELETE FROM '. $id2val .' WHERE val = "'. $graph->getUri() .'"';
+        $this->store->queryDB($query, $this->store->getDBCon());
     }
 
     /**

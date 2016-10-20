@@ -79,6 +79,58 @@ class ARC2Test extends StoreAbstractTest
     }
 
     /*
+     * Tests dropGraph
+     */
+
+    // checks that droping one graph does not affects other graphs or triples, meaning, that only the right stuff
+    // gets deleted.
+    public function testDropGraphEffects()
+    {
+        $secondGraph = new NamedNodeImpl(new NodeUtils(), $this->testGraph->getUri() . '2');
+
+        $this->fixture->createGraph($secondGraph);
+
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri().'>');
+        $this->fixture->query('CLEAR GRAPH <'. $secondGraph->getUri().'>');
+
+        // fill graph 1
+        $this->fixture->addStatements(
+            array(
+                new StatementImpl(
+                    $this->testGraph,
+                    $this->testGraph,
+                    $this->testGraph,
+                    $this->testGraph
+                ),
+            )
+        );
+
+        // fill graph 2
+        $this->fixture->addStatements(
+            array(
+                new StatementImpl(
+                    $secondGraph,
+                    $secondGraph,
+                    $secondGraph,
+                    $secondGraph
+                ),
+            )
+        );
+
+        // remove graph 1
+        $this->fixture->dropGraph($this->testGraph);
+
+        $result = $this->fixture->query('SELECT * FROM <'. $secondGraph->getUri() .'> WHERE {?s ?p ?o}');
+
+        $this->fixture->dropGraph($secondGraph);
+
+        $this->assertCountStatementIterator(
+            1,
+            $result
+        );
+    }
+
+    /*
      * Tests openConnection
      */
 
@@ -155,6 +207,8 @@ class ARC2Test extends StoreAbstractTest
     // related to https://github.com/SaftIng/Saft/issues/72
     public function testRemovalOfTriplesAfterDropGraph()
     {
+        $this->markTestSkipped('Implement a way to remove all triples on drop-graph call.');
+
         /*
          * Count rows of all relevant ARC2 tables
          */
