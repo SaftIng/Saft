@@ -2,8 +2,6 @@
 
 namespace Saft\Rdf;
 
-use Saft\Data\ParserSerializerUtils;
-
 /**
  * Helper class which provides useful methods for Node related operations, for instance node creation or URI
  * checks.
@@ -14,82 +12,92 @@ use Saft\Data\ParserSerializerUtils;
  */
 class NodeUtils
 {
-    protected $nodeFactory;
-    protected $parserSerializerUtils;
-
     /**
-     * @param NodeFactory $nodeFactory
+     * @param string $s
+     * @return string encoded string for n-quads
      */
-    public function __construct(NodeFactory $nodeFactory, ParserSerializerUtils $parserSerializerUtils)
+    public function encodeStringLitralForNQuads($s)
     {
-        $this->nodeFactory = $nodeFactory;
-        $this->parserSerializerUtils = $parserSerializerUtils;
+        $s = str_replace('\\', '\\\\', $s);
+        $s = str_replace("\t", '\t', $s);
+        $s = str_replace("\n", '\n', $s);
+        $s = str_replace("\r", '\r', $s);
+        $s = str_replace('"', '\"', $s);
+
+        return $s;
     }
 
     /**
-     * Helper function, which is useful, if you have all the meta information about a Node and want to create
-     * the according Node instance. It utilizes a NodeFactory instance to create Node instances.
+     * Returns the regex string to get a node from a triple/quad.
      *
-     * @param string      $value       Value of the node.
-     * @param string      $type        Can be uri, bnode, var or literal
-     * @param string      $datatype    URI of the datatype (optional)
-     * @param string      $language    Language tag (optional)
-     * @return Node Node instance, which type is one of: NamedNode, BlankNode, Literal, AnyPattern
-     * @throws \Exception if an unknown type was given.
-     * @api
-     * @since 0.1
+     * @param boolean $useVariables optional, default is false
+     * @param boolean $useNamespacedUri optional, default is false
+     * @return string
      */
-    public function createNodeInstance($value, $type, $datatype = null, $language = null)
-    {
-        switch ($type) {
-            case 'uri':
-                return $this->nodeFactory->createNamedNode($value);
+    public function getRegexStringForNodeRecognition(
+        $useBlankNode = false,
+        $useNamespacedUri = false,
+        $useTypedString = false,
+        $useLanguagedString = false,
+        $useSimpleString = false,
+        $useSimpleNumber = false,
+        $useVariables = false
+    ) {
+        $regex = '(<([a-z]{2,}:[^\s]*)>)'; // e.g. <http://foobar/a>
 
-            case 'bnode':
-                return $this->nodeFactory->createBlankNode($value);
-
-            case 'literal':
-                return $this->nodeFactory->createLiteral($value, $datatype, $language);
-
-            case 'typed-literal':
-                return $this->nodeFactory->createLiteral($value, $datatype, $language);
-
-            case 'var':
-                return $this->nodeFactory->createAnyPattern();
-
-            default:
-                throw new \Exception('Unknown $type given: '. $type);
+        if (true == $useBlankNode) {
+            $regex .= '|(_:([a-z0-9A-Z_]+))'; // e.g. _:foobar
         }
+
+        if (true == $useNamespacedUri) {
+            $regex .= '|(([a-z0-9]+)\:([a-z0-9]+))'; // e.g. rdfs:label
+        }
+
+        if (true == $useTypedString) {
+            // e.g. "Foo"^^<http://www.w3.org/2001/XMLSchema#string>
+            $regex .= '|(\"(.*?)\"\^\^\<([^\s]+)\>)';
+        }
+
+        if (true == $useLanguagedString) {
+            $regex .= '|(\"(.*?)\"\@([a-z\-]{2,}))'; // e.g. "Foo"@en
+        }
+
+        if (true == $useSimpleString) {
+            $regex .= '|(\"(.*?)\")'; // e.g. "Foo"
+        }
+
+        if (true == $useSimpleNumber) {
+            $regex .= '|([0-9]{1,})'; // e.g. 42
+        }
+
+        if (true == $useVariables) {
+            $regex .= '|(\?[a-z0-9\_]+)'; // e.g. ?s
+        }
+
+        return $regex;
     }
 
     /**
-     * Helper function to create a valid Node instance for a given string like "foo"@en.
-     *
-     * @param string $string
-     * @param array $namespaceAssignment Array with namespace keys and their full URI as value.
-     * @return Node
+     * @param string $stringToCheck
+     * @return null|string
      */
-    public function createNodeInstanceFromString($string, $namespaceAssignment = array())
+    public function guessFormat($stringToCheck)
     {
-        $regex = '/' . $this->parserSerializerUtils->getRegexStringForNodeRecognition(true, true, true, true) .'/si';
-
-        preg_match($regex, $string, $matches);
-
-        // http://...
-        if ('<' == substr($matches[0], 0, 1)) {
-            return $this->nodeFactory->createNamedNode(str_replace(array('<', '>'), '', $matches[1]));
-        // ".."^^<
-        } elseif (false !== strpos($matches[0], '"^^<')) {
-            return $this->nodeFactory->createLiteral($matches[9], $matches[10]);
-        // "foo"@en
-        } elseif (false !== strpos($matches[0], '"@')) {
-            return $this->nodeFactory->createLiteral($matches[12], null, $matches[13]);
-        // _:foo
-        } elseif ($this->simpleCheckBlankNodeId($matches[0])) {
-            return $this->nodeFactory->createBlankNode($matches[4]);
-        } else {
-            throw new \Exception('Unknown case for: '. $matches[1]);
+        if (false == is_string($stringToCheck)) {
+            throw new \Exception('Invalid $stringToCheck value given. It needs to be a string.');
         }
+
+        $short = substr($stringToCheck, 0, 1024);
+
+        // n-triples/n-quads
+        if (0 < preg_match('/^<.+>\t*\s*<.+>/m', $short, $matches)) {
+            return 'n-triples';
+        // RDF/XML
+        } elseif (0 < preg_match('/<rdf:/i', $short, $matches)) {
+            return 'rdf-xml';
+        }
+
+        return null;
     }
 
     /**
@@ -117,22 +125,7 @@ class NodeUtils
      */
     public function simpleCheckURI($string)
     {
-        $regEx = '/^([a-zA-Z][a-zA-Z0-9+.-]+):([^\x00-\x0f\x20\x7f<>{}|\[\]`"^\\\\])+$/';
+        $regEx = '/^([a-z]{2,}:[^\s]*)$/';
         return (1 === preg_match($regEx, (string)$string));
-    }
-
-    /**
-     * @param string $s
-     * @return string encoded string for n-quads
-     */
-    public function encodeStringLitralForNQuads($s)
-    {
-        $s = str_replace('\\', '\\\\', $s);
-        $s = str_replace("\t", '\t', $s);
-        $s = str_replace("\n", '\n', $s);
-        $s = str_replace("\r", '\r', $s);
-        $s = str_replace('"', '\"', $s);
-
-        return $s;
     }
 }

@@ -57,6 +57,7 @@ abstract class AbstractSparqlStore implements Store
      * @param QueryFactory             $queryFactory Instance of QueryFactory.
      * @param ResultFactory            $resultFactory Instance of ResultFactory.
      * @param StatementIteratorFactory $statementIteratorFactory Instance of StatementIteratorFactory.
+     * @param SparqlUtils              $sparqlUtils
      * @api
      * @since 0.1
      */
@@ -65,13 +66,15 @@ abstract class AbstractSparqlStore implements Store
         StatementFactory $statementFactory,
         QueryFactory $queryFactory,
         ResultFactory $resultFactory,
-        StatementIteratorFactory $statementIteratorFactory
+        StatementIteratorFactory $statementIteratorFactory,
+        SparqlUtils $sparqlUtils
     ) {
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
         $this->queryFactory = $queryFactory;
         $this->resultFactory = $resultFactory;
         $this->statementIteratorFactory = $statementIteratorFactory;
+        $this->sparqlUtils = $sparqlUtils;
     }
 
     /**
@@ -101,7 +104,7 @@ abstract class AbstractSparqlStore implements Store
             // non-concrete Statement instances not allowed
             if (false === $statement->isConcrete()) {
                 // We would need a rollback here, but we don't have any transactions so far
-                throw new \Exception('At least one Statement is not concrete');
+                throw new \Exception('At least one Statement is not concrete: ' . $statement->toNTriples());
             }
 
             // given $graph forces usage of it and not the graph from the statement instance
@@ -406,8 +409,7 @@ abstract class AbstractSparqlStore implements Store
      */
     protected function sparqlFormat(StatementIterator $statements, Node $graph = null)
     {
-        $sparqlUtils = new SparqlUtils();
-        return $sparqlUtils->statementIteratorToSparqlFormat($statements, $graph);
+        return $this->sparqlUtils->statementIteratorToSparqlFormat($statements, $graph);
     }
 
     /**

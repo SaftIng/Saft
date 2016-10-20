@@ -1,7 +1,7 @@
 {
     "name": "saft/saft-arc2",
     "type": "library",
-    "description": "ARC2 port.",
+    "description": "Adapter to integrate ARC2 store into Saft.",
     "keywords": ["Saft", "Triple Store", "ARC2", "RDF", "MySQL", "SPARQL"],
     "homepage": "https://safting.github.io/",
     "license": "GPL-3.0",
@@ -20,12 +20,13 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "semsol/arc2": "2.2.*",
-        "saft/saft-store": ">=0.4"
+        "php": ">=5.4",
+        "semsol/arc2": "2.*",
+        "saft/saft-store": ">=0.8"
     },
     "require-dev": {
-        "phpunit/phpunit": ">=4.8"
+        "phpunit/phpunit": "4.8.*",
+        "saft/saft-test": ">=0.8"
     },
     "autoload": {
         "psr-4": {

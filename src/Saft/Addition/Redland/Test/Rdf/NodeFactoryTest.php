@@ -2,8 +2,9 @@
 
 namespace Saft\Addition\Redland\Tests\Rdf;
 
-use Saft\Rdf\Test\NodeFactoryAbstractTest;
 use Saft\Addition\Redland\Rdf\NodeFactory;
+use Saft\Rdf\NodeUtils;
+use Saft\Rdf\Test\NodeFactoryAbstractTest;
 
 class NodeFactoryTest extends NodeFactoryAbstractTest
 {
@@ -12,7 +13,7 @@ class NodeFactoryTest extends NodeFactoryAbstractTest
      */
     public function getFixture()
     {
-        return new NodeFactory();
+        return new NodeFactory(new NodeUtils());
     }
 
     /**

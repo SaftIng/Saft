@@ -39,9 +39,9 @@ use Saft\Store\BasicTriplePatternStore;
 // init a basic store (it stores its data in the memory
 // and provides a basic interface for test usage)
 $store = new BasicTriplePatternStore(
-    new NodeFactoryImpl(),
+    new NodeFactoryImpl(new NodeUtils()),
     new StatementFactoryImpl(),
-    new QueryFactoryImpl(),
+    new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
     new StatementIteratorFactoryImpl()
 );
 
@@ -49,9 +49,9 @@ $store = new BasicTriplePatternStore(
 $restHub = new Hub(
     $store,
     new StatementFactoryImpl(),
-    new NodeFactoryImpl(),
+    new NodeFactoryImpl(new NodeUtils()),
     new NQuadsSerializerImpl('n-triples'),
-    new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
+    new NodeUtils()
 );
 
 // create PSR-7 request

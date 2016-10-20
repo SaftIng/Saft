@@ -2,7 +2,6 @@
 
 namespace Saft\Sparql\Query;
 
-use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\NodeFactoryImpl;
 
@@ -63,6 +62,11 @@ abstract class AbstractQuery implements Query
     );
 
     /**
+     * @var NodeUtils
+     */
+    protected $nodeUtils;
+
+    /**
      * @var string
      */
     protected $query;
@@ -75,11 +79,14 @@ abstract class AbstractQuery implements Query
     /**
      * Constructor.
      *
-     * @param  string     optional $query SPARQL query string to initialize this instance.
+     * @param string optional $query SPARQL query string to initialize this instance.
+     * @param NodeUtils $nodeUtils
      * @throws \Exception If parameter $query is empty, null or not a string.
      */
-    public function __construct($query = '')
+    public function __construct($query = '', NodeUtils $nodeUtils)
     {
+        $this->nodeUtils = $nodeUtils;
+
         if (true === empty($query) || null === $query || false === is_string($query)) {
             return;
         }
@@ -96,21 +103,18 @@ abstract class AbstractQuery implements Query
      */
     public function determineEntityType($entity)
     {
-        $nodeUtils = new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils());
-
         // remove braces at the beginning (only if $entity looks like <http://...>)
         if ('<' == substr($entity, 0, 1)) {
             $entity = str_replace(array('>', '<'), '', $entity);
         }
 
         // checks if $entity is an URL
-        if (true === $nodeUtils->simpleCheckURI($entity)) {
+        if (true === $this->nodeUtils->simpleCheckURI($entity)) {
             return 'uri';
 
         // checks if ^^< is in $entity OR if $entity is surrounded by quotation marks
         } elseif (false !== strpos($entity, '"^^<')
-            || ('"' == substr($entity, 0, 1)
-                && '"' == substr($entity, strlen($entity)-1, 1))) {
+            || ('"' == substr($entity, 0, 1) && '"' == substr($entity, strlen($entity)-1, 1))) {
             return 'typed-literal';
 
         // blank node
@@ -194,8 +198,6 @@ abstract class AbstractQuery implements Query
      */
     public function determineObjectValue($objectString)
     {
-        $nodeUtils = new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils());
-
         // checks if ^^< is in $objectString
         $arrowPos = strpos($objectString, '"^^<');
         $atPos = strpos($objectString, '"@');
@@ -217,7 +219,7 @@ abstract class AbstractQuery implements Query
         } elseif ('?' === substr($objectString, 0, 1)) {
             return substr($objectString, 1);
 
-        } elseif ($nodeUtils->simpleCheckURI($objectString)) {
+        } elseif ($this->nodeUtils->simpleCheckURI($objectString)) {
             return $objectString;
 
         // malformed string, return null as datatype
@@ -527,7 +529,7 @@ abstract class AbstractQuery implements Query
          * Whereas ?s ?p ?o stands for any triple, so also for an URI. It also matches multi line strings
          * which have { and triple on different lines.
          */
-        $result = preg_match_all('/GRAPH\s*\<(.*?)\>\s*\{\n*(.*?)\s*\n*\}/si', $query, $matches);
+        $result = preg_match_all('/GRAPH\s*\<(.*?)\>\s*\{\n*\s*(.*?)\s*\n*\}/si', $query, $matches);
 
         // if no errors occour and graphs and triple where found
         if (false !== $result
@@ -563,6 +565,18 @@ abstract class AbstractQuery implements Query
      */
     public function extractTriplePattern($where)
     {
+        // remove possible PREFIX parts at the beginning
+        $removeRegex = '/PREFIX\s+([a-z0-9]+)\:\s*\<([a-z0-9\:\/\.\#\-]+)\>/si';
+        $where = preg_replace($removeRegex, '', $where);
+
+        // remove FILTER clauses and their pattern to avoid false positives in the next regex-check
+        $removeRegex = '/FILTER\s*regex\(.*?\)'
+            .'|FILTER\s*\([a-z0-9]+\([a-z?]+\)'
+            .'|"([a-z]{2,}:[^\s]*)"'
+            .'|FILTER\s*\(\?[a-z\s=>0-9"]+\)'
+            .'/si';
+        $where = preg_replace($removeRegex, '', $where);
+
         /**
          * Because quads also consists of triple pattern, we first check if there are quads. In case there
          * are, return empty.
@@ -576,53 +590,41 @@ abstract class AbstractQuery implements Query
         /**
          * Here we know, no quads are there.
          */
+        $regex = '/' .
+            $this->nodeUtils->getRegexStringForNodeRecognition(
+                true, true, false, false, false, false, true
+            ) .'\s*|\t*'.
+            $this->nodeUtils->getRegexStringForNodeRecognition(
+                true, true, false, false, false, false, true
+            ) .'\s*|\t*'.
+            $this->nodeUtils->getRegexStringForNodeRecognition(
+                true, true, true, true, true, true, true
+            ) .'/is';
+
+        preg_match_all($regex, $where, $matches);
+
+        $lineIndex = -1;
         $pattern = array();
-
-        preg_match_all(
-            '/' .
-            /**
-             * Subject part
-             */
-            '(' .
-            '\<[a-z0-9\.\/\:#\-_]+\>|' . // e.g. <http://foobar/a>
-            '\?[a-z0-9\_]+|' .          // e.g. ?s
-            '[a-z0-9]+\:[a-z0-9]+|' .   // e.g. rdfs:label
-            '_:[a-z0-9]+' .             // e.g. _:foo
-            ')\s*' .
-            /**
-             * Predicate part
-             */
-            '(' .
-            '\<[a-z0-9\.\/\:#\-_]+\>|' . // e.g. <http://foobar/a>
-            '\?[a-z0-9\_]+|' .          // e.g. ?s
-            '[a-z0-9]+\:[a-z0-9]+' .    // e.g. rdfs:label
-            ')\s*' .
-            /**
-             * Object part
-             */
-            '(' .
-            '\<[a-zA-Z0-9\.\/\:#\-_]+\>|' .            // e.g. <http://foobar/a>
-            '[a-z0-9]+\:[a-z0-9]+|' .                  // e.g. rdfs:label
-            '\?[a-z0-9\_]+|' .                         // e.g. ?s
-            '\".*?\"\^\^\<[a-z0-9\.\/\:#-_+?=%]+\>|' . // e.g. "Foo"^^<http://www.w3.org/2001/XMLSchema#string>
-            '\".*?\"\@[a-z\-]{2,}|' .                  // e.g. "Foo"@en
-            '\".*?\"[\s|\.|\n|\}]*?|' .                 // e.g. "Foo"
-            '[0-9]{1,}' .                              // e.g. 42
-            ')' .
-            '/im',
-            $where,
-            $matches
-        );
-
-        $lineIndex = 0;
+        $s = $p = $o = '';
 
         foreach ($matches[0] as $match) {
+            $lineIndex++;
+
             /**
              * Handle type and value of subject and predicate
              */
-            $s = $matches[1][$lineIndex];
-            $p = $matches[2][$lineIndex];
-            $o = $matches[3][$lineIndex];
+            if (0 == $lineIndex) {
+                $s = $match;
+                continue;
+            } elseif (1 == $lineIndex) {
+                $p = $match;
+                continue;
+            } elseif (2 == $lineIndex) {
+                $o = $match;
+                $lineIndex = -1;
+            } else {
+                throw new \Exception('This should never happen: ' . $lineIndex);
+            }
 
             $oIsUri = false;
             if ('<' == substr($o, 0, 1)) {
@@ -650,11 +652,11 @@ abstract class AbstractQuery implements Query
              * If S or P are starting with a ?, remove it
              */
             if ('?' == substr($s, 0, 1)) {
-                $s = substr($s, 1);
+                $s = substr(trim($s), 1);
             }
 
             if ('?' == substr($p, 0, 1)) {
-                $p = substr($p, 1);
+                $p = substr(trim($p), 1);
             }
 
             /**
@@ -679,8 +681,6 @@ abstract class AbstractQuery implements Query
                 'o_datatype'    => $oDatatype,
                 'o_lang'        => $oLang
             );
-
-            ++$lineIndex;
         }
 
         return $pattern;

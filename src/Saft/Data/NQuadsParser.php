@@ -3,7 +3,6 @@
 namespace Saft\Data;
 
 use Sabre\Xml\Service;
-use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
@@ -11,6 +10,7 @@ use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactory;
+use Saft\Rdf\StatementIteratorFactory;
 
 /**
  * Parser for n-triples and n-quads (RDF).
@@ -21,26 +21,23 @@ class NQuadsParser implements Parser
 
     protected $nodeUtils;
 
-    protected $parserSerializerUtils;
-
     protected $statementFactory;
 
     /**
      * @param NodeFactory $nodeFactory
      * @param StatementFactory $statementFactory
      * @param NodeUtils $nodeUtils
-     * @param ParserSerializerUtils $parserSerializerUtils
      */
     public function __construct(
         NodeFactory $nodeFactory,
         StatementFactory $statementFactory,
-        NodeUtils $nodeUtils,
-        ParserSerializerUtils $parserSerializerUtils
+        StatementIteratorFactory $statementIteratorFactory,
+        NodeUtils $nodeUtils
     ) {
         $this->nodeFactory = $nodeFactory;
         $this->nodeUtils = $nodeUtils;
-        $this->parserSerializerUtils = $parserSerializerUtils;
         $this->statementFactory = $statementFactory;
+        $this->statementIteratorFactory = $statementIteratorFactory;
     }
 
     /**
@@ -75,10 +72,12 @@ class NQuadsParser implements Parser
         $statements = array();
 
         $pattern = '/' .
-            $this->parserSerializerUtils->getRegexStringForNodeRecognition(true) .'\s*|\t*'.
-            $this->parserSerializerUtils->getRegexStringForNodeRecognition() .'\s*|\t*'.
-            $this->parserSerializerUtils->getRegexStringForNodeRecognition(true, true, true, true) . '\s*|\t*'.
-            $this->parserSerializerUtils->getRegexStringForNodeRecognition() .
+            $this->nodeUtils->getRegexStringForNodeRecognition(true) .'\s*|\t*'.
+            $this->nodeUtils->getRegexStringForNodeRecognition() .'\s*|\t*'.
+            $this->nodeUtils->getRegexStringForNodeRecognition(
+                true, true, true, true, true, true
+            ) . '\s*|\t*'.
+            $this->nodeUtils->getRegexStringForNodeRecognition() .
             '/is';
 
         foreach (explode(PHP_EOL, $inputString) as $line) {
@@ -90,20 +89,20 @@ class NQuadsParser implements Parser
             preg_match_all($pattern, $line, $matches);
 
             if (isset($matches[0][3]) && false == empty($matches[0][3])) {
-                $graph = $this->nodeUtils->createNodeInstanceFromString($matches[0][3]);
+                $graph = $this->nodeFactory->createNodeFromNQuads($matches[0][3]);
             } else {
                 $graph = null;
             }
 
             $statements[] = $this->statementFactory->createStatement(
-                $this->nodeUtils->createNodeInstanceFromString($matches[0][0]),
-                $this->nodeUtils->createNodeInstanceFromString($matches[0][1]),
-                $this->nodeUtils->createNodeInstanceFromString($this->unescapeString($matches[0][2])),
+                $this->nodeFactory->createNodeFromNQuads($matches[0][0]),
+                $this->nodeFactory->createNodeFromNQuads($matches[0][1]),
+                $this->nodeFactory->createNodeFromNQuads($this->unescapeString($matches[0][2])),
                 $graph
             );
         }
 
-        return new ArrayStatementIteratorImpl($statements);
+        return $this->statementIteratorFactory->createStatementIteratorFromArray($statements);
     }
 
     /**

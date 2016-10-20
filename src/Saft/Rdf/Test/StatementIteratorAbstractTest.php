@@ -6,6 +6,7 @@ use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementImpl;
 use Saft\Test\TestCase;
 
@@ -49,25 +50,25 @@ abstract class StatementIteratorAbstractTest extends TestCase
 
     public function testCountAssertionSome()
     {
-        $nodeFactory = new NodeFactoryImpl();
+        $nodeFactory = new NodeFactoryImpl(new NodeUtils());
         $rdfLangString = $nodeFactory->createNamedNode(
             'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'
         );
         $statements = [
         new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new NamedNodeImpl('http://o/')
+            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://o/')
         ),
         new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new LiteralImpl('foobar', $rdfLangString, 'en')
+            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+            new LiteralImpl(new NodeUtils(), 'foobar', $rdfLangString, 'en')
         ),
         new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new LiteralImpl("42")
+            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+            new LiteralImpl(new NodeUtils(), "42")
         )];
 
         $iterator = $this->createInstanceWithArray($statements);
@@ -90,25 +91,25 @@ abstract class StatementIteratorAbstractTest extends TestCase
 
     public function testIterationWithForeachLoop()
     {
-        $nodeFactory = new NodeFactoryImpl();
+        $nodeFactory = new NodeFactoryImpl(new NodeUtils());
         $rdfLangString = $nodeFactory->createNamedNode(
             'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'
         );
         $statements = [
         new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new NamedNodeImpl('http://o/')
+            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://o/')
         ),
         new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new LiteralImpl('foobar', $rdfLangString, 'en')
+            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+            new LiteralImpl(new NodeUtils(), 'foobar', $rdfLangString, 'en')
         ),
         new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new LiteralImpl("42")
+            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+            new LiteralImpl(new NodeUtils(), "42")
         )];
 
         $iterator = $this->createInstanceWithArray($statements);

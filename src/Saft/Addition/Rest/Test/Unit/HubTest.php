@@ -3,12 +3,12 @@
 namespace Saft\Addition\Rest\Test\Unit;
 
 use Saft\Addition\Rest\Hub;
-use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Sparql\Query\QueryUtils;
 use Saft\Store\BasicTriplePatternStore;
 use Saft\Test\TestCase;
 use Zend\Diactoros\ServerRequest;
@@ -21,7 +21,7 @@ class HubTest extends TestCase
 
         $this->fixture = new Hub(
             $this->getMockStore(),
-            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
+            new NodeUtils()
         );
     }
 
@@ -31,9 +31,9 @@ class HubTest extends TestCase
     protected function getMockStore()
     {
         return new BasicTriplePatternStore(
-            new NodeFactoryImpl(),
+            new NodeFactoryImpl(new NodeUtils()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(),
+            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
             new StatementIteratorFactoryImpl()
         );
     }

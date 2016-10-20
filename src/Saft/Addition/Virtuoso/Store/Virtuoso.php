@@ -2,7 +2,6 @@
 
 namespace Saft\Addition\Virtuoso\Store;
 
-use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\AbstractLiteral;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Node;
@@ -13,6 +12,7 @@ use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
 use Saft\Rdf\Triple;
+use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
 use Saft\Sparql\Query\QueryUtils;
@@ -49,6 +49,11 @@ class Virtuoso extends AbstractSparqlStore
     private $nodeFactory = null;
 
     /**
+     * @var NodeUtils
+     */
+    private $nodeUtils = null;
+
+    /**
      * @var QueryFactory
      */
     private $queryFactory = null;
@@ -57,6 +62,11 @@ class Virtuoso extends AbstractSparqlStore
      * @var QueryUtils
      */
     protected $queryUtils;
+
+    /**
+     * @var SparqlUtils
+     */
+    protected $sparqlUtils;
 
     /**
      * @var StatementFactory
@@ -76,6 +86,8 @@ class Virtuoso extends AbstractSparqlStore
      * @param QueryFactory             $queryFactory
      * @param ResultFactory            $resultFactory
      * @param StatementIteratorFactory $statementIteratorFactory
+     * @param NodeUtils                $this->nodeUtils
+     * @param QueryUtils               $queryUtils
      * @param array                    $adapterOptions           Array containing database credentials
      * @throws \Exception              If PHP ODBC extension was not loaded.
      * @throws \Exception              If PHP PDO_ODBC extension was not loaded.
@@ -86,11 +98,16 @@ class Virtuoso extends AbstractSparqlStore
         QueryFactory $queryFactory,
         ResultFactory $resultFactory,
         StatementIteratorFactory $statementIteratorFactory,
+        NodeUtils $nodeUtils,
+        QueryUtils $queryUtils,
+        SparqlUtils $sparqlUtils,
         array $configuration
     ) {
         $this->checkRequirements();
 
-        $this->queryUtils = new QueryUtils();
+        $this->nodeUtils = $nodeUtils;
+        $this->queryUtils = $queryUtils;
+        $this->sparqlUtils = $sparqlUtils;
 
         $this->configuration = $configuration;
 
@@ -108,7 +125,8 @@ class Virtuoso extends AbstractSparqlStore
             $statementFactory,
             $queryFactory,
             $resultFactory,
-            $statementIteratorFactory
+            $statementIteratorFactory,
+            $sparqlUtils
         );
     }
 
@@ -331,13 +349,10 @@ class Virtuoso extends AbstractSparqlStore
                 $sparqlQuery = $query;
             }
 
-            // TODO move that to the constructor
-            $nodeUtils = new NodeUtils($this->nodeFactory, new ParserSerializerUtils());
-
             // make it possible to set a default graph URI
             if (
                 isset($options['default_graph_uri']) &&
-                $nodeUtils->simpleCheckURI($options['default_graph_uri'])
+                $this->nodeUtils->simpleCheckURI($options['default_graph_uri'])
             ) {
                 $graphUri = $options['default_graph_uri'];
             } else {

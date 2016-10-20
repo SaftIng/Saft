@@ -10,6 +10,7 @@ use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactory;
+use Saft\Rdf\StatementIteratorFactory;
 
 /**
  *
@@ -25,13 +26,19 @@ class RDFXMLParser implements Parser
     /**
      * @param NodeFactory $nodeFactory
      * @param StatementFactory $statementFactory
+     * @param StatementIteratorFactory $statementIteratorFactory
      * @param NodeUtils $nodeUtils
      */
-    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory, NodeUtils $nodeUtils)
-    {
+    public function __construct(
+        NodeFactory $nodeFactory,
+        StatementFactory $statementFactory,
+        StatementIteratorFactory $statementIteratorFactory,
+        NodeUtils $nodeUtils
+    ) {
         $this->nodeFactory = $nodeFactory;
         $this->nodeUtils = $nodeUtils;
         $this->statementFactory = $statementFactory;
+        $this->statementIteratorFactory = $statementIteratorFactory;
     }
 
     /**
@@ -106,7 +113,6 @@ class RDFXMLParser implements Parser
                     } elseif (isset($rdfDescription['attributes'][$rdfAboutString])
                         && $rdfDescription['attributes'][$rdfAboutString]) {
                         foreach ($rdfDescription['value'] as $objectValue) {
-                            // var_dump($objectValue['attributes']);
 
                             $predicate = $this->nodeFactory->createNamedNode(
                                 str_replace(array('{', '}'), '', $objectValue['name'])
@@ -150,7 +156,7 @@ class RDFXMLParser implements Parser
             }
         }
 
-        return new ArrayStatementIteratorImpl($statements);
+        return $this->statementIteratorFactory->createStatementIteratorFromArray($statements);
     }
 
     /**

@@ -3,6 +3,8 @@
 namespace Saft\Test;
 
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeUtils;
+use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\Result\Result;
 use Saft\Sparql\Result\SetResult;
@@ -308,7 +310,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
+        $this->testGraph = new NamedNodeImpl(new NodeUtils(), 'http://localhost/Saft/TestGraph/');
 
         // set path to test file
         $saftRootDir = dirname(__FILE__) . '/../../../';

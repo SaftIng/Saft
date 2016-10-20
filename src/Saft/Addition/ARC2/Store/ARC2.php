@@ -2,7 +2,6 @@
 
 namespace Saft\Addition\ARC2\Store;
 
-use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\Node;
@@ -35,12 +34,17 @@ class ARC2 extends AbstractSparqlStore
     /**
      * @var NodeFactory
      */
-    private $nodeFactory = null;
+    protected $nodeFactory = null;
+
+    /**
+     * @var NodeUtils
+     */
+    protected $nodeUtils = null;
 
     /**
      * @var QueryFactory
      */
-    private $queryFactory = null;
+    protected $queryFactory = null;
 
     /**
      * @var QueryUtils
@@ -50,17 +54,17 @@ class ARC2 extends AbstractSparqlStore
     /**
      * @var SparqlUtils
      */
-    private $sparqlUtils = null;
+    protected $sparqlUtils = null;
 
     /**
      * @var StatementFactory
      */
-    private $statementFactory = null;
+    protected $statementFactory = null;
 
     /**
      * @var StatementIteratorFactory
      */
-    private $statementIteratorFactory = null;
+    protected $statementIteratorFactory = null;
 
     /**
      * @var ARC2_Store
@@ -75,6 +79,9 @@ class ARC2 extends AbstractSparqlStore
      * @param QueryFactory             $queryFactory
      * @param ResultFactory            $resultFactory
      * @param StatementIteratorFactory $statementIteratorFactory
+     * @param NodeUtils                $nodeUtils
+     * @param QueryUtils               $queryUtils
+     * @param SparqlUtils              $sparqlUtils
      * @param array                    $configuration Array containing database credentials
      */
     public function __construct(
@@ -83,6 +90,9 @@ class ARC2 extends AbstractSparqlStore
         QueryFactory $queryFactory,
         ResultFactory $resultFactory,
         StatementIteratorFactory $statementIteratorFactory,
+        NodeUtils $nodeUtils,
+        QueryUtils $queryUtils,
+        SparqlUtils $sparqlUtils,
         array $configuration
     ) {
         $this->configuration = $configuration;
@@ -95,9 +105,10 @@ class ARC2 extends AbstractSparqlStore
             $this->store->setUp();
         }
 
-        $this->nodeUtils = new NodeUtils($nodeFactory, new ParserSerializerUtils());
-        $this->queryUtils = new QueryUtils();
-        $this->sparqlUtils = new SparqlUtils();
+        $this->nodeUtils = $nodeUtils;
+
+        $this->queryUtils = $queryUtils;
+        $this->sparqlUtils = $sparqlUtils;
 
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
@@ -110,7 +121,8 @@ class ARC2 extends AbstractSparqlStore
             $statementFactory,
             $queryFactory,
             $resultFactory,
-            $statementIteratorFactory
+            $statementIteratorFactory,
+            $sparqlUtils
         );
     }
 
@@ -544,29 +556,34 @@ class ARC2 extends AbstractSparqlStore
                 }
 
                 // subject
-                $s = $this->nodeUtils->createNodeInstance(
+                $s = $this->nodeFactory->createNodeInstanceFromNodeParameter(
                     $quad['s'],
                     $quad['s_type']
                 );
 
                 // predicate
-                $p = $this->nodeUtils->createNodeInstance(
+                $p = $this->nodeFactory->createNodeInstanceFromNodeParameter(
                     $quad['p'],
                     $quad['p_type']
                 );
 
                 // object
-                $o = $this->nodeUtils->createNodeInstance(
+                $o = $this->nodeFactory->createNodeInstanceFromNodeParameter(
                     $quad['o'],
                     $quad['o_type'],
                     $quad['o_datatype'],
                     $quad['o_lang']
                 );
 
-                $this->deleteMatchingStatements(new StatementImpl($s, $p, $o, new NamedNodeImpl($quad['g'])));
+                $this->deleteMatchingStatements($this->statementFactory->createStatement(
+                    $s,
+                    $p,
+                    $o,
+                    $this->nodeFactory->createNamedNode($quad['g'])
+                ));
             }
 
-            return new EmptyResultImpl();
+            return $this->resultFactory->createEmptyResult();
 
         /*
          * Add support for DELETE DATA queries. Transform them to DELETE FROM queries so that ARC2 can understand them.
@@ -582,29 +599,34 @@ class ARC2 extends AbstractSparqlStore
                 }
 
                 // subject
-                $s = $this->nodeUtils->createNodeInstance(
+                $s = $this->nodeUtils->createNodeInstanceFromNodeParameter(
                     $quad['s'],
                     $quad['s_type']
                 );
 
                 // predicate
-                $p = $this->nodeUtils->createNodeInstance(
+                $p = $this->nodeUtils->createNodeInstanceFromNodeParameter(
                     $quad['p'],
                     $quad['p_type']
                 );
 
                 // object
-                $o = $this->nodeUtils->createNodeInstance(
+                $o = $this->nodeUtils->createNodeInstanceFromNodeParameter(
                     $quad['o'],
                     $quad['o_type'],
                     $quad['o_datatype'],
                     $quad['o_lang']
                 );
 
-                $this->deleteMatchingStatements(new StatementImpl($s, $p, $o, new NamedNodeImpl($quad['g'])));
+                $this->deleteMatchingStatements($this->statementFactory->createStatement(
+                    $s,
+                    $p,
+                    $o,
+                    $this->nodeFactory->createNamedNode($quad['g'])
+                ));
             }
 
-            return new EmptyResultImpl();
+            return $this->resultFactory->createEmptyResult();
 
         /*
          * Add support for INSERT DATA queries. Transform them to INSERT INTO queries so that ARC2 can understand them.
@@ -622,31 +644,36 @@ class ARC2 extends AbstractSparqlStore
                 }
 
                 // subject
-                $s = $this->nodeUtils->createNodeInstance(
+                $s = $this->nodeFactory->createNodeInstanceFromNodeParameter(
                     $quad['s'],
                     $quad['s_type']
                 );
 
                 // predicate
-                $p = $this->nodeUtils->createNodeInstance(
+                $p = $this->nodeFactory->createNodeInstanceFromNodeParameter(
                     $quad['p'],
                     $quad['p_type']
                 );
 
                 // object
-                $o = $this->nodeUtils->createNodeInstance(
+                $o = $this->nodeFactory->createNodeInstanceFromNodeParameter(
                     $quad['o'],
                     $quad['o_type'],
                     $quad['o_datatype'],
                     $quad['o_lang']
                 );
 
-                $statements[] = new StatementImpl($s, $p, $o, new NamedNodeImpl($quad['g']));
+                $statements[] = $this->statementFactory->createStatement(
+                    $s,
+                    $p,
+                    $o,
+                    $this->nodeFactory->createNamedNode($quad['g'])
+                );
             }
 
             $this->addStatements($statements);
 
-            return new EmptyResultImpl();
+            return $this->resultFactory->createEmptyResult();
 
         /*
          * CONSTRUCT query

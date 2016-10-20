@@ -20,12 +20,13 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.4",
         "php-curl-class/php-curl-class": "4.11.*",
-        "saft/saft-store": ">=0.4"
+        "saft/saft-store": ">=0.8"
     },
     "require-dev": {
-        "phpunit/phpunit": ">=4.8"
+        "phpunit/phpunit": "4.8.*",
+        "saft/saft-test": ">=0.8"
     },
     "autoload": {
         "psr-4": {

@@ -3,6 +3,7 @@
 namespace Saft\Sparql\Test\Query;
 
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\AskQuery;
 use Saft\Sparql\Query\DescribeQuery;
@@ -29,10 +30,10 @@ class AbstractQueryUnitTest extends TestCase
     {
         parent::setUp();
 
-        $this->queryFactory = new QueryFactoryImpl();
+        $this->queryFactory = new QueryFactoryImpl(new NodeUtils(), new QueryUtils());
         $this->queryUtils = new QueryUtils();
 
-        $this->fixture = $this->getMockForAbstractClass('\Saft\Sparql\Query\AbstractQuery');
+        $this->fixture = new AbstractQueryChild('', new NodeUtils());
     }
 
     /*
@@ -485,8 +486,7 @@ class AbstractQueryUnitTest extends TestCase
                 )
             ),
             $this->fixture->extractTriplePattern(
-                'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema>
-                SELECT ?s FROM <> WHERE {
+                'WHERE {
                     ?s rdfs:label "Foo"@en
                 }'
             )
@@ -509,8 +509,7 @@ class AbstractQueryUnitTest extends TestCase
                 )
             ),
             $this->fixture->extractTriplePattern(
-                'PREFIX foaf: <http://whatelse/>
-                SELECT ?s FROM <> WHERE {
+                'WHERE {
                     ?s rdfs:label "Foo"@en
                 }'
             )
@@ -533,8 +532,7 @@ class AbstractQueryUnitTest extends TestCase
                 )
             ),
             $this->fixture->extractTriplePattern(
-                'PREFIX rdfs: <http://whatelse/>
-                SELECT ?s FROM <> WHERE {
+                'WHERE {
                     ?s rdfs:label "Foo"
                 }'
             )

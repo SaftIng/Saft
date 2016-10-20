@@ -2,24 +2,27 @@
 
 namespace Saft\Addition\Redland\Tests\Rdf;
 
-use Saft\Rdf\AnyPatternImpl;
 use Saft\Addition\Redland\Rdf\BlankNode;
 use Saft\Addition\Redland\Rdf\Literal;
 use Saft\Addition\Redland\Rdf\NamedNode;
 use Saft\Addition\Redland\Rdf\NodeFactory;
 use Saft\Addition\Redland\Rdf\Statement;
+use Saft\Rdf\AnyPatternImpl;
+use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
+use Saft\Rdf\Test\StatementAbstractTest;
 
-class StatementTest extends \Saft\Rdf\Test\StatementAbstractTest
+class StatementTest extends StatementAbstractTest
 {
     public function newLiteralInstance($value, $lang = null, $datatype = null)
     {
-        $factory = new NodeFactory();
+        $factory = new NodeFactory(new NodeUtils());
         return $factory->createLiteral($value, $lang, $datatype);
     }
 
     public function newNamedNodeInstance($uri)
     {
-        $factory = new NodeFactory();
+        $factory = new NodeFactory(new NodeUtils());
         return $factory->createNamedNode($uri);
     }
 
@@ -30,7 +33,7 @@ class StatementTest extends \Saft\Rdf\Test\StatementAbstractTest
 
     public function newBlankNodeInstance($blankId)
     {
-        $factory = new NodeFactory();
+        $factory = new NodeFactory(new NodeUtils());
         return $factory->createBlankNode($blankId);
     }
 
@@ -38,14 +41,14 @@ class StatementTest extends \Saft\Rdf\Test\StatementAbstractTest
     {
         $world = librdf_php_get_world();
 
-        $factory = new NodeFactory();
+        $factory = new NodeFactory(new NodeUtils());
         try {
             $redlandSubject = $factory->createRedlandNodeFromNode($subject);
             $redlandPredicate = $factory->createRedlandNodeFromNode($predicate);
             $redlandObject = $factory->createRedlandNodeFromNode($object);
 
             $statement = librdf_new_statement_from_nodes($world, $redlandSubject, $redlandPredicate, $redlandObject);
-            return new Statement($statement, $graph);
+            return new Statement($statement, $factory, new NodeUtils(), $graph);
         } catch (\Exception $e) {
             $this->markTestSkipped('Can\'t execute this test because: ' . $e->getMessage());
         }

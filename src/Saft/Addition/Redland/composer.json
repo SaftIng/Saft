@@ -13,13 +13,14 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "saft/saft-data": ">=0.4",
-        "saft/saft-rdf": ">=0.4",
-        "saft/saft-store": ">=0.4"
+        "php": ">=5.4",
+        "saft/saft-data": ">=0.8",
+        "saft/saft-rdf": ">=0.8",
+        "saft/saft-store": ">=0.8"
     },
     "require-dev": {
-        "phpunit/phpunit": ">=4.8",
+        "phpunit/phpunit": "4.8.*",
+        "saft/saft-test": ">=0.8",
         "squizlabs/php_codesniffer": ">=2.5"
     },
     "autoload": {

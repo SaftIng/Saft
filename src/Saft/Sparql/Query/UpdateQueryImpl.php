@@ -2,6 +2,7 @@
 
 namespace Saft\Sparql\Query;
 
+use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\AbstractQuery;
 
 /**
@@ -18,7 +19,8 @@ class UpdateQueryImpl extends AbstractQuery
     /**
      * Constructor.
      *
-     * @param  string     $query SPARQL query string to initialize this instance.
+     * @param string     $query SPARQL query string to initialize this instance.
+     * @param NodeUtils $nodeUtils
      * @throws \Exception If no where part was found in query.
      * @throws \Exception If given query is not suitable for UpdateQuery.
      * @throws \Exception If no triple part after INSERT DATA found.
@@ -27,9 +29,9 @@ class UpdateQueryImpl extends AbstractQuery
      * @throws \Exception If no valid WITH <> DELETE {...} INSERT { ... } WHERE { ...} query given.
      * @throws \Exception If there is either no triple part after INSERT INTO GRAPH or no graph set.
      */
-    public function __construct($query = '')
+    public function __construct($query = '', NodeUtils $nodeUtils)
     {
-        parent::__construct($query);
+        parent::__construct($query, $nodeUtils);
 
         if (null == $this->query) {
             return;
@@ -211,15 +213,10 @@ class UpdateQueryImpl extends AbstractQuery
         $queryFromDelete = substr($this->getQuery(), strpos($this->getQuery(), 'DELETE'));
 
         $this->queryParts = array(
-            'filter_pattern' => $this->extractFilterPattern($this->getQuery()),
             'graphs' => $this->extractGraphs($this->getQuery()),
-            'namespaces' => $this->extractNamespacesFromQuery($queryFromDelete),
-            'prefixes' => $this->extractPrefixesFromQuery($this->getQuery()),
-            'quad_pattern' => $this->extractQuads($this->getQuery()),
             'sub_type' => $this->getSubType(),
-            'triple_pattern' => $this->extractTriplePattern($this->getQuery()),
-            'variables' => $this->extractVariablesFromQuery($this->getQuery())
         );
+        $tripleRelatedPart = $this->getQuery();
 
         /**
          * Save parts for INSERT DATA
@@ -331,6 +328,8 @@ class UpdateQueryImpl extends AbstractQuery
                 $this->queryParts['deleteWhere'] = trim($matches[3]);
                 $this->queryParts['graphs'] = array(trim($matches[1]));
 
+                $tripleRelatedPart = $this->queryParts['deleteData'] . $this->queryParts['deleteWhere'];
+
                 /**
                  * TODO extract graphs
                  */
@@ -343,7 +342,7 @@ class UpdateQueryImpl extends AbstractQuery
         /**
          * Save parts for WITH <> DELETE {} INSERT {} WHERE {}
          */
-        } elseif ('withDeleteWhere' === $this->queryParts['sub_type']) {
+        } elseif ('withDeleteInsertWhere' === $this->queryParts['sub_type']) {
             preg_match(
                 '/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*INSERT\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/',
                 $this->getQuery(),
@@ -366,6 +365,15 @@ class UpdateQueryImpl extends AbstractQuery
                 );
             }
         }
+
+        $this->queryParts = array_merge($this->queryParts, array(
+            'filter_pattern' => $this->extractFilterPattern($this->getQuery()),
+            'namespaces' => $this->extractNamespacesFromQuery($queryFromDelete),
+            'prefixes' => $this->extractPrefixesFromQuery($this->getQuery()),
+            'quad_pattern' => $this->extractQuads($this->getQuery()),
+            'triple_pattern' => $this->extractTriplePattern($tripleRelatedPart),
+            'variables' => $this->extractVariablesFromQuery($this->getQuery())
+        ));
 
         $this->unsetEmptyValues($this->queryParts);
 

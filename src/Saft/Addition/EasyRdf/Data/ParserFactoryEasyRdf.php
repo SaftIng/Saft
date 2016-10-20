@@ -4,7 +4,9 @@ namespace Saft\Addition\EasyRdf\Data;
 
 use Saft\Data\ParserFactory;
 use Saft\Rdf\NodeFactory;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactory;
+use Saft\Rdf\StatementIteratorFactory;
 
 class ParserFactoryEasyRdf implements ParserFactory
 {
@@ -13,12 +15,20 @@ class ParserFactoryEasyRdf implements ParserFactory
      */
     protected $serializationMap;
 
-    private $nodeFactory;
+    protected $nodeFactory;
 
-    private $statementFactory;
+    protected $nodeUtils;
 
-    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory)
-    {
+    protected $statementFactory;
+
+    protected $statementIteratorFactory;
+
+    public function __construct(
+        NodeFactory $nodeFactory,
+        StatementFactory $statementFactory,
+        StatementIteratorFactory $statementIteratorFactory,
+        NodeUtils $nodeUtils
+    ) {
         /**
          * Map of serializations. It maps the Saft term on according the EasyRdf format.
          */
@@ -31,7 +41,9 @@ class ParserFactoryEasyRdf implements ParserFactory
         );
 
         $this->nodeFactory = $nodeFactory;
+        $this->nodeUtils = $nodeUtils;
         $this->statementFactory = $statementFactory;
+        $this->statementIteratorFactory = $statementIteratorFactory;
     }
 
     /**
@@ -51,7 +63,13 @@ class ParserFactoryEasyRdf implements ParserFactory
             );
         }
 
-        return new ParserEasyRdf($this->nodeFactory, $this->statementFactory, $serialization);
+        return new ParserEasyRdf(
+            $this->nodeFactory,
+            $this->statementFactory,
+            $this->statementIteratorFactory,
+            $this->nodeUtils,
+            $serialization
+        );
     }
 
     /**

@@ -6,19 +6,17 @@ use Curl\Curl;
 use \Mockery;
 use Saft\Addition\HttpStore\Store\Http;
 use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
+use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\ResultFactoryImpl;
 use Saft\Store\Test\StoreAbstractTest;
 
 class HttpTest extends StoreAbstractTest
 {
-    /**
-     * @var \GuzzleHttp\Client
-     */
-    protected $client;
-
     public function setUp()
     {
         parent::setUp();
@@ -29,11 +27,14 @@ class HttpTest extends StoreAbstractTest
         if (true === isset($this->configuration['httpConfig'])) {
 
             $this->fixture = new Http(
-                new NodeFactoryImpl(),
+                new NodeFactoryImpl(new NodeUtils()),
                 new StatementFactoryImpl(),
-                new QueryFactoryImpl(),
+                new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
                 new ResultFactoryImpl(),
                 new StatementIteratorFactoryImpl(),
+                new NodeUtils(),
+                new QueryUtils(),
+                new SparqlUtils(new StatementIteratorFactoryImpl()),
                 array('queryUrl' => 'http://query/url')
             );
 
@@ -60,11 +61,14 @@ class HttpTest extends StoreAbstractTest
 
         $config = array('authUrl' => 'http://not existend');
         $client = new Http(
-            new NodeFactoryImpl(),
+            new NodeFactoryImpl(new NodeUtils()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(),
+            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
+            new NodeUtils(),
+            new QueryUtils(),
+            new SparqlUtils(new StatementIteratorFactoryImpl()),
             $config
         );
         $client->setClient($this->httpClient);
@@ -81,11 +85,14 @@ class HttpTest extends StoreAbstractTest
 
         $config = array('queryUrl' => 'http://not existend');
         $client = new Http(
-            new NodeFactoryImpl(),
+            new NodeFactoryImpl(new NodeUtils()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(),
+            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
+            new NodeUtils(),
+            new QueryUtils(),
+            new SparqlUtils(new StatementIteratorFactoryImpl()),
             $config
         );
         $client->setClient($this->httpClient);
@@ -1140,11 +1147,14 @@ class HttpTest extends StoreAbstractTest
         $config = array('queryUrl' => 'http://dbpedia.org/sparql');
 
         $fixture = new Http(
-            new NodeFactoryImpl(),
+            new NodeFactoryImpl(new NodeUtils()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(),
+            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
+            new NodeUtils(),
+            new QueryUtils(),
+            new SparqlUtils(new StatementIteratorFactoryImpl()),
             $config
         );
         $fixture->setClient($this->httpClient);

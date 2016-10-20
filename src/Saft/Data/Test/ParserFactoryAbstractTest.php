@@ -2,7 +2,6 @@
 
 namespace Saft\Data\Test;
 
-use Saft\Data\ParserFactory;
 use Saft\Test\TestCase;
 
 abstract class ParserFactoryAbstractTest extends TestCase

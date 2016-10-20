@@ -2,6 +2,8 @@
 
 namespace Saft\Sparql\Query;
 
+use Saft\Rdf\NodeUtils;
+
 /**
  * Represents a SELECT query.
  */
@@ -12,9 +14,9 @@ class SelectQueryImpl extends AbstractQuery
      *
      * @param  string optional $query SPARQL query string to initialize this instance.
      */
-    public function __construct($query = '')
+    public function __construct($query = '', NodeUtils $nodeUtils)
     {
-        parent::__construct($query);
+        parent::__construct($query, $nodeUtils);
 
         if (null === $this->query) {
             return;

@@ -66,4 +66,19 @@ interface NodeFactory
      * @since 0.1
      */
     public function createNodeFromNQuads($string);
+
+    /**
+     * Helper function, which is useful, if you have all the meta information about a Node and want to create
+     * the according Node instance.
+     *
+     * @param string      $value       Value of the node.
+     * @param string      $type        Can be uri, bnode, var or literal
+     * @param string      $datatype    URI of the datatype (optional)
+     * @param string      $language    Language tag (optional)
+     * @return Node Node instance, which type is one of: NamedNode, BlankNode, Literal, AnyPattern
+     * @throws \Exception if an unknown type was given.
+     * @api
+     * @since 0.8
+     */
+    public function createNodeInstanceFromNodeParameter($value, $type, $datatype = null, $language = null);
 }

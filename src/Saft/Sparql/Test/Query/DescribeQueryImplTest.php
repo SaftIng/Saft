@@ -2,6 +2,7 @@
 
 namespace Saft\Sparql\Test\Query;
 
+use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\DescribeQueryImpl;
 use Saft\Test\TestCase;
 
@@ -11,7 +12,7 @@ class DescribeQueryImplTest extends TestCase
     {
         parent::setUp();
 
-        $this->fixture = new DescribeQueryImpl();
+        $this->fixture = new DescribeQueryImpl(null, new NodeUtils());
     }
 
     /*
@@ -24,7 +25,8 @@ class DescribeQueryImplTest extends TestCase
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             DESCRIBE ?x
             FROM <http://foobar/>
-            WHERE { ?x foaf:name "Alice" }'
+            WHERE { ?x foaf:name "Alice" }',
+            new NodeUtils()
         );
 
         $this->assertEquals(
@@ -47,7 +49,8 @@ class DescribeQueryImplTest extends TestCase
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             DESCRIBE ?x
             FROM <http://foo/bar/>
-            WHERE { ?x <http://foobar/name> "Alice". ?y <http://www.w3.org/2001/XMLSchema#string> "Alice". }'
+            WHERE { ?x <http://foobar/name> "Alice". ?y <http://www.w3.org/2001/XMLSchema#string> "Alice". }',
+            new NodeUtils()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -64,7 +67,8 @@ class DescribeQueryImplTest extends TestCase
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             DESCRIBE ?x
             FROM <http://foobar/>
-            WHERE { ?x foaf:name "Alice" }'
+            WHERE { ?x foaf:name "Alice" }',
+            new NodeUtils()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -83,7 +87,8 @@ class DescribeQueryImplTest extends TestCase
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             DESCRIBE ?x
             FROM <http://foo/bar/>
-            WHERE { ?x <http://foobar/name> "Alice" }'
+            WHERE { ?x <http://foobar/name> "Alice" }',
+            new NodeUtils()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -100,7 +105,8 @@ class DescribeQueryImplTest extends TestCase
         $this->fixture = new DescribeQueryImpl(
             'DESCRIBE ?x
             FROM <http://foo/bar/>
-            WHERE { ?x <http://foobar/name> "Alice" }'
+            WHERE { ?x <http://foobar/name> "Alice" }',
+            new NodeUtils()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -119,7 +125,8 @@ class DescribeQueryImplTest extends TestCase
             DESCRIBE ?s
             FROM <http://foo/bar/>
             FROM NAMED <http://foo/bar/named>
-            WHERE { ?s ?p ?o. FILTER (?o < 40) }'
+            WHERE { ?s ?p ?o. FILTER (?o < 40) }',
+            new NodeUtils()
         );
 
         $queryParts = $this->fixture->getQueryParts();

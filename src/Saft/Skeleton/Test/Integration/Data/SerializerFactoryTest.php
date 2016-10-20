@@ -2,6 +2,7 @@
 
 namespace Saft\Skeleton\Test\Integration\Data;
 
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Skeleton\Data\SerializerFactory;
@@ -13,7 +14,7 @@ class SerializerFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->fixture = new SerializerFactory(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $this->fixture = new SerializerFactory(new NodeFactoryImpl(new NodeUtils()), new StatementFactoryImpl());
     }
 
     /*

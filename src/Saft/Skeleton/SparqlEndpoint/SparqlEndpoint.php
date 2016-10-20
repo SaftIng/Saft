@@ -7,11 +7,16 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeFactory;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementImpl;
+use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
+use Saft\Rdf\StatementIteratorFactory;
 use Saft\Skeleton\Data\SerializerFactory;
 use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\Result;
+use Saft\Sparql\Result\ResultFactory;
 use Saft\Sparql\Result\SetResult;
 use Saft\Sparql\Result\SetResultImpl;
 use Saft\Sparql\Result\ValueResult;
@@ -23,6 +28,16 @@ use Symfony\Component\HttpFoundation\Response;
 class SparqlEndpoint
 {
     /**
+     * @var Negotiator
+     */
+    protected $negotiator;
+
+    /**
+     * @var NodeUtils
+     */
+    protected $nodeUtils;
+
+    /**
      * @var QueryUtils
      */
     protected $queryUtils;
@@ -33,17 +48,44 @@ class SparqlEndpoint
     protected $serializerFactory;
 
     /**
+     * @var StatementFactory
+     */
+    protected $statementFactory;
+
+    /**
      * @var Store
      */
     protected $store;
 
     /**
      * @param Store $store
+     * @param SerializerFactory $serializerFactory
+     * @param NodeFactory $nodeFactory
+     * @param StatementFactory $statementFactory
+     * @param StatementIteratorFactory $statementIteratorFactory
+     * @param NodeUtils $nodeUtils
+     * @param QueryUtils $queryUtils
+     * @param Negotiator $negotiator
      */
-    public function __construct(Store $store, SerializerFactory $serializerFactory, QueryUtils $queryUtils)
-    {
+    public function __construct(
+        Store $store,
+        SerializerFactory $serializerFactory,
+        NodeFactory $nodeFactory,
+        StatementFactory $statementFactory,
+        StatementIteratorFactory $statementIteratorFactory,
+        ResultFactory $resultFactory,
+        NodeUtils $nodeUtils,
+        QueryUtils $queryUtils,
+        Negotiator $negotiator
+    ) {
+        $this->negotiator = $negotiator;
+        $this->nodeUtils = $nodeUtils;
+        $this->nodeFactory = $nodeFactory;
         $this->queryUtils = $queryUtils;
+        $this->resultFactory = $resultFactory;
         $this->serializerFactory = $serializerFactory;
+        $this->statementFactory = $statementFactory;
+        $this->statementIteratorFactory = $statementIteratorFactory;
         $this->store = $store;
     }
 
@@ -91,10 +133,9 @@ class SparqlEndpoint
             /*
              * check accept header
              */
-            $negotiator = new Negotiator();
             // what media types we do support
             $serverPriorities = array('application/x-turtle');
-            $mediaType = $negotiator->getBest($request->headers->get('accept'), $serverPriorities);
+            $mediaType = $this->negotiator->getBest($request->headers->get('accept'), $serverPriorities);
             if (null !== $mediaType) {
                 $headers['Content-Type'] = $mediaType->getValue();
             } else {
@@ -199,20 +240,20 @@ class SparqlEndpoint
 
          */
         $statements = array();
-        $resultSetNode = new BlankNodeImpl('ResultSet');
+        $resultSetNode = $this->nodeFactory->createBlankNode('ResultSet');
 
-        $statements[] = new StatementImpl(
+        $statements[] = $this->statementFactory->createStatement(
             $resultSetNode,
-            new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-            new NamedNodeImpl('http://www.w3.org/2005/sparql-results#ResultSet')
+            $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+            $this->nodeFactory->createNamedNode('http://www.w3.org/2005/sparql-results#ResultSet')
         );
 
         // add variables
         foreach ($result->getVariables() as $variable) {
-            $statements[] = new StatementImpl(
+            $statements[] = $this->statementFactory->createStatement(
                 $resultSetNode,
-                new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#resultVariable'),
-                new LiteralImpl($variable)
+                $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#resultVariable'),
+                $this->nodeFactory->createLiteral($variable)
             );
         }
 
@@ -228,35 +269,35 @@ class SparqlEndpoint
         $bindingId = 0;
         foreach ($result as $setEntry) {
             // _:_ res:solution [
-            $solutionBlankNode = new BlankNodeImpl('solution'. $solutionId);
-            $statements[] = new StatementImpl(
+            $solutionBlankNode = $this->nodeFactory->createBlankNode('solution'. $solutionId);
+            $statements[] = $this->statementFactory->createStatement(
                 $resultSetNode,
-                new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#solution'),
+                $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#solution'),
                 $solutionBlankNode
             );
 
             // fill solution blank node
             foreach ($result->getVariables() as $variable) {
-                $bindingBlankNode = new BlankNodeImpl('binding'. $bindingId++);
+                $bindingBlankNode = $this->nodeFactory->createBlankNode('binding'. $bindingId++);
 
                 // _:solution1 res:binding _:binding1
-                $statements[] = new StatementImpl(
+                $statements[] = $this->statementFactory->createStatement(
                     $solutionBlankNode,
-                    new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#binding'),
+                    $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#binding'),
                     $bindingBlankNode
                 );
 
                 // res:variable "s" ;
-                $statements[] = new StatementImpl(
+                $statements[] = $this->statementFactory->createStatement(
                     $bindingBlankNode,
-                    new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#variable'),
-                    new LiteralImpl($variable)
+                    $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#variable'),
+                    $this->nodeFactory->createLiteral($variable)
                 );
 
                 // res:value "my-value"
-                $statements[] = new StatementImpl(
+                $statements[] = $this->statementFactory->createStatement(
                     $bindingBlankNode,
-                    new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#value'),
+                    $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#value'),
                     $setEntry[$variable]
                 );
             }
@@ -264,7 +305,7 @@ class SparqlEndpoint
             ++$solutionId;
         }
 
-        return new ArrayStatementIteratorImpl($statements);
+        return $this->statementIteratorFactory->createStatementIteratorFromArray($statements);
     }
 
     /**
@@ -283,7 +324,7 @@ class SparqlEndpoint
             );
         }
 
-        $result = new SetResultImpl($setEntries);
+        $result = $this->resultFactory->createSetResult($setEntries);
         $result->setVariables(array('s', 'p', 'o'));
 
         return $result;
@@ -309,7 +350,7 @@ class SparqlEndpoint
             );
         }
 
-        $result = new SetResultImpl($setEntries);
+        $result = $this->resultFactory->createSetResult($setEntries);
         $result->setVariables(array('s', 'p', 'o'));
         return $result;
     }
@@ -330,7 +371,7 @@ class SparqlEndpoint
             $statements[] = $statement;
         }
 
-        return new ArrayStatementIteratorImpl($statements);
+        return $this->statementIteratorFactory->createStatementIteratorFromArray($statements);
     }
 
     /**
@@ -340,26 +381,26 @@ class SparqlEndpoint
     public function transformValueResultToResultSet($result)
     {
         $statements = array();
-        $resultSetNode = new BlankNodeImpl('ResultSet');
+        $resultSetNode = $this->nodeFactory->createBlankNode('ResultSet');
 
         // [] rdf:type rs:results ;
-        $statements[] = new StatementImpl(
+        $statements[] = $this->statementFactory->createStatement(
             $resultSetNode,
-            new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-            new NamedNodeImpl('http://www.w3.org/2005/sparql-results#results')
+            $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+            $this->nodeFactory->createNamedNode('http://www.w3.org/2005/sparql-results#results')
         );
 
         // .. ; rs:boolean true .
         // assuming that only boolean as value are possible
-        $statements[] = new StatementImpl(
+        $statements[] = $this->statementFactory->createStatement(
             $resultSetNode,
-            new NamedNodeImpl('http://www.w3.org/2005/sparql-results#boolean'),
-            new LiteralImpl(
+            $this->nodeFactory->createNamedNode('http://www.w3.org/2005/sparql-results#boolean'),
+            $this->nodeFactory->createLiteral(
                 true === $result ? 'true' : 'false',
-                new NamedNodeImpl('http://www.w3.org/2001/XMLSchema#boolean')
+                $this->nodeFactory->createNamedNode('http://www.w3.org/2001/XMLSchema#boolean')
             )
         );
 
-        return new ArrayStatementIteratorImpl($statements);
+        return $this->statementIteratorFactory->createStatementIteratorFromArray($statements);
     }
 }

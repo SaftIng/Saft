@@ -2,6 +2,9 @@
 
 namespace Saft\Sparql\Test\Query;
 
+use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
+use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Sparql\Query\UpdateQueryImpl;
@@ -18,8 +21,8 @@ class UpdateQueryImplTest extends TestCase
     {
         parent::setUp();
 
-        $this->fixture = new UpdateQueryImpl();
-        $this->queryFactory = new QueryFactoryImpl();
+        $this->fixture = new UpdateQueryImpl(null, new NodeUtils());
+        $this->queryFactory = new QueryFactoryImpl(new NodeUtils(), new QueryUtils());
     }
 
     /*
@@ -30,7 +33,8 @@ class UpdateQueryImplTest extends TestCase
     {
         $this->fixture = new UpdateQueryImpl(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-            WITH <http://graph/> DELETE { ?x foaf:name "Alice" } WHERE { ?s ?p ?o }'
+            WITH <http://graph/> DELETE { ?x foaf:name "Alice" } WHERE { ?s ?p ?o }',
+            new NodeUtils()
         );
 
         $this->assertEquals(
@@ -44,7 +48,8 @@ class UpdateQueryImplTest extends TestCase
     {
         $this->fixture = new UpdateQueryImpl(
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-            DELETE DATA { ?x foaf:name "Alice" }'
+            DELETE DATA { ?x foaf:name "Alice" }',
+            new NodeUtils()
         );
 
         $this->assertEquals(
@@ -153,8 +158,10 @@ class UpdateQueryImplTest extends TestCase
 
     public function testGetSubTypeDeleteData()
     {
-        $this->fixture = new UpdateQueryImpl('
-            PREFIX dc: <http://foo/bar/> DELETE DATA { GRAPH <http://> { ?s ?p ?o } }');
+        $this->fixture = new UpdateQueryImpl(
+            'PREFIX dc: <http://foo/bar/> DELETE DATA { GRAPH <http://> { ?s ?p ?o } }',
+            new NodeUtils()
+        );
 
         $this->assertEquals('deleteData', $this->fixture->getSubType());
     }
@@ -162,7 +169,8 @@ class UpdateQueryImplTest extends TestCase
     public function testGetSubTypeInsertData()
     {
         $this->fixture = new UpdateQueryImpl(
-            'PREFIX dc: <http://foo/bar/> INSERT DATA { GRAPH <http://> { ?s dc:foo "hi" } }'
+            'PREFIX dc: <http://foo/bar/> INSERT DATA { GRAPH <http://> { ?s dc:foo "hi" } }',
+            new NodeUtils()
         );
 
         $this->assertEquals('insertData', $this->fixture->getSubType());
@@ -171,7 +179,8 @@ class UpdateQueryImplTest extends TestCase
     public function testGetSubTypeInsertInto()
     {
         $this->fixture = new UpdateQueryImpl(
-            'PREFIX dc: <http://foo/bar/> INSERT INTO GRAPH <http://> { ?s dc:foo "hi" }'
+            'PREFIX dc: <http://foo/bar/> INSERT INTO GRAPH <http://> { ?s dc:foo "hi" }',
+            new NodeUtils()
         );
 
         $this->assertEquals('insertInto', $this->fixture->getSubType());
@@ -181,7 +190,8 @@ class UpdateQueryImplTest extends TestCase
     {
         $this->fixture = new UpdateQueryImpl(
             'PREFIX dc: <http://foo/bar/>
-             WITH <http://> DELETE { ?s dc:foo "hi" } INSERT { ?s dc:foo "ho" } WHERE { ?s dc:foo "hi" }'
+             WITH <http://> DELETE { ?s dc:foo "hi" } INSERT { ?s dc:foo "ho" } WHERE { ?s dc:foo "hi" }',
+            new NodeUtils()
         );
 
         $this->assertEquals('withDeleteInsertWhere', $this->fixture->getSubType());
@@ -190,7 +200,8 @@ class UpdateQueryImplTest extends TestCase
     public function testGetSubTypeWithDeleteWhere()
     {
         $this->fixture = new UpdateQueryImpl(
-            'PREFIX dc: <http://foo/bar/> WITH <http://> DELETE { ?s dc:foo "hi" } WHERE { ?s dc:foo "hi" }'
+            'PREFIX dc: <http://foo/bar/> WITH <http://> DELETE { ?s dc:foo "hi" } WHERE { ?s dc:foo "hi" }',
+            new NodeUtils()
         );
 
         $this->assertEquals('withDeleteWhere', $this->fixture->getSubType());
@@ -206,7 +217,8 @@ class UpdateQueryImplTest extends TestCase
             'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             WITH <http://graph/>
             DELETE { ?x foaf:name "Alice"^^<http://www.w3.org/2001/XMLSchema#string>. ?x <http://namespace/aa> ?y }
-            WHERE { ?s ?p ?o. FILTER(?o < 40) }'
+            WHERE { ?s ?p ?o. FILTER(?o < 40) }',
+            new NodeUtils()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -288,7 +300,7 @@ class UpdateQueryImplTest extends TestCase
 
     public function testGetQueryPartsInsertDataMissingDataPart()
     {
-        $this->fixture = new UpdateQueryImpl('INSERT DATA { }');
+        $this->fixture = new UpdateQueryImpl('INSERT DATA { }', new NodeUtils());
 
         // expects an exception because data part is empty
         $this->setExpectedException('\Exception');

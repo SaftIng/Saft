@@ -2,8 +2,10 @@
 
 namespace Saft\Skeleton\Test\Unit\SparqlEndpoint;
 
+use Negotiation\Negotiator;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
@@ -12,6 +14,7 @@ use Saft\Skeleton\SparqlEndpoint\SparqlEndpoint;
 use Saft\Skeleton\Test\TestCase;
 use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Sparql\Query\QueryUtils;
+use Saft\Sparql\Result\ResultFactoryImpl;
 use Saft\Store\BasicTriplePatternStore;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,15 +32,25 @@ class SparqlEndpointTest extends TestCase
 
         // store
         $this->store = new BasicTriplePatternStore(
-            new NodeFactoryImpl(),
+            new NodeFactoryImpl(new NodeUtils()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(),
+            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
             new StatementIteratorFactoryImpl()
         );
 
-        $serializerFactory = new SerializerFactory(new NodeFactoryImpl(), new StatementFactoryImpl());
+        $serializerFactory = new SerializerFactory(new NodeFactoryImpl(new NodeUtils()), new StatementFactoryImpl());
 
-        $this->fixture = new SparqlEndpoint($this->store, $serializerFactory, new QueryUtils());
+        $this->fixture = new SparqlEndpoint(
+            $this->store,
+            $serializerFactory,
+            new NodeFactoryImpl(new NodeUtils()),
+            new StatementFactoryImpl(),
+            new StatementIteratorFactoryImpl(),
+            new ResultFactoryImpl(),
+            new NodeUtils(),
+            new QueryUtils(),
+            new Negotiator()
+        );
     }
 
     // test GET request with query parameter (ASK)
@@ -47,9 +60,9 @@ class SparqlEndpointTest extends TestCase
         $this->store->addStatements(
             array(
                 new StatementImpl(
-                    new NamedNodeImpl('http://s'),
-                    new NamedNodeImpl('http://p'),
-                    new NamedNodeImpl('http://o')
+                    new NamedNodeImpl(new NodeUtils(), 'http://s'),
+                    new NamedNodeImpl(new NodeUtils(), 'http://p'),
+                    new NamedNodeImpl(new NodeUtils(), 'http://o')
                 )
             ),
             $this->testGraph
@@ -94,9 +107,9 @@ class SparqlEndpointTest extends TestCase
         $this->store->addStatements(
             array(
                 new StatementImpl(
-                    new NamedNodeImpl('http://s'),
-                    new NamedNodeImpl('http://p'),
-                    new NamedNodeImpl('http://o')
+                    new NamedNodeImpl(new NodeUtils(), 'http://s'),
+                    new NamedNodeImpl(new NodeUtils(), 'http://p'),
+                    new NamedNodeImpl(new NodeUtils(), 'http://o')
                 )
             ),
             $this->testGraph
@@ -140,9 +153,9 @@ class SparqlEndpointTest extends TestCase
         $this->store->addStatements(
             array(
                 new StatementImpl(
-                    new NamedNodeImpl('http://s'),
-                    new NamedNodeImpl('http://p'),
-                    new NamedNodeImpl('http://o')
+                    new NamedNodeImpl(new NodeUtils(), 'http://s'),
+                    new NamedNodeImpl(new NodeUtils(), 'http://p'),
+                    new NamedNodeImpl(new NodeUtils(), 'http://o')
                 )
             ),
             $this->testGraph
@@ -202,9 +215,9 @@ class SparqlEndpointTest extends TestCase
         $this->store->addStatements(
             array(
                 new StatementImpl(
-                    new NamedNodeImpl('http://s'),
-                    new NamedNodeImpl('http://p'),
-                    new NamedNodeImpl('http://o')
+                    new NamedNodeImpl(new NodeUtils(), 'http://s'),
+                    new NamedNodeImpl(new NodeUtils(), 'http://p'),
+                    new NamedNodeImpl(new NodeUtils(), 'http://o')
                 )
             ),
             $this->testGraph

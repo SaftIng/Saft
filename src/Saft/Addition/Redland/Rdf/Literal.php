@@ -3,9 +3,15 @@
 namespace Saft\Addition\Redland\Rdf;
 
 use Saft\Rdf\AbstractLiteral;
+use Saft\Rdf\NodeUtils;
 
 class Literal extends AbstractLiteral
 {
+    /**
+     * @var NodeFactory
+     */
+    protected $nodeFactory;
+
     protected static $xsdString = 'http://www.w3.org/2001/XMLSchema#string';
     protected static $rdfLangString = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString';
 
@@ -14,7 +20,12 @@ class Literal extends AbstractLiteral
      */
     protected $redlandNode;
 
-    public function __construct($redlandNode)
+    /**
+     * @param ? $redlandNode
+     * @param NodeFactory $nodeFactory
+     * @param NodeUtils $nodeUtils
+     */
+    public function __construct($redlandNode, NodeFactory $nodeFactory, NodeUtils $nodeUtils)
     {
         if ($redlandNode === null) {
             throw new \Exception('Can\'t initialize literal with null.');
@@ -24,7 +35,10 @@ class Literal extends AbstractLiteral
             throw new \Exception('Redland Literals have to be initialized with a Redland node.');
         }
 
+        $this->nodeFactory = $nodeFactory;
         $this->redlandNode = $redlandNode;
+
+        parent::__construct($nodeUtils);
     }
 
     /**
@@ -41,7 +55,6 @@ class Literal extends AbstractLiteral
      */
     public function getDatatype()
     {
-        $nodeFactory = new NodeFactory();
         $datatypeUri = self::$xsdString;
         $datatype = librdf_node_get_literal_value_datatype_uri($this->redlandNode);
         if ($datatype !== null) {
@@ -50,7 +63,7 @@ class Literal extends AbstractLiteral
             $datatypeUri = self::$rdfLangString;
         }
 
-        return $nodeFactory->createNamedNode($datatypeUri);
+        return $this->nodeFactory->createNamedNode($datatypeUri);
     }
 
     /**

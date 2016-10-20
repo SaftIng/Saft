@@ -26,11 +26,12 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "saft/saft-rdf": ">=0.4",
-        "saft/saft-sparql": ">=0.4"
+        "saft/saft-rdf": ">=0.8",
+        "saft/saft-sparql": ">=0.8"
     },
     "require-dev": {
-        "phpunit/phpunit": ">=4.8"
+        "phpunit/phpunit": "4.8.*",
+        "saft/saft-test": ">=0.8"
     },
     "autoload": {
         "psr-4": {

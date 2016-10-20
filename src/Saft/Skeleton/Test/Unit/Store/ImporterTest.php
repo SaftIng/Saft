@@ -2,7 +2,6 @@
 
 namespace Saft\Skeleton\Test\Unit\Store;
 
-use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactoryImpl;
@@ -10,6 +9,7 @@ use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Skeleton\Data\ParserFactory;
 use Saft\Skeleton\Store\Importer;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Sparql\Query\QueryUtils;
 use Saft\Store\BasicTriplePatternStore;
 use Saft\Skeleton\Test\TestCase;
 
@@ -26,25 +26,33 @@ class ImporterTest extends TestCase
 
         // store
         $this->store = new BasicTriplePatternStore(
-            new NodeFactoryImpl(),
+            new NodeFactoryImpl(new NodeUtils()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(),
+            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
             new StatementIteratorFactoryImpl()
         );
 
         $this->fixture = new Importer(
             $this->store,
-            new ParserFactory(
-                new NodeFactoryImpl(),
+            new ParserFactory(new NodeFactoryImpl(
+                new NodeUtils()),
                 new StatementFactoryImpl(),
-                new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
-            )
+                new StatementIteratorFactoryImpl(), 
+                new NodeUtils()
+            ),
+            new NodeUtils()
         );
     }
 
     /*
      * Tests for importFile
      */
+
+    // N-Triples
+    public function testImportNTriplesFileFilenameGiven()
+    {
+        $this->assertTrue($this->fixture->importFile(__DIR__ . '/../../assets/dbpedia-leipzig-part.nt', $this->testGraph));
+    }
 
     // RDF/XML
     public function testImportXMLFileFilenameGiven()

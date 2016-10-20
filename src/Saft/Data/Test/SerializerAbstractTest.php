@@ -4,6 +4,7 @@ namespace Saft\Data\Test;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementImpl;
 use Saft\Test\TestCase;
 
@@ -47,14 +48,14 @@ abstract class SerializerAbstractTest extends TestCase
 
         $iterator = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl('http://saft/example/'),
-                new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                new NamedNodeImpl('http://saft/example/Foo')
+                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/'),
+                new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foo')
             ),
             new StatementImpl(
-                new NamedNodeImpl('http://saft/example/2'),
-                new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                new NamedNodeImpl('http://saft/example/Foo')
+                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/2'),
+                new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foo')
             ),
         ));
 
@@ -84,14 +85,14 @@ abstract class SerializerAbstractTest extends TestCase
 
         $iterator = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl('http://saft/example/'),
-                new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                new NamedNodeImpl('http://saft/example/Foo')
+                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/'),
+                new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foo')
             ),
             new StatementImpl(
-                new NamedNodeImpl('http://saft/example/2'),
-                new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                new NamedNodeImpl('http://saft/example/Foo')
+                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/2'),
+                new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foo')
             ),
         ));
 
@@ -124,14 +125,14 @@ abstract class SerializerAbstractTest extends TestCase
 
         $iterator = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl('http://saft/example/'),
-                new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                new NamedNodeImpl('http://saft/example/Foo')
+                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/'),
+                new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foo')
             ),
             new StatementImpl(
-                new NamedNodeImpl('http://saft/example/2'),
-                new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                new NamedNodeImpl('http://saft/example/Foo')
+                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/2'),
+                new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foo')
             ),
         ));
 

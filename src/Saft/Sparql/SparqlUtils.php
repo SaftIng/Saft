@@ -5,10 +5,21 @@ namespace Saft\Sparql;
 use Saft\Rdf\Node;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
+use Saft\Rdf\StatementIteratorFactory;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 
 class SparqlUtils
 {
+    /**
+     * @var StatementIteratorFactory
+     */
+    protected $statementIteratorFactory;
+
+    public function __construct(StatementIteratorFactory $statementIteratorFactory)
+    {
+        $this->statementIteratorFactory = $statementIteratorFactory;
+    }
+
     /**
      * Returns the Statement-Data in sparql-Format.
      *
@@ -22,9 +33,9 @@ class SparqlUtils
         $query = '';
         foreach ($statements as $statement) {
             if ($statement instanceof Statement) {
-                $con = self::getNodeInSparqlFormat($statement->getSubject()) . ' ' .
-                       self::getNodeInSparqlFormat($statement->getPredicate()) . ' ' .
-                       self::getNodeInSparqlFormat($statement->getObject()) . ' . ';
+                $con = $this->getNodeInSparqlFormat($statement->getSubject()) . ' ' .
+                       $this->getNodeInSparqlFormat($statement->getPredicate()) . ' ' .
+                       $this->getNodeInSparqlFormat($statement->getObject()) . ' . ';
 
                 $graphToUse = $graph;
                 if ($graph == null && $statement->isQuad()) {
@@ -54,10 +65,8 @@ class SparqlUtils
      */
     public function statementsToSparqlFormat(array $statements, Node $graph = null)
     {
-        // TODO make it more flexible by move $factory to parameter list?
-        $factory = new StatementIteratorFactoryImpl();
-        $iterator = $factory->createStatementIteratorFromArray($statements);
-        return self::statementIteratorToSparqlFormat($iterator, $graph);
+        $iterator = $this->statementIteratorFactory->createStatementIteratorFromArray($statements);
+        return $this->statementIteratorToSparqlFormat($iterator, $graph);
     }
 
     /**

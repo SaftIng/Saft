@@ -6,6 +6,8 @@ use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Skeleton\DependencyInjection\ContainerDice;
 use Saft\Skeleton\Test\TestCase;
 
@@ -14,7 +16,7 @@ class ContainerDiceTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->fixture = new ContainerDice();
+        $this->fixture = new ContainerDice(new NodeFactoryImpl(new NodeUtils));
     }
 
     protected function isTestWithVirtuosoPossible()
@@ -62,7 +64,7 @@ class ContainerDiceTest extends TestCase
         $this->fixture->setup();
 
         $this->assertEquals(
-            new LiteralImpl('foo'),
+            new LiteralImpl(new NodeUtils(), 'foo'),
             $this->fixture->createInstanceOf('Saft\Rdf\Literal', array('foo'))
         );
     }
@@ -72,7 +74,7 @@ class ContainerDiceTest extends TestCase
         $this->fixture->setup();
 
         $this->assertEquals(
-            new NamedNodeImpl('http://a'),
+            new NamedNodeImpl(new NodeUtils(), 'http://a'),
             $this->fixture->createInstanceOf('Saft\Rdf\NamedNode', array('http://a'))
         );
     }

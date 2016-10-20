@@ -3,6 +3,7 @@
 namespace Saft\Skeleton\DependencyInjection;
 
 use Dice\Dice;
+use Saft\Rdf\NodeFactory;
 
 class ContainerDice implements Container
 {
@@ -10,6 +11,19 @@ class ContainerDice implements Container
      * @var Dice
      */
     protected $dice;
+
+    /**
+     * @var NodeFactory
+     */
+    protected $nodeFactory;
+
+    /**
+     * @param NodeFactory $nodeFactory
+     */
+    public function __construct(NodeFactory $nodeFactory)
+    {
+        $this->nodeFactory = $nodeFactory;
+    }
 
     /**
      * Creates and returns an instance of a given class name.
@@ -49,7 +63,7 @@ class ContainerDice implements Container
                 'instanceOf' => 'Saft\Rdf\LiteralImpl',
                 'constructParams' => array(
                     // define second parameter which is of type NamedNode
-                    new \Saft\Rdf\NamedNodeImpl('http://www.w3.org/2001/XMLSchema#string')
+                    $this->nodeFactory->createNamedNode('http://www.w3.org/2001/XMLSchema#string')
                 )
             ),
             'Saft\Rdf\NamedNode' => array('instanceOf' => 'Saft\Rdf\NamedNodeImpl'),

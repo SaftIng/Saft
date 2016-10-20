@@ -6,11 +6,13 @@ use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Sparql\Query\QueryUtils;
 use Saft\Store\BasicTriplePatternStore;
 use Saft\Test\TestCase;
 
@@ -21,13 +23,13 @@ class AbstractTriplePatternStoreTest extends TestCase
     public function setUp()
     {
         $this->fixture = new BasicTriplePatternStore(
-            new NodeFactoryImpl(),
+            new NodeFactoryImpl(new NodeUtils()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(),
+            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
             new StatementIteratorFactoryImpl()
         );
 
-        $this->sparqlUtils = new SparqlUtils();
+        $this->sparqlUtils = new SparqlUtils(new StatementIteratorFactoryImpl());
     }
 
     /*
@@ -36,10 +38,10 @@ class AbstractTriplePatternStoreTest extends TestCase
 
     protected function getTestQuad()
     {
-        $subject1 = new NamedNodeImpl('http://saft/testquad/s1');
-        $predicate1 = new NamedNodeImpl('http://saft/testquad/p1');
-        $object1 = new NamedNodeImpl('http://saft/testquad/o1');
-        $graph1 = new NamedNodeImpl('http://saft/testquad/g1');
+        $subject1 = new NamedNodeImpl(new NodeUtils(), 'http://saft/testquad/s1');
+        $predicate1 = new NamedNodeImpl(new NodeUtils(), 'http://saft/testquad/p1');
+        $object1 = new NamedNodeImpl(new NodeUtils(), 'http://saft/testquad/o1');
+        $graph1 = new NamedNodeImpl(new NodeUtils(), 'http://saft/testquad/g1');
         $quad = new StatementImpl($subject1, $predicate1, $object1, $graph1);
 
         return new StatementImpl($subject1, $predicate1, $object1, $graph1);
@@ -47,9 +49,9 @@ class AbstractTriplePatternStoreTest extends TestCase
 
     protected function getTestTriple()
     {
-        $subject2 = new NamedNodeImpl('http://saft/testtriple/s2');
-        $predicate2 = new NamedNodeImpl('http://saft/testtriple/p2');
-        $object2 = new NamedNodeImpl('http://saft/testtriple/o2');
+        $subject2 = new NamedNodeImpl(new NodeUtils(), 'http://saft/testtriple/s2');
+        $predicate2 = new NamedNodeImpl(new NodeUtils(), 'http://saft/testtriple/p2');
+        $object2 = new NamedNodeImpl(new NodeUtils(), 'http://saft/testtriple/o2');
         $triple = new StatementImpl($subject2, $predicate2, $object2);
 
         return new StatementImpl($subject2, $predicate2, $object2);
@@ -66,9 +68,9 @@ class AbstractTriplePatternStoreTest extends TestCase
 
     protected function getTestStatementWithLiteral()
     {
-        $subject2 = new NamedNodeImpl('http://saft/test/s1');
-        $predicate2 = new NamedNodeImpl('http://saft/test/p2');
-        $object2 = new LiteralImpl('John');
+        $subject2 = new NamedNodeImpl(new NodeUtils(), 'http://saft/test/s1');
+        $predicate2 = new NamedNodeImpl(new NodeUtils(), 'http://saft/test/p2');
+        $object2 = new LiteralImpl(new NodeUtils(), 'John');
         return new StatementImpl($subject2, $predicate2, $object2);
     }
 
@@ -112,7 +114,7 @@ class AbstractTriplePatternStoreTest extends TestCase
                 $statement->getSubject(),
                 $statement->getPredicate(),
                 $statement->getObject(),
-                new NamedNodeImpl('http://graph/')
+                new NamedNodeImpl(new NodeUtils(), 'http://graph/')
             ),
             $resultStatements->current()
         );

@@ -2,11 +2,16 @@
 
 namespace Saft\Rdf\Test;
 
+use Saft\Rdf\BlankNodeImpl;
+use Saft\Rdf\Literal;
+use Saft\Rdf\LiteralImpl;
+use Saft\Rdf\NamedNode;
+use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Test\TestCase;
 
 abstract class NodeFactoryAbstractTest extends TestCase
 {
-
     /**
      * An abstract method which returns new instances of NodeFactory
      */
@@ -62,5 +67,54 @@ abstract class NodeFactoryAbstractTest extends TestCase
 
         $this->setExpectedException('Exception');
         $fixture->createNodeFromNQuads('http://example.org/blabla?argument=value#something');
+    }
+
+    /*
+     * Tests for createNodeInstanceFromNodeParameter
+     */
+
+    public function testCreateNodeInstanceBNode()
+    {
+        $node = $this->getFixture()->createNodeInstanceFromNodeParameter(
+            'bid',
+            'bnode'
+        );
+
+        $this->assertEquals(new BlankNodeImpl('bid'), $node);
+    }
+
+    public function testCreateNodeInstanceLiteral()
+    {
+        $node = $this->getFixture()->createNodeInstanceFromNodeParameter(
+            '42',
+            'literal',
+            'xsd:int'
+        );
+
+        $this->assertTrue($node instanceof Literal);
+        $this->assertEquals('42', $node->getValue());
+        $this->assertEquals('xsd:int', $node->getDatatype());
+    }
+
+    public function testCreateNodeInstanceUnknown()
+    {
+        // expect exception, because given type is unknown
+        $this->setExpectedException('\Exception');
+
+        $node = $this->getFixture()->createNodeInstanceFromNodeParameter(
+            null,
+            'unknown'
+        );
+    }
+
+    public function testCreateNodeInstanceUri()
+    {
+        $node = $this->getFixture()->createNodeInstanceFromNodeParameter(
+            'http://foo',
+            'uri'
+        );
+
+        $this->assertTrue($node instanceof NamedNode);
+        $this->assertEquals('http://foo', $node->getUri());
     }
 }

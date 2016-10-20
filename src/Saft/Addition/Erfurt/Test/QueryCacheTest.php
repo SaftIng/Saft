@@ -30,15 +30,15 @@ class QueryCacheTest
         if (true === isset($this->configuration['erfurtConfig'])) {
             // create mockstore to store triples in memory
             $this->mockStore = new BasicTriplePatternStore(
-                new NodeFactoryImpl(),
+                new NodeFactoryImpl(new NodeUtils()),
                 new StatementFactoryImpl(),
-                new QueryFactoryImpl(),
+                new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
                 new StatementIteratorFactoryImpl()
             );
 
             // setup Erfurts QueryCache
             $this->fixture = new \Saft\Addition\Erfurt\QueryCache\QueryCache(
-                new QueryFactoryImpl(),
+                new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
                 $this->configuration['erfurtConfig']
             );
             $this->fixture->setChainSuccessor($this->mockStore);
@@ -58,14 +58,14 @@ class QueryCacheTest
     public function testQueryDeeperCheck()
     {
         $stmtOne = new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new NamedNodeImpl('http://o/')
+            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://o/')
         );
         $stmtTwo = new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new LiteralImpl('test literal')
+            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+            new LiteralImpl(new NodeUtils(), 'test literal')
         );
 
         $this->mockStore->addStatements(new ArrayStatementIteratorImpl(array($stmtOne, $stmtTwo)));
@@ -75,13 +75,13 @@ class QueryCacheTest
 
         // empty mock store to check later on, if QueryCache uses its own data or the ones of the mock store.
         $this->mockStore = new BasicTriplePatternStore(
-            new NodeFactoryImpl(),
+            new NodeFactoryImpl(new NodeUtils()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(),
+            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture = new \Saft\Addition\Erfurt\QueryCache\QueryCache(
-            new QueryFactoryImpl(),
+            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
             $this->configuration['erfurtConfig']
         );
         $this->fixture->setChainSuccessor($this->mockStore);
@@ -97,14 +97,14 @@ class QueryCacheTest
     public function testQuerySimple()
     {
         $stmtOne = new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new NamedNodeImpl('http://o/')
+            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://o/')
         );
         $stmtTwo = new StatementImpl(
-            new NamedNodeImpl('http://s/'),
-            new NamedNodeImpl('http://p/'),
-            new LiteralImpl('test literal')
+            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+            new LiteralImpl(new NodeUtils(), 'test literal')
         );
 
         $this->mockStore->addStatements(new ArrayStatementIteratorImpl(array($stmtOne, $stmtTwo)));

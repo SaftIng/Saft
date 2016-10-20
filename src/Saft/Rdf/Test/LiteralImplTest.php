@@ -5,6 +5,7 @@ namespace Saft\Rdf\Test;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
 
 class LiteralImplTest extends LiteralAbstractTest
 {
@@ -13,11 +14,11 @@ class LiteralImplTest extends LiteralAbstractTest
      */
     public function newInstance($value, Node $datatype = null, $lang = null)
     {
-        return new LiteralImpl($value, $datatype, $lang);
+        return new LiteralImpl(new NodeUtils(), $value, $datatype, $lang);
     }
 
     public function getNodeFactory()
     {
-        return new NodeFactoryImpl();
+        return new NodeFactoryImpl(new NodeUtils());
     }
 }

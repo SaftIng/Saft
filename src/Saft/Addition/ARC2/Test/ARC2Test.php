@@ -8,11 +8,14 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Sparql\SparqlUtils;
+use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\ResultFactoryImpl;
 use Saft\Store\Test\StoreAbstractTest;
 use Symfony\Component\Yaml\Parser;
@@ -26,11 +29,14 @@ class ARC2Test extends StoreAbstractTest
         if (true === isset($this->configuration['arc2Config'])) {
             try {
                 $this->fixture = new ARC2(
-                    new NodeFactoryImpl(),
+                    new NodeFactoryImpl(new NodeUtils()),
                     new StatementFactoryImpl(),
-                    new QueryFactoryImpl(),
+                    new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
                     new ResultFactoryImpl(),
                     new StatementIteratorFactoryImpl(),
+                    new NodeUtils(),
+                    new QueryUtils(),
+                    new SparqlUtils(new StatementIteratorFactoryImpl()),
                     $this->configuration['arc2Config']
                 );
             } catch (\Exception $e) {
@@ -82,11 +88,14 @@ class ARC2Test extends StoreAbstractTest
         $this->setExpectedException('Exception');
 
         new ARC2(
-            new NodeFactoryImpl(),
+            new NodeFactoryImpl(new NodeUtils()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(),
+            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
+            new NodeUtils(),
+            new QueryUtils(),
+            new SparqlUtils(new StatementIteratorFactoryImpl()),
             array()
         );
     }
@@ -97,11 +106,14 @@ class ARC2Test extends StoreAbstractTest
         $this->setExpectedException('Exception');
 
         new ARC2(
-            new NodeFactoryImpl(),
+            new NodeFactoryImpl(new NodeUtils()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(),
+            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
+            new NodeUtils(),
+            new QueryUtils(),
+            new SparqlUtils(new StatementIteratorFactoryImpl()),
             array('database' => 'saft')
         );
     }
@@ -112,11 +124,14 @@ class ARC2Test extends StoreAbstractTest
         $this->setExpectedException('Exception');
 
         new ARC2(
-            new NodeFactoryImpl(),
+            new NodeFactoryImpl(new NodeUtils()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(),
+            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
+            new NodeUtils(),
+            new QueryUtils(),
+            new SparqlUtils(new StatementIteratorFactoryImpl()),
             array('database' => 'saft', 'host' => 'localhost')
         );
     }
@@ -175,8 +190,8 @@ class ARC2Test extends StoreAbstractTest
                 ),
                 new StatementImpl(
                     $this->testGraph,
-                    new NamedNodeImpl('http://foobar/1'),
-                    new NamedNodeImpl('http://foobar/2'),
+                    new NamedNodeImpl(new NodeUtils(), 'http://foobar/1'),
+                    new NamedNodeImpl(new NodeUtils(), 'http://foobar/2'),
                     $this->testGraph
                 )
             )

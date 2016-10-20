@@ -3,23 +3,28 @@
 namespace Saft\Addition\EasyRdf\Data;
 
 use Saft\Data\Parser;
-use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactory;
+use Saft\Rdf\StatementIteratorFactory;
 
 class ParserEasyRdf implements Parser
 {
     /**
      * @var NodeFactory
      */
-    private $nodeFactory;
+    protected $nodeFactory;
+
+    /**
+     * @var NodeUtils
+     */
+    protected $nodeUtils;
 
     /**
      * @var string
      */
-    private $serialization;
+    protected $serialization;
 
     /**
      * @var array
@@ -29,23 +34,30 @@ class ParserEasyRdf implements Parser
     /**
      * @var StatementFactory
      */
-    private $statementFactory;
+    protected $statementFactory;
 
     /**
      * Constructor.
      *
-     * @param NodeFactory      $nodeFactory
+     * @param NodeFactory $nodeFactory
      * @param StatementFactory $statementFactory
-     * @param string           $serialization
+     * @param StatementIteratorFactory $statementIteratorFactory
+     * @param NodeUtils $nodeUtils
+     * @param string $serialization
      * @throws \Exception if serialization is unknown.
      */
-    public function __construct(NodeFactory $nodeFactory, StatementFactory $statementFactory, $serialization)
-    {
-        // TODO move that to parameter list later on
-        $this->nodeUtils = new NodeUtils($nodeFactory, new ParserSerializerUtils());
+    public function __construct(
+        NodeFactory $nodeFactory,
+        StatementFactory $statementFactory,
+        StatementIteratorFactory $statementIteratorFactory,
+        NodeUtils $nodeUtils,
+        $serialization
+    ) {
+        $this->nodeUtils = $nodeUtils;
 
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
+        $this->statementIteratorFactory = $statementIteratorFactory;
 
         $this->serializationMap = array(
             'n-triples' => 'ntriples',
@@ -206,6 +218,6 @@ class ParserEasyRdf implements Parser
             }
         }
 
-        return new ArrayStatementIteratorImpl($statements);
+        return $this->statementIteratorFactory->createStatementIteratorFromArray($statements);
     }
 }

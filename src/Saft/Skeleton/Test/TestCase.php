@@ -3,13 +3,14 @@
 namespace Saft\Skeleton\Test;
 
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Test\TestCase as SaftTestTestCase;
 
 class TestCase extends SaftTestTestCase
 {
     public function setUp()
     {
-        $this->testGraph = new NamedNodeImpl('http://localhost/Saft/TestGraph/');
+        $this->testGraph = new NamedNodeImpl(new NodeUtils(), 'http://localhost/Saft/TestGraph/');
 
         // set path to test file
         $rootDir = dirname(__FILE__) . '/../../../../';

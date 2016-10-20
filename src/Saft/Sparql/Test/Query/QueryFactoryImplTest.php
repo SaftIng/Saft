@@ -2,6 +2,8 @@
 
 namespace Saft\Sparql\Test\Query;
 
+use Saft\Rdf\NodeUtils;
+use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Query\QueryFactoryImpl;
 
 class QueryFactoryImplTest extends QueryFactoryAbstractTest
@@ -13,6 +15,6 @@ class QueryFactoryImplTest extends QueryFactoryAbstractTest
      */
     public function newInstance()
     {
-        return new QueryFactoryImpl();
+        return new QueryFactoryImpl(new NodeUtils(), new QueryUtils());
     }
 }

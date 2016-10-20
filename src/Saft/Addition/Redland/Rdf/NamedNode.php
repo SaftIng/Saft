@@ -3,6 +3,7 @@
 namespace Saft\Addition\Redland\Rdf;
 
 use Saft\Rdf\AbstractNamedNode;
+use Saft\Rdf\NodeUtils;
 
 class NamedNode extends AbstractNamedNode
 {
@@ -11,6 +12,9 @@ class NamedNode extends AbstractNamedNode
      */
     protected $redlandNode;
 
+    /**
+     * @param NodeUtils $nodeUtils
+     */
     public function __construct($redlandNode)
     {
         if ($redlandNode === null) {

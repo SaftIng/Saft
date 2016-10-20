@@ -4,11 +4,18 @@ namespace Saft\Rdf;
 
 class NodeFactoryImpl implements NodeFactory
 {
-    const NAMED_NODE_REGEX = '/^<([^<>]+)>$/';
-    const BLANK_NODE_REGEX = '/^_:(.+)$/';
-    const LITERAL_DATATYPE_REGEX = '/^"(.+)"\^\^<([^<>]+)>$/';
-    const LITERAL_LANG_REGEX = '/^"(.+)"@([\w\-]+)$/';
-    const LITERAL_REGEX = '/^"(.*)"$/';
+    /**
+     * @var NodeUtils
+     */
+    protected $nodeUtils;
+
+    /**
+     *
+     */
+    public function __construct(NodeUtils $nodeUtils)
+    {
+        $this->nodeUtils = $nodeUtils;
+    }
 
     /**
      * @param string $value
@@ -24,12 +31,12 @@ class NodeFactoryImpl implements NodeFactory
                 throw new \Exception("Argument datatype has to be a named node.");
             }
         }
-        return new LiteralImpl($value, $datatype, $lang);
+        return new LiteralImpl($this->nodeUtils, $value, $datatype, $lang);
     }
 
     public function createNamedNode($uri)
     {
-        return new NamedNodeImpl($uri);
+        return new NamedNodeImpl($this->nodeUtils, $uri);
     }
 
     public function createBlankNode($blankId)
@@ -50,17 +57,81 @@ class NodeFactoryImpl implements NodeFactory
      */
     public function createNodeFromNQuads($string)
     {
-        if (preg_match(self::NAMED_NODE_REGEX, $string, $matches)) {
-            return $this->createNamedNode($matches[1]);
-        } elseif (preg_match(self::BLANK_NODE_REGEX, $string, $matches)) {
-            return $this->createBlankNode($matches[1]);
-        } elseif (preg_match(self::LITERAL_DATATYPE_REGEX, $string, $matches)) {
-            return $this->createLiteral($matches[1], $matches[2]);
-        } elseif (preg_match(self::LITERAL_LANG_REGEX, $string, $matches)) {
-            return $this->createLiteral($matches[1], null, $matches[2]);
-        } elseif (preg_match(self::LITERAL_REGEX, $string, $matches)) {
-            return $this->createLiteral($matches[1]);
+        $regex = '/' . $this->nodeUtils->getRegexStringForNodeRecognition(
+            true, true, true, true, true, true
+        ) .'/si';
+
+        $string = trim($string);
+
+        preg_match($regex, $string, $matches);
+
+        if (0 == count($matches)) {
+            throw new \Exception('Invalid parameter $string given. Our regex '. $regex .' doesnt apply.');
+        }
+
+        $firstChar = substr($matches[0], 0, 1);
+
+        // http://...
+        if ('<' == $firstChar) {
+            return $this->createNamedNode(str_replace(array('<', '>'), '', $matches[1]));
+        // ".."^^<
+        } elseif (false !== strpos($matches[0], '"^^<')) {
+            return $this->createLiteral($matches[9], $matches[10]);
+        // "foo"@en
+        } elseif (false !== strpos($matches[0], '"@')) {
+            return $this->createLiteral($matches[12], null, $matches[13]);
+        // "foo"
+        } elseif ('"' == $firstChar) {
+            return $this->createLiteral($matches[15]);
+        // _:foo
+        } elseif ($this->nodeUtils->simpleCheckBlankNodeId($matches[0])) {
+            return $this->createBlankNode($matches[4]);
+        // 0-9 (simple number, multi digits)
+        } elseif (0 < (int)$matches[0]) {
+            return $this->createLiteral(
+                $matches[16],
+                $this->createNamedNode('http://www.w3.org/2001/XMLSchema#double')
+            );
+        } else {
+            throw new \Exception('Unknown case for: '. $matches[1]);
         }
         throw new \Exception("The given string (\"$string\") is not valid or doesn't represent any RDF node");
+    }
+
+    /**
+     * Helper function, which is useful, if you have all the meta information about a Node and want to create
+     * the according Node instance.
+     *
+     * @param string      $value       Value of the node.
+     * @param string      $type        Can be uri, bnode, var or literal
+     * @param string      $datatype    URI of the datatype (optional)
+     * @param string      $language    Language tag (optional)
+     * @return Node Node instance, which type is one of: NamedNode, BlankNode, Literal, AnyPattern
+     * @throws \Exception if an unknown type was given.
+     * @throws \Exception if something went wrong during Node creation.
+     * @api
+     * @since 0.8
+     */
+    public function createNodeInstanceFromNodeParameter($value, $type, $datatype = null, $language = null)
+    {
+        switch ($type) {
+            case 'uri':
+                return $this->createNamedNode($value);
+
+            case 'bnode':
+                return $this->createBlankNode($value);
+
+            case 'literal':
+                return $this->createLiteral($value, $datatype, $language);
+
+            case 'typed-literal':
+                return $this->createLiteral($value, $datatype, $language);
+
+            case 'var':
+                return $this->createAnyPattern();
+
+            default:
+                throw new \Exception('Unknown $type given: '. $type);
+        }
     }
 }

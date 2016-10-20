@@ -3,6 +3,7 @@
 namespace Saft\Sparql\Test\Query;
 
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\SelectQueryImpl;
 use Saft\Test\TestCase;
 
@@ -12,7 +13,7 @@ class SelectQueryImplTest extends TestCase
     {
         parent::setUp();
 
-        $this->fixture = new SelectQueryImpl();
+        $this->fixture = new SelectQueryImpl(null, new NodeUtils());
     }
 
     /*
@@ -22,7 +23,8 @@ class SelectQueryImplTest extends TestCase
     public function testConstructor()
     {
         $this->fixture = new SelectQueryImpl(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}'
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}',
+            new NodeUtils()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -40,19 +42,21 @@ class SelectQueryImplTest extends TestCase
     public function testConstructorNotAllVariablesUsed()
     {
         $instanceToCheckAgainst = new SelectQueryImpl(
-            'SELECT ?x FROM <'. $this->testGraph->getUri() .'> WHERE {?x ?y ?z}'
+            'SELECT ?x FROM <'. $this->testGraph->getUri() .'> WHERE {?x ?y ?z}',
+            new NodeUtils()
         );
 
         $this->assertEquals(
             $instanceToCheckAgainst,
-            new SelectQueryImpl('SELECT ?x FROM <'. $this->testGraph->getUri() .'> WHERE {?x ?y ?z}')
+            new SelectQueryImpl('SELECT ?x FROM <'. $this->testGraph->getUri() .'> WHERE {?x ?y ?z}', new NodeUtils())
         );
     }
 
     public function testConstructorWithLimit()
     {
         $this->fixture = new SelectQueryImpl(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} LIMIT 10'
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} LIMIT 10',
+            new NodeUtils()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -64,7 +68,8 @@ class SelectQueryImplTest extends TestCase
     public function testConstructorWithOffset()
     {
         $this->fixture = new SelectQueryImpl(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} Offset 5'
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} Offset 5',
+            new NodeUtils()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -76,7 +81,8 @@ class SelectQueryImplTest extends TestCase
     public function testConstructorWithLimitOffset()
     {
         $this->fixture = new SelectQueryImpl(
-            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} LIMIT 10 OFFSET 5'
+            'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} LIMIT 10 OFFSET 5',
+            new NodeUtils()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -118,7 +124,8 @@ class SelectQueryImplTest extends TestCase
                     FILTER regex(?g, "r", "i")
                }
               LIMIT 10
-             OFFSET 5 '
+             OFFSET 5 ',
+             new NodeUtils()
         );
 
         $queryParts = $this->fixture->getQueryParts();

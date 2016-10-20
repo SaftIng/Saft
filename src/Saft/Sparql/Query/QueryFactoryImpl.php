@@ -2,18 +2,25 @@
 
 namespace Saft\Sparql\Query;
 
+use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\QueryUtils;
 
 class QueryFactoryImpl implements QueryFactory
 {
     /**
+     * @var NodeUtils
+     */
+    protected $nodeUtils;
+
+    /**
      * @var QueryUtils
      */
     protected $queryUtils;
 
-    public function __construct()
+    public function __construct(NodeUtils $nodeUtils, QueryUtils $queryUtils)
     {
-        $this->queryUtils = new QueryUtils();
+        $this->nodeUtils = $nodeUtils;
+        $this->queryUtils = $queryUtils;
     }
 
     /**
@@ -26,22 +33,22 @@ class QueryFactoryImpl implements QueryFactory
     {
         switch ($this->queryUtils->getQueryType($query)) {
             case 'askQuery':
-                return new AskQueryImpl($query);
+                return new AskQueryImpl($query, $this->nodeUtils);
 
             case 'constructQuery':
-                return new ConstructQueryImpl($query);
+                return new ConstructQueryImpl($query, $this->nodeUtils);
 
             case 'describeQuery':
-                return new DescribeQueryImpl($query);
+                return new DescribeQueryImpl($query, $this->nodeUtils);
 
             case 'graphQuery':
-                return new GraphQueryImpl($query);
+                return new GraphQueryImpl($query, $this->nodeUtils);
 
             case 'selectQuery':
-                return new SelectQueryImpl($query);
+                return new SelectQueryImpl($query, $this->nodeUtils);
 
             case 'updateQuery':
-                return new UpdateQueryImpl($query);
+                return new UpdateQueryImpl($query, $this->nodeUtils);
 
             default:
                 throw new \Exception('Unknown query type: '. $query);

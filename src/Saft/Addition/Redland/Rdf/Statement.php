@@ -4,6 +4,7 @@ namespace Saft\Addition\Redland\Rdf;
 
 use Saft\Rdf\AbstractStatement;
 use Saft\Rdf\Node;
+use Saft\Rdf\NodeUtils;
 
 class Statement extends AbstractStatement
 {
@@ -14,8 +15,10 @@ class Statement extends AbstractStatement
 
     protected $graph;
 
-    public function __construct($redlandStatement, Node $graph = null)
+    public function __construct($redlandStatement, NodeFactory $nodeFactory, NodeUtils $nodeUtils, Node $graph = null)
     {
+        $this->nodeFactory = $nodeFactory;
+        $this->nodeUtils = $nodeUtils;
         $this->redlandStatement = $redlandStatement;
         $this->graph = $graph;
     }
@@ -78,7 +81,7 @@ class Statement extends AbstractStatement
     protected function getNodeForRedlandNode($redlandNode)
     {
         if (librdf_node_is_literal($redlandNode)) {
-            return new Literal($redlandNode);
+            return new Literal($redlandNode, $this->nodeFactory, $this->nodeUtils);
         } elseif (librdf_node_is_resource($redlandNode)) {
             return new NamedNode($redlandNode);
         } elseif (librdf_node_is_blank($redlandNode)) {

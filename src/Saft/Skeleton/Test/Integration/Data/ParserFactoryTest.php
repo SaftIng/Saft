@@ -2,10 +2,10 @@
 
 namespace Saft\Skeleton\Test\Integration\Data;
 
-use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactoryImpl;
+use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Skeleton\Data\ParserFactory;
 use Saft\Skeleton\Test\TestCase;
 
@@ -16,9 +16,10 @@ class ParserFactoryTest extends TestCase
         parent::setUp();
 
         $this->fixture = new ParserFactory(
-            new NodeFactoryImpl(),
+            new NodeFactoryImpl(new NodeUtils()),
             new StatementFactoryImpl(),
-            new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils())
+            new StatementIteratorFactoryImpl(),
+            new NodeUtils()
         );
     }
 
@@ -28,7 +29,7 @@ class ParserFactoryTest extends TestCase
 
     public function testCreateParserFor()
     {
-        $serializationMap = array('n-triples', 'rdf-json', 'rdf-xml', 'rdfa', 'turtle');
+        $serializationMap = array('n-triples', 'n-quads', 'rdf-json', 'rdf-xml', 'rdfa', 'turtle');
 
         foreach ($serializationMap as $serialization) {
             $this->assertTrue(is_object($this->fixture->createParserFor($serialization)));

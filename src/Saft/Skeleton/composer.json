@@ -18,17 +18,16 @@
     ],
     "require": {
         "level-2/dice": "dev-v2.0-PHP5.4-5.5",
-        "saft/saft-arc2": ">=0.4",
-        "saft/saft-data": ">=0.4",
-        "saft/saft-easyrdf": ">=0.4",
-        "saft/saft-querycache": ">=0.4",
-        "saft/saft-rdf": ">=0.4",
-        "saft/saft-rest": ">=0.4",
-        "saft/saft-store-http": ">=0.4",
-        "saft/saft-store-virtuoso": ">=0.4",
-        "saft/saft-sparql": ">=0.4",
-        "saft/saft-store": ">=0.4",
-        "saft/saft-test": ">=0.4",
+        "saft/saft-arc2": ">=0.8",
+        "saft/saft-data": ">=0.8",
+        "saft/saft-easyrdf": ">=0.8",
+        "saft/saft-querycache": ">=0.8",
+        "saft/saft-rdf": ">=0.8",
+        "saft/saft-rest": ">=0.8",
+        "saft/saft-store-http": ">=0.8",
+        "saft/saft-store-virtuoso": ">=0.8",
+        "saft/saft-sparql": ">=0.8",
+        "saft/saft-store": ">=0.8",
         "slim/slim": "2.6.*",
         "symfony/http-foundation": "2.*",
         "willdurand/negotiation": "2.*",
@@ -43,7 +42,8 @@
         "ext-redis": "Enables usage of Redis as cache backend."
     },
     "require-dev": {
-        "phpunit/phpunit": ">=4.8"
+        "phpunit/phpunit": "4.8.*",
+        "saft/saft-test": ">=0.8"
     },
     "prefer-stable" : true,
     "autoload": {

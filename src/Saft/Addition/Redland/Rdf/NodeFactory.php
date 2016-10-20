@@ -2,7 +2,6 @@
 
 namespace Saft\Addition\Redland\Rdf;
 
-use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactoryImpl as SaftNodeFactoryImpl;
 use Saft\Rdf\NodeUtils;
@@ -24,9 +23,12 @@ class NodeFactory extends SaftNodeFactoryImpl
      */
     protected static $rdfLangString = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString';
 
-    public function __construct()
+    /**
+     * @param NodeUtils $nodeUtils
+     */
+    public function __construct(NodeUtils $nodeUtils)
     {
-        $this->nodeUtils = new NodeUtils($this, new ParserSerializerUtils());
+        $this->nodeUtils = $nodeUtils;
     }
 
     /**
@@ -78,7 +80,7 @@ class NodeFactory extends SaftNodeFactoryImpl
             throw new \Exception('Initialization of redland node failed.');
         }
 
-        return new Literal($redlandNode);
+        return new Literal($redlandNode, $this, $this->nodeUtils);
     }
 
     /**
@@ -91,8 +93,12 @@ class NodeFactory extends SaftNodeFactoryImpl
             throw new \Exception('Can\'t initialize node with null.');
         }
 
-        if (!$this->nodeUtils->simpleCheckURI($uri)) {
+        if (is_string($uri) && !$this->nodeUtils->simpleCheckURI($uri)) {
             throw new \Exception('Invalid URI was given for RDF NamedNode creation.');
+        }
+
+        if (!is_string($uri)) {
+            throw new \Exception('Parameter $uri is not a string and therefore not valid.');
         }
 
         // TODO catch invalid URIs
@@ -107,6 +113,41 @@ class NodeFactory extends SaftNodeFactoryImpl
         return new NamedNode($redlandNode);
     }
 
+    /**
+     * Helper function, which is useful, if you have all the meta information about a Node and want to create
+     * the according Node instance.
+     *
+     * @param string      $value       Value of the node.
+     * @param string      $type        Can be uri, bnode, var or literal
+     * @param string      $datatype    URI of the datatype (optional)
+     * @param string      $language    Language tag (optional)
+     * @return Node Node instance, which type is one of: NamedNode, BlankNode, Literal, AnyPattern
+     * @throws \Exception if an unknown type was given.
+     * @throws \Exception if something went wrong during Node creation.
+     * @api
+     * @since 0.8
+     */
+    public function createNodeInstanceFromNodeParameter($value, $type, $datatype = null, $language = null)
+    {
+        $node = parent::createNodeInstanceFromNodeParameter($value, $type, $datatype, $language);
+
+        if ($node->isNamed()) {
+            return $this->createNamedNode($node->getUri());
+        } elseif ($node->isLiteral()) {
+            return $this->createLiteral($value, $datatype, $language);
+        } elseif ($node->isBlank()) {
+            return $this->createBlankNode($node->getBlankId());
+        } else {
+            throw new \Exception(
+                'Invalid parameter given: '. $value .', '. $type .', '. $datatype .', '. $language
+            );
+        }
+    }
+
+    /**
+     * @param Node $node
+     * @return Node
+     */
     public function createRedlandNodeFromNode(Node $node)
     {
         if ($node instanceof NamedNode || $node instanceof Literal || $node instanceof BlankNode) {
@@ -122,6 +163,6 @@ class NodeFactory extends SaftNodeFactoryImpl
         } elseif ($node->isBlank()) {
             return $this->createBlankNode($node->getBlankId())->getRedlandNode();
         }
-        throw new \Exception("This node type (" . get_class($node) . ") is not supported by Redland backend");
+        throw new \Exception('This node type (' . get_class($node) . ') is not supported by Redland backend');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Saft\Sparql\Test\Query;
 
+use Saft\Rdf\NodeUtils;
 use Saft\Sparql\Query\AskQueryImpl;
 use Saft\Test\TestCase;
 
@@ -11,7 +12,7 @@ class AskQueryImplTest extends TestCase
     {
         parent::setUp();
 
-        $this->fixture = new AskQueryImpl();
+        $this->fixture = new AskQueryImpl(null, new NodeUtils());
     }
 
     /*
@@ -20,7 +21,7 @@ class AskQueryImplTest extends TestCase
 
     public function testConstructor()
     {
-        $this->fixture = new AskQueryImpl('ASK {?s ?p ?o.}');
+        $this->fixture = new AskQueryImpl('ASK {?s ?p ?o.}', new NodeUtils());
 
         $queryParts = $this->fixture->getQueryParts();
 
@@ -31,7 +32,7 @@ class AskQueryImplTest extends TestCase
     {
         $this->setExpectedException('\Exception');
 
-        $this->fixture = new AskQueryImpl('ASK {?s ?p ?o.');
+        $this->fixture = new AskQueryImpl('ASK {?s ?p ?o.', new NodeUtils());
     }
 
     /*
@@ -43,7 +44,8 @@ class AskQueryImplTest extends TestCase
         $this->fixture = new AskQueryImpl(
             'PREFIX foo: <http://bar.de> ASK WHERE {
                 ?s <http://foobar/hey> ?o. ?s <http://foobar/ho> ?o. ?s <http://www.w3.org/2001/XMLSchema#> ?o
-             }'
+            }',
+            new NodeUtils()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -56,7 +58,7 @@ class AskQueryImplTest extends TestCase
 
     public function testExtractNamespacesFromQueryNoNamespaces()
     {
-        $this->fixture = new AskQueryImpl('ASK WHERE { ?s ?p ?o }');
+        $this->fixture = new AskQueryImpl('ASK WHERE { ?s ?p ?o }', new NodeUtils());
 
         $queryParts = $this->fixture->getQueryParts();
 
@@ -71,7 +73,8 @@ class AskQueryImplTest extends TestCase
     {
         // assumption here is that fixture is of type
         $this->fixture = new AskQueryImpl(
-            'PREFIX foo: <http://bar.de> ASK { ?s ?p ?o }'
+            'PREFIX foo: <http://bar.de> ASK { ?s ?p ?o }',
+            new NodeUtils()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -82,9 +85,7 @@ class AskQueryImplTest extends TestCase
     public function testExtractPrefixesFromQueryNoPrefixes()
     {
         // assumption here is that fixture is of type
-        $this->fixture = new AskQueryImpl(
-            'ASK WHERE { ?s ?p ?o }'
-        );
+        $this->fixture = new AskQueryImpl('ASK WHERE { ?s ?p ?o }', new NodeUtils());
 
         $queryParts = $this->fixture->getQueryParts();
 
@@ -98,7 +99,8 @@ class AskQueryImplTest extends TestCase
     public function testGetQueryPartsEverything()
     {
         $this->fixture = new AskQueryImpl(
-            'PREFIX foo: <http://bar.de> ASK FROM <http://foobar/> { ?s ?p ?o. FILTER (?o < 40) }'
+            'PREFIX foo: <http://bar.de> ASK FROM <http://foobar/> { ?s ?p ?o. FILTER (?o < 40) }',
+            new NodeUtils()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -151,7 +153,7 @@ class AskQueryImplTest extends TestCase
 
     public function testGetQueryPartsWithPrefixesTriplePatternVariables()
     {
-        $this->fixture = new AskQueryImpl('PREFIX foo: <http://bar.de> ASK { ?s ?p ?o }');
+        $this->fixture = new AskQueryImpl('PREFIX foo: <http://bar.de> ASK { ?s ?p ?o }', new NodeUtils());
 
         $queryParts = $this->fixture->getQueryParts();
 

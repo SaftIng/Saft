@@ -3,7 +3,6 @@
 namespace Saft\Addition\HttpStore\Store;
 
 use Curl\Curl;
-use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
@@ -15,6 +14,7 @@ use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\NodeUtils;
+use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
 use Saft\Sparql\Query\QueryFactoryImpl;
@@ -45,7 +45,7 @@ class Http extends AbstractSparqlStore
     /**
      * @var NodeFactory
      */
-    private $nodeFactory;
+    protected $nodeFactory;
 
     /**
      * @var NodeUtils
@@ -55,7 +55,7 @@ class Http extends AbstractSparqlStore
     /**
      * @var QueryFactory
      */
-    private $queryFactory;
+    protected $queryFactory;
 
     /**
      * @var QueryUtils
@@ -65,17 +65,22 @@ class Http extends AbstractSparqlStore
     /**
      * @var ResultFactory
      */
-    private $resultFactory;
+    protected $resultFactory;
+
+    /**
+     * @var SparqlUtils
+     */
+    protected $sparqlUtils;
 
     /**
      * @var StatementFactory
      */
-    private $statementFactory;
+    protected $statementFactory;
 
     /**
      * @var StatementIteratorFactory
      */
-    private $statementIteratorFactory;
+    protected $statementIteratorFactory;
 
     /**
      * Constructor. Dont forget to call setClient and provide a working GuzzleHttp\Client instance.
@@ -85,7 +90,9 @@ class Http extends AbstractSparqlStore
      * @param QueryFactory             $queryFactory
      * @param ResultFactory            $resultFactory
      * @param StatementIteratorFactory $statementIteratorFactory
-     * @param array                    $configuration            Array containing database credentials
+     * @param NodeUtils                $nodeUtils
+     * @param QueryUtils               $queryUtils
+     * @param array                    $configuration Array containing database credentials
      * @throws \Exception              If HTTP store requires the PHP ODBC extension to be loaded.
      */
     public function __construct(
@@ -94,10 +101,13 @@ class Http extends AbstractSparqlStore
         QueryFactory $queryFactory,
         ResultFactory $resultFactory,
         StatementIteratorFactory $statementIteratorFactory,
+        NodeUtils $nodeUtils,
+        QueryUtils $queryUtils,
+        SparqlUtils $sparqlUtils,
         array $configuration
     ) {
-        $this->nodeUtils = new NodeUtils(new NodeFactoryImpl(), new ParserSerializerUtils());
-        $this->queryUtils = new QueryUtils();
+        $this->nodeUtils = $nodeUtils;
+        $this->queryUtils = $queryUtils;
 
         $this->configuration = $configuration;
 
@@ -115,7 +125,8 @@ class Http extends AbstractSparqlStore
             $statementFactory,
             $queryFactory,
             $resultFactory,
-            $statementIteratorFactory
+            $statementIteratorFactory,
+            $sparqlUtils
         );
     }
 
@@ -268,7 +279,7 @@ class Http extends AbstractSparqlStore
         }
 
         // check query URL
-        if (false === $this->nodeUtils->simpleCheckUri($configuration['queryUrl'])) {
+        if (false === $this->nodeUtils->simpleCheckURI($configuration['queryUrl'])) {
             throw new \Exception('Parameter queryUrl is not an URI or empty: '. $configuration['queryUrl']);
         }
     }

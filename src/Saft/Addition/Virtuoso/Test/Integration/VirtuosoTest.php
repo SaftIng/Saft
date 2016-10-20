@@ -3,16 +3,18 @@
 namespace Saft\Addition\Virtuoso\Test;
 
 use Saft\Addition\Virtuoso\Store\Virtuoso;
-use Saft\Data\ParserSerializerUtils;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
+use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\ResultFactoryImpl;
 use Saft\Store\Test\StoreAbstractTest;
 use Symfony\Component\Yaml\Parser;
@@ -26,11 +28,14 @@ class VirtuosoTest extends StoreAbstractTest
         try {
             $this->isTestPossible();
             $this->fixture = new Virtuoso(
-                new NodeFactoryImpl(),
+                new NodeFactoryImpl(new NodeUtils()),
                 new StatementFactoryImpl(),
-                new QueryFactoryImpl(),
+                new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
                 new ResultFactoryImpl(),
                 new StatementIteratorFactoryImpl(),
+                new NodeUtils(),
+                new QueryUtils(),
+                new SparqlUtils(new StatementIteratorFactoryImpl()),
                 $this->configuration['virtuosoConfig']
             );
         } catch(\Exception $e) {
@@ -76,9 +81,9 @@ class VirtuosoTest extends StoreAbstractTest
     public function testAddStatementsOnDefaultGraphWithException()
     {
         $stmtOne = new StatementImpl(
-            new NamedNodeImpl('http://add/delete/defaultgraph/s/'),
-            new NamedNodeImpl('http://add/delete/defaultgraph/p/'),
-            new NamedNodeImpl('http://add/delete/defaultgraph/o/')
+            new NamedNodeImpl(new NodeUtils(), 'http://add/delete/defaultgraph/s/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://add/delete/defaultgraph/p/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://add/delete/defaultgraph/o/')
         );
 
         $this->setExpectedException('\Exception');
@@ -96,9 +101,9 @@ class VirtuosoTest extends StoreAbstractTest
     public function testDeleteMatchingStatementsOnDefaultGraphWithException()
     {
         $stmtOne = new StatementImpl(
-            new NamedNodeImpl('http://add/delete/defaultgraph/s/'),
-            new NamedNodeImpl('http://add/delete/defaultgraph/p/'),
-            new NamedNodeImpl('http://add/delete/defaultgraph/o/')
+            new NamedNodeImpl(new NodeUtils(), 'http://add/delete/defaultgraph/s/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://add/delete/defaultgraph/p/'),
+            new NamedNodeImpl(new NodeUtils(), 'http://add/delete/defaultgraph/o/')
         );
 
         $this->setExpectedException('\Exception');

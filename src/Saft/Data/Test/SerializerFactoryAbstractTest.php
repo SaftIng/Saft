@@ -2,6 +2,7 @@
 
 namespace Saft\Data\Test;
 
+use Saft\Rdf\NodeUtils;
 use Saft\Test\TestCase;
 
 abstract class SerializerFactoryAbstractTest extends TestCase

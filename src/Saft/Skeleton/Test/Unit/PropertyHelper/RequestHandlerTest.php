@@ -6,12 +6,14 @@ use Nette\Caching\Cache;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Skeleton\PropertyHelper\RequestHandler;
 use Saft\Skeleton\Test\TestCase;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Sparql\Query\QueryUtils;
 use Saft\Store\BasicTriplePatternStore;
 
 class RequestHandlerTest extends TestCase
@@ -26,9 +28,9 @@ class RequestHandlerTest extends TestCase
 
         // store
         $this->store = new BasicTriplePatternStore(
-            new NodeFactoryImpl(),
+            new NodeFactoryImpl(new NodeUtils()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(),
+            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
             new StatementIteratorFactoryImpl()
         );
 
@@ -41,24 +43,24 @@ class RequestHandlerTest extends TestCase
         $this->store->addStatements(
             array(
                 new StatementImpl(
-                    new NamedNodeImpl('http://saft/test/s1'),
-                    new NamedNodeImpl('http://purl.org/dc/terms/title'),
-                    new LiteralImpl('s1 dcterms title')
+                    new NamedNodeImpl(new NodeUtils(), 'http://saft/test/s1'),
+                    new NamedNodeImpl(new NodeUtils(), 'http://purl.org/dc/terms/title'),
+                    new LiteralImpl(new NodeUtils(), 's1 dcterms title')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl('http://saft/test/s2'),
-                    new NamedNodeImpl('http://www.w3.org/2000/01/rdf-schema#label'),
-                    new LiteralImpl('s2 rdfs label')
+                    new NamedNodeImpl(new NodeUtils(), 'http://saft/test/s2'),
+                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2000/01/rdf-schema#label'),
+                    new LiteralImpl(new NodeUtils(), 's2 rdfs label')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl('http://saft/test/s2'),
-                    new NamedNodeImpl('http://purl.org/dc/terms/title'),
-                    new LiteralImpl('s2 dcterms title')
+                    new NamedNodeImpl(new NodeUtils(), 'http://saft/test/s2'),
+                    new NamedNodeImpl(new NodeUtils(), 'http://purl.org/dc/terms/title'),
+                    new LiteralImpl(new NodeUtils(), 's2 dcterms title')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl('http://saft/test/s2'),
-                    new NamedNodeImpl('http://purl.org/dc/terms/title'),
-                    new LiteralImpl('s2 dcterms title - 2')
+                    new NamedNodeImpl(new NodeUtils(), 'http://saft/test/s2'),
+                    new NamedNodeImpl(new NodeUtils(), 'http://purl.org/dc/terms/title'),
+                    new LiteralImpl(new NodeUtils(), 's2 dcterms title - 2')
                 )
             ),
             $this->testGraph
