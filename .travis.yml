@@ -8,6 +8,10 @@ php:
   - hhvm
   - nightly
 
+matrix:
+    allow_failures:
+        - php: nightly
+
 sudo: false
 
 install:
