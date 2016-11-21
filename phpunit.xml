@@ -34,7 +34,7 @@
             <directory suffix=".php">./src</directory>
             <exclude>
                 <directory suffix="Test.php">./src/Saft/*/Test</directory>
-                <directory suffix="Test.php">./src/Saft/Backend/*/Test</directory>
+                <directory suffix="Test.php">./src/Saft/Addition/*/Test</directory>
                 <directory>./src/Saft/Test</directory>
                 <file>./src/Saft/TestCase.php</file>
             </exclude>
