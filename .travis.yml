@@ -14,12 +14,15 @@ matrix:
 
 sudo: false
 
+services:
+    - mysql
+
 before_install:
     - composer require satooshi/php-coveralls:1.*
     - travis_retry composer install --dev --no-interaction
 
 before_script:
-    - cp test-config.yml.dist test-config.yml
+    - cp test-config.yml.travis test-config.yml
 
 script: vendor/bin/phpunit --coverage-clover gen/coverage/clover.xml
 
