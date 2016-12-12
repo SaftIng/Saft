@@ -1,11 +1,14 @@
-- `install-mediawiki.sh` to handle the install of MediaWiki
-- `install-semantic-mediawiki.sh` to handle the install of Semantic MediaWiki
 - `install-services.sh` to handle the install of additional services
 
 ## SPARQL services
 
+This file and scripts are taken form the SemanticMediaWiki repo and only selected files where copied for running tests with virtuoso.
+It is taken as of commit 721a63d3a73400300f73e0a088196a6ed0fe5afd from https://github.com/SemanticMediaWiki/SemanticMediaWiki.
+The unsupported services are marked with *Endabled* "No".
+
 <table>
 	<tr>
+		<th>Endabled</th>
 		<th>Service</th>
 		<th>Connector</th>
 		<th>QueryEndPoint</th>
@@ -15,6 +18,7 @@
 		<th>Comments</th>
 	</tr>
 	<tr>
+		<th>No</th>
 		<th>Fuseki (mem)<sup>1</sup></th>
 		<td>Fuseki</td>
 		<td>http://localhost:3030/db/query</td>
@@ -24,6 +28,7 @@
 		<td>fuseki-server --update --port=3030 --mem /db</td>
 	</tr>
 	<tr>
+		<th>No</th>
 		<th>Fuseki (memTDB)</th>
 		<td>Fuseki</td>
 		<td>http://localhost:3030/db/query</td>
@@ -33,6 +38,7 @@
 		<td>fuseki-server --update --port=3030 --memTDB --set tdb:unionDefaultGraph=true /db</td>
 	</tr>
 	<tr>
+		<th>Yes</th>
 		<th>Virtuoso opensource</th>
 		<td>Virtuoso</td>
 		<td>http://localhost:8890/sparql</td>
@@ -42,6 +48,7 @@
 		<td>sudo apt-get install virtuoso-opensource</td>
 	</tr>
 	<tr>
+		<th>No</th>
 		<th>4store<sup>2</sup></th>
 		<td>4store</td>
 		<td>http://localhost:8088/sparql/</td>
@@ -51,6 +58,7 @@
 		<td>apt-get install 4store</td>
 	</tr>
 	<tr>
+		<th>No</th>
 		<th>Sesame</th>
 		<td>Custom</td>
 		<td>http://localhost:8080/openrdf-sesame/repositories/test-smw</td>
