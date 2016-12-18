@@ -43,3 +43,16 @@ make install
 #enable pdo_odbc
 echo "extension=pdo_odbc.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
 php -m
+
+# build redland
+cd ../../../
+sudo apt-get install swig librdf0-dev
+git clone git://github.com/dajobe/redland-bindings.git
+cd redland-bindings
+./autogen.sh --with-php
+make
+make install
+
+#enable redland
+echo "extension=redland.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
+php -m
