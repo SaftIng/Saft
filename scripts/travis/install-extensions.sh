@@ -7,6 +7,10 @@ if [[ $TRAVIS_PHP_VERSION = "hhv"* ]]; then
     exit 0
 fi
 
+# add backports repo for swig3.0
+sudo add-apt-repository -r "deb http://archive.ubuntu.com/ubuntu $(lsb_release -cs)-backports main restricted universe multiverse "
+sudo apt-get update -qq
+
 # get build dependencies
 sudo apt-get install -y unixODBC-dev
 
@@ -49,13 +53,13 @@ php-config --configure-options
 # build redland
 cd ../../../
 # swig is required by the redland-bindings, gtk-doc-tools is required by raptor and librdf, bison is required to build raptor and rasqal
-sudo apt-get -y install swig bison gtk-doc-tools #librasqal3-dev
+sudo apt-get -y install swig3.0 bison gtk-doc-tools #librasqal3-dev
 git clone git://github.com/dajobe/raptor.git
 git clone git://github.com/dajobe/rasqal.git
 git clone git://github.com/dajobe/librdf.git
 git clone git://github.com/dajobe/redland-bindings.git
 
-PHP_INCLUDE=$PWD/php-src-php-$PHPVERSION
+#PHP_INCLUDE=$PWD/php-src-php-$PHPVERSION
 
 cd raptor
 ./autogen.sh --enable-gtk-doc-html=no
@@ -73,8 +77,8 @@ make
 sudo make install
 
 cd ../redland-bindings
-echo "php path:"$PHP_INCLUDE
-./autogen.sh --with-php=$PHP_INCLUDE
+#echo "php path:"$PHP_INCLUDE
+./autogen.sh --with-php
 make
 make install
 
