@@ -58,7 +58,7 @@ cd raptor
 make
 sudo make install
 
-cd ../rasqal
+cd ../rasqal --enable-gtk-doc-html=no
 ./autogen.sh
 make
 sudo make install
@@ -69,7 +69,7 @@ make
 sudo make install
 
 cd ../redland-bindings
-./autogen.sh --with-php
+./autogen.sh --with-php=`realpath ../php-src-php-$PHPVERSION`
 make
 make install
 
