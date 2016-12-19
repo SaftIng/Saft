@@ -55,6 +55,8 @@ git clone git://github.com/dajobe/rasqal.git
 git clone git://github.com/dajobe/librdf.git
 git clone git://github.com/dajobe/redland-bindings.git
 
+PHP_INCLUDE=$PWD/php-src-php-$PHPVERSION
+
 cd raptor
 ./autogen.sh --enable-gtk-doc-html=no
 make
@@ -71,9 +73,8 @@ make
 sudo make install
 
 cd ../redland-bindings
-echo "php path:"
-echo `realpath ../php-src-php-$PHPVERSION`
-./autogen.sh --with-php=`realpath ../php-src-php-$PHPVERSION`
+echo "php path:"$PHP_INCLUDE
+./autogen.sh --with-php=$PHP_INCLUDE
 make
 make install
 
