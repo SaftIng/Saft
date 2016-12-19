@@ -59,14 +59,14 @@ git clone git://github.com/dajobe/redland-bindings.git
 # make install
 
 cd raptor
-./autogen.sh
+./autogen.sh --enable-gtk-doc-html=no
 make
-make install
+sudo make install
 
-cd ../librdf
+cd ../librdf --enable-gtk-doc-html=no
 ./autogen.sh
 make
-make install
+sudo make install
 
 cd ../redland-bindings
 ./autogen.sh --with-php
