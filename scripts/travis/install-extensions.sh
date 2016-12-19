@@ -57,7 +57,7 @@ sudo apt-get -y install swig3.0 bison gtk-doc-tools #librasqal3-dev
 git clone git://github.com/dajobe/raptor.git
 git clone git://github.com/dajobe/rasqal.git
 git clone git://github.com/dajobe/librdf.git
-git clone git://github.com/dajobe/redland-bindings.git
+git clone git://github.com/white-gecko/redland-bindings.git
 
 #PHP_INCLUDE=$PWD/php-src-php-$PHPVERSION
 
