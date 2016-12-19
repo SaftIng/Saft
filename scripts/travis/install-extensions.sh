@@ -71,6 +71,8 @@ make
 sudo make install
 
 cd ../redland-bindings
+echo "php path:"
+echo `realpath ../php-src-php-$PHPVERSION`
 ./autogen.sh --with-php=`realpath ../php-src-php-$PHPVERSION`
 make
 make install
