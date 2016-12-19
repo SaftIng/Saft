@@ -48,18 +48,18 @@ php -m
 cd ../../../
 # swig is required by the redland-bindings, gtk-doc-tools is required by raptor and librdf, bison is required to build raptor and rasqal
 sudo apt-get -y install swig bison gtk-doc-tools #librasqal3-dev
-git clone git://github.com/dajobe/rasqal.git
 git clone git://github.com/dajobe/raptor.git
+git clone git://github.com/dajobe/rasqal.git
 git clone git://github.com/dajobe/librdf.git
 git clone git://github.com/dajobe/redland-bindings.git
 
-cd rasqal
-./autogen.sh
+cd raptor
+./autogen.sh --enable-gtk-doc-html=no
 make
 sudo make install
 
-cd ../raptor
-./autogen.sh --enable-gtk-doc-html=no
+cd ../rasqal
+./autogen.sh
 make
 sudo make install
 
