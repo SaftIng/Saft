@@ -46,9 +46,15 @@ php -m
 
 # build redland
 cd ../../../
-sudo apt-get install swig librdf0-dev
+sudo apt-get -y install swig
+git clone git://github.com/dajobe/librdf.git
 git clone git://github.com/dajobe/redland-bindings.git
-cd redland-bindings
+cd librdf
+./autogen.sh
+make
+make install
+
+cd ../redland-bindings
 ./autogen.sh --with-php
 make
 make install
