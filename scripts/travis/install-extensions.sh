@@ -44,6 +44,8 @@ make install
 echo "extension=pdo_odbc.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
 php -m
 
+php-config --configure-options
+
 # build redland
 cd ../../../
 # swig is required by the redland-bindings, gtk-doc-tools is required by raptor and librdf, bison is required to build raptor and rasqal
