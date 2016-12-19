@@ -46,8 +46,8 @@ php -m
 
 # build redland
 cd ../../../
-# swig is required by the redland-bindings, gtk-doc-tools is required by librdf
-sudo apt-get -y install swig gtk-doc-tools
+# swig is required by the redland-bindings, gtk-doc-tools and librasqal3-dev are required by librdf
+sudo apt-get -y install swig librasqal3-dev gtk-doc-tools
 git clone git://github.com/dajobe/librdf.git
 git clone git://github.com/dajobe/redland-bindings.git
 cd librdf
