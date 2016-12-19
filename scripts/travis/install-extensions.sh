@@ -46,8 +46,8 @@ php -m
 
 # build redland
 cd ../../../
-# swig is required by the redland-bindings, bison is required to build raptor and rasqal
-sudo apt-get -y install swig bison #gtk-doc-tools # gtk-doc-tools and #librasqal3-dev
+# swig is required by the redland-bindings, gtk-doc-tools is required by raptor and librdf, bison is required to build raptor and rasqal
+sudo apt-get -y install swig bison gtk-doc-tools #librasqal3-dev
 git clone git://github.com/dajobe/rasqal.git
 git clone git://github.com/dajobe/raptor.git
 git clone git://github.com/dajobe/librdf.git
