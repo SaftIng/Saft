@@ -57,10 +57,14 @@ cd swig
 ./autogen.sh
 ./configure
 make
+make check-php5-examples
+make check-php5-test-suite
 sudo make install
 cd ..
 
 # build redland
+
+# we need trusty becasue of bison
 
 # swig is required by the redland-bindings, gtk-doc-tools is required by raptor and librdf, bison is required to build raptor and rasqal
 sudo apt-get -y install bison gtk-doc-tools #librasqal3-dev
