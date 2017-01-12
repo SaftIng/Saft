@@ -7,12 +7,15 @@ class BlankNodeImpl extends AbstractBlankNode
     protected $blankId;
 
     /*
-     * @param mixed $value
-     * @param string $lang optional
+     * @param string $blankId
      */
     public function __construct($blankId)
     {
-        $this->blankId = $blankId;
+        if (is_string($blankId)) {
+            $this->blankId = $blankId;
+        } else {
+            throw new \Exception('Blank nodes have to have a string as $blankId.');
+        }
     }
 
     public function getBlankId()
