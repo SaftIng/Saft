@@ -29,4 +29,4 @@ Please have a look into prepared [examples](https://github.com/SaftIng/Saft.exam
 
 ## Credits
 
-Based on the work of [Simeon Ackermann](imeonackermann).
+Based on the work of [Simeon Ackermann](https://github.com/simeonackermann).
