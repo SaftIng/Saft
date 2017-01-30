@@ -11,13 +11,7 @@ For documentation please see http://safting.github.io/doc/.
 
 ## License
 
-Copyright (C) 2017:
-
-* Konrad Abicht <http://aksw.org/KonradAbicht>
-* Natanael Arndt <http://aksw.org/NatanaelArndt>
-* Viktor Befort <http://aksw.org/StudentWorker/ViktorBefort>
-* Oliver Skawron <http://aksw.org/StudentWorker/OliverSkawronek>
-* Philipp Frischmuth <http://aksw.org/PhilippFrischmuth>
+Copyright (C) 2017 by the Saft [contributors](CONTRIBUTORS)
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
 
