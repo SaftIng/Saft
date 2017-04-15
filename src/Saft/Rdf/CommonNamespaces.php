@@ -1,6 +1,6 @@
 <?php
 
-namespace Knorke;
+namespace Saft\Rdf;
 
 class CommonNamespaces
 {
