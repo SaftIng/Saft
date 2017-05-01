@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.4",
         "zendframework/zend-cache": "2.5.1",
         "saft/saft-store": ">=0.8"
     },
@@ -30,7 +30,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Saft\\QueryCache\\": "."
+            "Saft\\Addition\\QueryCache\\": "."
         }
     },
     "prefer-stable": true
