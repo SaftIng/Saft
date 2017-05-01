@@ -7,16 +7,20 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
+use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\ResultFactoryImpl;
+use Saft\Sparql\Result\StatementSetResultImpl;
 use Saft\Store\BasicTriplePatternStore;
 use Saft\Store\Test\StoreAbstractTest;
+use Saft\Test\TestCase;
 use Symfony\Component\Yaml\Parser;
 
-class QueryCacheTest
+class QueryCacheTest extends TestCase
 {
     /**
      * @var BasicTriplePatternStore
@@ -26,6 +30,8 @@ class QueryCacheTest
     public function setUp()
     {
         parent::setUp();
+
+        $this->loadTestConfiguration(__DIR__ .'/../test-config.yml');
 
         if (true === isset($this->configuration['erfurtConfig'])) {
             // create mockstore to store triples in memory
@@ -88,7 +94,7 @@ class QueryCacheTest
 
         // check, that it uses the cache and not the mock store
         $this->assertEquals(
-            new ArrayStatementIteratorImpl(array($stmtOne, $stmtTwo)),
+            new StatementSetResultImpl(array($stmtOne, $stmtTwo)),
             $this->fixture->query('SELECT * FROM <http://foo> WHERE {?s ?p ?o.}')
         );
     }
@@ -110,7 +116,7 @@ class QueryCacheTest
         $this->mockStore->addStatements(new ArrayStatementIteratorImpl(array($stmtOne, $stmtTwo)));
 
         $this->assertEquals(
-            new ArrayStatementIteratorImpl(array($stmtOne, $stmtTwo)),
+            new StatementSetResultImpl(array($stmtOne, $stmtTwo)),
             $this->fixture->query('SELECT * FROM <http://foo> WHERE {?s ?p ?o.}')
         );
     }
