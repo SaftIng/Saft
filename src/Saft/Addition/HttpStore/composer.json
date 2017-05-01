@@ -21,10 +21,11 @@
     ],
     "require": {
         "php": ">=5.4",
-        "php-curl-class/php-curl-class": "4.11.*",
+        "php-curl-class/php-curl-class": "4.*",
         "saft/saft-store": ">=0.8"
     },
     "require-dev": {
+        "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "4.8.*",
         "saft/saft-test": ">=0.8"
     },

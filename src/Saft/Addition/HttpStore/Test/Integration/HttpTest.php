@@ -20,6 +20,8 @@ class HttpTest extends StoreAbstractTest
     {
         parent::setUp();
 
+        $this->loadTestConfiguration(__DIR__ .'/../../test-config.yml');
+
         /*
          * first check, if target server is online
          */
