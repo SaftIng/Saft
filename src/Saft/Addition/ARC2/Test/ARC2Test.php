@@ -26,6 +26,8 @@ class ARC2Test extends StoreAbstractTest
     {
         parent::setUp();
 
+        $this->loadTestConfiguration(__DIR__ .'/../test-config.yml');
+
         if (true === isset($this->configuration['arc2Config'])) {
             try {
                 $this->fixture = new ARC2(
