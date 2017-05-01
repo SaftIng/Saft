@@ -311,11 +311,5 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->testGraph = new NamedNodeImpl(new NodeUtils(), 'http://localhost/Saft/TestGraph/');
-
-        // set path to test file
-        $saftRootDir = dirname(__FILE__) . '/../../../';
-        $configFilepath = $saftRootDir . 'test-config.yml';
-
-        $this->loadTestConfiguration($configFilepath);
     }
 }
