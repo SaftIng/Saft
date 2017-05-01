@@ -13,7 +13,7 @@ use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIteratorFactory;
 
 /**
- *
+ * A handy RDF/XML parser.
  */
 class RDFXMLParser implements Parser
 {
@@ -22,6 +22,8 @@ class RDFXMLParser implements Parser
     protected $nodeUtils;
 
     protected $statementFactory;
+
+    protected $statementIteratorFactory;
 
     /**
      * @param NodeFactory $nodeFactory
@@ -50,7 +52,7 @@ class RDFXMLParser implements Parser
     public function getCurrentPrefixList()
     {
         // TODO implement a way to get a list of all namespaces used in the last parsed datastring/file.
-        return array();
+        throw new \Exception('Not implemented yet.');
     }
 
     /**
@@ -93,18 +95,21 @@ class RDFXMLParser implements Parser
                 foreach ($rdfDescription['value'] as $value) {
 
                     // if object is a resource
-                    if (isset($value['attributes'][$rdfResourceString]) && $value['attributes'][$rdfResourceString]) {
+                    if (isset($value['attributes'][$rdfResourceString])
+                        && $value['attributes'][$rdfResourceString]) {
                         // create predicate
                         $predicate = $this->nodeFactory->createNamedNode(
                             str_replace(array('{', '}'), '', $value['name'])
                         );
 
-                        // we know that the object can only be a named node, so add triple to statements and go the
-                        // next entry
+                        // we know that the object can only be a named node, so add triple
+                        // to statements and go the next entry
                         $statements[] = $this->statementFactory->createStatement(
                             $subject,
                             $predicate,
-                            $this->nodeFactory->createNamedNode($value['attributes'][$rdfResourceString])
+                            $this->nodeFactory->createNamedNode(
+                                $value['attributes'][$rdfResourceString]
+                            )
                         );
 
                         continue;
@@ -120,8 +125,13 @@ class RDFXMLParser implements Parser
 
                             // object is URI
                             if (isset($objectValue['attributes'][$rdfResourceString])
-                                && $this->nodeUtils->simpleCheckURI($objectValue['attributes'][$rdfResourceString])) {
-                                $object = $this->nodeFactory->createNamedNode($objectValue['attributes'][$rdfResourceString]);
+                                && $this->nodeUtils->simpleCheckURI(
+                                    $objectValue['attributes'][$rdfResourceString])
+                                ) {
+
+                                $object = $this->nodeFactory->createNamedNode(
+                                    $objectValue['attributes'][$rdfResourceString]
+                                );
 
                             // object is blank node
                             } elseif ($this->nodeUtils->simpleCheckBlankNodeId($objectValue['value'])) {
@@ -148,7 +158,11 @@ class RDFXMLParser implements Parser
                                 );
                             }
 
-                            $statements[] = $this->statementFactory->createStatement($subject, $predicate, $object);
+                            $statements[] = $this->statementFactory->createStatement(
+                                $subject,
+                                $predicate,
+                                $object
+                            );
                             continue;
                         }
                     }
@@ -160,13 +174,16 @@ class RDFXMLParser implements Parser
     }
 
     /**
-     * Parses a given stream and returns an iterator containing Statement instances representing the
-     * previously read data. The stream parses the data not as a whole but in chunks.
+     * Parses a given stream and returns an iterator containing Statement instances
+     * representing the previously read data. The stream parses the data not as a whole but
+     * in chunks.
      *
-     * @param string $inputStream Filename of the stream to parse which contains RDF serialized data.
-     * @param string $baseUri     The base URI of the parsed content. If this URI is null, the inputStreams URL is taken
-     *                            as base URI. (optional)
-     * @return StatementIterator A StatementIterator containing all the Statements parsed by the parser to far.
+     * @param string $inputStream Filename of the stream to parse which contains RDF
+     *                            serialized data.
+     * @param string $baseUri     The base URI of the parsed content. If this URI is null,
+     *                            the inputStreams URL is taken as base URI. (optional)
+     * @return StatementIterator A StatementIterator containing all the Statements parsed by
+     *                           the parser to far.
      * @throws \Exception if the base URI $baseUri is no valid URI.
      * @api
      * @since 0.1

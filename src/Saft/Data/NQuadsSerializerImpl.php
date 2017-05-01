@@ -13,7 +13,8 @@ class NQuadsSerializerImpl implements Serializer
     {
         if ('n-quads' != $serialization && 'n-triples' != $serialization) {
             throw new \Exception(
-                'Unknown format given: '. $serialization .'. This serializer only supports n-quads and n-triples.'
+                'Unknown format given: '. $serialization
+                .'. This serializer only supports n-quads and n-triples.'
             );
         }
 
@@ -25,19 +26,22 @@ class NQuadsSerializerImpl implements Serializer
      * Prefixes are ignored here.
      *
      * @param array $prefixes An associative array with a prefix mapping of the prefixes. The key
-     *                        will be the prefix, while the values contains the according namespace URI.
+     *                        will be the prefix, while the values contains the according namespace
+     *                        URI.
      */
     public function setPrefixes(array $prefixes)
     {
+        throw new \Exception('Not implemented yet.');
     }
 
     /**
-     * Transforms the statements of a StatementIterator instance into a stream, a file for instance.
+     * Transforms the statements of a StatementIterator instance into a stream, a file for
+     * instance.
      *
-     * @param StatementIterator $statements   The StatementIterator containing all the Statements which
-     *                                        should be serialized by the serializer.
-     * @param string|resource   $outputStream Filename or file pointer to the stream to where the serialization
-     *                                        should be written.
+     * @param StatementIterator $statements The StatementIterator containing all the statements,
+     *                                      which should be serialized by the serializer.
+     * @param string|resource $outputStream Filename or file pointer to the stream to where
+     *                                      the serialization should be written.
      * @throws \Exception if unknown serialization was given.
      */
     public function serializeIteratorToStream(StatementIterator $statements, $outputStream)
@@ -69,8 +73,8 @@ class NQuadsSerializerImpl implements Serializer
             fwrite($outputStream, $statement->$function() . PHP_EOL);
         }
 
-        // Do not close the stream, because ... it is a stream and not a file! Well, maybe the user uses a
-        // file, but its handler will be closed by PHP automatically at the end anyway.
+        // Do not close the stream, because ... it is a stream and not a file! Well, maybe the
+        // user uses a file, but its handler will be closed by PHP automatically at the end anyway.
     }
 
     /**

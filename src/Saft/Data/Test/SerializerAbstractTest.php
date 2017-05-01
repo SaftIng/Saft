@@ -158,7 +158,9 @@ abstract class SerializerAbstractTest extends TestCase
     // purpose of this test is to call setPrefixes method and be sure, it acts as expected.
     public function testSetPrefixes()
     {
+        $this->setExpectedException('\Exception');
+
         $this->fixture = $this->newInstance('n-triples');
-        $this->assertNull($this->fixture->setPrefixes(array()));
+        $this->fixture->setPrefixes(array());
     }
 }
