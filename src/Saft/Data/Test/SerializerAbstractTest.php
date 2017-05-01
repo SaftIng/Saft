@@ -37,43 +37,6 @@ abstract class SerializerAbstractTest extends TestCase
         );
     }
 
-    public function testSerializeIteratorToStreamAsNQuads()
-    {
-        try {
-            // serialize $iterator to turtle
-            $this->fixture = $this->newInstance('n-quads');
-        } catch (\Exception $e) {
-            $this->markTestSkipped($e->getMessage());
-        }
-
-        $iterator = new ArrayStatementIteratorImpl(array(
-            new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foo')
-            ),
-            new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/2'),
-                new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foo')
-            ),
-        ));
-
-        $filepath = tempnam(sys_get_temp_dir(), 'saft_');
-        $testFile = fopen('file://' . $filepath, 'w+');
-
-        $this->fixture->serializeIteratorToStream($iterator, $testFile, 'n-quads');
-
-        // check
-        $this->assertEquals(
-            '<http://saft/example/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> '.
-            '<http://saft/example/Foo> .'. PHP_EOL .
-            '<http://saft/example/2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> '.
-            '<http://saft/example/Foo> .',
-            trim(file_get_contents($filepath))
-        );
-    }
-
     public function testSerializeIteratorToStreamAsNTriplesOutputStreamString()
     {
         try {
@@ -158,9 +121,9 @@ abstract class SerializerAbstractTest extends TestCase
     // purpose of this test is to call setPrefixes method and be sure, it acts as expected.
     public function testSetPrefixes()
     {
-        $this->setExpectedException('\Exception');
+        // $this->setExpectedException('\Exception');
 
         $this->fixture = $this->newInstance('n-triples');
-        $this->fixture->setPrefixes(array());
+        $this->assertNull($this->fixture->setPrefixes(array()));
     }
 }
