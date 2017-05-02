@@ -1,0 +1,4 @@
+virtuosoConfig: &virtuosoConfig
+    dsn: "VOS"
+    username: "dba"
+    password: "dba"

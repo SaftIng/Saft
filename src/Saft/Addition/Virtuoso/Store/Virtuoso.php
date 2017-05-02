@@ -177,12 +177,8 @@ class Virtuoso extends AbstractSparqlStore
      */
     public function checkRequirements()
     {
-        // check for odbc extension
-        if (false === extension_loaded('odbc')) {
-            throw new \Exception('Virtuoso store requires the PHP ODBC extension to be loaded.');
-
         // check for pdo_odbc extension
-        } elseif (false === extension_loaded('pdo_odbc')) {
+        if (false === extension_loaded('pdo_odbc')) {
             throw new \Exception('Virtuoso store requires the PHP PDO_ODBC extension to be loaded.');
         }
 
