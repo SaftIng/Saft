@@ -3,20 +3,20 @@
     xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"
     backupGlobals="false"
     backupStaticAttributes="false"
-    bootstrap="vendor/autoload.php"
+    bootstrap="Test/bootstrap.php"
     colors="true"
     convertErrorsToExceptions="true"
     convertNoticesToExceptions="true"
     convertWarningsToExceptions="true"
-    processIsolation="true"
+    processIsolation="false"
     stopOnFailure="false"
     syntaxCheck="false"
     verbose="true"
     >
     <php>
-        <ini name="error_reporting" value="1" />
+        <ini name="error_reporting" value="-1" />
         <ini name="intl.error_level" value="0" />
-         <ini name="display_errors" value="true"/>
+        <ini name="display_errors" value="On"/>
     </php>
     <!-- Define wich test cases should be executed -->
     <testsuites>
@@ -24,19 +24,4 @@
             <directory suffix="Test.php">./Test</directory>
         </testsuite>
     </testsuites>
-    <!-- Enable Code Coverage report -->
-    <logging>
-        <log type="coverage-html" target="gen/coverage/" title="Saft" />
-        <log type="junit" target="gen/test/log.junit.xml" logIncompleteSkipped="true" />
-        <log type="testdox-html" target="gen/test/testdox.html" />
-    </logging>
-    <!-- Define which files are included in the code coverage report -->
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">.</directory>
-            <exclude>
-                <directory suffix="Test.php">./Test</directory>
-            </exclude>
-        </whitelist>
-    </filter>
 </phpunit>
