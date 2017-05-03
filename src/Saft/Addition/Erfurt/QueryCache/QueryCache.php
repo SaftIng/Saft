@@ -32,10 +32,13 @@ class QueryCache implements ChainableStore
     protected $log = array();
 
     /**
-     * Instances of Erfurts QueryCache
+     * Instance of Erfurts QueryCache
      */
     protected $queryCache;
 
+    /**
+     * @var QueryFactory
+     */
     protected $queryFactory;
 
     /**
@@ -58,12 +61,12 @@ class QueryCache implements ChainableStore
         $this->erfurtApp = \Erfurt_App::getInstance(false);
         $this->erfurtApp->start($zendConfig);
 
-        // save reference to the QueryCache
-        $this->queryCache = $this->erfurtApp->getQueryCache();
-
         // Creates cache tables in the database
         $c = new \Erfurt_Cache_Backend_QueryCache_Database();
         $c->createCacheStructure();
+
+        // save reference to the QueryCache
+        $this->queryCache = $this->erfurtApp->getQueryCache();
 
         $this->queryFactory = $queryFactory;
     }
