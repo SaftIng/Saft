@@ -63,15 +63,24 @@ class HttpTest extends StoreAbstractTest
          * Skip test, if you dont have enough rights.
          */
         if (false === $rights['graphUpdate']) {
-            $this->markTestSkipped('Test skipped, because the adapter can not create/drop graphs.');
+            $this->markTestSkipped(
+                'Test skipped, because the adapter can not create/drop graphs. ' .
+                'Has the webuser of the SPARQL endpoint (Virtuoso?) enough rights?'
+            );
         }
 
         if (false === $rights['tripleQuerying']) {
-            $this->markTestSkipped('Test skipped, because the adapter can not query triples.');
+            $this->markTestSkipped(
+                'Test skipped, because the adapter can not query triples. ' .
+                'Has the webuser of the SPARQL endpoint (Virtuoso?) enough rights?'
+            );
         }
 
         if (false === $rights['tripleUpdate']) {
-            $this->markTestSkipped('Test skipped, because the adapter can not update triples.');
+            $this->markTestSkipped(
+                'Test skipped, because the adapter can not update triples. ' .
+                'Has the webuser of the SPARQL endpoint (Virtuoso?) enough rights?'
+            );
         }
 
         $this->fixture->dropGraph($this->testGraph);
