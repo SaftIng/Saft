@@ -25,4 +25,7 @@ do
     echo "############################"
     echo ""
     cd "$DIR/../${components[$i]}" && vendor/bin/phpunit
+
+    # let the program sleep so that the developer can recognize the result
+    sleep 1s
 done
