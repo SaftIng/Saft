@@ -22,10 +22,6 @@ setup-test-environment:
 	cp test-config.yml.dist test-config.yml
 	sudo apt-get install xsltproc
 
-test:
-	- $(PHPUNIT)
-	$(XSLTPROC) -o gen/test/report.html resources/phpunit-results.xsl gen/test/log.junit.xml
-
 codesniffer:
 	$(PHPCS) --standard=$(PHPCS-RULES) --extensions=php -p src/*
 
@@ -79,3 +75,6 @@ setup-subpackage-remotes:
 	git remote add saft.store.http git@github.com:SaftIng/Saft.store.http
 	git remote add saft.store.virtuoso git@github.com:SaftIng/Saft.store.virtuoso
 	git remote add saft.test git@github.com:SaftIng/Saft.test
+
+test:
+	./scripts/run-tests.sh
