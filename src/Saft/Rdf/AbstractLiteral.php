@@ -2,22 +2,20 @@
 
 namespace Saft\Rdf;
 
-use Saft\Rdf\NodeUtils;
-
 /**
  * @api
  * @since 0.1
  */
 abstract class AbstractLiteral implements Literal
 {
-    protected $nodeUtils;
+    protected $rdfHelpers;
 
     /**
-     * @param NodeUtils $nodeUtils
+     * @param RdfHelpers $rdfHelpers
      */
-    public function __construct(NodeUtils $nodeUtils)
+    public function __construct(RdfHelpers $rdfHelpers)
     {
-        $this->nodeUtils = $nodeUtils;
+        $this->nodeUtils = $rdfHelpers;
     }
 
     /**

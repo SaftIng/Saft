@@ -3,11 +3,15 @@
 namespace Saft\Sparql;
 
 use Saft\Rdf\Node;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 
+/**
+ * @deprecated Use Saft/Rdf/RdfHelpers!
+ */
 class SparqlUtils
 {
     /**
@@ -15,9 +19,14 @@ class SparqlUtils
      */
     protected $statementIteratorFactory;
 
+    /**
+     * @var RdfHelpers
+     */
+    protected $rdfHelpers;
+
     public function __construct(StatementIteratorFactory $statementIteratorFactory)
     {
-        $this->statementIteratorFactory = $statementIteratorFactory;
+        $this->rdfHelpers = new RdfHelpers($statementIteratorFactory);
     }
 
     /**
@@ -27,33 +36,11 @@ class SparqlUtils
      * @param  Node                    $graph      Use if each statement is a triple and to use another
      *                                             graph as the default.
      * @return string, part of query
+     * @deprecated Use Saft/Rdf/RdfHelpers!
      */
     public function statementIteratorToSparqlFormat($statements, Node $graph = null)
     {
-        $query = '';
-        foreach ($statements as $statement) {
-            if ($statement instanceof Statement) {
-                $con = $this->getNodeInSparqlFormat($statement->getSubject()) . ' ' .
-                       $this->getNodeInSparqlFormat($statement->getPredicate()) . ' ' .
-                       $this->getNodeInSparqlFormat($statement->getObject()) . ' . ';
-
-                $graphToUse = $graph;
-                if ($graph == null && $statement->isQuad()) {
-                    $graphToUse = $statement->getGraph();
-                }
-
-                if (null !== $graphToUse) {
-                    $sparqlString = 'Graph '. self::getNodeInSparqlFormat($graphToUse) .' {' . $con .'}';
-                } else {
-                    $sparqlString = $con;
-                }
-
-                $query .= $sparqlString .' ';
-            } else {
-                throw new \Exception('Not a Statement instance');
-            }
-        }
-        return $query;
+        return $this->rdfHelpers->statementIteratorToSparqlFormat($statements, $graph);
     }
 
     /**
@@ -62,11 +49,11 @@ class SparqlUtils
      * @param  array  $statements List of statements to format as SPARQL string.
      * @param  string $graphUri   Use if each statement is a triple and to use another graph as the default.
      * @return string Part of query
+     * @deprecated Use Saft/Rdf/RdfHelpers!
      */
     public function statementsToSparqlFormat(array $statements, Node $graph = null)
     {
-        $iterator = $this->statementIteratorFactory->createStatementIteratorFromArray($statements);
-        return $this->statementIteratorToSparqlFormat($iterator, $graph);
+        return $this->rdfHelpers->statementsToSparqlFormat($statements, $graph);
     }
 
     /**
@@ -75,15 +62,10 @@ class SparqlUtils
      * @param  Node   $node Node instance to format.
      * @param  string $var The variablename, which should be used, if the node is not concrete
      * @return string Either NQuad notation (if node is concrete) or as variable.
+     * @deprecated Use Saft/Rdf/RdfHelpers!
      */
     public function getNodeInSparqlFormat(Node $node, $var = null)
     {
-        if ($node->isConcrete()) {
-            return $node->toNQuads();
-        }
-        if ($var == null) {
-            $var = uniqid('tempVar');
-        }
-        return '?' . $var;
+        return $this->rdfHelpers->getNodeInSparqlFormat($node, $var);
     }
 }

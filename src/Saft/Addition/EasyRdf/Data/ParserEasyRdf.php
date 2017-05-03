@@ -5,7 +5,7 @@ namespace Saft\Addition\EasyRdf\Data;
 use Saft\Data\Parser;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NodeFactory;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIteratorFactory;
 
@@ -17,9 +17,9 @@ class ParserEasyRdf implements Parser
     protected $nodeFactory;
 
     /**
-     * @var NodeUtils
+     * @var RdfHelpers
      */
-    protected $nodeUtils;
+    protected $rdfHelpers;
 
     /**
      * @var string
@@ -42,7 +42,7 @@ class ParserEasyRdf implements Parser
      * @param NodeFactory $nodeFactory
      * @param StatementFactory $statementFactory
      * @param StatementIteratorFactory $statementIteratorFactory
-     * @param NodeUtils $nodeUtils
+     * @param RdfHelpers $rdfHelpers
      * @param string $serialization
      * @throws \Exception if serialization is unknown.
      */
@@ -50,10 +50,10 @@ class ParserEasyRdf implements Parser
         NodeFactory $nodeFactory,
         StatementFactory $statementFactory,
         StatementIteratorFactory $statementIteratorFactory,
-        NodeUtils $nodeUtils,
+        RdfHelpers $rdfHelpers,
         $serialization
     ) {
-        $this->nodeUtils = $nodeUtils;
+        $this->RdfHelpers = $rdfHelpers;
 
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
@@ -102,7 +102,7 @@ class ParserEasyRdf implements Parser
     public function parseStringToIterator($inputString, $baseUri = null)
     {
         // check $baseUri
-        if (null !== $baseUri && false == $this->nodeUtils->simpleCheckURI($baseUri)) {
+        if (null !== $baseUri && false == $this->RdfHelpers->simpleCheckURI($baseUri)) {
             throw new \Exception('Parameter $baseUri is not a valid URI.');
         }
 
@@ -126,7 +126,7 @@ class ParserEasyRdf implements Parser
     public function parseStreamToIterator($inputStream, $baseUri = null)
     {
         // check $baseUri
-        if (null !== $baseUri && false == $this->nodeUtils->simpleCheckURI($baseUri)) {
+        if (null !== $baseUri && false == $this->RdfHelpers->simpleCheckURI($baseUri)) {
             throw new \Exception('Parameter $baseUri is not a valid URI.');
         }
 
@@ -168,9 +168,9 @@ class ParserEasyRdf implements Parser
                     /**
                      * Create subject node
                      */
-                    if (true === $this->nodeUtils->simpleCheckURI($subject)) {
+                    if (true === $this->RdfHelpers->simpleCheckURI($subject)) {
                         $s = $this->nodeFactory->createNamedNode($subject);
-                    } elseif (true === $this->nodeUtils->simpleCheckBlankNodeId($subject)) {
+                    } elseif (true === $this->RdfHelpers->simpleCheckBlankNodeId($subject)) {
                         $s = $this->nodeFactory->createBlankNode($subject);
                     } else {
                         // should not be possible, because EasyRdf is able to check for invalid subjects.
@@ -180,9 +180,9 @@ class ParserEasyRdf implements Parser
                     /**
                      * Create predicate node
                      */
-                    if (true === $this->nodeUtils->simpleCheckURI($property)) {
+                    if (true === $this->RdfHelpers->simpleCheckURI($property)) {
                         $p = $this->nodeFactory->createNamedNode($property);
-                    } elseif (true === $this->nodeUtils->simpleCheckBlankNodeId($property)) {
+                    } elseif (true === $this->RdfHelpers->simpleCheckBlankNodeId($property)) {
                         $p = $this->nodeFactory->createBlankNode($property);
                     } else {
                         // should not be possible, because EasyRdf is able to check for invalid predicates.
@@ -193,7 +193,7 @@ class ParserEasyRdf implements Parser
                      * Create object node
                      */
                     // URI
-                    if ($this->nodeUtils->simpleCheckURI($object['value'])) {
+                    if ($this->RdfHelpers->simpleCheckURI($object['value'])) {
                         $o = $this->nodeFactory->createNamedNode($object['value']);
 
                     // datatype set

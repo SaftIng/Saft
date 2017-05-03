@@ -5,7 +5,7 @@ namespace Saft\Rdf\Test;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementImpl;
 use Saft\Test\TestCase;
 
@@ -32,11 +32,11 @@ abstract class StatementAbstractTest extends TestCase
     public function testEquals()
     {
         $subjectA = new AnyPatternImpl();
-        $subjectB = new NamedNodeImpl(new NodeUtils(), "http://example.org/");
-        $predicate = new NamedNodeImpl(new NodeUtils(), "http://example.org/");
-        $object = new NamedNodeImpl(new NodeUtils(), "http://example.org/");
+        $subjectB = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
+        $predicate = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
+        $object = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
         $graphA = new AnyPatternImpl();
-        $graphB = new NamedNodeImpl(new NodeUtils(), "http://example.org/");
+        $graphB = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
 
         $fixtureA = $this->newInstance($subjectA, $predicate, $object);
         $fixtureB = $this->newInstance($subjectB, $predicate, $object);
@@ -64,11 +64,11 @@ abstract class StatementAbstractTest extends TestCase
     public function testIsConcrete()
     {
         $subjectA = new AnyPatternImpl();
-        $subjectB = new NamedNodeImpl(new NodeUtils(), "http://example.org/");
-        $predicate = new NamedNodeImpl(new NodeUtils(), "http://example.org/");
-        $object = new NamedNodeImpl(new NodeUtils(), "http://example.org/");
+        $subjectB = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
+        $predicate = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
+        $object = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
         $graphA = new AnyPatternImpl();
-        $graphB = new NamedNodeImpl(new NodeUtils(), "http://example.org/");
+        $graphB = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
 
         $fixtureA = $this->newInstance($subjectA, $predicate, $object);
         $fixtureB = $this->newInstance($subjectB, $predicate, $object);
@@ -91,11 +91,11 @@ abstract class StatementAbstractTest extends TestCase
 
     public function testMatches()
     {
-        $subject = new NamedNodeImpl(new NodeUtils(), 'http://foo.net');
-        $predicate = new NamedNodeImpl(new NodeUtils(), 'http://bar.net');
-        $graphA = new NamedNodeImpl(new NodeUtils(), 'http://example.net');
-        $graphB = new NamedNodeImpl(new NodeUtils(), 'http://other.net');
-        $object = new LiteralImpl(new NodeUtils(), 'baz');
+        $subject = new NamedNodeImpl(new RdfHelpers(), 'http://foo.net');
+        $predicate = new NamedNodeImpl(new RdfHelpers(), 'http://bar.net');
+        $graphA = new NamedNodeImpl(new RdfHelpers(), 'http://example.net');
+        $graphB = new NamedNodeImpl(new RdfHelpers(), 'http://other.net');
+        $object = new LiteralImpl(new RdfHelpers(), 'baz');
         $fixtureA = $this->newInstance($subject, $predicate, $object);
         $fixtureB = $this->newInstance($subject, $predicate, $object, $graphA);
         $fixtureC = $this->newInstance($subject, $predicate, $object, $graphB);
@@ -113,27 +113,27 @@ abstract class StatementAbstractTest extends TestCase
         $this->assertTrue($patternC->matches($fixtureB));
         $this->assertFalse($patternC->matches($fixtureC));
 
-        $subject = new NamedNodeImpl(new NodeUtils(), 'http://foo.net');
-        $predicate = new NamedNodeImpl(new NodeUtils(), 'http://bar.net');
-        $object = new LiteralImpl(new NodeUtils(), 'baz');
+        $subject = new NamedNodeImpl(new RdfHelpers(), 'http://foo.net');
+        $predicate = new NamedNodeImpl(new RdfHelpers(), 'http://bar.net');
+        $object = new LiteralImpl(new RdfHelpers(), 'baz');
         $pattern = new StatementImpl($subject, $predicate, $object);
         $this->assertTrue($pattern->matches($fixtureA));
 
         $subject = new AnyPatternImpl();
-        $predicate = new NamedNodeImpl(new NodeUtils(), 'http://bar.net');
+        $predicate = new NamedNodeImpl(new RdfHelpers(), 'http://bar.net');
         $object = new AnyPatternImpl();
         $pattern = new StatementImpl($subject, $predicate, $object);
         $this->assertTrue($pattern->matches($fixtureA));
 
         $subject = new AnyPatternImpl();
-        $predicate = new NamedNodeImpl(new NodeUtils(), 'http://other.net');
+        $predicate = new NamedNodeImpl(new RdfHelpers(), 'http://other.net');
         $object = new AnyPatternImpl();
         $pattern = new StatementImpl($subject, $predicate, $object);
         $this->assertFalse($pattern->matches($fixtureA));
 
-        $subject = new NamedNodeImpl(new NodeUtils(), 'http://other.net');
-        $predicate = new NamedNodeImpl(new NodeUtils(), 'http://bar.net');
-        $object = new LiteralImpl(new NodeUtils(), 'baz');
+        $subject = new NamedNodeImpl(new RdfHelpers(), 'http://other.net');
+        $predicate = new NamedNodeImpl(new RdfHelpers(), 'http://bar.net');
+        $object = new LiteralImpl(new RdfHelpers(), 'baz');
         $pattern = new StatementImpl($subject, $predicate, $object);
         $this->assertFalse($pattern->matches($fixtureA));
     }
@@ -159,10 +159,10 @@ abstract class StatementAbstractTest extends TestCase
 
     public function testToNQuads()
     {
-        $subject = new NamedNodeImpl(new NodeUtils(), 'http://foo.net');
-        $predicate = new NamedNodeImpl(new NodeUtils(), 'http://bar.net');
-        $object = new NamedNodeImpl(new NodeUtils(), 'http://baz.net');
-        $graph = new NamedNodeImpl(new NodeUtils(), 'http://graph.net');
+        $subject = new NamedNodeImpl(new RdfHelpers(), 'http://foo.net');
+        $predicate = new NamedNodeImpl(new RdfHelpers(), 'http://bar.net');
+        $object = new NamedNodeImpl(new RdfHelpers(), 'http://baz.net');
+        $graph = new NamedNodeImpl(new RdfHelpers(), 'http://graph.net');
         $anyGraph = new AnyPatternImpl();
 
         $fixtureA = $this->newInstance($subject, $predicate, $object, $graph);

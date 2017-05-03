@@ -7,7 +7,7 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
@@ -18,10 +18,10 @@ class RDFXMLParserTest extends TestCase
     public function setUp()
     {
         $this->fixture = new RDFXMLParser(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
             new StatementIteratorFactoryImpl(),
-            new NodeUtils()
+            new RdfHelpers()
         );
     }
 
@@ -36,25 +36,25 @@ class RDFXMLParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/2015–16_MSV_Duisburg_season'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/property/location'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/2015–16_MSV_Duisburg_season'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/property/location'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2000/01/rdf-schema#label'),
-                    new LiteralImpl(new NodeUtils(), 'Leipzig', null, 'de')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2000/01/rdf-schema#label'),
+                    new LiteralImpl(new RdfHelpers(), 'Leipzig', null, 'de')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2000/01/rdf-schema#label'),
-                    new LiteralImpl(new NodeUtils(), 'Leipzig', null, 'en')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2000/01/rdf-schema#label'),
+                    new LiteralImpl(new RdfHelpers(), 'Leipzig', null, 'en')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2000/01/rdf-schema#comment'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2000/01/rdf-schema#comment'),
                     new LiteralImpl(
-                        new NodeUtils(),
+                        new RdfHelpers(),
                         "Leipzig (/ˈlaɪpsɪɡ/; German: [ˈlaɪptsɪç]) is the largest city in the federal state of Saxony, "
                         ."Germany. It has a population of 544,479 inhabitants (1,001,220 residents in the larger "
                         ."urban zone). Leipzig is located about 150 kilometers (93 miles) south of Berlin at the "
@@ -66,41 +66,41 @@ class RDFXMLParserTest extends TestCase
                     )
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://umbel.org/umbel/rc/PopulatedPlace')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://umbel.org/umbel/rc/PopulatedPlace')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://umbel.org/umbel/rc/Location_Underspecified')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://umbel.org/umbel/rc/Location_Underspecified')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/ontology/wikiPageID'),
-                    new LiteralImpl(new NodeUtils(), '17955', new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2001/XMLSchema#integer'))
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/ontology/wikiPageID'),
+                    new LiteralImpl(new RdfHelpers(), '17955', new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2001/XMLSchema#integer'))
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/property/align'),
-                    new LiteralImpl(new NodeUtils(), 'right', null, 'en')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/property/align'),
+                    new LiteralImpl(new RdfHelpers(), 'right', null, 'en')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/property/febHighC'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/property/febHighC'),
                     new LiteralImpl(
-                        new NodeUtils(),
+                        new RdfHelpers(),
                         '4.3',
-                        new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2001/XMLSchema#double')
+                        new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2001/XMLSchema#double')
                     )
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/property/febLowC'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/property/febLowC'),
                     new LiteralImpl(
-                        new NodeUtils(),
+                        new RdfHelpers(),
                         '-2',
-                        new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2001/XMLSchema#integer')
+                        new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2001/XMLSchema#integer')
                     )
                 ),
             )),
@@ -120,25 +120,25 @@ class RDFXMLParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/2015–16_MSV_Duisburg_season'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/property/location'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/2015–16_MSV_Duisburg_season'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/property/location'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2000/01/rdf-schema#label'),
-                    new LiteralImpl(new NodeUtils(), 'Leipzig', null, 'de')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2000/01/rdf-schema#label'),
+                    new LiteralImpl(new RdfHelpers(), 'Leipzig', null, 'de')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2000/01/rdf-schema#label'),
-                    new LiteralImpl(new NodeUtils(), 'Leipzig', null, 'en')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2000/01/rdf-schema#label'),
+                    new LiteralImpl(new RdfHelpers(), 'Leipzig', null, 'en')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2000/01/rdf-schema#comment'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2000/01/rdf-schema#comment'),
                     new LiteralImpl(
-                        new NodeUtils(),
+                        new RdfHelpers(),
                         "Leipzig (/ˈlaɪpsɪɡ/; German: [ˈlaɪptsɪç]) is the largest city in the federal state of Saxony, "
                         ."Germany. It has a population of 544,479 inhabitants (1,001,220 residents in the larger "
                         ."urban zone). Leipzig is located about 150 kilometers (93 miles) south of Berlin at the "
@@ -150,34 +150,34 @@ class RDFXMLParserTest extends TestCase
                     )
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://umbel.org/umbel/rc/PopulatedPlace')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://umbel.org/umbel/rc/PopulatedPlace')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://umbel.org/umbel/rc/Location_Underspecified')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://umbel.org/umbel/rc/Location_Underspecified')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/ontology/wikiPageID'),
-                    new LiteralImpl(new NodeUtils(), '17955', new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2001/XMLSchema#integer'))
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/ontology/wikiPageID'),
+                    new LiteralImpl(new RdfHelpers(), '17955', new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2001/XMLSchema#integer'))
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/property/align'),
-                    new LiteralImpl(new NodeUtils(), 'right', null, 'en')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/property/align'),
+                    new LiteralImpl(new RdfHelpers(), 'right', null, 'en')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/property/febHighC'),
-                    new LiteralImpl(new NodeUtils(), '4.3', new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2001/XMLSchema#double'))
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/property/febHighC'),
+                    new LiteralImpl(new RdfHelpers(), '4.3', new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2001/XMLSchema#double'))
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/property/febLowC'),
-                    new LiteralImpl(new NodeUtils(), '-2', new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2001/XMLSchema#integer'))
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/property/febLowC'),
+                    new LiteralImpl(new RdfHelpers(), '-2', new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2001/XMLSchema#integer'))
                 ),
             )),
             $result

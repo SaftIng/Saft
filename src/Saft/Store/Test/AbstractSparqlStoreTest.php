@@ -7,7 +7,7 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementImpl;
@@ -44,12 +44,12 @@ class AbstractSparqlStoreTest extends TestCase
         $this->mock = $this->getMockForAbstractClass(
             '\Saft\Store\AbstractSparqlStore',
             array(
-                new NodeFactoryImpl(new NodeUtils()),
+                new NodeFactoryImpl(new RdfHelpers()),
                 new StatementFactoryImpl(),
-                new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+                new QueryFactoryImpl(new RdfHelpers()),
                 new ResultFactoryImpl(),
                 new StatementIteratorFactoryImpl(),
-                new SparqlUtils(new StatementIteratorFactoryImpl())
+                new RdfHelpers()
             )
         );
     }
@@ -68,21 +68,21 @@ class AbstractSparqlStoreTest extends TestCase
         if ('pattern' == $s) {
             $s = new AnyPatternImpl();
         } elseif ('uri' == $s) {
-            $s = new NamedNodeImpl(new NodeUtils(), 'http://saft/test/s');
+            $s = new NamedNodeImpl(new RdfHelpers(), 'http://saft/test/s');
         }
 
         // p
         if ('pattern' == $p) {
             $p = new AnyPatternImpl();
         } elseif ('uri' == $p) {
-            $p = new NamedNodeImpl(new NodeUtils(), 'http://saft/test/p');
+            $p = new NamedNodeImpl(new RdfHelpers(), 'http://saft/test/p');
         }
 
         // o
         if ('pattern' == $o) {
             $o = new AnyPatternImpl();
         } elseif ('uri' == $o) {
-            $o = new NamedNodeImpl(new NodeUtils(), 'http://saft/test/o');
+            $o = new NamedNodeImpl(new RdfHelpers(), 'http://saft/test/o');
         }
 
         // g
@@ -90,7 +90,7 @@ class AbstractSparqlStoreTest extends TestCase
             $g = new AnyPatternImpl();
             $stmt = new StatementImpl($s, $p, $o, $g);
         } elseif ('uri' == $g) {
-            $g = new NamedNodeImpl(new NodeUtils(), 'http://saft/test/g');
+            $g = new NamedNodeImpl(new RdfHelpers(), 'http://saft/test/g');
             $stmt = new StatementImpl($s, $p, $o, $g);
         } else { // null == $g
             $stmt = new StatementImpl($s, $p, $o);
@@ -146,9 +146,9 @@ class AbstractSparqlStoreTest extends TestCase
         // generate as many statements as the batch size is
         for ($i = 0; $i < 100; ++$i) {
             $statementArray[] = new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://localhost/saft/'. $i),
-                new NamedNodeImpl(new NodeUtils(), 'http://localhost/saft/'. $i),
-                new NamedNodeImpl(new NodeUtils(), 'http://localhost/saft/'. $i)
+                new NamedNodeImpl(new RdfHelpers(), 'http://localhost/saft/'. $i),
+                new NamedNodeImpl(new RdfHelpers(), 'http://localhost/saft/'. $i),
+                new NamedNodeImpl(new RdfHelpers(), 'http://localhost/saft/'. $i)
             );
         }
 
@@ -172,15 +172,15 @@ class AbstractSparqlStoreTest extends TestCase
         /*
          * object is a number
          */
-        $subject1 = new NamedNodeImpl(new NodeUtils(), 'http://saft/test/s1');
-        $predicate1 = new NamedNodeImpl(new NodeUtils(), 'http://saft/test/p1');
-        $object1 = new LiteralImpl(new NodeUtils(), "42"); // will be handled as string, because no datatype given.
+        $subject1 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/test/s1');
+        $predicate1 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/test/p1');
+        $object1 = new LiteralImpl(new RdfHelpers(), "42"); // will be handled as string, because no datatype given.
         $triple1 = new StatementImpl($subject1, $predicate1, $object1);
 
         /*
          * object is a literal
          */
-        $object2 = new LiteralImpl(new NodeUtils(), 'John'); // will be handled as string, because no datatype given.
+        $object2 = new LiteralImpl(new RdfHelpers(), 'John'); // will be handled as string, because no datatype given.
         $triple2 = new StatementImpl($subject1, $predicate1, $object2);
 
         // Setup array statement iterator

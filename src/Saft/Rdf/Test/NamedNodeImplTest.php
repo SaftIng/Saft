@@ -3,7 +3,7 @@
 namespace Saft\Rdf\Test;
 
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 
 class NamedNodeImplTest extends NamedNodeAbstractTest
 {
@@ -12,6 +12,6 @@ class NamedNodeImplTest extends NamedNodeAbstractTest
      */
     public function newInstance($uri)
     {
-        return new NamedNodeImpl(new NodeUtils(), $uri);
+        return new NamedNodeImpl(new RdfHelpers(), $uri);
     }
 }

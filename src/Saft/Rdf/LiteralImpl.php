@@ -30,14 +30,14 @@ class LiteralImpl extends AbstractLiteral
     protected $lang = null;
 
     /**
-     * @param nodeUtils $nodeUtils
+     * @param RdfHelpers $rdfHelpers
      * @param string $value The Literal value
      * @param NamedNode $datatype The datatype of the Literal (respectively defaults to xsd:string or rdf:langString)
      * @param string $lang The language tag of the Literal (optional)
      */
-    public function __construct(NodeUtils $nodeUtils, $value, NamedNode $datatype = null, $lang = null)
+    public function __construct(RdfHelpers $rdfHelpers, $value, NamedNode $datatype = null, $lang = null)
     {
-        parent::__construct($nodeUtils);
+        parent::__construct($rdfHelpers);
 
         if ($value === null) {
             throw new \Exception('Literal value can\'t be null. Please use AnyPattern if you need a variable.');
@@ -63,9 +63,9 @@ class LiteralImpl extends AbstractLiteral
         if ($datatype !== null) {
             $this->datatype = $datatype;
         } elseif ($lang !== null) {
-            $this->datatype = new NamedNodeImpl($nodeUtils, self::$rdfLangString);
+            $this->datatype = new NamedNodeImpl($rdfHelpers, self::$rdfLangString);
         } else {
-            $this->datatype = new NamedNodeImpl($nodeUtils, self::$xsdString);
+            $this->datatype = new NamedNodeImpl($rdfHelpers, self::$xsdString);
         }
     }
 

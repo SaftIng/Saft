@@ -2,7 +2,7 @@
 
 namespace Saft\Sparql\Query;
 
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Sparql\Query\AbstractQuery;
 
 /**
@@ -16,9 +16,9 @@ class AskQueryImpl extends AbstractQuery
      * @param  string     optional $query SPARQL query string to initialize this instance.
      * @throws \Exception If no where part was found in query.
      */
-    public function __construct($query = '', NodeUtils $nodeUtils)
+    public function __construct($query = '', RdfHelpers $rdfHelpers)
     {
-        parent::__construct($query, $nodeUtils);
+        parent::__construct($query, $rdfHelpers);
 
         if (null !== $this->query) {
             /*

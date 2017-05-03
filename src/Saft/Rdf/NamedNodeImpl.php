@@ -10,13 +10,13 @@ class NamedNodeImpl extends AbstractNamedNode
     protected $uri;
 
     /**
+     * @param RdfHelpers $rdfHelpers
      * @param mixed $uri The URI of the node.
-     * @param NodeUtils $nodeUtils
      * @throws \Exception If parameter $value is not a valid URI.
      */
-    public function __construct(NodeUtils $nodeUtils, $uri)
+    public function __construct(RdfHelpers $rdfHelpers, $uri)
     {
-        if ($uri == null || !$nodeUtils->simpleCheckURI($uri)) {
+        if ($uri == null || !$rdfHelpers->simpleCheckURI($uri)) {
             throw new \Exception('Parameter $uri is not a valid URI: '. $uri);
         }
 

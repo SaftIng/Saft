@@ -5,7 +5,7 @@ namespace Saft\Addition\EasyRdf\Test;
 use Saft\Addition\EasyRdf\Data\ParserFactoryEasyRdf;
 use Saft\Data\Test\ParserFactoryAbstractTest;
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 
@@ -31,10 +31,10 @@ class ParserFactoryEasyRdfTest extends ParserFactoryAbstractTest
     protected function newInstance()
     {
         return new ParserFactoryEasyRdf(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
             new StatementIteratorFactoryImpl(),
-            new NodeUtils()
+            new RdfHelpers()
         );
     }
 }

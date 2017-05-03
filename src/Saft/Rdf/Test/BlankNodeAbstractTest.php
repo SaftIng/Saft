@@ -4,7 +4,7 @@ namespace Saft\Rdf\Test;
 
 use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\LiteralImpl;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Test\TestCase;
 
 abstract class BlankNodeAbstractTest extends TestCase
@@ -37,7 +37,7 @@ abstract class BlankNodeAbstractTest extends TestCase
     public function testEqualsCheckBlankNodeAndLiteral()
     {
         $instanceA = $this->newInstance('foo');
-        $instanceB = new LiteralImpl(new NodeUtils(), 'foo');
+        $instanceB = new LiteralImpl(new RdfHelpers(), 'foo');
 
         $this->assertFalse($instanceA->equals($instanceB));
     }

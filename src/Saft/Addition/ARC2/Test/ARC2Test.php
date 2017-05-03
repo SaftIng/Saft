@@ -8,8 +8,8 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\NodeUtils;
 use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
@@ -31,14 +31,12 @@ class ARC2Test extends StoreAbstractTest
         if (true === isset($this->configuration['arc2Config'])) {
             try {
                 $this->fixture = new ARC2(
-                    new NodeFactoryImpl(new NodeUtils()),
+                    new NodeFactoryImpl(new RdfHelpers()),
                     new StatementFactoryImpl(),
-                    new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+                    new QueryFactoryImpl(new RdfHelpers()),
                     new ResultFactoryImpl(),
                     new StatementIteratorFactoryImpl(),
-                    new NodeUtils(),
-                    new QueryUtils(),
-                    new SparqlUtils(new StatementIteratorFactoryImpl()),
+                    new RdfHelpers(),
                     $this->configuration['arc2Config']
                 );
             } catch (\Exception $e) {
@@ -88,7 +86,7 @@ class ARC2Test extends StoreAbstractTest
     // gets deleted.
     public function testDropGraphEffects()
     {
-        $secondGraph = new NamedNodeImpl(new NodeUtils(), $this->testGraph->getUri() . '2');
+        $secondGraph = new NamedNodeImpl(new RdfHelpers(), $this->testGraph->getUri() . '2');
 
         $this->fixture->createGraph($secondGraph);
 
@@ -142,14 +140,12 @@ class ARC2Test extends StoreAbstractTest
         $this->setExpectedException('Exception');
 
         new ARC2(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
-            new NodeUtils(),
-            new QueryUtils(),
-            new SparqlUtils(new StatementIteratorFactoryImpl()),
+            new RdfHelpers(),
             array()
         );
     }
@@ -160,14 +156,12 @@ class ARC2Test extends StoreAbstractTest
         $this->setExpectedException('Exception');
 
         new ARC2(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
-            new NodeUtils(),
-            new QueryUtils(),
-            new SparqlUtils(new StatementIteratorFactoryImpl()),
+            new RdfHelpers(),
             array('database' => 'saft')
         );
     }
@@ -178,14 +172,12 @@ class ARC2Test extends StoreAbstractTest
         $this->setExpectedException('Exception');
 
         new ARC2(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
-            new NodeUtils(),
-            new QueryUtils(),
-            new SparqlUtils(new StatementIteratorFactoryImpl()),
+            new RdfHelpers(),
             array('database' => 'saft', 'host' => 'localhost')
         );
     }
@@ -246,8 +238,8 @@ class ARC2Test extends StoreAbstractTest
                 ),
                 new StatementImpl(
                     $this->testGraph,
-                    new NamedNodeImpl(new NodeUtils(), 'http://foobar/1'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://foobar/2'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://foobar/1'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://foobar/2'),
                     $this->testGraph
                 )
             )

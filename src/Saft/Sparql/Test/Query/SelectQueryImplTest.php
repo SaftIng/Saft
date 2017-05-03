@@ -3,7 +3,7 @@
 namespace Saft\Sparql\Test\Query;
 
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Sparql\Query\SelectQueryImpl;
 use Saft\Test\TestCase;
 
@@ -13,7 +13,7 @@ class SelectQueryImplTest extends TestCase
     {
         parent::setUp();
 
-        $this->fixture = new SelectQueryImpl(null, new NodeUtils());
+        $this->fixture = new SelectQueryImpl(null, new RdfHelpers());
     }
 
     /*
@@ -24,7 +24,7 @@ class SelectQueryImplTest extends TestCase
     {
         $this->fixture = new SelectQueryImpl(
             'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.}',
-            new NodeUtils()
+            new RdfHelpers()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -43,12 +43,12 @@ class SelectQueryImplTest extends TestCase
     {
         $instanceToCheckAgainst = new SelectQueryImpl(
             'SELECT ?x FROM <'. $this->testGraph->getUri() .'> WHERE {?x ?y ?z}',
-            new NodeUtils()
+            new RdfHelpers()
         );
 
         $this->assertEquals(
             $instanceToCheckAgainst,
-            new SelectQueryImpl('SELECT ?x FROM <'. $this->testGraph->getUri() .'> WHERE {?x ?y ?z}', new NodeUtils())
+            new SelectQueryImpl('SELECT ?x FROM <'. $this->testGraph->getUri() .'> WHERE {?x ?y ?z}', new RdfHelpers())
         );
     }
 
@@ -56,7 +56,7 @@ class SelectQueryImplTest extends TestCase
     {
         $this->fixture = new SelectQueryImpl(
             'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} LIMIT 10',
-            new NodeUtils()
+            new RdfHelpers()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -69,7 +69,7 @@ class SelectQueryImplTest extends TestCase
     {
         $this->fixture = new SelectQueryImpl(
             'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} Offset 5',
-            new NodeUtils()
+            new RdfHelpers()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -82,7 +82,7 @@ class SelectQueryImplTest extends TestCase
     {
         $this->fixture = new SelectQueryImpl(
             'SELECT ?s ?p ?o FROM <'. $this->testGraph->getUri() .'> WHERE {?s ?p ?o.} LIMIT 10 OFFSET 5',
-            new NodeUtils()
+            new RdfHelpers()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -125,7 +125,7 @@ class SelectQueryImplTest extends TestCase
                }
               LIMIT 10
              OFFSET 5 ',
-             new NodeUtils()
+             new RdfHelpers()
         );
 
         $queryParts = $this->fixture->getQueryParts();

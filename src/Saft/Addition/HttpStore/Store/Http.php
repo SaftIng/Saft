@@ -13,12 +13,10 @@ use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\NodeUtils;
-use Saft\Sparql\SparqlUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
 use Saft\Sparql\Query\QueryFactoryImpl;
-use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\ResultFactory;
 use Saft\Sparql\Result\ResultFactoryImpl;
 use Saft\Store\AbstractSparqlStore;
@@ -48,9 +46,9 @@ class Http extends AbstractSparqlStore
     protected $nodeFactory;
 
     /**
-     * @var NodeUtils
+     * @var RdfHelpers
      */
-    protected $nodeUtils;
+    protected $rdfHelpers;
 
     /**
      * @var QueryFactory
@@ -58,19 +56,9 @@ class Http extends AbstractSparqlStore
     protected $queryFactory;
 
     /**
-     * @var QueryUtils
-     */
-    protected $queryUtils;
-
-    /**
      * @var ResultFactory
      */
     protected $resultFactory;
-
-    /**
-     * @var SparqlUtils
-     */
-    protected $sparqlUtils;
 
     /**
      * @var StatementFactory
@@ -90,8 +78,7 @@ class Http extends AbstractSparqlStore
      * @param QueryFactory             $queryFactory
      * @param ResultFactory            $resultFactory
      * @param StatementIteratorFactory $statementIteratorFactory
-     * @param NodeUtils                $nodeUtils
-     * @param QueryUtils               $queryUtils
+     * @param RdfHelpers                $rdfHelpers
      * @param array                    $configuration Array containing database credentials
      * @throws \Exception              If HTTP store requires the PHP ODBC extension to be loaded.
      */
@@ -101,13 +88,10 @@ class Http extends AbstractSparqlStore
         QueryFactory $queryFactory,
         ResultFactory $resultFactory,
         StatementIteratorFactory $statementIteratorFactory,
-        NodeUtils $nodeUtils,
-        QueryUtils $queryUtils,
-        SparqlUtils $sparqlUtils,
+        RdfHelpers $rdfHelpers,
         array $configuration
     ) {
-        $this->nodeUtils = $nodeUtils;
-        $this->queryUtils = $queryUtils;
+        $this->RdfHelpers = $rdfHelpers;
 
         $this->configuration = $configuration;
 
@@ -126,7 +110,7 @@ class Http extends AbstractSparqlStore
             $queryFactory,
             $resultFactory,
             $statementIteratorFactory,
-            $sparqlUtils
+            $rdfHelpers
         );
     }
 
@@ -270,7 +254,7 @@ class Http extends AbstractSparqlStore
         ), $this->configuration);
 
         // authenticate only if an authUrl was given.
-        if ($this->nodeUtils->simpleCheckURI($configuration['authUrl'])) {
+        if ($this->RdfHelpers->simpleCheckURI($configuration['authUrl'])) {
             $this->authenticateOnServer(
                 $configuration['authUrl'],
                 $configuration['username'],
@@ -279,7 +263,7 @@ class Http extends AbstractSparqlStore
         }
 
         // check query URL
-        if (false === $this->nodeUtils->simpleCheckURI($configuration['queryUrl'])) {
+        if (false === $this->RdfHelpers->simpleCheckURI($configuration['queryUrl'])) {
             throw new \Exception('Parameter queryUrl is not an URI or empty: '. $configuration['queryUrl']);
         }
     }
@@ -300,7 +284,7 @@ class Http extends AbstractSparqlStore
     {
         $queryObject = $this->queryFactory->createInstanceByQueryString($query);
         $queryParts = $queryObject->getQueryParts();
-        $queryType = $this->queryUtils->getQueryType($query);
+        $queryType = $this->rdfHelpers->getQueryType($query);
 
         /**
          * CONSTRUCT query

@@ -8,7 +8,7 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
@@ -46,11 +46,11 @@ class QueryCacheTest extends TestCase
     {
         parent::setUp();
 
-        $this->queryFactory = new QueryFactoryImpl(new NodeUtils(), new QueryUtils());
+        $this->queryFactory = new QueryFactoryImpl(new RdfHelpers());
 
         $this->fixture = new QueryCache(
             new Memory(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
 
@@ -65,9 +65,9 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
@@ -135,9 +135,9 @@ class QueryCacheTest extends TestCase
     public function testBuildPatternListByStatement()
     {
         $statement = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://a'),
-            new NamedNodeImpl(new NodeUtils(), 'http://b'),
-            new NamedNodeImpl(new NodeUtils(), 'http://c')
+            new NamedNodeImpl(new RdfHelpers(), 'http://a'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://b'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://c')
         );
 
         $this->assertEquals(
@@ -263,9 +263,9 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
@@ -294,9 +294,9 @@ class QueryCacheTest extends TestCase
     public function testGetAndSetChainSuccessor()
     {
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
 
@@ -313,9 +313,9 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
@@ -347,9 +347,9 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
@@ -405,9 +405,9 @@ class QueryCacheTest extends TestCase
     public function testGetLogBuildPatternListByStatement()
     {
         $statement = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://a'),
-            new NamedNodeImpl(new NodeUtils(), 'http://b'),
-            new NamedNodeImpl(new NodeUtils(), 'http://c')
+            new NamedNodeImpl(new RdfHelpers(), 'http://a'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://b'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://c')
         );
 
         $this->fixture->buildPatternListByStatement($statement, $this->testGraph->getUri());
@@ -440,9 +440,9 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
@@ -498,9 +498,9 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
@@ -554,9 +554,9 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
@@ -577,9 +577,9 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
@@ -801,9 +801,9 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
@@ -856,18 +856,18 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
         // test data
         $statement = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://o/')
+            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://o/')
         );
         $statementIterator = new StatementSetResultImpl(array($statement));
         $options = array(1);
@@ -906,18 +906,18 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
         // test data
         $statement = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-            new LiteralImpl(new NodeUtils(), 'test literal')
+            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+            new LiteralImpl(new RdfHelpers(), 'test literal')
         );
         $statementIterator = new StatementSetResultImpl(array($statement));
         $options = array(1);
@@ -958,9 +958,9 @@ class QueryCacheTest extends TestCase
 
         // test data
         $statement = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-            new LiteralImpl(new NodeUtils(), 'test literal')
+            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+            new LiteralImpl(new RdfHelpers(), 'test literal')
         );
         $statementIterator = new StatementSetResultImpl(array($statement));
         $options = array(1);
@@ -972,18 +972,18 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
         // test data
         $statement = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://o/')
+            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://o/')
         );
         $statementIterator = new StatementSetResultImpl(array($statement));
         $options = array(1);
@@ -1029,9 +1029,9 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
@@ -1080,9 +1080,9 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
@@ -1110,18 +1110,18 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
         // test data
         $statement = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p'),
-            new LiteralImpl(new NodeUtils(), 'foo')
+            new NamedNodeImpl(new RdfHelpers(), 'http://s'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p'),
+            new LiteralImpl(new RdfHelpers(), 'foo')
         );
 
         $this->fixture->addStatements(array($statement), $this->testGraph);
@@ -1136,18 +1136,18 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
 
         // test data
         $statement = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p'),
-            new NamedNodeImpl(new NodeUtils(), 'http://o')
+            new NamedNodeImpl(new RdfHelpers(), 'http://s'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://o')
         );
 
         $this->fixture->addStatements(array($statement), $this->testGraph);
@@ -1173,9 +1173,9 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
@@ -1196,9 +1196,9 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);
@@ -1374,9 +1374,9 @@ class QueryCacheTest extends TestCase
     {
         // set basic store as successor
         $successor = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture->setChainSuccessor($successor);

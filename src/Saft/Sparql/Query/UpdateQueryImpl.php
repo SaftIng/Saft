@@ -2,7 +2,7 @@
 
 namespace Saft\Sparql\Query;
 
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Sparql\Query\AbstractQuery;
 
 /**
@@ -20,7 +20,7 @@ class UpdateQueryImpl extends AbstractQuery
      * Constructor.
      *
      * @param string     $query SPARQL query string to initialize this instance.
-     * @param NodeUtils $nodeUtils
+     * @param RdfHelpers $rdfHelpers
      * @throws \Exception If no where part was found in query.
      * @throws \Exception If given query is not suitable for UpdateQuery.
      * @throws \Exception If no triple part after INSERT DATA found.
@@ -29,9 +29,9 @@ class UpdateQueryImpl extends AbstractQuery
      * @throws \Exception If no valid WITH <> DELETE {...} INSERT { ... } WHERE { ...} query given.
      * @throws \Exception If there is either no triple part after INSERT INTO GRAPH or no graph set.
      */
-    public function __construct($query = '', NodeUtils $nodeUtils)
+    public function __construct($query = '', RdfHelpers $rdfHelpers)
     {
-        parent::__construct($query, $nodeUtils);
+        parent::__construct($query, $rdfHelpers);
 
         if (null == $this->query) {
             return;

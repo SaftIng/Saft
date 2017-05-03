@@ -2,7 +2,7 @@
 
 namespace Saft\Sparql\Query;
 
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\NodeFactoryImpl;
 
 /**
@@ -62,9 +62,9 @@ abstract class AbstractQuery implements Query
     );
 
     /**
-     * @var NodeUtils
+     * @var RdfHelpers
      */
-    protected $nodeUtils;
+    protected $rdfHelpers;
 
     /**
      * @var string
@@ -80,12 +80,12 @@ abstract class AbstractQuery implements Query
      * Constructor.
      *
      * @param string optional $query SPARQL query string to initialize this instance.
-     * @param NodeUtils $nodeUtils
+     * @param RdfHelpers $rdfHelpers
      * @throws \Exception If parameter $query is empty, null or not a string.
      */
-    public function __construct($query = '', NodeUtils $nodeUtils)
+    public function __construct($query = '', RdfHelpers $rdfHelpers)
     {
-        $this->nodeUtils = $nodeUtils;
+        $this->RdfHelpers = $rdfHelpers;
 
         if (true === empty($query) || null === $query || false === is_string($query)) {
             return;
@@ -109,7 +109,7 @@ abstract class AbstractQuery implements Query
         }
 
         // checks if $entity is an URL
-        if (true === $this->nodeUtils->simpleCheckURI($entity)) {
+        if (true === $this->RdfHelpers->simpleCheckURI($entity)) {
             return 'uri';
 
         // checks if ^^< is in $entity OR if $entity is surrounded by quotation marks
@@ -219,7 +219,7 @@ abstract class AbstractQuery implements Query
         } elseif ('?' === substr($objectString, 0, 1)) {
             return substr($objectString, 1);
 
-        } elseif ($this->nodeUtils->simpleCheckURI($objectString)) {
+        } elseif ($this->RdfHelpers->simpleCheckURI($objectString)) {
             return $objectString;
 
         // malformed string, return null as datatype
@@ -591,13 +591,13 @@ abstract class AbstractQuery implements Query
          * Here we know, no quads are there.
          */
         $regex = '/' .
-            $this->nodeUtils->getRegexStringForNodeRecognition(
+            $this->RdfHelpers->getRegexStringForNodeRecognition(
                 true, true, false, false, false, false, true
             ) .'\s*|\t*'.
-            $this->nodeUtils->getRegexStringForNodeRecognition(
+            $this->RdfHelpers->getRegexStringForNodeRecognition(
                 true, true, false, false, false, false, true
             ) .'\s*|\t*'.
-            $this->nodeUtils->getRegexStringForNodeRecognition(
+            $this->RdfHelpers->getRegexStringForNodeRecognition(
                 true, true, true, true, true, true, true
             ) .'/is';
 

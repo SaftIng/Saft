@@ -8,7 +8,7 @@ use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Rdf\StatementImpl;
@@ -19,10 +19,10 @@ class NQuadsParserTest extends TestCase
     public function setUp()
     {
         $this->fixture = new NQuadsParser(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
             new StatementIteratorFactoryImpl(),
-            new NodeUtils()
+            new RdfHelpers()
         );
     }
 
@@ -37,34 +37,34 @@ class NQuadsParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/property/janLowC'),
-                    new LiteralImpl(new NodeUtils(), '-2.2', new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2001/XMLSchema#double')),
-                    new NamedNodeImpl(new NodeUtils(), 'http://graph/2')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/property/janLowC'),
+                    new LiteralImpl(new RdfHelpers(), '-2.2', new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2001/XMLSchema#double')),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://graph/2')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/ontology/leaderTitle'),
-                    new LiteralImpl(new NodeUtils(), 'Oberbürgermeister', null, 'en'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://graph/1')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/ontology/leaderTitle'),
+                    new LiteralImpl(new RdfHelpers(), 'Oberbürgermeister', null, 'en'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://graph/1')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://bnode/test'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://bnode/test'),
                     new BlankNodeImpl('bnode'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://graph/1')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://graph/1')
                 ),
                 new StatementImpl(
                     new BlankNodeImpl('bnode'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://bnode/test'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://graph/1')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://bnode/test'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://graph/1')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2000/01/rdf-schema#comment'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2000/01/rdf-schema#comment'),
                     new LiteralImpl(
-                        new NodeUtils(),
+                        new RdfHelpers(),
                         'Leipzig (/ˈlaɪpsɪɡ/; German: [ˈlaɪptsɪç]) is the largest city in the federal state '.
                         'of Saxony, Germany. It has a population of 544,479 inhabitants (1,001,220 residents in the '.
                         'larger urban zone). Leipzig is located about 150 kilometers (93 miles) south of Berlin at '.
@@ -74,7 +74,7 @@ class NQuadsParserTest extends TestCase
                         null,
                         'en'
                     ),
-                    new NamedNodeImpl(new NodeUtils(), 'http://graph/2')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://graph/2')
                 ),
             )),
             $result
@@ -88,30 +88,30 @@ class NQuadsParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/property/janLowC'),
-                    new LiteralImpl(new NodeUtils(), '-2.2', new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2001/XMLSchema#double'))
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/property/janLowC'),
+                    new LiteralImpl(new RdfHelpers(), '-2.2', new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2001/XMLSchema#double'))
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/ontology/leaderTitle'),
-                    new LiteralImpl(new NodeUtils(), 'Oberbürgermeister', null, 'en')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/ontology/leaderTitle'),
+                    new LiteralImpl(new RdfHelpers(), 'Oberbürgermeister', null, 'en')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://bnode/test'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://bnode/test'),
                     new BlankNodeImpl('bnode')
                 ),
                 new StatementImpl(
                     new BlankNodeImpl('bnode'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://bnode/test'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://bnode/test'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2000/01/rdf-schema#comment'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2000/01/rdf-schema#comment'),
                     new LiteralImpl(
-                        new NodeUtils(),
+                        new RdfHelpers(),
                         'Leipzig (/ˈlaɪpsɪɡ/; German: [ˈlaɪptsɪç]) is the largest city in the federal state '.
                         'of Saxony, Germany. It has a population of 544,479 inhabitants (1,001,220 residents in the '.
                         'larger urban zone). Leipzig is located about 150 kilometers (93 miles) south of Berlin at '.
@@ -141,7 +141,7 @@ class NQuadsParserTest extends TestCase
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
                     new BlankNodeImpl('bnode1'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo1'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo1'),
                     new BlankNodeImpl('bnode2')
                 )
             )),
@@ -159,8 +159,8 @@ class NQuadsParserTest extends TestCase
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
                     new BlankNodeImpl('bnode1'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo1'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo2')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo1'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo2')
                 )
             )),
             $result
@@ -176,8 +176,8 @@ class NQuadsParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo1'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo1'),
                     new BlankNodeImpl('bnode')
                 )
             )),
@@ -194,9 +194,9 @@ class NQuadsParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo1'),
-                    new LiteralImpl(new NodeUtils(), 'Foo')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo1'),
+                    new LiteralImpl(new RdfHelpers(), 'Foo')
                 )
             )),
             $result
@@ -212,9 +212,9 @@ class NQuadsParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo1'),
-                    new LiteralImpl(new NodeUtils(), 'Foo', null, 'de')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo1'),
+                    new LiteralImpl(new RdfHelpers(), 'Foo', null, 'de')
                 )
             )),
             $result
@@ -230,9 +230,9 @@ class NQuadsParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo1'),
-                    new LiteralImpl(new NodeUtils(), 'Foo', new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2001/XMLSchema#string'))
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo1'),
+                    new LiteralImpl(new RdfHelpers(), 'Foo', new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2001/XMLSchema#string'))
                 )
             )),
             $result
@@ -248,9 +248,9 @@ class NQuadsParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo1'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo2')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo1'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo2')
                 )
             )),
             $result
@@ -267,9 +267,9 @@ class NQuadsParserTest extends TestCase
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
                     new BlankNodeImpl('bnode1'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo1'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo1'),
                     new BlankNodeImpl('bnode2'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://graph/')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://graph/')
                 )
             )),
             $result
@@ -286,9 +286,9 @@ class NQuadsParserTest extends TestCase
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
                     new BlankNodeImpl('bnode1'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo1'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo2'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://graph/')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo1'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo2'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://graph/')
                 )
             )),
             $result
@@ -304,10 +304,10 @@ class NQuadsParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo1'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo1'),
                     new BlankNodeImpl('bnode'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://graph/')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://graph/')
                 )
             )),
             $result
@@ -323,9 +323,9 @@ class NQuadsParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo1'),
-                    new LiteralImpl(new NodeUtils(), 'Foo')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo1'),
+                    new LiteralImpl(new RdfHelpers(), 'Foo')
                 )
             )),
             $result
@@ -341,9 +341,9 @@ class NQuadsParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo1'),
-                    new LiteralImpl(new NodeUtils(), 'Foo', null, 'de')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo1'),
+                    new LiteralImpl(new RdfHelpers(), 'Foo', null, 'de')
                 )
             )),
             $result
@@ -359,9 +359,9 @@ class NQuadsParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo1'),
-                    new LiteralImpl(new NodeUtils(), 'Foo', new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2001/XMLSchema#string'))
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo1'),
+                    new LiteralImpl(new RdfHelpers(), 'Foo', new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2001/XMLSchema#string'))
                 )
             )),
             $result
@@ -377,10 +377,10 @@ class NQuadsParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo1'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://locahost/#foo2'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://graph/')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo1'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://locahost/#foo2'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://graph/')
                 )
             )),
             $result
@@ -396,34 +396,34 @@ class NQuadsParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/property/janLowC'),
-                    new LiteralImpl(new NodeUtils(), '-2.2', new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2001/XMLSchema#double')),
-                    new NamedNodeImpl(new NodeUtils(), 'http://graph/2')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/property/janLowC'),
+                    new LiteralImpl(new RdfHelpers(), '-2.2', new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2001/XMLSchema#double')),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://graph/2')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/ontology/leaderTitle'),
-                    new LiteralImpl(new NodeUtils(), 'Oberbürgermeister', null, 'en'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://graph/1')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/ontology/leaderTitle'),
+                    new LiteralImpl(new RdfHelpers(), 'Oberbürgermeister', null, 'en'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://graph/1')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://bnode/test'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://bnode/test'),
                     new BlankNodeImpl('bnode'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://graph/1')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://graph/1')
                 ),
                 new StatementImpl(
                     new BlankNodeImpl('bnode'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://bnode/test'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://graph/1')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://bnode/test'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://graph/1')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2000/01/rdf-schema#comment'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2000/01/rdf-schema#comment'),
                     new LiteralImpl(
-                        new NodeUtils(),
+                        new RdfHelpers(),
                         'Leipzig (/ˈlaɪpsɪɡ/; German: [ˈlaɪptsɪç]) is the largest city in the federal state '.
                         'of Saxony, Germany. It has a population of 544,479 inhabitants (1,001,220 residents in the '.
                         'larger urban zone). Leipzig is located about 150 kilometers (93 miles) south of Berlin at '.
@@ -433,7 +433,7 @@ class NQuadsParserTest extends TestCase
                         null,
                         'en'
                     ),
-                    new NamedNodeImpl(new NodeUtils(), 'http://graph/2')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://graph/2')
                 ),
             )),
             $result
@@ -447,30 +447,30 @@ class NQuadsParserTest extends TestCase
         $this->assertStatementIteratorEquals(
             new ArrayStatementIteratorImpl(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/property/janLowC'),
-                    new LiteralImpl(new NodeUtils(), '-2.2', new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2001/XMLSchema#double'))
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/property/janLowC'),
+                    new LiteralImpl(new RdfHelpers(), '-2.2', new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2001/XMLSchema#double'))
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/ontology/leaderTitle'),
-                    new LiteralImpl(new NodeUtils(), 'Oberbürgermeister', null, 'en')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/ontology/leaderTitle'),
+                    new LiteralImpl(new RdfHelpers(), 'Oberbürgermeister', null, 'en')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://bnode/test'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://bnode/test'),
                     new BlankNodeImpl('bnode')
                 ),
                 new StatementImpl(
                     new BlankNodeImpl('bnode'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://bnode/test'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://bnode/test'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://dbpedia.org/resource/Leipzig'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2000/01/rdf-schema#comment'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://dbpedia.org/resource/Leipzig'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2000/01/rdf-schema#comment'),
                     new LiteralImpl(
-                        new NodeUtils(),
+                        new RdfHelpers(),
                         'Leipzig (/ˈlaɪpsɪɡ/; German: [ˈlaɪptsɪç]) is the largest city in the federal state '.
                         'of Saxony, Germany. It has a population of 544,479 inhabitants (1,001,220 residents in the '.
                         'larger urban zone). Leipzig is located about 150 kilometers (93 miles) south of Berlin at '.

@@ -2,9 +2,8 @@
 
 namespace Saft\Test;
 
-use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\NodeUtils;
 use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\Result\Result;
 use Saft\Sparql\Result\SetResult;
@@ -310,6 +309,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->testGraph = new NamedNodeImpl(new NodeUtils(), 'http://localhost/Saft/TestGraph/');
+        $this->rdfHelpers = new RdfHelpers();
+        $this->nodeFactory = new NodeFactoryImpl($this->rdfHelpers);
+        $this->testGraph = $this->nodeFactory->createNamedNode('http://localhost/Saft/TestGraph/');
     }
 }

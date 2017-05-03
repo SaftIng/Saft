@@ -3,7 +3,7 @@
 namespace Saft\Rdf\Test;
 
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 
 class NodeFactoryImplTest extends NodeFactoryAbstractTest
 {
@@ -13,6 +13,6 @@ class NodeFactoryImplTest extends NodeFactoryAbstractTest
      */
     public function getFixture()
     {
-        return new NodeFactoryImpl(new NodeUtils());
+        return new NodeFactoryImpl(new RdfHelpers());
     }
 }

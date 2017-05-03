@@ -5,7 +5,7 @@ namespace Saft\Addition\HttpStore\Test\Integration;
 use Curl\Curl;
 use Saft\Addition\HttpStore\Store\Http;
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\SparqlUtils;
@@ -41,14 +41,12 @@ class HttpTest extends StoreAbstractTest
          */
         if (true === isset($this->configuration['httpConfig'])) {
             $this->fixture = new Http(
-                new NodeFactoryImpl(new NodeUtils()),
+                new NodeFactoryImpl(new RdfHelpers()),
                 new StatementFactoryImpl(),
-                new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+                new QueryFactoryImpl(new RdfHelpers()),
                 new ResultFactoryImpl(),
                 new StatementIteratorFactoryImpl(),
-                new NodeUtils(),
-                new QueryUtils(),
-                new SparqlUtils(new StatementIteratorFactoryImpl()),
+                new RdfHelpers(),
                 $this->configuration['httpConfig']
             );
             $this->fixture->setClient(new Curl());
@@ -114,14 +112,12 @@ class HttpTest extends StoreAbstractTest
 
         $config = array('authUrl' => 'http://not existend');
         $http = new Http(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
-            new NodeUtils(),
-            new QueryUtils(),
-            new SparqlUtils(new StatementIteratorFactoryImpl()),
+            new RdfHelpers(),
             $config
         );
         $http->setClient(new Curl());
@@ -135,14 +131,12 @@ class HttpTest extends StoreAbstractTest
 
         $config = array('queryUrl' => 'http://not existend');
         $http = new Http(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
-            new NodeUtils(),
-            new QueryUtils(),
-            new SparqlUtils(new StatementIteratorFactoryImpl()),
+            new RdfHelpers(),
             $config
         );
         $http->setClient(new Curl());
@@ -159,14 +153,12 @@ class HttpTest extends StoreAbstractTest
         $config = array('queryUrl' => 'http://dbpedia.org/sparql');
 
         $fixture = new Http(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
-            new NodeUtils(),
-            new QueryUtils(),
-            new SparqlUtils(new StatementIteratorFactoryImpl()),
+            new RdfHelpers(),
             $config
         );
         $fixture->setClient(new Curl());

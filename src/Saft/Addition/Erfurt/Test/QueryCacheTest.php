@@ -7,7 +7,7 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
@@ -36,15 +36,15 @@ class QueryCacheTest extends TestCase
         if (true === isset($this->configuration['erfurtConfig'])) {
             // create mockstore to store triples in memory
             $this->mockStore = new BasicTriplePatternStore(
-                new NodeFactoryImpl(new NodeUtils()),
+                new NodeFactoryImpl(new RdfHelpers()),
                 new StatementFactoryImpl(),
-                new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+                new QueryFactoryImpl(new RdfHelpers()),
                 new StatementIteratorFactoryImpl()
             );
 
             // setup Erfurts QueryCache
             $this->fixture = new \Saft\Addition\Erfurt\QueryCache\QueryCache(
-                new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+                new QueryFactoryImpl(new RdfHelpers()),
                 $this->configuration['erfurtConfig']
             );
             $this->fixture->setChainSuccessor($this->mockStore);
@@ -64,14 +64,14 @@ class QueryCacheTest extends TestCase
     public function testQueryDeeperCheck()
     {
         $stmtOne = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://o/')
+            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://o/')
         );
         $stmtTwo = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-            new LiteralImpl(new NodeUtils(), 'test literal')
+            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+            new LiteralImpl(new RdfHelpers(), 'test literal')
         );
 
         $this->mockStore->addStatements(new ArrayStatementIteratorImpl(array($stmtOne, $stmtTwo)));
@@ -81,13 +81,13 @@ class QueryCacheTest extends TestCase
 
         // empty mock store to check later on, if QueryCache uses its own data or the ones of the mock store.
         $this->mockStore = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new NodeUtils()),
+            new NodeFactoryImpl(new RdfHelpers()),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             new StatementIteratorFactoryImpl()
         );
         $this->fixture = new \Saft\Addition\Erfurt\QueryCache\QueryCache(
-            new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+            new QueryFactoryImpl(new RdfHelpers()),
             $this->configuration['erfurtConfig']
         );
         $this->fixture->setChainSuccessor($this->mockStore);
@@ -103,14 +103,14 @@ class QueryCacheTest extends TestCase
     public function testQuerySimple()
     {
         $stmtOne = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://o/')
+            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://o/')
         );
         $stmtTwo = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-            new LiteralImpl(new NodeUtils(), 'test literal')
+            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+            new LiteralImpl(new RdfHelpers(), 'test literal')
         );
 
         $this->mockStore->addStatements(new ArrayStatementIteratorImpl(array($stmtOne, $stmtTwo)));

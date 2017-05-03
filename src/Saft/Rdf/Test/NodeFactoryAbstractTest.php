@@ -7,7 +7,6 @@ use Saft\Rdf\Literal;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\NodeUtils;
 use Saft\Test\TestCase;
 
 abstract class NodeFactoryAbstractTest extends TestCase

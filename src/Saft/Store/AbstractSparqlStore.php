@@ -5,11 +5,11 @@ namespace Saft\Store;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
-use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\QueryFactory;
 use Saft\Sparql\Result\Result;
 use Saft\Sparql\Result\EmptyResult;
@@ -27,27 +27,27 @@ abstract class AbstractSparqlStore implements Store
     /**
      * @var NodeFactory
      */
-    private $nodeFactory;
+    protected $nodeFactory;
 
     /**
      * @var QueryFactory
      */
-    private $queryFactory;
+    protected $queryFactory;
 
     /**
      * @var ResultFactory
      */
-    private $resultFactory;
+    protected $resultFactory;
 
     /**
      * @var StatementFactory
      */
-    private $statementFactory;
+    protected $statementFactory;
 
     /**
      * @var StatementIteratorFactory
      */
-    private $statementIteratorFactory;
+    protected $statementIteratorFactory;
 
     /**
      * Constructor.
@@ -57,7 +57,7 @@ abstract class AbstractSparqlStore implements Store
      * @param QueryFactory             $queryFactory Instance of QueryFactory.
      * @param ResultFactory            $resultFactory Instance of ResultFactory.
      * @param StatementIteratorFactory $statementIteratorFactory Instance of StatementIteratorFactory.
-     * @param SparqlUtils              $sparqlUtils
+     * @param RdfHelpers              $rdfHelpers
      * @api
      * @since 0.1
      */
@@ -67,14 +67,14 @@ abstract class AbstractSparqlStore implements Store
         QueryFactory $queryFactory,
         ResultFactory $resultFactory,
         StatementIteratorFactory $statementIteratorFactory,
-        SparqlUtils $sparqlUtils
+        RdfHelpers $rdfHelpers
     ) {
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
         $this->queryFactory = $queryFactory;
         $this->resultFactory = $resultFactory;
         $this->statementIteratorFactory = $statementIteratorFactory;
-        $this->sparqlUtils = $sparqlUtils;
+        $this->rdfHelpers = $rdfHelpers;
     }
 
     /**
@@ -409,7 +409,7 @@ abstract class AbstractSparqlStore implements Store
      */
     protected function sparqlFormat(StatementIterator $statements, Node $graph = null)
     {
-        return $this->sparqlUtils->statementIteratorToSparqlFormat($statements, $graph);
+        return $this->rdfHelpers->statementIteratorToSparqlFormat($statements, $graph);
     }
 
     /**

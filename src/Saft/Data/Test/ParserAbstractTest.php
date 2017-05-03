@@ -7,7 +7,7 @@ use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementImpl;
 use Saft\Test\TestCase;
 
@@ -45,52 +45,52 @@ abstract class ParserAbstractTest extends TestCase
 
         $statementIteratorToCheckAgainst = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foo')
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Foo')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2000/01/rdf-schema#label'),
-                new LiteralImpl(new NodeUtils(), 'RDFS label')
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2000/01/rdf-schema#label'),
+                new LiteralImpl(new RdfHelpers(), 'RDFS label')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foobar'),
-                new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Bar')
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Foobar'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Bar')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foobar'),
-                new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2000/01/rdf-schema#label'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Foobar'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2000/01/rdf-schema#label'),
                 new LiteralImpl(
-                    new NodeUtils(),
+                    new RdfHelpers(),
                     'RDFS label with language tag',
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'),
                     'en'
                 )
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foobar'),
-                new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2000/01/rdf-schema#comment'),
-                new LiteralImpl(new NodeUtils(), "\n    Multi line comment\n    ")
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Foobar'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2000/01/rdf-schema#comment'),
+                new LiteralImpl(new RdfHelpers(), "\n    Multi line comment\n    ")
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foobar'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/component'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/geo')
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Foobar'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/component'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/geo')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foobar'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/component'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/time')
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Foobar'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/component'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/time')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/dataset'),
-                new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2000/01/rdf-schema#label'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/dataset'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2000/01/rdf-schema#label'),
                 new LiteralImpl(
-                    new NodeUtils(),
+                    new RdfHelpers(),
                     "RDFS label with datatype",
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2001/XMLSchema#string')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2001/XMLSchema#string')
                 )
             ),
         ));
@@ -104,7 +104,7 @@ abstract class ParserAbstractTest extends TestCase
 
     public function testParseStringToIteratorTurtleString()
     {
-        $xsdString = new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2001/XMLSchema#string');
+        $xsdString = new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2001/XMLSchema#string');
 
         $fixture = $this->newInstance('turtle');
 
@@ -115,19 +115,19 @@ abstract class ParserAbstractTest extends TestCase
         // build StatementIterator to check against
         $statementIteratorToCheckAgainst = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foo'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/knows'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Bar')
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Foo'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/knows'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Bar')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Foo'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/name'),
-                new LiteralImpl(new NodeUtils(), 'Foo', $xsdString)
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Foo'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/name'),
+                new LiteralImpl(new RdfHelpers(), 'Foo', $xsdString)
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Bar'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/name'),
-                new LiteralImpl(new NodeUtils(), 'Bar', $xsdString)
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Bar'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/name'),
+                new LiteralImpl(new RdfHelpers(), 'Bar', $xsdString)
             ),
         ));
 
@@ -137,7 +137,7 @@ abstract class ParserAbstractTest extends TestCase
     // that test checks if the subject can be of type blank node
     public function testParseStringToIteratorTurtleStringSubjectBlankNode()
     {
-        $xsdString = new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/2001/XMLSchema#string');
+        $xsdString = new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/2001/XMLSchema#string');
 
         $fixture = $this->newInstance('turtle');
 
@@ -149,18 +149,18 @@ abstract class ParserAbstractTest extends TestCase
         $statementIteratorToCheckAgainst = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
                 new BlankNodeImpl('_:genid1'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/knows'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Bar')
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/knows'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Bar')
             ),
             new StatementImpl(
                 new BlankNodeImpl('_:genid1'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/name'),
-                new LiteralImpl(new NodeUtils(), 'Foo', $xsdString)
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/name'),
+                new LiteralImpl(new RdfHelpers(), 'Foo', $xsdString)
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/Bar'),
-                new NamedNodeImpl(new NodeUtils(), 'http://saft/example/name'),
-                new LiteralImpl(new NodeUtils(), 'Bar', $xsdString)
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Bar'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/name'),
+                new LiteralImpl(new RdfHelpers(), 'Bar', $xsdString)
             ),
         ));
 

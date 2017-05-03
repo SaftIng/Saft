@@ -7,7 +7,7 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactoryImpl;
@@ -27,8 +27,6 @@ abstract class StoreAbstractTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-
-        $this->sparqlUtils = new SparqlUtils(new StatementIteratorFactoryImpl());
     }
 
     public function tearDown()
@@ -65,18 +63,18 @@ abstract class StoreAbstractTest extends TestCase
 
     protected function getTestQuad()
     {
-        $subject1 = new NamedNodeImpl(new NodeUtils(), 'http://saft/testquad/s1');
-        $predicate1 = new NamedNodeImpl(new NodeUtils(), 'http://saft/testquad/p1');
-        $object1 = new NamedNodeImpl(new NodeUtils(), 'http://saft/testquad/o1');
-        $graph1 = new NamedNodeImpl(new NodeUtils(), 'http://saft/testquad/g1');
+        $subject1 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/testquad/s1');
+        $predicate1 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/testquad/p1');
+        $object1 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/testquad/o1');
+        $graph1 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/testquad/g1');
         return new StatementImpl($subject1, $predicate1, $object1, $graph1);
     }
 
     protected function getTestTriple()
     {
-        $subject2 = new NamedNodeImpl(new NodeUtils(), 'http://saft/testtriple/s2');
-        $predicate2 = new NamedNodeImpl(new NodeUtils(), 'http://saft/testtriple/p2');
-        $object2 = new NamedNodeImpl(new NodeUtils(), 'http://saft/testtriple/o2');
+        $subject2 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/testtriple/s2');
+        $predicate2 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/testtriple/p2');
+        $object2 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/testtriple/o2');
         return new StatementImpl($subject2, $predicate2, $object2);
     }
 
@@ -90,9 +88,9 @@ abstract class StoreAbstractTest extends TestCase
 
     protected function getTestStatementWithLiteral()
     {
-        $subject2 = new NamedNodeImpl(new NodeUtils(), 'http://saft/test/s1');
-        $predicate2 = new NamedNodeImpl(new NodeUtils(), 'http://saft/test/p2');
-        $object2 = new LiteralImpl(new NodeUtils(), 'John');
+        $subject2 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/test/s1');
+        $predicate2 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/test/p2');
+        $object2 = new LiteralImpl(new RdfHelpers(), 'John');
         return new StatementImpl($subject2, $predicate2, $object2, $this->testGraph);
     }
 
@@ -102,14 +100,14 @@ abstract class StoreAbstractTest extends TestCase
     public function testAddAndDeleteStatementsOnDefaultGraph()
     {
         $stmtOne = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://o/')
+            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://o/')
         );
         $stmtTwo = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-            new LiteralImpl(new NodeUtils(), 'test literal')
+            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+            new LiteralImpl(new RdfHelpers(), 'test literal')
         );
 
         if ($this->fixture->hasMatchingStatement($stmtOne) || $this->fixture->hasMatchingStatement($stmtTwo)) {
@@ -157,14 +155,14 @@ abstract class StoreAbstractTest extends TestCase
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://o/')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://o/')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new LiteralImpl(new NodeUtils(), 'test literal')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new LiteralImpl(new RdfHelpers(), 'test literal')
             ),
         ));
 
@@ -207,14 +205,14 @@ abstract class StoreAbstractTest extends TestCase
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new LiteralImpl(new NodeUtils(), 'test literal', null, 'en')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new LiteralImpl(new RdfHelpers(), 'test literal', null, 'en')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new LiteralImpl(new NodeUtils(), 'test literal', null, 'de')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new LiteralImpl(new RdfHelpers(), 'test literal', null, 'de')
             ),
         ));
 
@@ -268,15 +266,15 @@ abstract class StoreAbstractTest extends TestCase
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://o/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://o/'),
                 $this->testGraph
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new LiteralImpl(new NodeUtils(), 'test literal'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new LiteralImpl(new RdfHelpers(), 'test literal'),
                 $this->testGraph
             ),
         ));
@@ -308,14 +306,14 @@ abstract class StoreAbstractTest extends TestCase
         // 2 triples
         $statements = array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://o/')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://o/')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new LiteralImpl(new NodeUtils(), 'test literal')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new LiteralImpl(new RdfHelpers(), 'test literal')
             ),
         );
 
@@ -392,14 +390,14 @@ abstract class StoreAbstractTest extends TestCase
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://o/')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://o/')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new LiteralImpl(new NodeUtils(), 'test literal')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new LiteralImpl(new RdfHelpers(), 'test literal')
             ),
         ));
 
@@ -414,7 +412,7 @@ abstract class StoreAbstractTest extends TestCase
          * drop all triples
          */
         $this->fixture->deleteMatchingStatements(
-            new StatementImpl(new NamedNodeImpl(new NodeUtils(), 'http://s/'), new NamedNodeImpl(new NodeUtils(), 'http://p/'), new AnyPatternImpl()),
+            new StatementImpl(new NamedNodeImpl(new RdfHelpers(), 'http://s/'), new NamedNodeImpl(new RdfHelpers(), 'http://p/'), new AnyPatternImpl()),
             $this->testGraph
         );
 
@@ -440,15 +438,15 @@ abstract class StoreAbstractTest extends TestCase
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://o/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://o/'),
                 $this->testGraph
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new LiteralImpl(new NodeUtils(), 'test literal'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new LiteralImpl(new RdfHelpers(), 'test literal'),
                 $this->testGraph
             ),
         ));
@@ -465,8 +463,8 @@ abstract class StoreAbstractTest extends TestCase
          */
         $this->fixture->deleteMatchingStatements(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
                 new AnyPatternImpl(),
                 $this->testGraph
             )
@@ -495,14 +493,14 @@ abstract class StoreAbstractTest extends TestCase
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://o/')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://o/')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new LiteralImpl(new NodeUtils(), 'test literal')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new LiteralImpl(new RdfHelpers(), 'test literal')
             ),
         ));
 
@@ -535,9 +533,9 @@ abstract class StoreAbstractTest extends TestCase
 
         $this->assertEquals(0, $this->countTriples($this->testGraph));
 
-        $s = new NamedNodeImpl(new NodeUtils(), 'http://saft/s');
-        $p = new NamedNodeImpl(new NodeUtils(), 'http://saft/p');
-        $o = new NamedNodeImpl(new NodeUtils(), 'http://saft/o');
+        $s = new NamedNodeImpl(new RdfHelpers(), 'http://saft/s');
+        $p = new NamedNodeImpl(new RdfHelpers(), 'http://saft/p');
+        $o = new NamedNodeImpl(new RdfHelpers(), 'http://saft/o');
         $statement = new StatementImpl($s, $p, $o, $this->testGraph);
         $this->fixture->addStatements(array($statement));
 
@@ -608,14 +606,14 @@ abstract class StoreAbstractTest extends TestCase
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://o/')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://o/')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new LiteralImpl(new NodeUtils(), 'test literal')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new LiteralImpl(new RdfHelpers(), 'test literal')
             ),
         ));
 
@@ -623,8 +621,8 @@ abstract class StoreAbstractTest extends TestCase
         $this->fixture->addStatements($statements, $this->testGraph);
 
         $statement = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
             new AnyPatternImpl()
         );
 
@@ -633,15 +631,15 @@ abstract class StoreAbstractTest extends TestCase
          */
         $instanceToCheckAgainst = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://o/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://o/'),
                 $this->testGraph
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new LiteralImpl(new NodeUtils(), 'test literal'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new LiteralImpl(new RdfHelpers(), 'test literal'),
                 $this->testGraph
             )
         ));
@@ -670,14 +668,14 @@ abstract class StoreAbstractTest extends TestCase
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://o/')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://o/')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new LiteralImpl(new NodeUtils(), 'test literal')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new LiteralImpl(new RdfHelpers(), 'test literal')
             ),
         ));
 
@@ -685,8 +683,8 @@ abstract class StoreAbstractTest extends TestCase
         $this->fixture->addStatements($statements, $this->testGraph);
 
         $statement = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
             new AnyPatternImpl(),
             $this->testGraph
         );
@@ -742,16 +740,16 @@ abstract class StoreAbstractTest extends TestCase
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://o1/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://graph/a')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://o1/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://graph/a')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://o2/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://graph/b')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://o2/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://graph/b')
             ),
         ));
 
@@ -759,8 +757,8 @@ abstract class StoreAbstractTest extends TestCase
         $this->fixture->addStatements($statements);
 
         $statement = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
             new AnyPatternImpl(),
             new AnyPatternImpl()
         );
@@ -785,8 +783,8 @@ abstract class StoreAbstractTest extends TestCase
     public function testGetMatchingStatementsReturnType()
     {
         $statement = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
             new AnyPatternImpl()
         );
 
@@ -817,14 +815,14 @@ abstract class StoreAbstractTest extends TestCase
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://o/')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://o/')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new LiteralImpl(new NodeUtils(), 'test literal')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new LiteralImpl(new RdfHelpers(), 'test literal')
             ),
         ));
 
@@ -866,7 +864,7 @@ abstract class StoreAbstractTest extends TestCase
 
         $this->fixture->query('CLEAR GRAPH <'. $quad->getGraph()->getUri() .'>');
 
-        $query = 'ASK { '. $this->sparqlUtils->statementsToSparqlFormat([$quad]) .'}';
+        $query = 'ASK { '. $this->rdfHelpers->statementsToSparqlFormat([$quad]) .'}';
 
         $this->assertEquals(new ValueResultImpl(false), $this->fixture->query($query));
     }
@@ -882,24 +880,24 @@ abstract class StoreAbstractTest extends TestCase
         // 2 triples
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://o/')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://o/')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
                 new LiteralImpl(
-                    new NodeUtils(),
+                    new RdfHelpers(),
                     'foobar',
-                    new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'),
                     'en'
                 )
             ),
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new LiteralImpl(new NodeUtils(), '42')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new LiteralImpl(new RdfHelpers(), '42')
             ),
         ));
 
@@ -913,22 +911,22 @@ abstract class StoreAbstractTest extends TestCase
             new \ArrayIterator(
                 array(
                     array(
-                        's' => new NamedNodeImpl(new NodeUtils(), 'http://s/'),
+                        's' => new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
                         'o' =>
                         new LiteralImpl(
-                            new NodeUtils(),
+                            new RdfHelpers(),
                             'foobar',
-                            new NamedNodeImpl(new NodeUtils(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'),
+                            new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'),
                             'en'
                         )
                     ),
                     array(
-                        's' => new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                        'o' => new LiteralImpl(new NodeUtils(), '42')
+                        's' => new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                        'o' => new LiteralImpl(new RdfHelpers(), '42')
                     ),
                     array(
-                        's' => new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                        'o' => new NamedNodeImpl(new NodeUtils(), 'http://o/')
+                        's' => new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                        'o' => new NamedNodeImpl(new RdfHelpers(), 'http://o/')
                     )
                 )
             )
@@ -961,8 +959,8 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertEquals(
             $resultFactory->createSetResult(array(
                 array(
-                    'p' => new NamedNodeImpl(new NodeUtils(), 'http://example.org/b'),
-                    'o' => new NamedNodeImpl(new NodeUtils(), 'http://example.org/c')
+                    'p' => new NamedNodeImpl(new RdfHelpers(), 'http://example.org/b'),
+                    'o' => new NamedNodeImpl(new RdfHelpers(), 'http://example.org/c')
                 )
             )),
             $result
@@ -987,9 +985,9 @@ abstract class StoreAbstractTest extends TestCase
         // 1 triple
         $statements = new ArrayStatementIteratorImpl(array(
             new StatementImpl(
-                new NamedNodeImpl(new NodeUtils(), 'http://s/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://p/'),
-                new NamedNodeImpl(new NodeUtils(), 'http://o/')
+                new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
+                new NamedNodeImpl(new RdfHelpers(), 'http://o/')
             ),
         ));
 
@@ -1016,14 +1014,14 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertResultEquals(
             $resultFactory->createStatementResult(array(
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://saft/testquad/p1'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://saft/testquad/s1'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://saft/testquad/o1')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://saft/testquad/p1'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://saft/testquad/s1'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://saft/testquad/o1')
                 ),
                 new StatementImpl(
-                    new NamedNodeImpl(new NodeUtils(), 'http://saft/testtriple/p2'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://saft/testtriple/s2'),
-                    new NamedNodeImpl(new NodeUtils(), 'http://saft/testtriple/o2')
+                    new NamedNodeImpl(new RdfHelpers(), 'http://saft/testtriple/p2'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://saft/testtriple/s2'),
+                    new NamedNodeImpl(new RdfHelpers(), 'http://saft/testtriple/o2')
                 )
             )),
             $this->fixture->query(
@@ -1077,7 +1075,7 @@ abstract class StoreAbstractTest extends TestCase
         /*
          * remove test data via query
          */
-        $triplePart = $this->sparqlUtils->statementsToSparqlFormat(array($this->getTestPatternStatement()));
+        $triplePart = $this->rdfHelpers->statementsToSparqlFormat(array($this->getTestPatternStatement()));
         $query = 'DELETE WHERE { Graph <'. $this->testGraph .'> {'. $triplePart .'}}';
 
         $this->assertTrue($this->fixture->query($query)->isEmptyResult());
@@ -1095,9 +1093,9 @@ abstract class StoreAbstractTest extends TestCase
 
         $this->assertEquals(0, $this->countTriples($this->testGraph));
 
-        $subject2 = new NamedNodeImpl(new NodeUtils(), 'http://saft/test/s1');
-        $predicate2 = new NamedNodeImpl(new NodeUtils(), 'http://saft/test/p2');
-        $object2 = new LiteralImpl(new NodeUtils(), 'Emma');
+        $subject2 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/test/s1');
+        $predicate2 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/test/p2');
+        $object2 = new LiteralImpl(new RdfHelpers(), 'Emma');
         $statement = new StatementImpl($subject2, $predicate2, $object2);
 
         // add two statements with literal
@@ -1110,7 +1108,7 @@ abstract class StoreAbstractTest extends TestCase
         /*
          * remove test data via query
          */
-        $triplePart = $this->sparqlUtils->statementsToSparqlFormat(array($this->getTestPatternStatement()));
+        $triplePart = $this->rdfHelpers->statementsToSparqlFormat(array($this->getTestPatternStatement()));
         $query = 'DELETE WHERE { Graph <'. $this->testGraph .'> {'. $triplePart .'}}';
 
         $this->assertTrue($this->fixture->query($query)->isEmptyResult());

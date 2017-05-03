@@ -2,7 +2,7 @@
 
 namespace Saft\Sparql\Test\Query;
 
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Sparql\Query\DescribeQueryImpl;
 use Saft\Test\TestCase;
 
@@ -12,7 +12,7 @@ class DescribeQueryImplTest extends TestCase
     {
         parent::setUp();
 
-        $this->fixture = new DescribeQueryImpl(null, new NodeUtils());
+        $this->fixture = new DescribeQueryImpl(null, new RdfHelpers());
     }
 
     /*
@@ -26,7 +26,7 @@ class DescribeQueryImplTest extends TestCase
             DESCRIBE ?x
             FROM <http://foobar/>
             WHERE { ?x foaf:name "Alice" }',
-            new NodeUtils()
+            new RdfHelpers()
         );
 
         $this->assertEquals(
@@ -50,7 +50,7 @@ class DescribeQueryImplTest extends TestCase
             DESCRIBE ?x
             FROM <http://foo/bar/>
             WHERE { ?x <http://foobar/name> "Alice". ?y <http://www.w3.org/2001/XMLSchema#string> "Alice". }',
-            new NodeUtils()
+            new RdfHelpers()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -68,7 +68,7 @@ class DescribeQueryImplTest extends TestCase
             DESCRIBE ?x
             FROM <http://foobar/>
             WHERE { ?x foaf:name "Alice" }',
-            new NodeUtils()
+            new RdfHelpers()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -88,7 +88,7 @@ class DescribeQueryImplTest extends TestCase
             DESCRIBE ?x
             FROM <http://foo/bar/>
             WHERE { ?x <http://foobar/name> "Alice" }',
-            new NodeUtils()
+            new RdfHelpers()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -106,7 +106,7 @@ class DescribeQueryImplTest extends TestCase
             'DESCRIBE ?x
             FROM <http://foo/bar/>
             WHERE { ?x <http://foobar/name> "Alice" }',
-            new NodeUtils()
+            new RdfHelpers()
         );
 
         $queryParts = $this->fixture->getQueryParts();
@@ -126,7 +126,7 @@ class DescribeQueryImplTest extends TestCase
             FROM <http://foo/bar/>
             FROM NAMED <http://foo/bar/named>
             WHERE { ?s ?p ?o. FILTER (?o < 40) }',
-            new NodeUtils()
+            new RdfHelpers()
         );
 
         $queryParts = $this->fixture->getQueryParts();

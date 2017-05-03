@@ -7,14 +7,14 @@ class NodeFactoryImpl implements NodeFactory
     /**
      * @var NodeUtils
      */
-    protected $nodeUtils;
+    protected $rdfHelpers;
 
     /**
      *
      */
-    public function __construct(NodeUtils $nodeUtils)
+    public function __construct(RdfHelpers $rdfHelpers)
     {
-        $this->nodeUtils = $nodeUtils;
+        $this->nodeUtils = $rdfHelpers;
     }
 
     /**

@@ -4,7 +4,7 @@ namespace Saft\Addition\EasyRdf\Data;
 
 use Saft\Data\ParserFactory;
 use Saft\Rdf\NodeFactory;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIteratorFactory;
 
@@ -17,7 +17,7 @@ class ParserFactoryEasyRdf implements ParserFactory
 
     protected $nodeFactory;
 
-    protected $nodeUtils;
+    protected $rdfHelpers;
 
     protected $statementFactory;
 
@@ -27,7 +27,7 @@ class ParserFactoryEasyRdf implements ParserFactory
         NodeFactory $nodeFactory,
         StatementFactory $statementFactory,
         StatementIteratorFactory $statementIteratorFactory,
-        NodeUtils $nodeUtils
+        RdfHelpers $rdfHelpers
     ) {
         /**
          * Map of serializations. It maps the Saft term on according the EasyRdf format.
@@ -41,7 +41,7 @@ class ParserFactoryEasyRdf implements ParserFactory
         );
 
         $this->nodeFactory = $nodeFactory;
-        $this->nodeUtils = $nodeUtils;
+        $this->RdfHelpers = $rdfHelpers;
         $this->statementFactory = $statementFactory;
         $this->statementIteratorFactory = $statementIteratorFactory;
     }
@@ -67,7 +67,7 @@ class ParserFactoryEasyRdf implements ParserFactory
             $this->nodeFactory,
             $this->statementFactory,
             $this->statementIteratorFactory,
-            $this->nodeUtils,
+            $this->RdfHelpers,
             $serialization
         );
     }

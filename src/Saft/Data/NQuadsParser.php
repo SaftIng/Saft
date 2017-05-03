@@ -7,7 +7,7 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactory;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIteratorFactory;
@@ -19,23 +19,23 @@ class NQuadsParser implements Parser
 {
     protected $nodeFactory;
 
-    protected $nodeUtils;
+    protected $rdfHelpers;
 
     protected $statementFactory;
 
     /**
      * @param NodeFactory $nodeFactory
      * @param StatementFactory $statementFactory
-     * @param NodeUtils $nodeUtils
+     * @param NodeUtils $rdfHelpers
      */
     public function __construct(
         NodeFactory $nodeFactory,
         StatementFactory $statementFactory,
         StatementIteratorFactory $statementIteratorFactory,
-        NodeUtils $nodeUtils
+        RdfHelpers $rdfHelpers
     ) {
         $this->nodeFactory = $nodeFactory;
-        $this->nodeUtils = $nodeUtils;
+        $this->nodeUtils = $rdfHelpers;
         $this->statementFactory = $statementFactory;
         $this->statementIteratorFactory = $statementIteratorFactory;
     }

@@ -5,7 +5,6 @@ namespace Saft\Addition\EasyRdf\Data;
 use Saft\Data\Serializer;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NodeFactory;
-use Saft\Rdf\NodeUtils;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 

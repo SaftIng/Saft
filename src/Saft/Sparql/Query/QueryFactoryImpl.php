@@ -2,25 +2,18 @@
 
 namespace Saft\Sparql\Query;
 
-use Saft\Rdf\NodeUtils;
-use Saft\Sparql\Query\QueryUtils;
+use Saft\Rdf\RdfHelpers;
 
 class QueryFactoryImpl implements QueryFactory
 {
     /**
-     * @var NodeUtils
+     * @var RdfHelpers
      */
-    protected $nodeUtils;
+    protected $rdfHelpers;
 
-    /**
-     * @var QueryUtils
-     */
-    protected $queryUtils;
-
-    public function __construct(NodeUtils $nodeUtils, QueryUtils $queryUtils)
+    public function __construct(RdfHelpers $rdfHelpers)
     {
-        $this->nodeUtils = $nodeUtils;
-        $this->queryUtils = $queryUtils;
+        $this->rdfHelpers = $rdfHelpers;
     }
 
     /**
@@ -31,24 +24,24 @@ class QueryFactoryImpl implements QueryFactory
      */
     public function createInstanceByQueryString($query)
     {
-        switch ($this->queryUtils->getQueryType($query)) {
+        switch ($this->rdfHelpers->getQueryType($query)) {
             case 'askQuery':
-                return new AskQueryImpl($query, $this->nodeUtils);
+                return new AskQueryImpl($query, $this->rdfHelpers);
 
             case 'constructQuery':
-                return new ConstructQueryImpl($query, $this->nodeUtils);
+                return new ConstructQueryImpl($query, $this->rdfHelpers);
 
             case 'describeQuery':
-                return new DescribeQueryImpl($query, $this->nodeUtils);
+                return new DescribeQueryImpl($query, $this->rdfHelpers);
 
             case 'graphQuery':
-                return new GraphQueryImpl($query, $this->nodeUtils);
+                return new GraphQueryImpl($query, $this->rdfHelpers);
 
             case 'selectQuery':
-                return new SelectQueryImpl($query, $this->nodeUtils);
+                return new SelectQueryImpl($query, $this->rdfHelpers);
 
             case 'updateQuery':
-                return new UpdateQueryImpl($query, $this->nodeUtils);
+                return new UpdateQueryImpl($query, $this->rdfHelpers);
 
             default:
                 throw new \Exception('Unknown query type: '. $query);

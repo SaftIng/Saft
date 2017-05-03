@@ -8,7 +8,7 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
@@ -25,17 +25,17 @@ class VirtuosoTest extends StoreAbstractTest
     {
         parent::setUp();
 
+        $this->loadTestConfiguration(__DIR__.'/../../test-config.yml');
+
         try {
             $this->isTestPossible();
             $this->fixture = new Virtuoso(
-                new NodeFactoryImpl(new NodeUtils()),
+                new NodeFactoryImpl(new RdfHelpers()),
                 new StatementFactoryImpl(),
-                new QueryFactoryImpl(new NodeUtils(), new QueryUtils()),
+                new QueryFactoryImpl(new RdfHelpers()),
                 new ResultFactoryImpl(),
                 new StatementIteratorFactoryImpl(),
-                new NodeUtils(),
-                new QueryUtils(),
-                new SparqlUtils(new StatementIteratorFactoryImpl()),
+                new RdfHelpers(),
                 $this->configuration['virtuosoConfig']
             );
         } catch(\Exception $e) {
@@ -81,9 +81,9 @@ class VirtuosoTest extends StoreAbstractTest
     public function testAddStatementsOnDefaultGraphWithException()
     {
         $stmtOne = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://add/delete/defaultgraph/s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://add/delete/defaultgraph/p/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://add/delete/defaultgraph/o/')
+            new NamedNodeImpl(new RdfHelpers(), 'http://add/delete/defaultgraph/s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://add/delete/defaultgraph/p/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://add/delete/defaultgraph/o/')
         );
 
         $this->setExpectedException('\Exception');
@@ -101,9 +101,9 @@ class VirtuosoTest extends StoreAbstractTest
     public function testDeleteMatchingStatementsOnDefaultGraphWithException()
     {
         $stmtOne = new StatementImpl(
-            new NamedNodeImpl(new NodeUtils(), 'http://add/delete/defaultgraph/s/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://add/delete/defaultgraph/p/'),
-            new NamedNodeImpl(new NodeUtils(), 'http://add/delete/defaultgraph/o/')
+            new NamedNodeImpl(new RdfHelpers(), 'http://add/delete/defaultgraph/s/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://add/delete/defaultgraph/p/'),
+            new NamedNodeImpl(new RdfHelpers(), 'http://add/delete/defaultgraph/o/')
         );
 
         $this->setExpectedException('\Exception');

@@ -6,7 +6,7 @@ use Saft\Rdf\NamedNode;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactory;
@@ -15,7 +15,6 @@ use Saft\Rdf\StatementIteratorFactory;
 use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
-use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\EmptyResultImpl;
 use Saft\Sparql\Result\ResultFactory;
 use Saft\Sparql\Result\SetResult;
@@ -37,24 +36,14 @@ class ARC2 extends AbstractSparqlStore
     protected $nodeFactory = null;
 
     /**
-     * @var NodeUtils
+     * @var RdfHelpers
      */
-    protected $nodeUtils = null;
+    protected $rdfHelpers = null;
 
     /**
      * @var QueryFactory
      */
     protected $queryFactory = null;
-
-    /**
-     * @var QueryUtils
-     */
-    protected $queryUtils;
-
-    /**
-     * @var SparqlUtils
-     */
-    protected $sparqlUtils = null;
 
     /**
      * @var StatementFactory
@@ -79,8 +68,8 @@ class ARC2 extends AbstractSparqlStore
      * @param QueryFactory             $queryFactory
      * @param ResultFactory            $resultFactory
      * @param StatementIteratorFactory $statementIteratorFactory
-     * @param NodeUtils                $nodeUtils
-     * @param QueryUtils               $queryUtils
+     * @param RdfHelpers                $rdfHelpers
+     * @param rdfHelpers               $rdfHelpers
      * @param SparqlUtils              $sparqlUtils
      * @param array                    $configuration Array containing database credentials
      */
@@ -90,9 +79,7 @@ class ARC2 extends AbstractSparqlStore
         QueryFactory $queryFactory,
         ResultFactory $resultFactory,
         StatementIteratorFactory $statementIteratorFactory,
-        NodeUtils $nodeUtils,
-        QueryUtils $queryUtils,
-        SparqlUtils $sparqlUtils,
+        RdfHelpers $rdfHelpers,
         array $configuration
     ) {
         $this->configuration = $configuration;
@@ -105,10 +92,7 @@ class ARC2 extends AbstractSparqlStore
             $this->store->setUp();
         }
 
-        $this->nodeUtils = $nodeUtils;
-
-        $this->queryUtils = $queryUtils;
-        $this->sparqlUtils = $sparqlUtils;
+        $this->rdfHelpers = $rdfHelpers;
 
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
@@ -122,7 +106,7 @@ class ARC2 extends AbstractSparqlStore
             $queryFactory,
             $resultFactory,
             $statementIteratorFactory,
-            $sparqlUtils
+            $rdfHelpers
         );
     }
 
@@ -163,9 +147,9 @@ class ARC2 extends AbstractSparqlStore
 
             $this->query(
                 'INSERT INTO <'. $graphUriToUse .'> {'
-                . $this->sparqlUtils->getNodeInSparqlFormat($statement->getSubject()) . ' '
-                . $this->sparqlUtils->getNodeInSparqlFormat($statement->getPredicate()) . ' '
-                . $this->sparqlUtils->getNodeInSparqlFormat($statement->getObject()) . ' . '
+                . $this->rdfHelpers->getNodeInSparqlFormat($statement->getSubject()) . ' '
+                . $this->rdfHelpers->getNodeInSparqlFormat($statement->getPredicate()) . ' '
+                . $this->rdfHelpers->getNodeInSparqlFormat($statement->getObject()) . ' . '
                 . '}',
                 $options
             );
@@ -330,7 +314,7 @@ class ARC2 extends AbstractSparqlStore
 
         // collect graph URI's
         while ($row = $result->fetch_assoc()) {
-            if ($this->nodeUtils->simpleCheckURI($row['graphUri'])) {
+            if ($this->rdfHelpers->simpleCheckURI($row['graphUri'])) {
                 $graphs[$row['graphUri']] = $this->nodeFactory->createNamedNode($row['graphUri']);
             }
         }
@@ -543,19 +527,19 @@ class ARC2 extends AbstractSparqlStore
                 }
 
                 // subject
-                $s = $this->nodeUtils->createNodeInstanceFromNodeParameter(
+                $s = $this->rdfHelpers->createNodeInstanceFromNodeParameter(
                     $quad['s'],
                     $quad['s_type']
                 );
 
                 // predicate
-                $p = $this->nodeUtils->createNodeInstanceFromNodeParameter(
+                $p = $this->rdfHelpers->createNodeInstanceFromNodeParameter(
                     $quad['p'],
                     $quad['p_type']
                 );
 
                 // object
-                $o = $this->nodeUtils->createNodeInstanceFromNodeParameter(
+                $o = $this->rdfHelpers->createNodeInstanceFromNodeParameter(
                     $quad['o'],
                     $quad['o_type'],
                     $quad['o_datatype'],
@@ -622,7 +606,7 @@ class ARC2 extends AbstractSparqlStore
         /*
          * CONSTRUCT query
          */
-        } elseif ('constructQuery' === $this->queryUtils->getQueryType($query)) {
+        } elseif ('constructQuery' === $this->rdfHelpers->getQueryType($query)) {
             $statements = array();
             foreach ($result['result'] as $subjectUri => $predicates) {
                 foreach ($predicates as $predicateUri => $objects) {
@@ -652,7 +636,7 @@ class ARC2 extends AbstractSparqlStore
         /*
          * SELECT query
          */
-        } elseif ('selectQuery' === $this->queryUtils->getQueryType($query)) {
+        } elseif ('selectQuery' === $this->rdfHelpers->getQueryType($query)) {
             /*
              * For a SELECT query the result looks like:
              *
@@ -711,8 +695,8 @@ class ARC2 extends AbstractSparqlStore
 
                         case 'uri':
                             // ARC2 seems to think that an email is a valid URI.
-                            if ($this->nodeUtils->simpleCheckURI($row[$variable])
-                                || $this->nodeUtils->simpleCheckBlankNodeId($row[$variable])) {
+                            if ($this->rdfHelpers->simpleCheckURI($row[$variable])
+                                || $this->rdfHelpers->simpleCheckBlankNodeId($row[$variable])) {
                                 $newEntry[$variable] = $this->nodeFactory->createNamedNode($row[$variable]);
                             // we force such things as literal
                             } else {
@@ -734,7 +718,7 @@ class ARC2 extends AbstractSparqlStore
             return $setResult;
 
         } else {
-            if ('askQuery' === $this->queryUtils->getQueryType($query)) {
+            if ('askQuery' === $this->rdfHelpers->getQueryType($query)) {
                 return $this->resultFactory->createValueResult($result['result']);
 
             } else {

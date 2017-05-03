@@ -6,16 +6,14 @@ use Saft\Rdf\AbstractLiteral;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
 use Saft\Rdf\Triple;
-use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
-use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\EmptyResult;
 use Saft\Sparql\Result\ResultFactory;
 use Saft\Sparql\Result\SetResult;
@@ -46,37 +44,27 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * @var NodeFactory
      */
-    private $nodeFactory = null;
+    protected $nodeFactory = null;
 
     /**
-     * @var NodeUtils
+     * @var RdfHelpers
      */
-    private $nodeUtils = null;
+    protected $rdfHelpers = null;
 
     /**
      * @var QueryFactory
      */
-    private $queryFactory = null;
-
-    /**
-     * @var QueryUtils
-     */
-    protected $queryUtils;
-
-    /**
-     * @var SparqlUtils
-     */
-    protected $sparqlUtils;
+    protected $queryFactory = null;
 
     /**
      * @var StatementFactory
      */
-    private $statementFactory = null;
+    protected $statementFactory = null;
 
     /**
      * @var StatementIteratorFactory
      */
-    private $statementIteratorFactory = null;
+    protected $statementIteratorFactory = null;
 
     /**
      * Constructor.
@@ -86,9 +74,8 @@ class Virtuoso extends AbstractSparqlStore
      * @param QueryFactory             $queryFactory
      * @param ResultFactory            $resultFactory
      * @param StatementIteratorFactory $statementIteratorFactory
-     * @param NodeUtils                $this->nodeUtils
-     * @param QueryUtils               $queryUtils
-     * @param array                    $adapterOptions           Array containing database credentials
+     * @param RdfHelpers               $rdfHelpers
+     * @param array                    $adapterOptions Array containing database credentials
      * @throws \Exception              If PHP ODBC extension was not loaded.
      * @throws \Exception              If PHP PDO_ODBC extension was not loaded.
      */
@@ -98,17 +85,12 @@ class Virtuoso extends AbstractSparqlStore
         QueryFactory $queryFactory,
         ResultFactory $resultFactory,
         StatementIteratorFactory $statementIteratorFactory,
-        NodeUtils $nodeUtils,
-        QueryUtils $queryUtils,
-        SparqlUtils $sparqlUtils,
+        RdfHelpers $rdfHelpers,
         array $configuration
     ) {
         $this->checkRequirements();
 
-        $this->nodeUtils = $nodeUtils;
-        $this->queryUtils = $queryUtils;
-        $this->sparqlUtils = $sparqlUtils;
-
+        $this->rdfHelpers = $rdfHelpers;
         $this->configuration = $configuration;
 
         // Open connection
@@ -126,7 +108,7 @@ class Virtuoso extends AbstractSparqlStore
             $queryFactory,
             $resultFactory,
             $statementIteratorFactory,
-            $sparqlUtils
+            $rdfHelpers
         );
     }
 
@@ -331,7 +313,7 @@ class Virtuoso extends AbstractSparqlStore
 
         $queryObject = $this->queryFactory->createInstanceByQueryString($query);
         $queryParts = $queryObject->getQueryParts();
-        $queryType = $this->queryUtils->getQueryType($query);
+        $queryType = $this->rdfHelpers->getQueryType($query);
 
         /**
          * SPARQL query (usually to fetch data)
@@ -348,7 +330,7 @@ class Virtuoso extends AbstractSparqlStore
             // make it possible to set a default graph URI
             if (
                 isset($options['default_graph_uri']) &&
-                $this->nodeUtils->simpleCheckURI($options['default_graph_uri'])
+                $this->rdfHelpers->simpleCheckURI($options['default_graph_uri'])
             ) {
                 $graphUri = $options['default_graph_uri'];
             } else {

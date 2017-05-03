@@ -18,6 +18,8 @@ use Saft\Store\Store;
 /**
  * This is a basic resp. simple implementation of the Store interface using the AbstractTriplePatternStore.
  * Its purpose is to serve as mock store in test cases.
+ *
+ * @deprecated
  */
 class BasicTriplePatternStore extends AbstractTriplePatternStore
 {

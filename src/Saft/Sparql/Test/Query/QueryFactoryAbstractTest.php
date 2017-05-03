@@ -2,7 +2,7 @@
 
 namespace Saft\Sparql\Test\Query;
 
-use Saft\Rdf\NodeUtils;
+use Saft\Rdf\RdfHelpers;
 use Saft\Sparql\Query\AskQueryImpl;
 use Saft\Sparql\Query\DescribeQueryImpl;
 use Saft\Sparql\Query\GraphQueryImpl;
@@ -38,7 +38,7 @@ abstract class QueryFactoryAbstractTest extends TestCase
                   foaf:mbox  <mailto:alice@work.example> }';
 
         $this->assertEquals(
-            new AskQueryImpl($query, new NodeUtils()),
+            new AskQueryImpl($query, new RdfHelpers()),
             $this->fixture->createInstanceByQueryString($query)
         );
     }
@@ -50,7 +50,7 @@ abstract class QueryFactoryAbstractTest extends TestCase
                   WHERE { ?x foaf:mbox <mailto:alice@org> }';
 
         $this->assertEquals(
-            new DescribeQueryImpl($query, new NodeUtils()),
+            new DescribeQueryImpl($query, new RdfHelpers()),
             $this->fixture->createInstanceByQueryString($query)
         );
     }
@@ -60,7 +60,7 @@ abstract class QueryFactoryAbstractTest extends TestCase
         $query = 'CREATE GRAPH <'. $this->testGraph->getUri() .'>';
 
         $this->assertEquals(
-            new GraphQueryImpl($query, new NodeUtils()),
+            new GraphQueryImpl($query, new RdfHelpers()),
             $this->fixture->createInstanceByQueryString($query)
         );
     }
@@ -72,7 +72,7 @@ abstract class QueryFactoryAbstractTest extends TestCase
                   WHERE { ?x foaf:mbox <mailto:alice@org> }';
 
         $this->assertEquals(
-            new SelectQueryImpl($query, new NodeUtils()),
+            new SelectQueryImpl($query, new RdfHelpers()),
             $this->fixture->createInstanceByQueryString($query)
         );
     }
@@ -94,7 +94,7 @@ abstract class QueryFactoryAbstractTest extends TestCase
                   INSERT DATA {Graph <>}';
 
         $this->assertEquals(
-            new UpdateQueryImpl($query, new NodeUtils()),
+            new UpdateQueryImpl($query, new RdfHelpers()),
             $this->fixture->createInstanceByQueryString($query)
         );
 
@@ -104,7 +104,7 @@ abstract class QueryFactoryAbstractTest extends TestCase
         $query = 'INSERT INTO GRAPH <> { ... }';
 
         $this->assertEquals(
-            new UpdateQueryImpl($query, new NodeUtils()),
+            new UpdateQueryImpl($query, new RdfHelpers()),
             $this->fixture->createInstanceByQueryString($query)
         );
 
@@ -114,7 +114,7 @@ abstract class QueryFactoryAbstractTest extends TestCase
         $query = 'WITH <'. $this->testGraph->getUri() .'> DELETE { ... } WHERE { ... }';
 
         $this->assertEquals(
-            new UpdateQueryImpl($query, new NodeUtils()),
+            new UpdateQueryImpl($query, new RdfHelpers()),
             $this->fixture->createInstanceByQueryString($query)
         );
 
@@ -125,7 +125,7 @@ abstract class QueryFactoryAbstractTest extends TestCase
                   DELETE DATA {}';
 
         $this->assertEquals(
-            new UpdateQueryImpl($query, new NodeUtils()),
+            new UpdateQueryImpl($query, new RdfHelpers()),
             $this->fixture->createInstanceByQueryString($query)
         );
     }
