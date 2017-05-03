@@ -22,10 +22,9 @@ Please see [LICENSE](LICENSE) for further information.
 
 ## Current status
 
-Saft is under development but provides [stable releases](https://github.com/SaftIng/Saft/releases) already. Its used in different scenarios and is already performing very well for our approaches and rapid prototyping. With Erfurt in the bag, we are now supporting all major Semantic Web libraries for PHP:
-* Erfurt
-* ARC2
-* EasyRDF
-* Redland
+Saft is under development but provides [stable releases](https://github.com/SaftIng/Saft/releases) already. Its used in different scenarios and is already performing very well for our approaches and rapid prototyping. Saft provides basic support for the following major Semantic Web libraries for PHP:
+* Erfurt (currently only QueryCache)
+* ARC2 (currently only data storage)
+* EasyRDF (currently only parser and serializer)
 
 Sure, there is still work to do to refine the library, so you are very welcome to join us and help to make Saft better!
