@@ -1,4 +1,3 @@
-PHPUNIT = ./vendor/bin/phpunit
 PHPCS = ./vendor/bin/phpcs
 PHPCBF = ./vendor/bin/phpcbf
 SAMI = ./vendor/bin/sami.php
@@ -12,15 +11,16 @@ default:
 	@echo "Saft - CLI"
 	@echo ""
 	@echo "You can execute:"
-	@echo "- make codebeautifier - Clean and format code."
-	@echo "- make codesniffer - Check code format."
-	@echo "- make setup-test-environment - Setup test-environment of Saft."
-	@echo "- make setup-subtrees - Setup all remotes for Saft's subtree repositories."
+	@echo "- make clean                  - Remove temporary folders and vendor folder."
+	@echo "- make commit                 - Runs some quality checks before call git commit."
+	@echo "- make codebeautifier         - Clean and format code."
+	@echo "- make codesniffer            - Check code format."
+	@echo "- make setup-subtrees         - Setup all remotes for Saft's subtree repositories."
+	@echo "- make test                   - Run all test suites."
 	@echo ""
 
-setup-test-environment:
-	cp test-config.yml.dist test-config.yml
-	sudo apt-get install xsltproc
+apidoc:
+	$(SAMI) update -n -v --force $(SAMI-CONFIG)
 
 codesniffer:
 	$(PHPCS) --standard=$(PHPCS-RULES) --extensions=php -p src/*
@@ -28,19 +28,13 @@ codesniffer:
 codebeautifier:
 	$(PHPCBF) --standard=$(PHPCS-RULES) --extensions=php -p src/*
 
-apidoc:
-	$(SAMI) update -n -v --force $(SAMI-CONFIG)
-
 clean:
-	rm -r ./gen ./tmp
+	rm -r ./gen ./tmp ./vendor
 
 commit:
 	make codebeautifier
 	make codesniffer
 	git-cola
-
-mrpropper: clean
-	rm -r ./vendor
 
 # Remove all remotes for Saft's subpackages.
 remove-subpackage-remotes:
@@ -58,6 +52,9 @@ remove-subpackage-remotes:
 	git remote rm saft.store.http
 	git remote rm saft.store.virtuoso
 	git remote rm saft.test
+
+setup:
+	./scripts/setup-components.sh
 
 # Setup all remotes subpackages
 setup-subpackage-remotes:
