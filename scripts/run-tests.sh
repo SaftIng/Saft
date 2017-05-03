@@ -15,7 +15,6 @@ components[easyrdf]=src/Saft/Addition/EasyRdf
 components[erfurt]=src/Saft/Addition/Erfurt
 components[httpstore]=src/Saft/Addition/HttpStore
 components[querycache]=src/Saft/Addition/QueryCache
-components[redland]=src/Saft/Addition/Redland
 components[virtuoso]=src/Saft/Addition/Virtuoso
 
 for i in "${!components[@]}"
