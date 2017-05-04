@@ -9,7 +9,7 @@
 | Sparql    | [![Build Status](https://travis-ci.org/SaftIng/Saft.sparql.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.sparql) |
 | Store     | [![Build Status](https://travis-ci.org/SaftIng/Saft.store.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.store)   |
 
-The Saft PHP framework provides RDF handling and support for Semantic Web technologies. It consists of the Saft.Library (_Saft.data_, _Saft.rdf_, _Saft.sparql_ and _Saft.store_), Saft.Additions (e.g. adapter for triple stores) and Saft.skeleton (to jump start your project).
+The Saft PHP framework provides RDF handling and support for Semantic Web technologies. It consists of the Saft.Library (_Saft.data_, _Saft.rdf_, _Saft.sparql_ and _Saft.store_) and Saft.Additions (e.g. adapter for triple stores or integration of libraries like ARC2 and EasyRdf).
 
 ## Documentation
 
