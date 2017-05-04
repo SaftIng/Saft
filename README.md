@@ -1,13 +1,11 @@
 # Saft
 
-[![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft)
-
-| Component | Build Status                                                                                                              |
-|:----------|:--------------------------------------------------------------------------------------------------------------------------|
-| Data      | [![Build Status](https://travis-ci.org/SaftIng/Saft.data.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.data)     |
-| Rdf       | [![Build Status](https://travis-ci.org/SaftIng/Saft.rdf.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.rdf)       |
-| Sparql    | [![Build Status](https://travis-ci.org/SaftIng/Saft.sparql.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.sparql) |
-| Store     | [![Build Status](https://travis-ci.org/SaftIng/Saft.store.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.store)   |
+| Core Component | Build Status                                                                                                              | Code Coverage                                                                                                                                                      |
+|:---------------|:--------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Data           | [![Build Status](https://travis-ci.org/SaftIng/Saft.data.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.data)     | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.data/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.data?branch=master)     |
+| Rdf            | [![Build Status](https://travis-ci.org/SaftIng/Saft.rdf.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.rdf)       | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.rdf/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.rdf?branch=master)       |
+| Sparql         | [![Build Status](https://travis-ci.org/SaftIng/Saft.sparql.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.sparql) | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.sparql/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.sparql?branch=master) |
+| Store          | [![Build Status](https://travis-ci.org/SaftIng/Saft.store.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.store)   | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.store/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.store?branch=master)   |
 
 The Saft PHP framework provides RDF handling and support for Semantic Web technologies. It consists of the Saft.Library (_Saft.data_, _Saft.rdf_, _Saft.sparql_ and _Saft.store_) and Saft.Additions (e.g. adapter for triple stores or integration of libraries like ARC2 and EasyRdf).
 
