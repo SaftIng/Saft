@@ -24,4 +24,16 @@
             <directory suffix="Test.php">./Test</directory>
         </testsuite>
     </testsuites>
+    <!-- Enable Code Coverage report -->
+    <logging>
+        <log type="coverage-html" target="gen/coverage/" title="Saft" />
+        <log type="junit" target="gen/test/log.junit.xml" logIncompleteSkipped="true" />
+        <log type="testdox-html" target="gen/test/testdox.html" />
+    </logging>
+    <!-- Define which files are included in the code coverage report -->
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./Store</directory>
+        </whitelist>
+    </filter>
 </phpunit>

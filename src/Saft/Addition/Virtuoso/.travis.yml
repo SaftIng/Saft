@@ -1,0 +1,38 @@
+language: php
+
+php:
+    - '5.6'
+    - '7.0'
+    - '7.1'
+    - nightly
+
+env:
+    - VIRTUOSO=6.1.7
+    - VIRTUOSO=7.1.0
+    - VIRTUOSO=7.2.4.2
+
+matrix:
+    fast_finish: true
+    include:
+        - php: hhvm
+    allow_failures:
+        - env: VIRTUOSO=6.1.4
+        - env: VIRTUOSO=6.1.6
+        - php: nightly
+
+cache:
+    directories:
+        - $HOME/.composer/cache
+        - virtuoso-opensource
+
+sudo: true
+
+before_install:
+    - bash ./scripts/install-extensions.sh
+    - bash ./scripts/install-services.sh
+    - composer require satooshi/php-coveralls:*
+    - travis_retry composer install --dev --no-interaction
+
+script: vendor/bin/phpunit --coverage-clover gen/coverage/clover.xml
+
+after_script: php vendor/bin/coveralls -v
