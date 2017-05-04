@@ -23,8 +23,6 @@ repos[saft.easyrdf]=src/Saft/Addition/EasyRdf
 repos[saft.erfurt]=src/Saft/Addition/Erfurt
 repos[saft.querycache]=src/Saft/Addition/QueryCache
 repos[saft.redland]=src/Saft/Addition/Redland
-repos[saft.rest]=src/Saft/Addition/Rest
-repos[saft.skeleton]=src/Saft/Skeleton
 repos[saft.store.http]=src/Saft/Addition/HttpStore
 repos[saft.store.virtuoso]=src/Saft/Addition/Virtuoso
 
