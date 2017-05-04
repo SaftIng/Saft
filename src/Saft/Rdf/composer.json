@@ -2,7 +2,7 @@
     "name": "saft/saft-rdf",
     "type": "library",
     "description": "RDF library from the Saft project.",
-    "keywords": ["Saft", "Linked Data", "Semantic Web", "RDF"],
+    "keywords": ["Saft", "Linked Data", "Semantic Web", "RDF", "Triples"],
     "homepage": "https://safting.github.io/",
     "license": "GPL-3.0",
     "authors": [
