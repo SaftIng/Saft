@@ -44,9 +44,6 @@ before_install:
     - composer require satooshi/php-coveralls:1.*
     - travis_retry composer install --dev --no-interaction
 
-before_script:
-    - sed -i 's|<[/]\?log[^>]*>||' phpunit.xml
-
 script: bash ./scripts/run-tests.sh
 
 after_script: php vendor/bin/coveralls -v
