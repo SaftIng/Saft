@@ -36,6 +36,21 @@ commit:
 	make codesniffer
 	git-cola
 
+# Remove all subpackages branches
+remove-subpackage-branches:
+	git branch -D saft.arc2
+	git branch -D saft.data
+	git branch -D saft.easyrdf
+	git branch -D saft.erfurt
+	git branch -D saft.querycache
+	git branch -D saft.rdf
+	git branch -D saft.redland
+	git branch -D saft.sparql
+	git branch -D saft.store
+	git branch -D saft.store.http
+	git branch -D saft.store.virtuoso
+	git branch -D saft.test
+
 # Remove all remotes for Saft's subpackages.
 remove-subpackage-remotes:
 	git remote rm saft.arc2
