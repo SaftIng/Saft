@@ -25,7 +25,7 @@
         }
     ],
     "require": {
-        "php": ">=5.4",
+        "php": ">=5.6",
         "saft/saft-rdf": ">=0.8",
         "saft/saft-sparql": ">=0.8"
     },
