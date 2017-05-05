@@ -15,7 +15,7 @@ abstract class AbstractLiteral implements Literal
      */
     public function __construct(RdfHelpers $rdfHelpers)
     {
-        $this->nodeUtils = $rdfHelpers;
+        $this->rdfHelpers = $rdfHelpers;
     }
 
     /**
