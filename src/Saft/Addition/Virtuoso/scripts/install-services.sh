@@ -97,7 +97,7 @@ then
 		exit $E_UNREACHABLE
 	fi
 
-	./openrdf-sesame-$SESAME/bin/console.sh < $BASE_PATH/scripts/travis/openrdf-sesame-memory-repository.txt
+	./openrdf-sesame-$SESAME/bin/console.sh < $BASE_PATH/scripts/openrdf-sesame-memory-repository.txt
 fi
 
 # Version 1.1.4-1 is available but has a problem
@@ -174,7 +174,7 @@ then
 
 	sleep 15
 
-	sudo /usr/local/virtuoso-opensource/bin/isql-v 1111 dba dba $BASE_PATH/scripts/travis/virtuoso-sparql-permission.sql
+	sudo /usr/local/virtuoso-opensource/bin/isql-v 1111 dba dba $BASE_PATH/scripts/virtuoso-sparql-permission.sql
 
 	# configure datasource name for ODBC connection
 	echo "[VOS]" | sudo tee -a /etc/odbc.ini > /dev/null
@@ -198,7 +198,7 @@ then
 	#wget http://downloads.sourceforge.net/project/bigdata/bigdata/$BLAZEGRAPH/bigdata.war
 
 	#cp bigdata.war /var/lib/tomcat6/webapps/
-	#export JAVA_OPTS="-server -Xmx2g -Dcom.bigdata.rdf.sail.webapp.ConfigParams.propertyFile="$BASE_PATH/scripts/travis/blazegraph-store.properties
+	#export JAVA_OPTS="-server -Xmx2g -Dcom.bigdata.rdf.sail.webapp.ConfigParams.propertyFile="$BASE_PATH/scripts/blazegraph-store.properties
 
 	#sudo service tomcat6 restart
 	#sleep 3
@@ -208,7 +208,7 @@ then
 	# wget http://downloads.sourceforge.net/project/bigdata/bigdata/$BLAZEGRAPH/bigdata-bundled.jar
 	wget https://github.com/mwjames/travis-support/raw/master/blazegraph/$BLAZEGRAPH/bigdata-bundled.jar
 
-	java -server -Xmx4g -Dbigdata.propertyFile=$BASE_PATH/scripts/travis/blazegraph-store.properties -jar bigdata-bundled.jar &>/dev/null &
+	java -server -Xmx4g -Dbigdata.propertyFile=$BASE_PATH/scripts/blazegraph-store.properties -jar bigdata-bundled.jar &>/dev/null &
 	sleep 5
 
 	if curl --output /dev/null --silent --head --fail "http://localhost:9999/bigdata"

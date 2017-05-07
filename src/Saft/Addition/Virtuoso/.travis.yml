@@ -19,6 +19,7 @@ matrix:
         - env: VIRTUOSO=6.1.4
         - env: VIRTUOSO=6.1.6
         - php: nightly
+        - php: hhvm
 
 cache:
     directories:
