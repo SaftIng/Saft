@@ -10,6 +10,8 @@ matrix:
     fast_finish: true
     include:
         - php: hhvm
+    allow_failures:
+        - php: hhvm
 
 cache:
     directories:
