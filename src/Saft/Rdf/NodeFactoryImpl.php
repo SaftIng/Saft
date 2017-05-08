@@ -14,7 +14,7 @@ class NodeFactoryImpl implements NodeFactory
      */
     public function __construct(RdfHelpers $rdfHelpers)
     {
-        $this->nodeUtils = $rdfHelpers;
+        $this->rdfHelpers = $rdfHelpers;
     }
 
     /**
@@ -31,12 +31,12 @@ class NodeFactoryImpl implements NodeFactory
                 throw new \Exception("Argument datatype has to be a named node.");
             }
         }
-        return new LiteralImpl($this->nodeUtils, $value, $datatype, $lang);
+        return new LiteralImpl($this->rdfHelpers, $value, $datatype, $lang);
     }
 
     public function createNamedNode($uri)
     {
-        return new NamedNodeImpl($this->nodeUtils, $uri);
+        return new NamedNodeImpl($this->rdfHelpers, $uri);
     }
 
     public function createBlankNode($blankId)
@@ -57,7 +57,7 @@ class NodeFactoryImpl implements NodeFactory
      */
     public function createNodeFromNQuads($string)
     {
-        $regex = '/' . $this->nodeUtils->getRegexStringForNodeRecognition(
+        $regex = '/' . $this->rdfHelpers->getRegexStringForNodeRecognition(
             true, true, true, true, true, true
         ) .'/si';
 
@@ -84,7 +84,7 @@ class NodeFactoryImpl implements NodeFactory
         } elseif ('"' == $firstChar) {
             return $this->createLiteral($matches[15]);
         // _:foo
-        } elseif ($this->nodeUtils->simpleCheckBlankNodeId($matches[0])) {
+        } elseif ($this->rdfHelpers->simpleCheckBlankNodeId($matches[0])) {
             return $this->createBlankNode($matches[4]);
         // 0-9 (simple number, multi digits)
         } elseif (0 < (int)$matches[0]) {

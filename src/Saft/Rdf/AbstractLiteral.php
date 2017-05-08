@@ -132,7 +132,7 @@ abstract class AbstractLiteral implements Literal
      */
     public function toNQuads()
     {
-        $string = '"' . $this->nodeUtils->encodeStringLitralForNQuads($this->getValue()) . '"';
+        $string = '"' . $this->rdfHelpers->encodeStringLitralForNQuads($this->getValue()) . '"';
 
         if ($this->getLanguage() !== null) {
             $string .= '@' . $this->getLanguage();

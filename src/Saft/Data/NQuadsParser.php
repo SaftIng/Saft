@@ -35,7 +35,7 @@ class NQuadsParser implements Parser
         RdfHelpers $rdfHelpers
     ) {
         $this->nodeFactory = $nodeFactory;
-        $this->nodeUtils = $rdfHelpers;
+        $this->rdfHelpers = $rdfHelpers;
         $this->statementFactory = $statementFactory;
         $this->statementIteratorFactory = $statementIteratorFactory;
     }
@@ -65,19 +65,19 @@ class NQuadsParser implements Parser
     public function parseStringToIterator($inputString, $baseUri = null)
     {
         // check $baseUri
-        if (null !== $baseUri && false == $this->nodeUtils->simpleCheckURI($baseUri)) {
+        if (null !== $baseUri && false == $this->rdfHelpers->simpleCheckURI($baseUri)) {
             throw new \Exception('No base URI support for now. To continue, just leave $baseUri = null.');
         }
 
         $statements = array();
 
         $pattern = '/' .
-            $this->nodeUtils->getRegexStringForNodeRecognition(true) .'\s*|\t*'.
-            $this->nodeUtils->getRegexStringForNodeRecognition() .'\s*|\t*'.
-            $this->nodeUtils->getRegexStringForNodeRecognition(
+            $this->rdfHelpers->getRegexStringForNodeRecognition(true) .'\s*|\t*'.
+            $this->rdfHelpers->getRegexStringForNodeRecognition() .'\s*|\t*'.
+            $this->rdfHelpers->getRegexStringForNodeRecognition(
                 true, true, true, true, true, true
             ) . '\s*|\t*'.
-            $this->nodeUtils->getRegexStringForNodeRecognition() .
+            $this->rdfHelpers->getRegexStringForNodeRecognition() .
             '/is';
 
         foreach (explode(PHP_EOL, $inputString) as $line) {

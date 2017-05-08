@@ -38,7 +38,7 @@ class RDFXMLParser implements Parser
         RdfHelpers $rdfHelpers
     ) {
         $this->nodeFactory = $nodeFactory;
-        $this->nodeUtils = $rdfHelpers;
+        $this->rdfHelpers = $rdfHelpers;
         $this->statementFactory = $statementFactory;
         $this->statementIteratorFactory = $statementIteratorFactory;
     }
@@ -68,7 +68,7 @@ class RDFXMLParser implements Parser
     public function parseStringToIterator($inputString, $baseUri = null)
     {
         // check $baseUri
-        if (null !== $baseUri && false == $this->nodeUtils->simpleCheckURI($baseUri)) {
+        if (null !== $baseUri && false == $this->rdfHelpers->simpleCheckURI($baseUri)) {
             throw new \Exception('No base URI support for now. To continue, just leave $baseUri = null.');
         }
 
@@ -125,7 +125,7 @@ class RDFXMLParser implements Parser
 
                             // object is URI
                             if (isset($objectValue['attributes'][$rdfResourceString])
-                                && $this->nodeUtils->simpleCheckURI(
+                                && $this->rdfHelpers->simpleCheckURI(
                                     $objectValue['attributes'][$rdfResourceString])
                                 ) {
 
@@ -134,7 +134,7 @@ class RDFXMLParser implements Parser
                                 );
 
                             // object is blank node
-                            } elseif ($this->nodeUtils->simpleCheckBlankNodeId($objectValue['value'])) {
+                            } elseif ($this->rdfHelpers->simpleCheckBlankNodeId($objectValue['value'])) {
                                 $object = $this->nodeFactory->createBlankNode($objectValue['value']);
 
                             // guess object is of type literal
