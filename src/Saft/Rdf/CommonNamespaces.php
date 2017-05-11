@@ -93,12 +93,37 @@ class CommonNamespaces
         return false == strpos($string, '://');
     }
 
+    /**
+     * @param string $uri
+     * @return string
+     */
     public function shortenUri($uri)
     {
+        $longestNamespaceInfo = null;
+
         foreach ($this->namespaces as $ns => $nsUri) {
+            // prefix found
             if (false !== strpos($uri, $nsUri)) {
-                return str_replace($nsUri, $ns .':', $uri);
+                if (null == $longestNamespaceInfo) {
+                    $longestNamespaceInfo = array(
+                        'ns' => $ns,
+                        'nsUri' => $nsUri
+                    );
+                    continue;
+                }
+
+                if (strlen($nsUri) > strlen($longestNamespaceInfo['nsUri'])) {
+                    $longestNamespaceInfo = array(
+                        'ns' => $ns,
+                        'nsUri' => $nsUri
+                    );
+                }
             }
+        }
+
+        // prefer the prefix with the longest URI to avoid results like foo:bar/fff
+        if (null !== $longestNamespaceInfo) {
+            return str_replace($longestNamespaceInfo['nsUri'], $longestNamespaceInfo['ns'] .':', $uri);
         }
 
         return $uri;
