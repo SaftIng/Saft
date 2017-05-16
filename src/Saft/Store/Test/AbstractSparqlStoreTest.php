@@ -35,7 +35,7 @@ class AbstractSparqlStoreTest extends TestCase
     /**
      * @var string
      */
-    protected $regexUri = '[a-z0-9:\/#-\.]+';
+    protected $regexUri = '[a-zA-Z0-9:\/#-\.]+';
 
     public function setUp()
     {
@@ -237,6 +237,83 @@ class AbstractSparqlStoreTest extends TestCase
         );
     }
 
+    // test that no graph is getting used
+    public function testAddStatementsWithoutGraph()
+    {
+        /*
+            check that query function gets a query which looks like:
+            INSERT DATA {
+                    <http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.
+            }
+         */
+        $this->mock
+            ->expects($this->once())
+            ->method('query')
+            ->with(new RegexMatchConstraint(
+                '/INSERTDATA{'.
+                '<'. $this->regexUri .'><'. $this->regexUri .'><'. $this->regexUri .'>.'.
+                '}/si'
+            ));
+
+        // use the given graphUri
+        $this->assertNull($this->mock->addStatements(array(
+            $this->getTestStatement('uri', 'uri', 'uri')
+        )));
+    }
+
+    // test if statement graph is preferred.
+    public function testAddStatementsWithStatementGraph()
+    {
+        /*
+            check that query function gets a query which looks like:
+            INSERT DATA {
+                Graph <http://saft/test/foograph> {
+                    <http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.
+            } }
+         */
+        $this->mock
+            ->expects($this->once())
+            ->method('query')
+            ->with(new RegexMatchConstraint(
+                '/INSERTDATA{Graph<http:\/\/saft\/test\/g>{'.
+                '<'. $this->regexUri .'><'. $this->regexUri .'><'. $this->regexUri .'>.'.
+                '}}/si'
+            ));
+
+        // use the given graphUri
+        $this->assertNull($this->mock->addStatements(array(
+            $this->getTestStatement('uri', 'uri', 'uri', 'uri')
+        )));
+    }
+
+    // test handling of un-concrete statements
+    public function testAddStatementsUnconcreteStatements()
+    {
+        $this->setExpectedException('\Exception');
+
+        $this->mock->addStatements(array(
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createAnyPattern(),
+                $this->nodeFactory->createAnyPattern(),
+                $this->nodeFactory->createAnyPattern()
+            )
+        ));
+    }
+
+    /*
+     * Tests for createGraph
+     */
+
+    public function testCreateGraph()
+    {
+        $this->mock
+            ->expects($this->once())
+            ->method('query')
+            ->with(new RegexMatchConstraint('/CREATESILENTGRAPH<'. $this->regexUri .'>/si'));
+
+        $this->mock->createGraph($this->testGraph);
+    }
+
     /*
      * Tests for deleteMatchingStatements
      */
@@ -262,6 +339,62 @@ class AbstractSparqlStoreTest extends TestCase
 
         $this->mock->deleteMatchingStatements(
             $this->getTestStatement('uri', 'uri', 'uri', 'uri')
+        );
+    }
+
+    public function testDeleteMatchingStatementsUseGivenGraph()
+    {
+        /*
+            check that query function gets a query which looks like:
+            DELETE WHERE {
+                Graph <http://saft/test/g1> {
+                    <http://saft/test/s1> <http://saft/test/p1> <http://saft/test/o1>.
+                }
+            }
+         */
+        $this->mock
+            ->expects($this->once())
+            ->method('query')
+            ->with(new RegexMatchConstraint(
+                '/DELETEWHERE{Graph<'. $this->regexUri .'>{'.
+                '<'. $this->regexUri .'><'. $this->regexUri .'><'. $this->regexUri .'>.'.
+                '}}/si'
+            ));
+
+        $this->mock->deleteMatchingStatements(
+            $this->getTestStatement('uri', 'uri', 'uri'), $this->testGraph
+        );
+    }
+
+    /*
+     * Tests for dropGraph
+     */
+
+    public function testDropGraph()
+    {
+        $this->mock
+            ->expects($this->once())
+            ->method('query')
+            ->with(new RegexMatchConstraint('/DROPSILENTGRAPH<'. $this->regexUri .'>/si'));
+
+        $this->mock->dropGraph($this->testGraph);
+    }
+
+    /*
+     * Tests for getGraphs
+     */
+
+    public function testGetGraphs()
+    {
+        $this->mock
+            ->expects($this->once())
+            ->method('query')
+            ->with(new RegexMatchConstraint('/SELECTDISTINCT\?gWHERE{GRAPH\?g{\?s\?p\?o.}}/si'))
+            ->will($this->returnValue(array(array('g' => $this->testGraph))));
+
+        $this->assertEquals(
+            array($this->testGraph->getUri() => $this->testGraph),
+            $this->mock->getGraphs($this->testGraph)
         );
     }
 
@@ -335,6 +468,25 @@ class AbstractSparqlStoreTest extends TestCase
         $this->assertNull($result);
     }
 
+    public function testHasMatchingStatementGraphNotNamedNode()
+    {
+        // check that query function gets a query which looks like:
+        // ASK { Graph ?tempVar... { ?tempVar... <http://saft/test/p1> <http://saft/test/o1> . }}
+        $this->mock
+            ->expects($this->once())
+            ->method('query')
+            ->with(new RegexMatchConstraint(
+                '/ASK{Graph'. $this->regexPattern .'{'.
+                $this->regexPattern .'<'. $this->regexUri .'><'. $this->regexUri .'>.'.
+                '}}/i'
+            ));
+
+        $result = $this->mock->hasMatchingStatement(
+            $this->getTestStatement('pattern', 'uri', 'uri', 'pattern')
+        );
+        $this->assertNull($result);
+    }
+
     /*
      * Tests for that the pattern-variable is recognized properly.
      */
@@ -377,5 +529,68 @@ class AbstractSparqlStoreTest extends TestCase
         );
 
         $this->assertNull($result);
+    }
+
+    /*
+     * Tests for transformEntryToNode
+     */
+
+    public function testTransformEntryToNode()
+    {
+        // blank node (by value check)
+        $this->assertEquals(
+            $this->mock->transformEntryToNode(array('value' => '_:foo')),
+            $this->nodeFactory->createBlankNode('_:foo')
+        );
+
+        // blank node (by type check)
+        $this->assertEquals(
+            $this->mock->transformEntryToNode(array('type' => 'bnode', 'value' => '_:foo')),
+            $this->nodeFactory->createBlankNode('_:foo')
+        );
+
+        // literal
+        $this->assertEquals(
+            $this->mock->transformEntryToNode(array(
+                'xml:lang' => 'lang',
+                'type' => 'literal',
+                'value' => 'foo'
+            )),
+            $this->nodeFactory->createLiteral(
+                'foo',
+                'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
+                'lang'
+            )
+        );
+
+        // typed-literal
+        $this->assertEquals(
+            $this->mock->transformEntryToNode(array(
+                'datatype' => 'http://dt',
+                'type' => 'typed-literal',
+                'value' => 'foo'
+            )),
+            $this->nodeFactory->createLiteral(
+                'foo',
+                'http://dt'
+            )
+        );
+
+        // named node
+        $this->assertEquals(
+            $this->mock->transformEntryToNode(array(
+                'type' => 'uri',
+                'value' => 'http://foo'
+            )),
+            $this->nodeFactory->createNamedNode('http://foo')
+        );
+    }
+
+    // test for exception when invalid type was given
+    public function testTransformEntryToNodeInvalidType()
+    {
+        $this->setExpectedException('\Exception');
+
+        $this->mock->transformEntryToNode(array('type' => 'invalid-type'));
     }
 }

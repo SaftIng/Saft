@@ -5,7 +5,7 @@ namespace Saft\Rdf;
 class NodeFactoryImpl implements NodeFactory
 {
     /**
-     * @var NodeUtils
+     * @var RdfHelpers
      */
     protected $rdfHelpers;
 
@@ -21,6 +21,7 @@ class NodeFactoryImpl implements NodeFactory
      * @param string $value
      * @param Node|string $datatype (optional)
      * @param string $lang (optional)
+     * @return Literal
      */
     public function createLiteral($value, $datatype = null, $lang = null)
     {
@@ -34,16 +35,25 @@ class NodeFactoryImpl implements NodeFactory
         return new LiteralImpl($this->rdfHelpers, $value, $datatype, $lang);
     }
 
+    /*
+     * @return NamedNode
+     */
     public function createNamedNode($uri)
     {
         return new NamedNodeImpl($this->rdfHelpers, $uri);
     }
 
+    /*
+     * @return BlankNode
+     */
     public function createBlankNode($blankId)
     {
         return new BlankNodeImpl($blankId);
     }
 
+    /*
+     * @return AnyPattern
+     */
     public function createAnyPattern()
     {
         return new AnyPatternImpl();
@@ -53,6 +63,7 @@ class NodeFactoryImpl implements NodeFactory
      * Creates an RDF Node based on a N-Triples/N-Quads node string.
      *
      * @param $string string the N-Triples/N-Quads node string
+     * @return Node
      * @throws \Exception if no node could be created e.g. because of a syntax error in the node string
      */
     public function createNodeFromNQuads($string)

@@ -186,11 +186,7 @@ abstract class AbstractSparqlStore implements Store
      */
     public function createGraph(NamedNode $graph, array $options = array())
     {
-        if ($graph->isNamed()) {
-            $this->query('CREATE SILENT GRAPH <'. $graph->getUri() .'>');
-        } else {
-            throw new \Exception('Given $graph is not a NamedNode.');
-        }
+        $this->query('CREATE SILENT GRAPH <'. $graph->getUri() .'>');
     }
 
     /**
@@ -237,11 +233,7 @@ abstract class AbstractSparqlStore implements Store
      */
     public function dropGraph(NamedNode $graph, array $options = array())
     {
-        if ($graph->isNamed()) {
-            $this->query('DROP SILENT GRAPH <'. $graph->getUri() .'>');
-        } else {
-            throw new \Exception('Given $graph is not a NamedNode.');
-        }
+        $this->query('DROP SILENT GRAPH <'. $graph->getUri() .'>');
     }
 
     /**
@@ -430,9 +422,11 @@ abstract class AbstractSparqlStore implements Store
          */
 
         // it seems that for instance Virtuoso returns type=literal for bnodes,
-        // so we manually fix that here to avoid that problem if other stores act
+        // so we manually fix that here to avoid that problem, if other stores act
         // the same
-        if (true === is_string($entry['value']) && false !== strpos($entry['value'], '_:')) {
+        if (isset($entry['value'])
+            && true === is_string($entry['value'])
+            && false !== strpos($entry['value'], '_:')) {
             $entry['type'] = 'bnode';
         }
 

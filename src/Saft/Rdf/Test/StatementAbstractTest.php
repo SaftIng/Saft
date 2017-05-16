@@ -77,10 +77,13 @@ abstract class StatementAbstractTest extends TestCase
 
         $this->assertFalse($fixtureA->isConcrete());
         $this->assertTrue($fixtureA->isPattern());
+
         $this->assertTrue($fixtureB->isConcrete());
         $this->assertFalse($fixtureB->isPattern());
+
         $this->assertFalse($fixtureC->isConcrete());
         $this->assertTrue($fixtureC->isPattern());
+
         $this->assertTrue($fixtureD->isConcrete());
         $this->assertFalse($fixtureD->isPattern());
     }

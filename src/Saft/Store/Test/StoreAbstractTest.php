@@ -11,7 +11,6 @@ use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactoryImpl;
-use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Result\EmptyResultImpl;
 use Saft\Sparql\Result\ResultFactoryImpl;
 use Saft\Sparql\Result\SetResultImpl;
@@ -20,10 +19,11 @@ use Saft\Sparql\Result\ValueResultImpl;
 use Saft\Test\TestCase;
 use Symfony\Component\Yaml\Parser;
 
+/**
+ * @codeCoverageIgnore
+ */
 abstract class StoreAbstractTest extends TestCase
 {
-    protected $sparqlUtils;
-
     public function setUp()
     {
         parent::setUp();
