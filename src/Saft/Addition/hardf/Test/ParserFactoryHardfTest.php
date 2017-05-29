@@ -35,17 +35,4 @@ class ParserFactoryHardfTest extends ParserFactoryAbstractTest
             new RdfHelpers()
         );
     }
-
-    public function testBum()
-    {
-        $str = '<http://foo> <http://bar> <http://baz> ;
-                    <http://bar2> "hey"@de ;
-                    <http://bar3> [
-                        <http://bar4> "hi"^^<http://xsd#string>
-                    ] .';
-
-        $instance = $this->newInstance();
-        $parser = $instance->createParserFor('turtle');
-        $iterator = $parser->parseStringToIterator($str);
-    }
 }
