@@ -12,6 +12,7 @@ components[store]=src/Saft/Store
 # additions
 components[arc2]=src/Saft/Addition/ARC2
 components[easyrdf]=src/Saft/Addition/EasyRdf
+components[hardf]=src/Saft/Addition/hardf
 components[erfurt]=src/Saft/Addition/Erfurt
 components[httpstore]=src/Saft/Addition/HttpStore
 components[querycache]=src/Saft/Addition/QueryCache

@@ -42,6 +42,7 @@ remove-subpackage-branches:
 	git branch -D saft.data
 	git branch -D saft.easyrdf
 	git branch -D saft.erfurt
+	git branch -D saft.hardf
 	git branch -D saft.querycache
 	git branch -D saft.rdf
 	git branch -D saft.redland
@@ -57,6 +58,7 @@ remove-subpackage-remotes:
 	git remote rm saft.data
 	git remote rm saft.easyrdf
 	git remote rm saft.erfurt
+	git remote rm saft.hardf
 	git remote rm saft.querycache
 	git remote rm saft.rdf
 	git remote rm saft.redland
@@ -75,6 +77,7 @@ setup-subpackage-remotes:
 	git remote add saft.data git@github.com:SaftIng/Saft.data
 	git remote add saft.easyrdf git@github.com:SaftIng/Saft.easyrdf
 	git remote add saft.erfurt git@github.com:SaftIng/Saft.erfurt
+	git remote add saft.hardf git@github.com:SaftIng/Saft.hardf
 	git remote add saft.querycache git@github.com:SaftIng/Saft.querycache
 	git remote add saft.rdf git@github.com:SaftIng/Saft.rdf
 	git remote add saft.redland git@github.com:SaftIng/Saft.redland
