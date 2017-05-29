@@ -142,28 +142,32 @@ abstract class ParserAbstractTest extends TestCase
         $fixture = $this->newInstance('turtle');
 
         $testString = '@prefix ex: <http://saft/example/> .
-            _:foo  ex:knows ex:Bar ; ex:name  "Foo"^^<'. $xsdString .'> .
-            ex:Bar  ex:name  "Bar"^^<'. $xsdString .'> .';
+            _:foo  ex:knows ex:Bar ;
+                ex:name  "Foo"^^<'. $xsdString .'> .';
 
-        // build StatementIterator to check against
-        $statementIteratorToCheckAgainst = new ArrayStatementIteratorImpl(array(
-            new StatementImpl(
-                new BlankNodeImpl('_:genid1'),
-                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/knows'),
-                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Bar')
-            ),
-            new StatementImpl(
-                new BlankNodeImpl('_:genid1'),
-                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/name'),
-                new LiteralImpl(new RdfHelpers(), 'Foo', $xsdString)
-            ),
-            new StatementImpl(
-                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Bar'),
-                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/name'),
-                new LiteralImpl(new RdfHelpers(), 'Bar', $xsdString)
-            ),
-        ));
+        $result = $fixture->parseStringToIterator($testString);
 
-        $this->assertEquals($statementIteratorToCheckAgainst, $fixture->parseStringToIterator($testString));
+        $this->assertCountStatementIterator(2, $result);
+
+        // check generated triples
+        foreach ($result as $stmt) {
+            // subject needs to be a BlankNode
+            $this->assertTrue($stmt->getSubject()->isBlank());
+
+            // predicate check
+            $pUri = $stmt->getPredicate()->getUri();
+            $this->assertTrue(
+                'http://saft/example/knows' == $pUri || 'http://saft/example/name' == $pUri
+            );
+
+            // object check
+            $this->assertTrue($stmt->getObject()->isNamed() || $stmt->getObject()->isLiteral());
+
+            if ($stmt->getObject()->isNamed()) {
+                $this->assertEquals('http://saft/example/Bar', $stmt->getObject()->getUri());
+            } else { // isLiteral
+                $this->assertEquals('Foo', $stmt->getObject()->getValue());
+            }
+        }
     }
 }
