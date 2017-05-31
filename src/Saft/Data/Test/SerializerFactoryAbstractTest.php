@@ -5,6 +5,9 @@ namespace Saft\Data\Test;
 use Saft\Rdf\NodeUtils;
 use Saft\Test\TestCase;
 
+/**
+ * @codeCoverageIgnore
+ */
 abstract class SerializerFactoryAbstractTest extends TestCase
 {
     /**

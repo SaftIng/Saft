@@ -4,6 +4,9 @@ namespace Saft\Data\Test;
 
 use Saft\Test\TestCase;
 
+/**
+ * @codeCoverageIgnore
+ */
 abstract class ParserFactoryAbstractTest extends TestCase
 {
     /**

@@ -11,6 +11,9 @@ use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementImpl;
 use Saft\Test\TestCase;
 
+/**
+ * @codeCoverageIgnore
+ */
 abstract class ParserAbstractTest extends TestCase
 {
     /**
