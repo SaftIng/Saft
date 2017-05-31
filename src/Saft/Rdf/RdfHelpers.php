@@ -218,6 +218,10 @@ class RdfHelpers
         // RDF/XML
         } elseif (0 < preg_match('/<rdf:/i', $short, $matches)) {
             return 'rdf-xml';
+
+        // turtle
+        } elseif (0 < preg_match('/@prefix\s|@base\s/i', $short, $matches)) {
+            return 'turtle';
         }
 
         return null;

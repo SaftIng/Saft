@@ -125,9 +125,17 @@ class RdfHelpersTest extends TestCase
 
     public function testGuessFormat()
     {
+        // n-triples
         $this->assertEquals('n-triples', $this->fixture->guessFormat('<foo><bar>'));
         $this->assertEquals('n-triples', $this->fixture->guessFormat('<foo>'));
 
+        // rdf xml
+        $this->assertEquals('rdf-xml', $this->fixture->guessFormat('<rdf:aa'));
+
+        // turtle
+        $this->assertEquals('turtle', $this->fixture->guessFormat('@prefix foo:<http://bar>'));
+
+        // invalid strings
         $this->assertEquals(null, $this->fixture->guessFormat('<foo'));
         $this->assertEquals(null, $this->fixture->guessFormat('foo://>'));
     }
