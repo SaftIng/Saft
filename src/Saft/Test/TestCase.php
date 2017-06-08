@@ -2,6 +2,7 @@
 
 namespace Saft\Test;
 
+use Saft\Rdf\CommonNamespaces;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactoryImpl;
@@ -21,12 +22,18 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      */
     protected $configuration;
 
+    protected $commonNamespaces;
+
     /**
      * Contains an instance of the class to test.
      *
      * @var mixed
      */
     protected $fixture;
+
+    protected $nodeFactory;
+    protected $rdfHelpers;
+    protected $statementFactory;
 
     /**
      * @var NamedNode
@@ -348,6 +355,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
+        $this->commonNamespaces = new CommonNamespaces();
         $this->rdfHelpers = new RdfHelpers();
         $this->nodeFactory = new NodeFactoryImpl($this->rdfHelpers);
         $this->statementFactory = new StatementFactoryImpl($this->rdfHelpers);
