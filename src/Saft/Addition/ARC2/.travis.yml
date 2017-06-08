@@ -32,6 +32,6 @@ before_install:
     - composer require satooshi/php-coveralls:* --ignore-platform-reqs
     - travis_retry composer install --dev --no-interaction --ignore-platform-reqs
 
-script: vendor/bin/phpunit --bootstrap tests/bootstrap-travis.php --coverage-clover gen/coverage/clover.xml
+script: vendor/bin/phpunit --bootstrap Test/bootstrap-travis.php --coverage-clover gen/coverage/clover.xml
 
 after_script: php vendor/bin/coveralls -v
