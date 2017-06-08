@@ -7,6 +7,11 @@
 | Sparql         | [![Build Status](https://travis-ci.org/SaftIng/Saft.sparql.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.sparql) | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.sparql/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.sparql?branch=master) |
 | Store          | [![Build Status](https://travis-ci.org/SaftIng/Saft.store.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.store)   | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.store/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.store?branch=master)   |
 
+| Addition | Build Status                                                                                                              | Code Coverage                                                                                                                                                      |
+|:---------------|:--------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ARC2           | [![Build Status](https://travis-ci.org/SaftIng/Saft.arc2.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.arc2)     | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.arc2/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.arc2?branch=master)     |
+| hardf           | [![Build Status](https://travis-ci.org/SaftIng/Saft.hardf.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.hardf)     | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.hardf/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.hardf?branch=master)     |
+
 The Saft PHP framework provides RDF handling and support for Semantic Web technologies. It consists of the Saft.Library (_Saft.data_, _Saft.rdf_, _Saft.sparql_ and _Saft.store_) and Saft.Additions (e.g. adapter for triple stores or integration of libraries like ARC2 and EasyRdf).
 
 ## License
