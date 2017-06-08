@@ -1,0 +1,37 @@
+language: php
+dist: trusty
+
+addons:
+  apt:
+    packages:
+    - mysql-server-5.6
+    - mysql-client-core-5.6
+    - mysql-client-5.6
+
+php:
+    - '5.6'
+    - '7.0'
+    - '7.1'
+    - nightly
+
+matrix:
+    fast_finish: true
+    include:
+        - php: hhvm
+    allow_failures:
+        - php: hhvm
+
+cache:
+    directories:
+        - $HOME/.composer/cache
+
+sudo: true
+
+before_install:
+    - mysql -e 'CREATE DATABASE IF NOT EXISTS saft;'
+    - composer require satooshi/php-coveralls:* --ignore-platform-reqs
+    - travis_retry composer install --dev --no-interaction --ignore-platform-reqs
+
+script: vendor/bin/phpunit --bootstrap tests/bootstrap-travis.php --coverage-clover gen/coverage/clover.xml
+
+after_script: php vendor/bin/coveralls -v

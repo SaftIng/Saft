@@ -26,7 +26,11 @@ class ARC2Test extends StoreAbstractTest
     {
         parent::setUp();
 
-        $this->loadTestConfiguration(__DIR__ .'/../test-config.yml');
+        if (defined('IN_TRAVIS')) {
+            $this->loadTestConfiguration(__DIR__ .'/../test-config-travis.yml');
+        } else {
+            $this->loadTestConfiguration(__DIR__ .'/../test-config.yml');
+        }
 
         if (true === isset($this->configuration['arc2Config'])) {
             try {
