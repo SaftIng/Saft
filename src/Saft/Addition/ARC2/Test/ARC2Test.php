@@ -36,13 +36,13 @@ class ARC2Test extends StoreAbstractTest
         if (true === isset($this->configuration['arc2Config'])) {
             try {
                 $this->fixture = new ARC2(
-                    new NodeFactoryImpl(new RdfHelpers()),
-                    new StatementFactoryImpl(),
+                    $this->nodeFactory,
+                    $this->statementFactory,
                     new QueryFactoryImpl(new RdfHelpers()),
                     new ResultFactoryImpl(),
                     new StatementIteratorFactoryImpl(),
-                    new RdfHelpers(),
-                    new CommonNamespaces(),
+                    $this->rdfHelpers,
+                    $this->commonNamespaces,
                     $this->configuration['arc2Config']
                 );
             } catch (\Exception $e) {

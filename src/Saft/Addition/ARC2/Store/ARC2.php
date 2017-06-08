@@ -738,8 +738,7 @@ class ARC2 extends AbstractSparqlStore
 
                             case 'uri':
                                 // ARC2 seems to think that an email is a valid URI.
-                                if ($this->rdfHelpers->simpleCheckURI($row[$variable])
-                                    || $this->rdfHelpers->simpleCheckBlankNodeId($row[$variable])) {
+                                if ($this->rdfHelpers->simpleCheckURI($row[$variable])) {
                                     $newEntry[$variable] = $this->nodeFactory->createNamedNode($row[$variable]);
                                 // we force such things as literal
                                 } else {
@@ -749,6 +748,13 @@ class ARC2 extends AbstractSparqlStore
                                     );
                                 }
                                 break;
+
+                            case 'bnode':
+                                $newEntry[$variable] = $this->nodeFactory->createBlankNode(
+                                    substr($row[$variable], 2) // use ID without _:
+                                );
+                                break;
+
                         }
                     }
 

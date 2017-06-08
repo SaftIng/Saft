@@ -1181,6 +1181,53 @@ abstract class StoreAbstractTest extends TestCase
         $this->assertEquals(0, $this->countTriples($this->testGraph));
     }
 
+    // tests how blank nodes are getting handled in the result
+    public function testQueryScenarioBlankNodeHandling()
+    {
+        $this->fixture->dropGraph($this->testGraph);
+
+        $this->commonNamespaces->add('stat', 'http://statValue/');
+
+        $this->fixture->addStatements(array(
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createNamedNode('http://statValue/2'),
+                $this->nodeFactory->createNamedNode('rdf:type'),
+                $this->nodeFactory->createNamedNode('kno:StatisticValue'),
+                $this->testGraph
+            ),
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createNamedNode('http://statValue/2'),
+                $this->nodeFactory->createNamedNode('kno:computation-order'),
+                $this->nodeFactory->createBlankNode('genid1'),
+                $this->testGraph
+            ),
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createBlankNode('genid1'),
+                $this->nodeFactory->createNamedNode('kno:_0'),
+                $this->nodeFactory->createLiteral('[stat:1]'),
+                $this->testGraph
+            )
+        ));
+
+        $knoPrefix = $this->commonNamespaces->getUri('kno');
+        $result = $this->fixture->query('SELECT * FROM <'. $this->testGraph .'> WHERE {
+            <http://statValue/2> ?p ?o .
+            ?o ?p1 ?o1 .
+        }');
+
+        $this->assertEquals(
+            new SetResultImpl(array(
+                array(
+                    'p' => $this->nodeFactory->createNamedNode($knoPrefix . 'computation-order'),
+                    'o' => $result[0]['o'], // borrow blank node, because its random
+                    'p1' => $this->nodeFactory->createNamedNode($knoPrefix . '_0'),
+                    'o1' => $this->nodeFactory->createLiteral('[stat:1]'),
+                )
+            )),
+            $result
+        );
+    }
+
     // tests query function how it reacts if nothing was found.
     public function testQueryScenarioEmptyResult()
     {
