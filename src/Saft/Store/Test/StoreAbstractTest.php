@@ -1116,4 +1116,20 @@ abstract class StoreAbstractTest extends TestCase
         // check that test data was removed
         $this->assertEquals(0, $this->countTriples($this->testGraph));
     }
+
+    // tests query function how it reacts if nothing was found.
+    public function testQueryScenarioEmptyResult()
+    {
+        $this->fixture->dropGraph($this->testGraph);
+
+        // empty graph
+        $this->assertEquals(0, $this->countTriples($this->testGraph));
+
+        $result = $this->fixture->query('SELECT * FROM <'. $this->testGraph->getUri() .'> WHERE {
+            ?s ?p ?o.
+            ?s rdf:type foo:Bar .
+        }');
+
+        $this->assertCountStatementIterator(0, $result);
+    }
 }

@@ -657,59 +657,61 @@ class ARC2 extends AbstractSparqlStore
             $entries = array();
 
             // go through all rows
-            foreach ($result['result']['rows'] as $row) {
-                $newEntry = array();
+            if (isset($result['result']['rows'])) {
+                foreach ($result['result']['rows'] as $row) {
+                    $newEntry = array();
 
-                foreach ($result['result']['variables'] as $variable) {
-                    // checks for variable type
-                    // example: $row['s type']
-                    switch ($row[$variable .' type']) {
-                        // ARC2 does not differenciate between typed literal and literal, like Virtuoso does
-                        // for instance. You have to check for lang and datatype key by yourself.
-                        case 'literal':
-                            // if language is set
-                            if (isset($row[$variable .' lang'])) {
-                                $newEntry[$variable] = $this->nodeFactory->createLiteral(
-                                    $row[$variable],
-                                    // set standard datatype if language tag is given
-                                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
-                                    $row[$variable .' lang']
-                                );
+                    foreach ($result['result']['variables'] as $variable) {
+                        // checks for variable type
+                        // example: $row['s type']
+                        switch ($row[$variable .' type']) {
+                            // ARC2 does not differenciate between typed literal and literal, like Virtuoso does
+                            // for instance. You have to check for lang and datatype key by yourself.
+                            case 'literal':
+                                // if language is set
+                                if (isset($row[$variable .' lang'])) {
+                                    $newEntry[$variable] = $this->nodeFactory->createLiteral(
+                                        $row[$variable],
+                                        // set standard datatype if language tag is given
+                                        'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
+                                        $row[$variable .' lang']
+                                    );
 
-                            // if datatype is set
-                            } elseif (isset($row[$variable .' datatype'])) {
-                                $newEntry[$variable] = $this->nodeFactory->createLiteral(
-                                    $row[$variable],
-                                    $row[$variable .' datatype']
-                                );
+                                // if datatype is set
+                                } elseif (isset($row[$variable .' datatype'])) {
+                                    $newEntry[$variable] = $this->nodeFactory->createLiteral(
+                                        $row[$variable],
+                                        $row[$variable .' datatype']
+                                    );
 
-                            // if neither one is set, we assume its a string and use xsd:string as datatype
-                            } else {
-                                $newEntry[$variable] = $this->nodeFactory->createLiteral(
-                                    $row[$variable],
-                                    'http://www.w3.org/2001/XMLSchema#string'
-                                );
-                            }
+                                // if neither one is set, we assume its a string and use xsd:string as datatype
+                                } else {
+                                    $newEntry[$variable] = $this->nodeFactory->createLiteral(
+                                        $row[$variable],
+                                        'http://www.w3.org/2001/XMLSchema#string'
+                                    );
+                                }
 
-                            break;
+                                break;
 
-                        case 'uri':
-                            // ARC2 seems to think that an email is a valid URI.
-                            if ($this->rdfHelpers->simpleCheckURI($row[$variable])
-                                || $this->rdfHelpers->simpleCheckBlankNodeId($row[$variable])) {
-                                $newEntry[$variable] = $this->nodeFactory->createNamedNode($row[$variable]);
-                            // we force such things as literal
-                            } else {
-                                $newEntry[$variable] = $this->nodeFactory->createLiteral(
-                                    $row[$variable],
-                                    'http://www.w3.org/2001/XMLSchema#string'
-                                );
-                            }
-                            break;
+                            case 'uri':
+                                // ARC2 seems to think that an email is a valid URI.
+                                if ($this->rdfHelpers->simpleCheckURI($row[$variable])
+                                    || $this->rdfHelpers->simpleCheckBlankNodeId($row[$variable])) {
+                                    $newEntry[$variable] = $this->nodeFactory->createNamedNode($row[$variable]);
+                                // we force such things as literal
+                                } else {
+                                    $newEntry[$variable] = $this->nodeFactory->createLiteral(
+                                        $row[$variable],
+                                        'http://www.w3.org/2001/XMLSchema#string'
+                                    );
+                                }
+                                break;
+                        }
                     }
-                }
 
-                $entries[] = $newEntry;
+                    $entries[] = $newEntry;
+                }
             }
 
             // Create and fill SetResult instance
