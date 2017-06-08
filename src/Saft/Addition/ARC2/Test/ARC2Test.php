@@ -5,6 +5,7 @@ namespace Saft\Addition\ARC2\Test;
 use Saft\Addition\ARC2\Store\ARC2;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\CommonNamespaces;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\NamedNodeImpl;
@@ -41,6 +42,7 @@ class ARC2Test extends StoreAbstractTest
                     new ResultFactoryImpl(),
                     new StatementIteratorFactoryImpl(),
                     new RdfHelpers(),
+                    new CommonNamespaces(),
                     $this->configuration['arc2Config']
                 );
             } catch (\Exception $e) {
@@ -90,7 +92,7 @@ class ARC2Test extends StoreAbstractTest
     // gets deleted.
     public function testDropGraphEffects()
     {
-        $secondGraph = new NamedNodeImpl(new RdfHelpers(), $this->testGraph->getUri() . '2');
+        $secondGraph = $this->nodeFactory->createNamedNode($this->testGraph->getUri() . '2');
 
         $this->fixture->createGraph($secondGraph);
 
@@ -150,6 +152,7 @@ class ARC2Test extends StoreAbstractTest
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
             new RdfHelpers(),
+            new CommonNamespaces(),
             array()
         );
     }
@@ -166,6 +169,7 @@ class ARC2Test extends StoreAbstractTest
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
             new RdfHelpers(),
+            new CommonNamespaces(),
             array('database' => 'saft')
         );
     }
@@ -182,6 +186,7 @@ class ARC2Test extends StoreAbstractTest
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
             new RdfHelpers(),
+            new CommonNamespaces(),
             array('database' => 'saft', 'host' => 'localhost')
         );
     }
@@ -242,8 +247,8 @@ class ARC2Test extends StoreAbstractTest
                 ),
                 new StatementImpl(
                     $this->testGraph,
-                    new NamedNodeImpl(new RdfHelpers(), 'http://foobar/1'),
-                    new NamedNodeImpl(new RdfHelpers(), 'http://foobar/2'),
+                    $this->nodeFactory->createNamedNode('http://foobar/1'),
+                    $this->nodeFactory->createNamedNode('http://foobar/2'),
                     $this->testGraph
                 )
             )

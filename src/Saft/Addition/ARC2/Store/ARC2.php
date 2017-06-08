@@ -2,6 +2,7 @@
 
 namespace Saft\Addition\ARC2\Store;
 
+use Saft\Rdf\CommonNamespaces;
 use Saft\Rdf\NamedNode;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\Node;
@@ -34,6 +35,11 @@ class ARC2 extends AbstractSparqlStore
      * @var NodeFactory
      */
     protected $nodeFactory = null;
+
+    /**
+     * @var CommonNamespaces
+     */
+    protected $commonNamespaces = null;
 
     /**
      * @var RdfHelpers
@@ -80,9 +86,11 @@ class ARC2 extends AbstractSparqlStore
         ResultFactory $resultFactory,
         StatementIteratorFactory $statementIteratorFactory,
         RdfHelpers $rdfHelpers,
+        CommonNamespaces $commonNamespaces,
         array $configuration
     ) {
         $this->configuration = $configuration;
+        $this->commonNamespaces = $commonNamespaces;
 
         // Open connection
         $this->openConnection();
@@ -145,11 +153,29 @@ class ARC2 extends AbstractSparqlStore
             }
             // else: non-concrete Statement instances not allowed
 
+            // use full URIs, if available
+            $s = $statement->getSubject();
+            if ($s->isNamed()) {
+                $s = $this->nodeFactory->createNamedNode(
+                    $this->commonNamespaces->extendUri($statement->getSubject()->getUri())
+                );
+            }
+            $p = $this->nodeFactory->createNamedNode(
+                $this->commonNamespaces->extendUri($statement->getPredicate()->getUri())
+            );
+            $o = $statement->getObject();
+            if ($o->isNamed()) {
+                $o = $this->nodeFactory->createNamedNode(
+                    $this->commonNamespaces->extendUri($statement->getObject()->getUri())
+                );
+            }
+
+            // execute query
             $this->query(
                 'INSERT INTO <'. $graphUriToUse .'> {'
-                . $this->rdfHelpers->getNodeInSparqlFormat($statement->getSubject()) . ' '
-                . $this->rdfHelpers->getNodeInSparqlFormat($statement->getPredicate()) . ' '
-                . $this->rdfHelpers->getNodeInSparqlFormat($statement->getObject()) . ' . '
+                . $this->rdfHelpers->getNodeInSparqlFormat($s) . ' '
+                . $this->rdfHelpers->getNodeInSparqlFormat($p) . ' '
+                . $this->rdfHelpers->getNodeInSparqlFormat($o) . ' . '
                 . '}',
                 $options
             );
@@ -217,12 +243,28 @@ class ARC2 extends AbstractSparqlStore
             $graph = $statement->getGraph();
         }
 
+        // use full URIs, if available
+        $s = $statement->getSubject();
+        if ($s->isNamed()) {
+            $s = $this->nodeFactory->createNamedNode(
+                $this->commonNamespaces->extendUri($statement->getSubject()->getUri())
+            );
+        }
+        $p = $statement->getPredicate();
+        if ($p->isNamed()) {
+            $p = $this->nodeFactory->createNamedNode(
+                $this->commonNamespaces->extendUri($statement->getPredicate()->getUri())
+            );
+        }
+        $o = $statement->getObject();
+        if ($o->isNamed()) {
+            $o = $this->nodeFactory->createNamedNode(
+                $this->commonNamespaces->extendUri($statement->getObject()->getUri())
+            );
+        }
+
         // create triple statement, because we have to handle the graph extra
-        $tripleStatement = $this->statementFactory->createStatement(
-            $statement->getSubject(),
-            $statement->getPredicate(),
-            $statement->getObject()
-        );
+        $tripleStatement = $this->statementFactory->createStatement($s, $p, $o);
 
         $statementIterator = $this->statementIteratorFactory->createStatementIteratorFromArray(
             array($tripleStatement)

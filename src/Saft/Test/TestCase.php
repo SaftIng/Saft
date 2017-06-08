@@ -101,70 +101,89 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      */
     public function assertSetIteratorEquals(SetResult $expected, SetResult $actual)
     {
-        $entriesToCheck = array();
+        $expectedEntries = array();
         foreach ($expected as $entry) {
             // serialize entry and hash it afterwards to use it as key for $entriesToCheck array.
             // later on we only check the other list that each entry, serialized and hashed, has
             // its equal key in the list.
-
             // the structure of each entry is an associative array which contains Node instances.
             $entryString = '';
             foreach ($entry as $key => $nodeInstance) {
                 if ($nodeInstance->isConcrete()) {
                     // build a string of all entries of $entry and generate a hash based on that later on.
-                    $entryString .= $nodeInstance->toNQuads();
+                    $entryString .= $nodeInstance->toNQuads() . ' ';
                 } else {
                     throw new \Exception('Non-concrete Node instance in SetResult instance found.');
                 }
             }
-            $entriesToCheck[hash('sha256', $entryString)] = false;
+            $expectedEntries[$entryString] = $entry;
         }
 
-        // contains a list of all entries, which were not found in $expected.
-        $actualEntriesNotFound = array();
+        $actualEntries = array();
         foreach ($actual as $entry) {
             $entryString = '';
             foreach ($entry as $key => $nodeInstance) {
                 if ($nodeInstance->isConcrete()) {
                     // build a string of all entries of $entry and generate a hash based on that later on.
-                    $entryString .= $nodeInstance->toNQuads();
+                    $entryString .= $nodeInstance->toNQuads() . ' ';
                 } else {
                     throw new \Exception('Non-concrete Node instance in SetResult instance found.');
                 }
             }
-            $entryHash = hash('sha256', $entryString);
-            if (isset($entriesToCheck[$entryHash])) {
-                // if entry was found, mark it.
-                $entriesToCheck[$entryHash] = true;
-            } else {
-                // entry was not found
-                $actualEntriesNotFound[] = $entryHash;
+            $actualEntries[$entryString] = $entry;
+        }
+
+        $notFoundEntries = array();
+        foreach ($expectedEntries as $expectedEntry) {
+            $foundExpectedEntry = false;
+
+            // 1. generate a string which represents all nodes of an expected set entry
+            $expectedEntryString = '';
+            foreach ($expectedEntry as $nodeInstance) {
+                $expectedEntryString .= $nodeInstance->toNQuads() . ' ';
+            }
+
+            // 2. for each actual entry check their generated string against the expected one
+            foreach ($actualEntries as $actualEntry) {
+                $actualEntryString = '';
+                foreach ($actualEntry as $nodeInstance) {
+                    $actualEntryString .= $nodeInstance->toNQuads() . ' ';
+                }
+                if ($actualEntryString == $expectedEntryString) {
+                    $foundExpectedEntry = true;
+                    break;
+                }
+            }
+
+            if (false == $foundExpectedEntry) {
+                $notFoundEntries[] = $expectedEntryString;
             }
         }
 
-        $notCheckedEntries = array();
-        // check that all entries from $expected were checked
-        foreach ($entriesToCheck as $key => $value) {
-            if (!$value) {
-                $notCheckedEntries[] = $key;
-            }
+        // first simply check of the number of given actual entries and expected
+        if (count($actualEntries) != count($expectedEntries)) {
+            $this->fail('Expected '. count($expectedEntries) . ' entries, but got '. count($actualEntries));
         }
 
-        if (!empty($actualEntriesNotFound) || !empty($notCheckedEntries)) {
+        if (!empty($notFoundEntries)) {
+            echo PHP_EOL . PHP_EOL . 'Given entries, but not found:' . PHP_EOL;
+            var_dump($notFoundEntries);
 
-            $message = 'The StatementIterators are not equal.';
-
-            if (!empty($actualEntriesNotFound)) {
-                print_r($actualEntriesNotFound);
-                $message .= ' ' . count($actualEntriesNotFound) . ' Statements where not expected.';
+            echo PHP_EOL . PHP_EOL . 'Actual entries:' . PHP_EOL;
+            foreach ($actualEntries as $entries) {
+                echo '- ';
+                foreach ($entries as $entry) {
+                    echo $entry->toNQuads() .' ';
+                }
+                echo PHP_EOL;
+                echo PHP_EOL;
             }
 
-            if (!empty($notCheckedEntries)) {
-                print_r($notCheckedEntries);
-                $message .= ' ' . count($notCheckedEntries) . ' Statements where not present but expected.';
-            }
+            $this->fail(count($notFoundEntries) .' entries where not found.');
 
-            $this->fail($message);
+        // check variables in the end
+        } elseif (0 == count($notFoundEntries)) {
+            $this->assertEquals($expected->getVariables(), $actual->getVariables());
         }
     }
 
@@ -175,6 +194,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      * @param StatementIterator $expected
      * @param StatementIterator $actual
      * @param boolean $debug optional, default: false
+     * @todo implement a more precise way to check blank nodes (currently we just count expected
+     *       and actual numbers of statements with blank nodes)
      * @api
      * @since 0.1
      */
@@ -184,61 +205,78 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         $debug = false
     ) {
         $entriesToCheck = array();
+        $expectedStatementsWithBlankNodeCount = 0;
+
         foreach ($expected as $statement) {
             // serialize entry and hash it afterwards to use it as key for $entriesToCheck array.
             // later on we only check the other list that each entry, serialized and hashed, has
             // its equal key in the list.
             if (!$statement->isConcrete()) {
-                $this->markTestIncomplete("Comparison of variable statements in iterators not yet implemented.");
+                $this->markTestIncomplete('Comparison of variable statements in iterators not yet implemented.');
             }
-            $entriesToCheck[hash('sha256', $statement->toNQuads())] = false;
+            if ($this->statementContainsNoBlankNodes($statement)) {
+                $entriesToCheck[hash('sha256', $statement->toNQuads())] = false;
+            } else {
+                ++$expectedStatementsWithBlankNodeCount;
+            }
         }
 
         // contains a list of all entries, which were not found in $expected.
         $actualEntriesNotFound = array();
         $notCheckedEntries = array();
         $foundEntries = array();
+        $actualStatementsWithBlankNodeCount = 0;
 
         foreach ($actual as $statement) {
             if (!$statement->isConcrete()) {
                 $this->markTestIncomplete("Comparison of variable statements in iterators not yet implemented.");
             }
-
             $statmentHash = hash('sha256', $statement->toNQuads());
-            if (isset($entriesToCheck[$statmentHash])) {
+            // statements without blank nodes
+            if (isset($entriesToCheck[$statmentHash]) && $this->statementContainsNoBlankNodes($statement)) {
                 // if entry was found, mark it.
                 $entriesToCheck[$statmentHash] = true;
                 $foundEntries[] = $statement;
+
+            // handle statements with blank nodes separate because blanknode ID is random
+            // and therefore gets lost when stored (usually)
+            } elseif (false == $this->statementContainsNoBlankNodes($statement)) {
+                ++$actualStatementsWithBlankNodeCount;
+
+            // statement was not found
             } else {
-                // entry was not found
                 $actualEntriesNotFound[] = $statement;
                 $notCheckedEntries[] = $statement;
             }
         }
 
         if (!empty($actualEntriesNotFound) || !empty($notCheckedEntries)) {
-
             $message = 'The StatementIterators are not equal.';
-
             if (!empty($actualEntriesNotFound)) {
                 if ($debug) {
                     echo PHP_EOL . 'Following statements where not expected, but found: ';
                     var_dump($actualEntriesNotFound);
                 }
-
                 $message .= ' ' . count($actualEntriesNotFound) . ' Statements where not expected.';
             }
-
             if (!empty($notCheckedEntries)) {
                 if ($debug) {
                     echo PHP_EOL . 'Following statements where not present, but expected: ';
                     var_dump($notCheckedEntries);
                 }
-
                 $message .= ' ' . count($notCheckedEntries) . ' Statements where not present but expected.';
             }
-
             $this->assertFalse(!empty($actualEntriesNotFound) || !empty($notCheckedEntries), $message);
+
+        // compare count of statements with blank nodes
+        } elseif ($expectedStatementsWithBlankNodeCount != $actualStatementsWithBlankNodeCount) {
+            $this->assertFalse(
+                true,
+                'Some statements with blank nodes where not found. '
+                    . 'Expected: ' . $expectedStatementsWithBlankNodeCount
+                    . 'Actual: ' . $actualStatementsWithBlankNodeCount
+            );
+
         } else {
             $this->assertTrue(true);
         }
