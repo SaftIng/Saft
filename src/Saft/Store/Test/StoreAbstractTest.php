@@ -331,30 +331,28 @@ abstract class StoreAbstractTest extends TestCase
         // clear test graph
         $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
 
-        $knorkePrefix = 'https://raw.githubusercontent.com/k00ni/knorke/master/knowledge/knorke.ttl#';
-
         // add triples
         $this->fixture->addStatements(array(
             $this->statementFactory->createStatement(
                 $this->nodeFactory->createNamedNode('http://statValue/2'),
                 $this->nodeFactory->createNamedNode('rdf:type'),
-                $this->nodeFactory->createNamedNode('kno:StatisticValue'),
+                $this->nodeFactory->createNamedNode('http://stat/StatisticValue'),
                 $this->testGraph
             ),
         ));
 
         $result = $this->fixture->query('SELECT * FROM <'. $this->testGraph .'> WHERE {?s ?p ?o.}');
 
-        $this->assertSetIteratorEquals(
-            $result,
-            new SetResultImpl(array(
-                array(
-                    's' => $this->nodeFactory->createNamedNode('http://statValue/2'),
-                    'p' => $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                    'o' => $this->nodeFactory->createNamedNode($knorkePrefix . 'StatisticValue')
-                ),
-            ))
-        );
+        $expectedResult = new SetResultImpl(array(
+            array(
+                's' => $this->nodeFactory->createNamedNode('http://statValue/2'),
+                'p' => $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                'o' => $this->nodeFactory->createNamedNode('http://stat/StatisticValue')
+            ),
+        ));
+        $expectedResult->setVariables(array('s', 'p', 'o'));
+
+        $this->assertSetIteratorEquals($expectedResult, $result);
     }
 
     /*

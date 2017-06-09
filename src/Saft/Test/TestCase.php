@@ -5,6 +5,7 @@ namespace Saft\Test;
 use Saft\Rdf\CommonNamespaces;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\RdfHelpers;
+use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIterator;
 use Saft\Sparql\Result\Result;
@@ -360,5 +361,15 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         $this->nodeFactory = new NodeFactoryImpl($this->rdfHelpers);
         $this->statementFactory = new StatementFactoryImpl($this->rdfHelpers);
         $this->testGraph = $this->nodeFactory->createNamedNode('http://localhost/Saft/TestGraph/');
+    }
+
+    /**
+     * @param Statement $statement
+     * @return bool
+     */
+    protected function statementContainsNoBlankNodes(Statement $statement)
+    {
+        return false == $statement->getSubject()->isBlank()
+            && false == $statement->getObject()->isBlank();
     }
 }

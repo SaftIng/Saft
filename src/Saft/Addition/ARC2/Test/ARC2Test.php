@@ -18,6 +18,7 @@ use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\ResultFactoryImpl;
+use Saft\Sparql\Result\SetResultImpl;
 use Saft\Store\Test\StoreAbstractTest;
 use Symfony\Component\Yaml\Parser;
 
@@ -200,6 +201,120 @@ class ARC2Test extends StoreAbstractTest
     {
         // See: https://github.com/openlink/virtuoso-opensource/issues/417
         $this->markTestSkipped('ARC2 does not grant read and write access to the default graph.');
+    }
+
+    // test if ARC2 merges blank nodes
+    public function testQueryRegressionBlankNodeHandling()
+    {
+        $this->fixture->addStatements(array(
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createNamedNode('http://foo/bar1'),
+                $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                $this->nodeFactory->createNamedNode('http://foo/bar2'),
+                $this->testGraph
+            ),
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createNamedNode('http://foo/bar1'),
+                $this->nodeFactory->createNamedNode('http://foo/bar2'),
+                $this->nodeFactory->createLiteral('baz'),
+                $this->testGraph
+            ),
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createBlankNode('b0'),
+                $this->nodeFactory->createNamedNode('http://foo/bar4'),
+                $this->nodeFactory->createLiteral('foobar'),
+                $this->testGraph
+            ),
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createNamedNode('http://foo/bar1'),
+                $this->nodeFactory->createNamedNode('http://foo/bar3'),
+                $this->nodeFactory->createBlankNode('b0'),
+                $this->testGraph
+            ),
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createBlankNode('b1'),
+                $this->nodeFactory->createNamedNode('http://foo/event'),
+                $this->nodeFactory->createNamedNode('http://foo/foobar2'),
+                $this->testGraph
+            ),
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createBlankNode('b1'),
+                $this->nodeFactory->createNamedNode('http://foo/foobaz'),
+                $this->nodeFactory->createLiteral('true'),
+                $this->testGraph
+            ),
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createNamedNode('http://foo/bar1'),
+                $this->nodeFactory->createNamedNode('http://foo/bar3'),
+                $this->nodeFactory->createBlankNode('b1'),
+                $this->testGraph
+            ),
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createNamedNode('http://foo/Event'),
+                $this->nodeFactory->createNamedNode('http://foo/baz'),
+                $this->nodeFactory->createNamedNode('http://foo/baz2'),
+                $this->testGraph
+            ),
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createNamedNode('http://foo/foobar2'),
+                $this->nodeFactory->createNamedNode('http://foo/baz2'),
+                $this->nodeFactory->createNamedNode('http://foo/baz3'),
+                $this->testGraph
+            ),
+        ));
+
+        $resultToCheck = $this->fixture->query('SELECT * FROM <'. $this->testGraph .'> WHERE {?s ?p ?o.}');
+
+        $this->assertEquals(
+            new SetResultImpl(array(
+                array(
+                    's' => $this->nodeFactory->createNamedNode('http://foo/bar1'),
+                    'p' => $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                    'o' => $this->nodeFactory->createNamedNode('http://foo/bar2'),
+                ),
+                array(
+                    's' => $this->nodeFactory->createNamedNode('http://foo/bar1'),
+                    'p' => $this->nodeFactory->createNamedNode('http://foo/bar2'),
+                    'o' => $this->nodeFactory->createLiteral('baz')
+                ),
+                array(
+                    's' => $this->nodeFactory->createNamedNode('http://foo/bar1'),
+                    'p' => $this->nodeFactory->createNamedNode('http://foo/bar3'),
+                    'o' => $resultToCheck[2]['o'] // b0
+                ),
+                array(
+                    's' => $this->nodeFactory->createNamedNode('http://foo/bar1'),
+                    'p' => $this->nodeFactory->createNamedNode('http://foo/bar3'),
+                    'o' => $resultToCheck[3]['o'] // b1
+                ),
+                array(
+                    's' => $resultToCheck[2]['o'], // b0
+                    'p' => $this->nodeFactory->createNamedNode('http://foo/bar4'),
+                    'o' => $this->nodeFactory->createLiteral('foobar')
+                ),
+                array(
+                    's' => $resultToCheck[3]['o'], // b1
+                    'p' => $this->nodeFactory->createNamedNode('http://foo/event'),
+                    'o' => $this->nodeFactory->createNamedNode('http://foo/foobar2')
+                ),
+                array(
+                    's' => $resultToCheck[3]['o'], // b1
+                    'p' => $this->nodeFactory->createNamedNode('http://foo/foobaz'),
+                    'o' => $this->nodeFactory->createLiteral('true')
+                ),
+                array(
+                    's' => $this->nodeFactory->createNamedNode('http://foo/Event'),
+                    'p' => $this->nodeFactory->createNamedNode('http://foo/baz'),
+                    'o' => $this->nodeFactory->createNamedNode('http://foo/baz2')
+                ),
+                array(
+                    's' => $this->nodeFactory->createNamedNode('http://foo/foobar2'),
+                    'p' => $this->nodeFactory->createNamedNode('http://foo/baz2'),
+                    'o' => $this->nodeFactory->createNamedNode('http://foo/baz3')
+                ),
+            )),
+            $resultToCheck
+        );
     }
 
     /**
