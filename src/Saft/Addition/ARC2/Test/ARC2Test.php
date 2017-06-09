@@ -265,56 +265,56 @@ class ARC2Test extends StoreAbstractTest
 
         $resultToCheck = $this->fixture->query('SELECT * FROM <'. $this->testGraph .'> WHERE {?s ?p ?o.}');
 
-        $this->assertEquals(
-            new SetResultImpl(array(
-                array(
-                    's' => $this->nodeFactory->createNamedNode('http://foo/bar1'),
-                    'p' => $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                    'o' => $this->nodeFactory->createNamedNode('http://foo/bar2'),
-                ),
-                array(
-                    's' => $this->nodeFactory->createNamedNode('http://foo/bar1'),
-                    'p' => $this->nodeFactory->createNamedNode('http://foo/bar2'),
-                    'o' => $this->nodeFactory->createLiteral('baz')
-                ),
-                array(
-                    's' => $this->nodeFactory->createNamedNode('http://foo/bar1'),
-                    'p' => $this->nodeFactory->createNamedNode('http://foo/bar3'),
-                    'o' => $resultToCheck[2]['o'] // b0
-                ),
-                array(
-                    's' => $this->nodeFactory->createNamedNode('http://foo/bar1'),
-                    'p' => $this->nodeFactory->createNamedNode('http://foo/bar3'),
-                    'o' => $resultToCheck[3]['o'] // b1
-                ),
-                array(
-                    's' => $resultToCheck[2]['o'], // b0
-                    'p' => $this->nodeFactory->createNamedNode('http://foo/bar4'),
-                    'o' => $this->nodeFactory->createLiteral('foobar')
-                ),
-                array(
-                    's' => $resultToCheck[3]['o'], // b1
-                    'p' => $this->nodeFactory->createNamedNode('http://foo/event'),
-                    'o' => $this->nodeFactory->createNamedNode('http://foo/foobar2')
-                ),
-                array(
-                    's' => $resultToCheck[3]['o'], // b1
-                    'p' => $this->nodeFactory->createNamedNode('http://foo/foobaz'),
-                    'o' => $this->nodeFactory->createLiteral('true')
-                ),
-                array(
-                    's' => $this->nodeFactory->createNamedNode('http://foo/Event'),
-                    'p' => $this->nodeFactory->createNamedNode('http://foo/baz'),
-                    'o' => $this->nodeFactory->createNamedNode('http://foo/baz2')
-                ),
-                array(
-                    's' => $this->nodeFactory->createNamedNode('http://foo/foobar2'),
-                    'p' => $this->nodeFactory->createNamedNode('http://foo/baz2'),
-                    'o' => $this->nodeFactory->createNamedNode('http://foo/baz3')
-                ),
-            )),
-            $resultToCheck
-        );
+        $expectedResult = new SetResultImpl(array(
+            array(
+                's' => $this->nodeFactory->createNamedNode('http://foo/bar1'),
+                'p' => $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                'o' => $this->nodeFactory->createNamedNode('http://foo/bar2'),
+            ),
+            array(
+                's' => $this->nodeFactory->createNamedNode('http://foo/bar1'),
+                'p' => $this->nodeFactory->createNamedNode('http://foo/bar2'),
+                'o' => $this->nodeFactory->createLiteral('baz')
+            ),
+            array(
+                's' => $this->nodeFactory->createNamedNode('http://foo/bar1'),
+                'p' => $this->nodeFactory->createNamedNode('http://foo/bar3'),
+                'o' => $resultToCheck[2]['o'] // b0
+            ),
+            array(
+                's' => $this->nodeFactory->createNamedNode('http://foo/bar1'),
+                'p' => $this->nodeFactory->createNamedNode('http://foo/bar3'),
+                'o' => $resultToCheck[3]['o'] // b1
+            ),
+            array(
+                's' => $resultToCheck[2]['o'], // b0
+                'p' => $this->nodeFactory->createNamedNode('http://foo/bar4'),
+                'o' => $this->nodeFactory->createLiteral('foobar')
+            ),
+            array(
+                's' => $resultToCheck[3]['o'], // b1
+                'p' => $this->nodeFactory->createNamedNode('http://foo/event'),
+                'o' => $this->nodeFactory->createNamedNode('http://foo/foobar2')
+            ),
+            array(
+                's' => $resultToCheck[3]['o'], // b1
+                'p' => $this->nodeFactory->createNamedNode('http://foo/foobaz'),
+                'o' => $this->nodeFactory->createLiteral('true')
+            ),
+            array(
+                's' => $this->nodeFactory->createNamedNode('http://foo/Event'),
+                'p' => $this->nodeFactory->createNamedNode('http://foo/baz'),
+                'o' => $this->nodeFactory->createNamedNode('http://foo/baz2')
+            ),
+            array(
+                's' => $this->nodeFactory->createNamedNode('http://foo/foobar2'),
+                'p' => $this->nodeFactory->createNamedNode('http://foo/baz2'),
+                'o' => $this->nodeFactory->createNamedNode('http://foo/baz3')
+            ),
+        ));
+        $expectedResult->setVariables(array('s', 'p', 'o'));
+
+        $this->assertSetIteratorEquals($expectedResult, $resultToCheck);
     }
 
     /**
