@@ -321,7 +321,7 @@ class UpdateQueryImpl extends AbstractQuery
          * Save parts for WITH <> DELETE {} WHERE {}
          */
         } elseif ('withDeleteWhere' === $this->queryParts['sub_type']) {
-            preg_match('/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/', $this->getQuery(), $matches);
+            preg_match('/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/si', $this->getQuery(), $matches);
 
             if (true === isset($matches[1])) {
                 $this->queryParts['deleteData'] = trim($matches[2]);

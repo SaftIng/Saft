@@ -8,6 +8,14 @@ namespace Saft\Sparql\Result;
 class EmptyResultImpl implements Result
 {
     /**
+     * @return array
+     */
+    public function getVariables()
+    {
+        return array();
+    }
+
+    /**
      * @return boolean True
      */
     public function isEmptyResult()

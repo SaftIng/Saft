@@ -298,6 +298,20 @@ class UpdateQueryImplTest extends TestCase
         $this->assertEqualsArrays(array('s', 'p', 'o', 'x', 'y'), $queryParts['variables']);
     }
 
+    // test if it recognizes the query right
+    public function testGetQueryPartsWithDeleteWhereStatement()
+    {
+        $this->fixture = new UpdateQueryImpl(
+            'PREFIX backmodel: <https://back/model/>
+            WITH <https://data/>
+            DELETE { ?settings_blank ?p ?o . }
+            WHERE { <https://foo> backmodel:has-user-settings ?settings_blank . }',
+            new RdfHelpers()
+        );
+
+        $this->assertTrue(0 < $this->fixture->getQueryParts());
+    }
+
     public function testGetQueryPartsInsertDataMissingDataPart()
     {
         $this->fixture = new UpdateQueryImpl('INSERT DATA { }', new RdfHelpers());
