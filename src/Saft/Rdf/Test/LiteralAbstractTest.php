@@ -380,4 +380,22 @@ abstract class LiteralAbstractTest extends TestCase
         $this->assertTrue(is_string((string)$fixture));
         $this->assertTrue(strpos((string)$fixture, $fixture->getValue()) >= 0);
     }
+
+    /*
+     * check for literal with datatype and language
+     */
+    public function testWrongDatatypeLanguageLiteral()
+    {
+        $this->setExpectedException(\Exception::class);
+        $this->nodeFactory->createLiteral('TestLanguage', 'http://www.w3.org/2001/XMLSchema#boolean', 'de');
+    }
+
+    /*
+     * check for literal with language datatype and no language
+     */
+    public function testWrongDatatypeLiteral()
+    {
+        $this->setExpectedException(\Exception::class);
+        $this->nodeFactory->createLiteral('TestLanguage', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString');
+    }
 }
