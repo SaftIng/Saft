@@ -4,7 +4,7 @@
     "description": "Saft library provides tools and an infrastructure to build Semantic Web and Linked Data applications.",
     "keywords": ["Saft", "Linked Data", "Semantic Web", "RDF", "Triple Store", "Parser", "Serializer", "QueryCache"],
     "homepage": "https://safting.github.io/",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Natanael Arndt",

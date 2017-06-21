@@ -4,7 +4,7 @@
     "description": "Store package for library Saft.",
     "keywords": ["Saft", "Linked Data", "Semantic Web", "Store", "Triple Store"],
     "homepage": "https://safting.github.io/",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Natanael Arndt",

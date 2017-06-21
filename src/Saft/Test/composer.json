@@ -3,7 +3,7 @@
     "description": "Test package for Saft library.",
     "keywords": ["Saft", "Test"],
     "homepage": "https://safting.github.io/",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Natanael Arndt",
