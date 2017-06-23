@@ -97,8 +97,8 @@ class ARC2Test extends StoreAbstractTest
 
         $this->fixture->createGraph($secondGraph);
 
-        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri().'>');
-        $this->fixture->query('CLEAR GRAPH <'. $secondGraph->getUri().'>');
+        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
+        $this->fixture->query('CLEAR GRAPH <'. $secondGraph->getUri() .'>');
 
         // fill graph 1
         $this->fixture->addStatements(
@@ -201,5 +201,51 @@ class ARC2Test extends StoreAbstractTest
     {
         // See: https://github.com/openlink/virtuoso-opensource/issues/417
         $this->markTestSkipped('ARC2 does not grant read and write access to the default graph.');
+    }
+
+    // tests how it reacts, when it is called with multiple dropGraph calls and addStatements between
+    public function testRegressionMultipleDropGraphsWithAddStatements()
+    {
+        // recreate graph
+        $this->fixture->dropGraph($this->testGraph);
+        $this->assertEquals(0, count($this->fixture->getGraphs()));
+
+        $this->fixture->createGraph($this->testGraph);
+        $this->assertEquals(1, count($this->fixture->getGraphs()));
+
+        // add data
+        $this->fixture->addStatements(array(
+                $this->statementFactory->createStatement(
+                    $this->nodeFactory->createNamedNode('http://foo/1'),
+                    $this->nodeFactory->createNamedNode('http://foo/2'),
+                    $this->nodeFactory->createNamedNode('http://foo/3')
+                )
+            ),
+            $this->testGraph
+        );
+
+        $results = $this->fixture->query('SELECT ?s ?p ?o FROM <'. $this->testGraph .'> WHERE {?s ?p ?o.}');
+        $this->assertEquals(1, count($results));
+
+        // recreate graph
+        $this->fixture->dropGraph($this->testGraph);
+        $this->fixture->createGraph($this->testGraph);
+
+        // add data
+        $this->fixture->addStatements(
+            array(
+                $this->statementFactory->createStatement(
+                    $this->nodeFactory->createNamedNode($this->testGraph . '1'),
+                    $this->nodeFactory->createNamedNode($this->testGraph . '2'),
+                    $this->nodeFactory->createNamedNode($this->testGraph . '3')
+                )
+            ),
+            $this->testGraph
+        );
+
+        $results = $this->fixture->query('SELECT * FROM <'. $this->testGraph .'> WHERE {?s ?p ?o.}');
+        $this->assertEquals(1, count($results));
+
+        $this->fixture->dropGraph($this->testGraph);
     }
 }

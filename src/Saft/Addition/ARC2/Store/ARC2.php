@@ -119,7 +119,7 @@ class ARC2 extends AbstractSparqlStore
     }
 
     /**
-     * Adds multiple Statements to (default-) graph. It overrides parents addStatements because ARC2 only
+     * Adds multiple Statements to graph. It overrides parents addStatements because ARC2 only
      * supports SPARQL+ and not SPARQL Update 1.1, which means an INSERT INTO query has to look like:
      * INSERT INTO <http://graph/> { triple ... }.
      *
@@ -131,6 +131,7 @@ class ARC2 extends AbstractSparqlStore
      * @param  array                   $options optional Key-value pairs which provide additional
      *                                                   introductions for the store and/or its
      *                                                   adapter(s).
+     * @throws \Exception if one of the given Statements is not concrete.
      */
     public function addStatements($statements, Node $graph = null, array $options = array())
     {
@@ -170,15 +171,19 @@ class ARC2 extends AbstractSparqlStore
                 );
             }
 
-            // execute query
-            $this->query(
-                'INSERT INTO <'. $graphUriToUse .'> {'
+            $query = 'INSERT INTO <'. $graphUriToUse .'> {'
                 . $this->rdfHelpers->getNodeInSparqlFormat($s) . ' '
                 . $this->rdfHelpers->getNodeInSparqlFormat($p) . ' '
                 . $this->rdfHelpers->getNodeInSparqlFormat($o) . ' . '
-                . '}',
-                $options
-            );
+                . '}';
+
+            // execute query
+            $res = $this->store->query($query, $options);
+
+            if (0 == $res) {
+                var_dump($this->store->getErrors());
+                throw new \Exception('Insert query failed: '. $query);
+            }
         }
     }
 
@@ -192,17 +197,11 @@ class ARC2 extends AbstractSparqlStore
      */
     public function createGraph(NamedNode $graph, array $options = array())
     {
-        // table names
-        $g2t = $this->configuration['table-prefix'] . '_g2t';
-        $id2val = $this->configuration['table-prefix'] . '_id2val';
+        if (false === isset($this->getGraphs()[$graph->getUri()])) {
+            // table names
+            $g2t = $this->configuration['table-prefix'] . '_g2t';
+            $id2val = $this->configuration['table-prefix'] . '_id2val';
 
-        // check if there is already a graph with the given URI
-        $result = $this->store->queryDB(
-            'SELECT id FROM '. $id2val .' WHERE val = "'. $graph->getUri() .'";',
-            $this->store->getDBCon()
-        );
-
-        if (0 == $result->num_rows) {
             /*
              * for id2val table
              */
@@ -290,30 +289,7 @@ class ARC2 extends AbstractSparqlStore
      */
     public function dropGraph(NamedNode $graph, array $options = array())
     {
-        // let ARC2 remove all triples first, his way
         $this->store->query('DELETE FROM <'. $graph->getUri() .'>');
-
-        // table names
-        $g2t = $this->configuration['table-prefix'] . '_g2t';
-        $id2val = $this->configuration['table-prefix'] . '_id2val';
-
-        /*
-         * ask for all entries with the given graph URI
-         */
-        $query = 'SELECT id FROM '. $id2val .' WHERE val = "'. $graph->getUri() .'"';
-        $result = $this->store->queryDB($query, $this->store->getDBCon());
-
-        /*
-         * go through all given entries and remove all according entries in the g2t table
-         */
-        while ($row = $result->fetch_assoc()) {
-            $query = 'DELETE FROM '. $g2t .' WHERE t="'. $row['id'] .'"';
-            $this->store->queryDB($query, $this->store->getDBCon());
-        }
-
-        // remove entry/entries in the id2val table too
-        $query = 'DELETE FROM '. $id2val .' WHERE val = "'. $graph->getUri() .'"';
-        $this->store->queryDB($query, $this->store->getDBCon());
     }
 
     /**
