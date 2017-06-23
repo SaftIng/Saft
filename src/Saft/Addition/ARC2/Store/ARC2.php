@@ -290,18 +290,19 @@ class ARC2 extends AbstractSparqlStore
      */
     public function dropGraph(NamedNode $graph, array $options = array())
     {
-        // table names
-        $g2t = $this->configuration['table-prefix'] . '_g2t';
-        $id2val = $this->configuration['table-prefix'] . '_id2val';
+        // let ARC2 remove all triples first, his way
+        $this->store->query('DELETE FROM <'. $graph->getUri() .'>');
 
         // table names
         $g2t = $this->configuration['table-prefix'] . '_g2t';
         $id2val = $this->configuration['table-prefix'] . '_id2val';
+
         /*
          * ask for all entries with the given graph URI
          */
         $query = 'SELECT id FROM '. $id2val .' WHERE val = "'. $graph->getUri() .'"';
         $result = $this->store->queryDB($query, $this->store->getDBCon());
+
         /*
          * go through all given entries and remove all according entries in the g2t table
          */
@@ -309,6 +310,7 @@ class ARC2 extends AbstractSparqlStore
             $query = 'DELETE FROM '. $g2t .' WHERE t="'. $row['id'] .'"';
             $this->store->queryDB($query, $this->store->getDBCon());
         }
+
         // remove entry/entries in the id2val table too
         $query = 'DELETE FROM '. $id2val .' WHERE val = "'. $graph->getUri() .'"';
         $this->store->queryDB($query, $this->store->getDBCon());
