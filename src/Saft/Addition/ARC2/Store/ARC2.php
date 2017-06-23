@@ -181,7 +181,6 @@ class ARC2 extends AbstractSparqlStore
             $res = $this->store->query($query, $options);
 
             if (0 == $res) {
-                var_dump($this->store->getErrors());
                 throw new \Exception('Insert query failed: '. $query);
             }
         }
