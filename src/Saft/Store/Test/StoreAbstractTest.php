@@ -1241,4 +1241,34 @@ abstract class StoreAbstractTest extends TestCase
 
         $this->assertCountStatementIterator(0, $result);
     }
+
+    // tests that query returns no triples after dropGraph call
+    public function testRemovalOfTriplesAfterDropGraph()
+    {
+        // add test triples to graph
+        $this->fixture->addStatements(
+            array(
+                new StatementImpl(
+                    $this->testGraph,
+                    $this->testGraph,
+                    $this->testGraph,
+                    $this->testGraph
+                ),
+                new StatementImpl(
+                    $this->testGraph,
+                    $this->nodeFactory->createNamedNode('http://foobar/1'),
+                    $this->nodeFactory->createNamedNode('http://foobar/2'),
+                    $this->testGraph
+                )
+            )
+        );
+
+        $result = $this->fixture->query('SELECT * FROM <'. $this->testGraph .'> WHERE { ?s ?p ?o. }');
+        $this->assertEquals(2, count($result));
+
+        $this->fixture->dropGraph($this->testGraph);
+
+        $result = $this->fixture->query('SELECT * FROM <'. $this->testGraph .'> WHERE { ?s ?p ?o. }');
+        $this->assertEquals(0, count($result));
+    }
 }
