@@ -53,11 +53,21 @@ class LiteralImpl extends AbstractLiteral
 
         if (
             $lang !== null &&
+            $lang !== "" &&
             $datatype !== null &&
             $datatype->isNamed() &&
             $datatype->getUri() !== self::$rdfLangString
         ) {
             throw new \Exception('Language tagged Literals must have <'. self::$rdfLangString .'> datatype.');
+        }
+
+        if (
+            ($lang === null || $lang == "") &&
+            $datatype !== null &&
+            $datatype->isNamed() &&
+            $datatype->getUri() === self::$rdfLangString
+        ) {
+            throw new \Exception('No or empty Language Tag for Literals with <'. self::$rdfLangString .'> datatype.');
         }
 
         if ($datatype !== null) {
