@@ -393,9 +393,18 @@ abstract class LiteralAbstractTest extends TestCase
     /*
      * check for literal with language datatype and no language
      */
-    public function testWrongDatatypeLiteral()
+    public function testNoLanguageTagLiteral()
     {
         $this->setExpectedException(\Exception::class);
-        $this->nodeFactory->createLiteral('TestLanguage', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString');
+        $this->nodeFactory->createLiteral('TestNoLanguage', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString');
+    }
+
+    /*
+     * check for literal with language datatype and empty language
+     */
+    public function testEmptyLanguageTagLiteral()
+    {
+        $this->setExpectedException(\Exception::class);
+        $this->nodeFactory->createLiteral('TestEmptyLanguage', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString', '');
     }
 }
