@@ -33,6 +33,16 @@ class CommonNamespacesTest extends TestCase
         $this->assertEquals('http://foo/baz/bar', $this->fixture->extendUri('foo2:bar'));
     }
 
+    public function testExtendUriOverlappingPrefixes2()
+    {
+        // it assumes
+        // - ma     => http://www.w3.org/ns/ma-ont#
+        // - schema => http://schema.org/
+        // are known prefixes.
+
+        $this->assertEquals('http://schema.org/foo', $this->fixture->extendUri('schema:foo'));
+    }
+
     /*
      * Tests for shortenUri
      */

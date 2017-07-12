@@ -51,22 +51,34 @@ class CommonNamespaces
         'xsd'     => 'http://www.w3.org/2001/XMLSchema#',
     );
 
+    /**
+     * @param string $prefix
+     * @param string $uri
+     */
     public function add($prefix, $uri)
     {
         $this->namespaces[$prefix] = $uri;
     }
 
-    public function extendUri($shortendUri)
+    /**
+     * @param string $shortenedUri
+     * @return string
+     */
+    public function extendUri($shortenedUri)
     {
-        foreach ($this->namespaces as $ns => $nsUri) {
-            if (false !== strpos($shortendUri, $ns .':')) {
-                return str_replace($ns .':', $nsUri, $shortendUri);
-            }
+        $parts = explode(':', $shortenedUri);
+        // exactly 2 parts found. one before and one after the :
+        // if namespace is known (by prefix $parts[0])
+        if (2 == count($parts) && isset($this->namespaces[$parts[0]])) {
+            return str_replace($parts[0] .':', $this->namespaces[$parts[0]], $shortenedUri);
         }
 
-        return $shortendUri;
+        return $shortenedUri;
     }
 
+    /**
+     * @return array
+     */
     public function getNamespaces()
     {
         return $this->namespaces;
