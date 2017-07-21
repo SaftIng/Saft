@@ -52,6 +52,16 @@ class CommonNamespaces
     );
 
     /**
+     * @param array $customPrefixes Allows you to pass further prefixes on instantiation
+     */
+    public function __construct(array $customPrefixes = array())
+    {
+        foreach ($customPrefixes as $prefix => $uri) {
+            $this->add($prefix, $uri);
+        }
+    }
+
+    /**
      * @param string $prefix
      * @param string $uri
      */
