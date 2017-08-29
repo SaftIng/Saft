@@ -4,7 +4,7 @@
     "description": "HTTP/REST store implementation.",
     "keywords": ["Saft", "REST", "HTTP", "Store", "RDF", "Triple Store"],
     "homepage": "https://safting.github.io/",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Natanael Arndt",

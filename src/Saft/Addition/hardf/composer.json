@@ -4,7 +4,7 @@
     "description": "Adapter to integrate hardf library into Saft.",
     "keywords": ["RDF", "serialization", "parsing", "Saft"],
     "homepage": "https://github.com/SaftIng/Saft",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Konrad Abicht",

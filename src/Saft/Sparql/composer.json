@@ -4,7 +4,7 @@
     "description": "Sparql package for Saft.",
     "keywords": ["Saft", "Linked Data", "Semantic Web", "Sparql", "Query"],
     "homepage": "https://safting.github.com/",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Natanael Arndt",

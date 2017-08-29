@@ -4,7 +4,7 @@
     "description": "Virtuoso store implementation.",
     "keywords": ["Saft", "Triple Store", "Virtuoso", "RDF"],
     "homepage": "https://safting.github.io/",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Natanael Arndt",

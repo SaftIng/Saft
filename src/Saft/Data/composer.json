@@ -3,7 +3,7 @@
     "description": "Data interface for parsind and serializing RDF data for the Saft library.",
     "keywords": ["Saft", "Linked Data", "Semantic Web", "RDF", "Parser", "Serializer"],
     "homepage": "https://safting.github.io/",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Natanael Arndt",

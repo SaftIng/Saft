@@ -4,7 +4,7 @@
     "description": "QueryCache package from the library Saft.",
     "keywords": ["Saft", "Linked Data", "Semantic Web", "SPARQL", "Query Cache"],
     "homepage": "https://safting.github.io/",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Natanael Arndt",

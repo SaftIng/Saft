@@ -4,7 +4,7 @@
     "description": "Erfurt library integration. Erfurt is a mature library which shares a lot of the same objects Saft do. That package provides access to Erfurt using Saft.",
     "keywords": ["Saft", "Triple Store", "Erfurt", "RDF", "QueryCache"],
     "homepage": "https://safting.github.io/",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Natanael Arndt",

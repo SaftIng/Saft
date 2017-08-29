@@ -1,3 +1,12 @@
+<!--
+ * This file is part of Saft.
+ *
+ * (c) Konrad Abicht <hi@inspirito.de>
+ * (c) Natanael Arndt <arndt@informatik.uni-leipzig.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+-->
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"

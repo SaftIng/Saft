@@ -3,7 +3,7 @@
     "description": "Redland backend for the Saft library.",
     "keywords": ["Saft", "Linked Data", "Semantic Web", "Redland", "Parser", "RDF"],
     "homepage": "https://safting.github.io/",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Natanael Arndt",
