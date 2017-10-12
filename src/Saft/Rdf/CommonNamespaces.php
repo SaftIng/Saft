@@ -47,6 +47,7 @@ class CommonNamespaces
         'schema'  => 'http://schema.org/',
         'sd'      => 'http://www.w3.org/ns/sparql-service-description#',
         'sioc'    => 'http://rdfs.org/sioc/ns#',
+        'sh'      => 'http://www.w3.org/ns/shacl#',
         'skos'    => 'http://www.w3.org/2004/02/skos/core#',
         'skosxl'  => 'http://www.w3.org/2008/05/skos-xl#',
         'synd'    => 'http://purl.org/rss/1.0/modules/syndication/',
