@@ -210,6 +210,28 @@ class RdfHelpers
     }
 
     /**
+     * Returns the value (or URI or ID) for a given node.
+     *
+     * @param Node $node Node you want the value of. Can be of type NamedNode, BlankNode or Literal.
+     * @return string|null
+     */
+    public function getValueForNode(Node $node)
+    {
+        if ($node->isNamed()) {
+            return $node->getUri();
+
+        } elseif ($node->isLiteral()) {
+            return $node->getValue();
+
+        } elseif ($node->isBlank()) {
+            return $node->getBlankId();
+
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * @param string $stringToCheck
      * @return null|string
      */

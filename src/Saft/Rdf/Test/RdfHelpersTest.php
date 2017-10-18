@@ -130,6 +130,18 @@ class RdfHelpersTest extends TestCase
     }
 
     /*
+     * Tests for getValueForNode
+     */
+
+    public function testGetValueForNode()
+    {
+        $this->assertEquals('blankId', $this->fixture->getValueForNode(new BlankNodeImpl('blankId')));
+        $this->assertEquals('http://foo', $this->fixture->getValueForNode(new NamedNodeImpl($this->fixture, 'http://foo')));
+        $this->assertEquals('foo', $this->fixture->getValueForNode(new LiteralImpl($this->fixture, 'foo')));
+        $this->assertNull($this->fixture->getValueForNode(new AnyPatternImpl()));
+    }
+
+    /*
      * Tests for guessFormat
      */
 
