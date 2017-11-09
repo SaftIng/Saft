@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Saft\Addition\ARC2\Test;
+namespace Saft\Addition\ARC2\Test\Store;
 
 use Saft\Addition\ARC2\Store\ARC2;
 use Saft\Rdf\AnyPatternImpl;
@@ -39,9 +39,9 @@ class ARC2Test extends StoreAbstractTest
         parent::setUp();
 
         if (defined('IN_TRAVIS')) {
-            $this->loadTestConfiguration(__DIR__ .'/../test-config-travis.yml');
+            $this->loadTestConfiguration(__DIR__ .'/../../test-config-travis.yml');
         } else {
-            $this->loadTestConfiguration(__DIR__ .'/../test-config.yml');
+            $this->loadTestConfiguration(__DIR__ .'/../../test-config.yml');
         }
 
         if (true === isset($this->configuration['arc2Config'])) {
