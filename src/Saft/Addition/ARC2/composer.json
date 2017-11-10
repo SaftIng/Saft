@@ -27,7 +27,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "4.8.*",
-        "saft/saft-test": ">=0.9"
+        "saft/saft-test": ">=0.9",
+        "doctrine/instantiator": "1.0.*"
     },
     "autoload": {
         "psr-4": {
