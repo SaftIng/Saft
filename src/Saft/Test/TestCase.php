@@ -18,6 +18,7 @@ use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIterator;
+use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Result\Result;
 use Saft\Sparql\Result\SetResult;
 use Symfony\Component\Yaml\Parser;
@@ -45,6 +46,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     protected $nodeFactory;
     protected $rdfHelpers;
     protected $statementFactory;
+    protected $statementIteratorFactory;
 
     /**
      * @var NamedNode
@@ -370,6 +372,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         $this->rdfHelpers = new RdfHelpers();
         $this->nodeFactory = new NodeFactoryImpl($this->rdfHelpers);
         $this->statementFactory = new StatementFactoryImpl($this->rdfHelpers);
+        $this->statementIteratorFactory = new StatementIteratorFactoryImpl();
         $this->testGraph = $this->nodeFactory->createNamedNode('http://localhost/Saft/TestGraph/');
     }
 
