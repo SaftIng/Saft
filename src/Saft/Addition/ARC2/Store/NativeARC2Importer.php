@@ -35,7 +35,7 @@ class NativeARC2Importer
      * @param string $fileName
      * @param string $graphUri
      */
-    public function importN3FileIntoGraph(string $fileName, string $graphUri)
+    public function importN3FileIntoGraph($fileName, $graphUri)
     {
         $file = new \SplFileObject($fileName);
 
