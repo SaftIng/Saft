@@ -162,6 +162,14 @@ class RdfHelpersTest extends TestCase
         $this->assertEquals(null, $this->fixture->guessFormat('foo://>'));
     }
 
+    // test that guessFormat doesn't confuse n-triples with turtle
+    public function testGuessFormatRegression1()
+    {
+        $fileContent = file_get_contents(__DIR__ .'/resources/guessFormat-regression1.ttl');
+
+        $this->assertEquals('turtle', $this->fixture->guessFormat($fileContent));
+    }
+
     public function testGuessFormatInvalidParameter()
     {
         $this->setExpectedException('\Exception');

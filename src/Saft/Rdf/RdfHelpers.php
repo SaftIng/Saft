@@ -244,7 +244,7 @@ class RdfHelpers
         $short = substr($stringToCheck, 0, 1024);
 
         // n-triples/n-quads
-        if (0 < preg_match('/^<.+>/m', $short, $matches)) {
+        if (0 < preg_match('/^<.+>/i', $short, $matches)) {
             return 'n-triples';
 
         // RDF/XML
