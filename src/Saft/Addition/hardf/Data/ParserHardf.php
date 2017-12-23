@@ -92,10 +92,11 @@ class ParserHardf implements Parser
      *
      * @return array An associative array with a prefix mapping of the prefixes parsed so far. The key
      *               will be the prefix, while the values contains the according namespace URI.
+     * @throws \Exception currently not implemented.
      */
     public function getCurrentPrefixList()
     {
-        throw new \Exception('Currently not implement.');
+        throw new \Exception('Currently not implemented.');
     }
 
     /**

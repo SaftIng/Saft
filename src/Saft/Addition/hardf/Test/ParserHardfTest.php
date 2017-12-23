@@ -116,4 +116,12 @@ class ParserHardfTest extends ParserAbstractTest
 
         $this->assertEquals($expected, $iterator);
     }
+
+    // test that guessFormat doesn't confuse n-triples with turtle
+    public function testParseStringToIteratorRegression1()
+    {
+        $fileContent = file_get_contents(__DIR__ .'/resources/guessFormat-regression1.ttl');
+
+        $this->assertCountStatementIterator(1165, $this->newInstance('turtle')->parseStringToIterator($fileContent));
+    }
 }
