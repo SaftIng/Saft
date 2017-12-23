@@ -15,6 +15,9 @@ namespace Saft\Addition\Redland\Rdf;
 use Saft\Rdf\AbstractLiteral;
 use Saft\Rdf\NodeUtils;
 
+/**
+ * @deprecated
+ */
 class Literal extends AbstractLiteral
 {
     /**

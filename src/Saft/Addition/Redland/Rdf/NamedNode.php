@@ -15,6 +15,9 @@ namespace Saft\Addition\Redland\Rdf;
 use Saft\Rdf\AbstractNamedNode;
 use Saft\Rdf\NodeUtils;
 
+/**
+ * @deprecated
+ */
 class NamedNode extends AbstractNamedNode
 {
     /**

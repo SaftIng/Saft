@@ -16,6 +16,9 @@ use Saft\Rdf\AbstractStatement;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeUtils;
 
+/**
+ * @deprecated
+ */
 class Statement extends AbstractStatement
 {
     /**

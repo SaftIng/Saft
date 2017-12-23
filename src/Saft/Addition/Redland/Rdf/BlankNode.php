@@ -14,6 +14,9 @@ namespace Saft\Addition\Redland\Rdf;
 
 use Saft\Rdf\AbstractBlankNode;
 
+/**
+ * @deprecated
+ */
 class BlankNode extends AbstractBlankNode
 {
     /**

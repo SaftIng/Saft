@@ -14,6 +14,9 @@ namespace Saft\Addition\Redland\Rdf;
 
 use Saft\Rdf\StatementIterator as SaftStatementIterator;
 
+/**
+ * @deprecated
+ */
 class StatementIterator implements SaftStatementIterator
 {
     /**

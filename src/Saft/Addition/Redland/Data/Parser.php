@@ -15,6 +15,9 @@ namespace Saft\Addition\Redland\Data;
 use Saft\Data\Parser as ParserInterface;
 use Saft\Addition\Redland\Rdf\StatementIterator;
 
+/**
+ * @deprecated
+ */
 class Parser implements ParserInterface
 {
     /**
