@@ -1,5 +1,11 @@
 # Saft
 
+Saft stands for **S**emantic **A**pplication **F**ramework Saf**t** and is a PHP framework, which provides RDF handling and support for Semantic Web technologies. It consists of the core library (_Saft.data_, _Saft.rdf_, _Saft.sparql_ and _Saft.store_) and some additions (e.g. adapter for triple stores or integration of libraries like ARC2 and EasyRdf), which extend the core with application specific code.
+
+There are currently 4 other RDF-libraries for PHP available (EasyRdf, Erfurt, hardf, ARC2). Each implements different areas with various quality and feature-coverage. Combined, they provide a rich feature-set from RDF data handling, serialization and parsing to database access. With Saft we aim to provide an integration layer to enable the usage of all these libraries at the same time. 
+
+### Build status and code coverage
+
 | Core Component | Build Status                                                                                                              | Code Coverage                                                                                                                                                      |
 |:---------------|:--------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Data           | [![Build Status](https://travis-ci.org/SaftIng/Saft.data.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.data)     | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.data/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.data?branch=master)     |
@@ -11,8 +17,6 @@
 |:---------------|:--------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ARC2           | [![Build Status](https://travis-ci.org/SaftIng/Saft.arc2.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.arc2)     | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.arc2/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.arc2?branch=master)     |
 | hardf           | [![Build Status](https://travis-ci.org/SaftIng/Saft.hardf.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.hardf)     | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.hardf/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.hardf?branch=master)     |
-
-The Saft PHP framework provides RDF handling and support for Semantic Web technologies. It consists of the Saft.Library (_Saft.data_, _Saft.rdf_, _Saft.sparql_ and _Saft.store_) and Saft.Additions (e.g. adapter for triple stores or integration of libraries like ARC2 and EasyRdf).
 
 ## License
 
