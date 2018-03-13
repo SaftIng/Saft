@@ -39,19 +39,21 @@ class NativeARC2Importer
     {
         $file = new \SplFileObject($fileName);
 
-        $batch = 100;
+        $batch = 1000;
         $counter = 0;
-        $batch = '';
+        $chunk = '';
+        $j = 0;
 
         // Loop until we reach the end of the file.
         while (!$file->eof()) {
-            $batch .= $file->fgets();
+            $chunk .= $file->fgets();
 
             if ($counter > $batch) {
-                $this->store->query('INSERT INTO <'. $graphUri .'> {'. $batch .'}');
+                $this->store->query('INSERT INTO <'. $graphUri .'> {'. $chunk .'}');
 
-                $batch = '';
+                $chunk = '';
                 $counter = 0;
+                $j++;
             }
 
             ++$counter;
