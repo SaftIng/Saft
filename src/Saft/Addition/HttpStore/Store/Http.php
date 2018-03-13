@@ -144,6 +144,9 @@ class Http extends AbstractSparqlStore
         }
     }
 
+    /**
+     * @return Curl\Curl
+     */
     public function getHttpClient()
     {
         return $this->httpClient;
