@@ -26,7 +26,7 @@ class CommonNamespaces
         'doap'    => 'http://usefulinc.com/ns/doap#',
         'exif'    => 'http://www.w3.org/2003/12/exif/ns#',
         'foaf'    => 'http://xmlns.com/foaf/0.1/',
-        'geo'     => 'http://www.w3.org/2003/01/geo/wgs84_pos#',
+        'geo'     => 'http://www.w3.org/2003/01/geo/',
         'gr'      => 'http://purl.org/goodrelations/v1#',
         'grddl'   => 'http://www.w3.org/2003/g/data-view#',
         'ical'    => 'http://www.w3.org/2002/12/cal/icaltzd#',
