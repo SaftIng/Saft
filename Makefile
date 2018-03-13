@@ -21,12 +21,17 @@ default:
 	@echo "Saft - CLI"
 	@echo ""
 	@echo "You can execute:"
-	@echo "- make clean                  - Remove temporary folders and vendor folder."
-	@echo "- make commit                 - Runs some quality checks before call git commit."
-	@echo "- make codebeautifier         - Clean and format code."
-	@echo "- make codesniffer            - Check code format."
-	@echo "- make setup-subtrees         - Setup all remotes for Saft's subtree repositories."
-	@echo "- make test                   - Run all test suites."
+	@echo "- make apidoc                      - Update API doc."
+	@echo "- make codesniffer                 - Check code format."
+	@echo "- make codebeautifier              - Clean and format code."
+	@echo "- make clean                       - Remove temporary folders and vendor folder."
+	@echo "- make commit                      - Runs some quality checks before call git commit."
+	@echo "- make remove-subpackage-branches  - Removes subpackage branches."
+	@echo "- make remove-subpackage-remotes   - Removes subpackage remotes."
+	@echo "- make setup-subpackage-remotes    - Setup subpackage remotes."
+	@echo "- make test                        - Run all test suites."
+	@echo "- make tag-subpackage-repos        - Adds a new tag to all subpackage repos."
+	@echo "- make update-subpackage-repos     - Splits commits and add related to appropriate Saft components."
 	@echo ""
 
 apidoc:
@@ -97,5 +102,11 @@ setup-subpackage-remotes:
 	git remote add saft.store.virtuoso git@github.com:SaftIng/Saft.store.virtuoso
 	git remote add saft.test git@github.com:SaftIng/Saft.test
 
+tag-subpackage-repos:
+	./scripts/tag-subpackage-repos.sh
+
 test:
 	./scripts/run-tests.sh
+
+update-subpackage-repos:
+	./scripts/update-subpackage-repos.sh
