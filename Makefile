@@ -103,7 +103,7 @@ setup-subpackage-remotes:
 	git remote add saft.test git@github.com:SaftIng/Saft.test
 
 tag-subpackage-repos:
-	./scripts/tag-subpackage-repos.sh
+	./scripts/tag-subpackage-repos.sh $(TAG)
 
 test:
 	./scripts/run-tests.sh
