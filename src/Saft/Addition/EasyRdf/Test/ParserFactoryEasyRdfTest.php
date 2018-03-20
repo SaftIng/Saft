@@ -13,13 +13,13 @@
 namespace Saft\Addition\EasyRdf\Test;
 
 use Saft\Addition\EasyRdf\Data\ParserFactoryEasyRdf;
-use Saft\Data\Test\ParserFactoryAbstractTest;
+use Saft\Data\Test\AbstractParserFactoryTest;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 
-class ParserFactoryEasyRdfTest extends ParserFactoryAbstractTest
+class ParserFactoryEasyRdfTest extends AbstractParserFactoryTest
 {
     /**
      * This list represents all serializations that are supported by the Parsers behind the ParserFactory
@@ -27,13 +27,13 @@ class ParserFactoryEasyRdfTest extends ParserFactoryAbstractTest
      *
      * @var array
      */
-    protected $availableSerializations = array(
+    protected $availableSerializations = [
         'n-triples',
         'rdf-json',
         'rdf-xml',
         'rdfa',
-        'turtle'
-    );
+        'turtle',
+    ];
 
     /**
      * @return ParserFactory
@@ -41,7 +41,7 @@ class ParserFactoryEasyRdfTest extends ParserFactoryAbstractTest
     protected function newInstance()
     {
         return new ParserFactoryEasyRdf(
-            new NodeFactoryImpl(new RdfHelpers()),
+            new NodeFactoryImpl(),
             new StatementFactoryImpl(),
             new StatementIteratorFactoryImpl(),
             new RdfHelpers()

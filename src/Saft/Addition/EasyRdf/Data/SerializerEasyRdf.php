@@ -13,9 +13,6 @@
 namespace Saft\Addition\EasyRdf\Data;
 
 use Saft\Data\Serializer;
-use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Rdf\NodeFactory;
-use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 
 class SerializerEasyRdf implements Serializer
@@ -28,25 +25,26 @@ class SerializerEasyRdf implements Serializer
     /**
      * Constructor.
      *
-     * @param string $serialization Serialization format, for instance turtle or rdfa.
-     * @throws \Exception if unknown serialization format was given.
+     * @param string $serialization serialization format, for instance turtle or rdfa
+     *
+     * @throws \Exception if unknown serialization format was given
      */
     public function __construct($serialization)
     {
-        /**
+        /*
          * Map of serializations. It maps the Saft term on according the EasyRdf format.
          */
-        $this->serializationMap = array(
+        $this->serializationMap = [
             'n-triples' => 'ntriples',
             'rdf-json' => 'json',
             'rdf-xml' => 'rdfxml',
             'rdfa' => 'rdfa',
             'turtle' => 'turtle',
-        );
+        ];
 
         if (false == isset($this->serializationMap[$serialization])) {
             throw new \Exception(
-                'Unknown serialization format given: '. $serialization .'. Supported are only '.
+                'Unknown serialization format given: '.$serialization.'. Supported are only '.
                 implode(', ', array_keys($this->serializationMap))
             );
         }
@@ -70,11 +68,12 @@ class SerializerEasyRdf implements Serializer
     /**
      * Transforms the statements of a StatementIterator instance into a stream, a file for instance.
      *
-     * @param StatementIterator $statements   The StatementIterator containing all the Statements which
-     *                                        should be serialized by the serializer.
-     * @param string|resource   $outputStream Filename or file pointer to the stream to where the serialization
-     *                                        should be written.
-     * @throws \Exception if unknown serilaization was given.
+     * @param StatementIterator $statements   the StatementIterator containing all the Statements which
+     *                                        should be serialized by the serializer
+     * @param string|resource   $outputStream filename or file pointer to the stream to where the serialization
+     *                                        should be written
+     *
+     * @throws \Exception if unknown serilaization was given
      */
     public function serializeIteratorToStream(StatementIterator $statements, $outputStream)
     {
@@ -83,10 +82,8 @@ class SerializerEasyRdf implements Serializer
          */
         if (is_resource($outputStream)) {
             // use it as it is
-
         } elseif (is_string($outputStream)) {
             $outputStream = fopen($outputStream, 'w');
-
         } else {
             throw new \Exception('Parameter $outputStream is neither a string nor resource.');
         }
@@ -102,7 +99,7 @@ class SerializerEasyRdf implements Serializer
             if ($stmtSubject->isNamed()) {
                 $s = $stmtSubject->getUri();
             } elseif ($stmtSubject->isBlank()) {
-                $s = '_:' . $stmtSubject->getBlankId();
+                $s = '_:'.$stmtSubject->getBlankId();
             } else {
                 throw new \Exception('Subject can either be a blank node or an URI.');
             }
@@ -122,15 +119,15 @@ class SerializerEasyRdf implements Serializer
              */
             $stmtObject = $statement->getObject();
             if ($stmtObject->isNamed()) {
-                $o = array('type' => 'uri', 'value' => $stmtObject->getUri());
+                $o = ['type' => 'uri', 'value' => $stmtObject->getUri()];
             } elseif ($stmtObject->isBlank()) {
-                $o = array('type' => 'bnode', 'value' => '_:' . $stmtObject->getBlankId());
+                $o = ['type' => 'bnode', 'value' => '_:'.$stmtObject->getBlankId()];
             } elseif ($stmtObject->isLiteral()) {
-                $o = array(
+                $o = [
                     'type' => 'literal',
                     'value' => $stmtObject->getValue(),
-                    'datatype' => $stmtObject->getDataType()->getUri()
-                );
+                    'datatype' => $stmtObject->getDataType()->getUri(),
+                ];
             } else {
                 throw new \Exception('Object can either be a blank node, an URI or literal.');
             }
@@ -138,13 +135,13 @@ class SerializerEasyRdf implements Serializer
             $graph->add($s, $p, $o);
         }
 
-        fwrite($outputStream, $graph->serialise($this->serialization) . PHP_EOL);
+        fwrite($outputStream, $graph->serialise($this->serialization).PHP_EOL);
     }
 
     /**
      * Returns a list of all supported serialization types.
      *
-     * @return array Array of supported serialization types which can be used by this serializer.
+     * @return array array of supported serialization types which can be used by this serializer
      */
     public function getSupportedSerializations()
     {

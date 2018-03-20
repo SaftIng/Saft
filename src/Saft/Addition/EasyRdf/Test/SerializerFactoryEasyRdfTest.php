@@ -13,9 +13,9 @@
 namespace Saft\Addition\EasyRdf\Data\Test;
 
 use Saft\Addition\EasyRdf\Data\SerializerFactoryEasyRdf;
-use Saft\Data\Test\SerializerFactoryAbstractTest;
+use Saft\Data\Test\AbstractSerializerFactoryTest;
 
-class SerializerFactoryEasyRdfTest extends SerializerFactoryAbstractTest
+class SerializerFactoryEasyRdfTest extends AbstractSerializerFactoryTest
 {
     /**
      * This list represents all serializations that are supported by the Serializers behind the ParserFactory
@@ -23,13 +23,13 @@ class SerializerFactoryEasyRdfTest extends SerializerFactoryAbstractTest
      *
      * @var array
      */
-    protected $availableSerializations = array(
+    protected $availableSerializations = [
         'n-triples',
         'rdf-json',
         'rdf-xml',
         'rdfa',
-        'turtle'
-    );
+        'turtle',
+    ];
 
     /**
      * @return SerializerFactory

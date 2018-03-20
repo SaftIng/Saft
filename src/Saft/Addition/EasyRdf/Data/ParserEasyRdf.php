@@ -13,7 +13,6 @@
 namespace Saft\Addition\EasyRdf\Data;
 
 use Saft\Data\Parser;
-use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactory;
@@ -49,12 +48,13 @@ class ParserEasyRdf implements Parser
     /**
      * Constructor.
      *
-     * @param NodeFactory $nodeFactory
-     * @param StatementFactory $statementFactory
+     * @param NodeFactory              $nodeFactory
+     * @param StatementFactory         $statementFactory
      * @param StatementIteratorFactory $statementIteratorFactory
-     * @param RdfHelpers $rdfHelpers
-     * @param string $serialization
-     * @throws \Exception if serialization is unknown.
+     * @param RdfHelpers               $rdfHelpers
+     * @param string                   $serialization
+     *
+     * @throws \Exception if serialization is unknown
      */
     public function __construct(
         NodeFactory $nodeFactory,
@@ -69,19 +69,19 @@ class ParserEasyRdf implements Parser
         $this->statementFactory = $statementFactory;
         $this->statementIteratorFactory = $statementIteratorFactory;
 
-        $this->serializationMap = array(
+        $this->serializationMap = [
             'n-triples' => 'ntriples',
             'rdf-json' => 'json',
             'rdf-xml' => 'rdfxml',
             'rdfa' => 'rdfa',
             'turtle' => 'turtle',
-        );
+        ];
 
         $this->serialization = $this->serializationMap[$serialization];
 
         if (false == isset($this->serializationMap[$serialization])) {
             throw new \Exception(
-                'Unknown serialization format given: '. $serialization .'. Supported are only '.
+                'Unknown serialization format given: '.$serialization.'. Supported are only '.
                 implode(', ', array_keys($this->serializationMap))
             );
         }
@@ -96,18 +96,20 @@ class ParserEasyRdf implements Parser
     public function getCurrentPrefixList()
     {
         // TODO implement a way to get a list of all namespaces used in the last parsed datastring/file.
-        return array();
+        return [];
     }
 
     /**
      * Parses a given string and returns an iterator containing Statement instances representing the read data.
      *
-     * @param  string $inputString Data string containing RDF serialized data.
-     * @param  string $baseUri     The base URI of the parsed content. If this URI is null the inputStreams URL
-     *                             is taken as base URI.
+     * @param string $inputString data string containing RDF serialized data
+     * @param string $baseUri     The base URI of the parsed content. If this URI is null the inputStreams URL
+     *                            is taken as base URI.
+     *
      * @return StatementIterator StatementIterator instaince containing all the Statements parsed by the
      *                           parser to far
-     * @throws \Exception if the base URI $baseUri is no valid URI.
+     *
+     * @throws \Exception if the base URI $baseUri is no valid URI
      */
     public function parseStringToIterator($inputString, $baseUri = null)
     {
@@ -127,11 +129,13 @@ class ParserEasyRdf implements Parser
      * Parses a given stream and returns an iterator containing Statement instances representing the
      * previously read data. The stream parses the data not as a whole but in chunks.
      *
-     * @param  string $inputStream Filename of the stream to parse which contains RDF serialized data.
-     * @param  string $baseUri     The base URI of the parsed content. If this URI is null the inputStreams URL
-     *                             is taken as base URI.
-     * @return StatementIterator A StatementIterator containing all the Statements parsed by the parser to far.
-     * @throws \Exception if the base URI $baseUri is no valid URI.
+     * @param string $inputStream filename of the stream to parse which contains RDF serialized data
+     * @param string $baseUri     The base URI of the parsed content. If this URI is null the inputStreams URL
+     *                            is taken as base URI.
+     *
+     * @return StatementIterator a StatementIterator containing all the Statements parsed by the parser to far
+     *
+     * @throws \Exception if the base URI $baseUri is no valid URI
      */
     public function parseStreamToIterator($inputStream, $baseUri = null)
     {
@@ -152,22 +156,24 @@ class ParserEasyRdf implements Parser
      *
      * @param array $rdfPhp RDF data structured as array. It structure looks like:
      *                      array(
-     *                         $subject => array(
-     *                             $predicate => array (
-     *                                 // object information
-     *                                 'datatype' => ...,
-     *                                 'lang' => ...,
-     *                                 'value' => ...
-     *                             )
-     *                          )
+     *                      $subject => array(
+     *                      $predicate => array (
+     *                      // object information
+     *                      'datatype' => ...,
+     *                      'lang' => ...,
+     *                      'value' => ...
      *                      )
+     *                      )
+     *                      )
+     *
      * @return StatementIterator
-     * @throws \Exception if a non-URI or non-BlankNode is used at subject position.
-     * @throws \Exception if a non-URI or non-BlankNode is used at predicate position.
+     *
+     * @throws \Exception if a non-URI or non-BlankNode is used at subject position
+     * @throws \Exception if a non-URI or non-BlankNode is used at predicate position
      */
     protected function rdfPhpToStatementIterator(array $rdfPhp)
     {
-        $statements = array();
+        $statements = [];
 
         // go through all subjects
         foreach ($rdfPhp as $subject => $predicates) {
@@ -175,7 +181,7 @@ class ParserEasyRdf implements Parser
             foreach ($predicates as $property => $objects) {
                 // object(s)
                 foreach ($objects as $object) {
-                    /**
+                    /*
                      * Create subject node
                      */
                     if (true === $this->RdfHelpers->simpleCheckURI($subject)) {
@@ -187,7 +193,7 @@ class ParserEasyRdf implements Parser
                         throw new \Exception('Only URIs and blank nodes are allowed as subjects.');
                     }
 
-                    /**
+                    /*
                      * Create predicate node
                      */
                     if (true === $this->RdfHelpers->simpleCheckURI($property)) {

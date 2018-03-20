@@ -13,12 +13,13 @@
 namespace Saft\Addition\EasyRdf\Test;
 
 use Saft\Addition\EasyRdf\Data\SerializerEasyRdf;
-use Saft\Data\Test\SerializerAbstractTest;
+use Saft\Data\Test\AbstractSerializerTest;
 
-class SerializerEasyRdfTest extends SerializerAbstractTest
+class SerializerEasyRdfTest extends AbstractSerializerTest
 {
     /**
      * @param string $serialization
+     *
      * @return Serializer
      */
     protected function newInstance($serialization)

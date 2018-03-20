@@ -21,8 +21,10 @@ class SerializerFactoryEasyRdf implements SerializerFactory
      *
      * @param string $serialization The serialization you need a serializer for. In case it is not available,
      *                              an exception will be thrown.
-     * @return Parser Suitable serializer for the requested serialization.
-     * @throws \Exception If serializer for requested serialization is not available.
+     *
+     * @return Parser suitable serializer for the requested serialization
+     *
+     * @throws \Exception if serializer for requested serialization is not available
      */
     public function createSerializerFor($serialization)
     {
@@ -30,11 +32,10 @@ class SerializerFactoryEasyRdf implements SerializerFactory
 
         if (in_array($serialization, $serializer->getSupportedSerializations())) {
             return $serializer;
-
         } else {
             throw new \Exception(
-                'No serializer for requested serialization available: '. $serialization .'. '.
-                'Supported serializations are: '. implode(', ', $this->getSupportedSerializations())
+                'No serializer for requested serialization available: '.$serialization.'. '.
+                'Supported serializations are: '.implode(', ', $this->getSupportedSerializations())
             );
         }
     }
@@ -42,10 +43,10 @@ class SerializerFactoryEasyRdf implements SerializerFactory
     /**
      * Returns a list of all supported serialization types.
      *
-     * @return array Array of supported serialization types which can be used by this serializer.
+     * @return array array of supported serialization types which can be used by this serializer
      */
     public function getSupportedSerializations()
     {
-        return array('n-triples', 'rdf-json', 'rdf-xml', 'rdfa', 'turtle');
+        return ['n-triples', 'rdf-json', 'rdf-xml', 'rdfa', 'turtle'];
     }
 }
