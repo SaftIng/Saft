@@ -13,12 +13,8 @@
 namespace Saft\Data;
 
 use Sabre\Xml\Service;
-use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Rdf\LiteralImpl;
-use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\RdfHelpers;
-use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIteratorFactory;
 
@@ -36,10 +32,10 @@ class RDFXMLParser implements Parser
     protected $statementIteratorFactory;
 
     /**
-     * @param NodeFactory $nodeFactory
-     * @param StatementFactory $statementFactory
+     * @param NodeFactory              $nodeFactory
+     * @param StatementFactory         $statementFactory
      * @param StatementIteratorFactory $statementIteratorFactory
-     * @param NodeUtils $rdfHelpers
+     * @param NodeUtils                $rdfHelpers
      */
     public function __construct(
         NodeFactory $nodeFactory,
@@ -68,12 +64,14 @@ class RDFXMLParser implements Parser
     /**
      * Parses a given string and returns an iterator containing Statement instances representing the read data.
      *
-     * @param  string $inputString Data string containing RDF serialized data.
-     * @param  string $baseUri     The base URI of the parsed content. If this URI is null the inputStreams URL
-     *                             is taken as base URI.
+     * @param string $inputString data string containing RDF serialized data
+     * @param string $baseUri     The base URI of the parsed content. If this URI is null the inputStreams URL
+     *                            is taken as base URI.
+     *
      * @return StatementIterator StatementIterator instaince containing all the Statements parsed by the
      *                           parser to far
-     * @throws \Exception if the base URI $baseUri is no valid URI.
+     *
+     * @throws \Exception if the base URI $baseUri is no valid URI
      */
     public function parseStringToIterator($inputString, $baseUri = null)
     {
@@ -91,7 +89,7 @@ class RDFXMLParser implements Parser
         $rdfResourceString = '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource';
         $xmlNamespaceLangString = '{http://www.w3.org/XML/1998/namespace}lang';
 
-        $statements = array();
+        $statements = [];
 
         // go through all rdf:Description elements
         foreach ($xmlArray as $rdfDescription) {
@@ -103,13 +101,12 @@ class RDFXMLParser implements Parser
                 );
 
                 foreach ($rdfDescription['value'] as $value) {
-
                     // if object is a resource
                     if (isset($value['attributes'][$rdfResourceString])
                         && $value['attributes'][$rdfResourceString]) {
                         // create predicate
                         $predicate = $this->nodeFactory->createNamedNode(
-                            str_replace(array('{', '}'), '', $value['name'])
+                            str_replace(['{', '}'], '', $value['name'])
                         );
 
                         // we know that the object can only be a named node, so add triple
@@ -128,9 +125,8 @@ class RDFXMLParser implements Parser
                     } elseif (isset($rdfDescription['attributes'][$rdfAboutString])
                         && $rdfDescription['attributes'][$rdfAboutString]) {
                         foreach ($rdfDescription['value'] as $objectValue) {
-
                             $predicate = $this->nodeFactory->createNamedNode(
-                                str_replace(array('{', '}'), '', $objectValue['name'])
+                                str_replace(['{', '}'], '', $objectValue['name'])
                             );
 
                             // object is URI
@@ -138,7 +134,6 @@ class RDFXMLParser implements Parser
                                 && $this->rdfHelpers->simpleCheckURI(
                                     $objectValue['attributes'][$rdfResourceString])
                                 ) {
-
                                 $object = $this->nodeFactory->createNamedNode(
                                     $objectValue['attributes'][$rdfResourceString]
                                 );
@@ -149,7 +144,6 @@ class RDFXMLParser implements Parser
 
                             // guess object is of type literal
                             } else {
-
                                 // check for language
                                 if (isset($objectValue['attributes'][$xmlNamespaceLangString])) {
                                     $lang = $objectValue['attributes'][$xmlNamespaceLangString];
@@ -162,7 +156,7 @@ class RDFXMLParser implements Parser
                                 }
 
                                 $object = $this->nodeFactory->createLiteral(
-                                    str_replace(array('{', '}'), '', $objectValue['value']),
+                                    str_replace(['{', '}'], '', $objectValue['value']),
                                     $datatype,
                                     $lang
                                 );
@@ -188,14 +182,18 @@ class RDFXMLParser implements Parser
      * representing the previously read data. The stream parses the data not as a whole but
      * in chunks.
      *
-     * @param string $inputStream Filename of the stream to parse which contains RDF
-     *                            serialized data.
+     * @param string $inputStream filename of the stream to parse which contains RDF
+     *                            serialized data
      * @param string $baseUri     The base URI of the parsed content. If this URI is null,
      *                            the inputStreams URL is taken as base URI. (optional)
-     * @return StatementIterator A StatementIterator containing all the Statements parsed by
-     *                           the parser to far.
-     * @throws \Exception if the base URI $baseUri is no valid URI.
+     *
+     * @return StatementIterator a StatementIterator containing all the Statements parsed by
+     *                           the parser to far
+     *
+     * @throws \Exception if the base URI $baseUri is no valid URI
+     *
      * @api
+     *
      * @since 0.1
      */
     public function parseStreamToIterator($inputStream, $baseUri = null)

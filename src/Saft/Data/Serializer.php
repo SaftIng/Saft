@@ -20,7 +20,7 @@ use Saft\Rdf\StatementIterator;
  * for each serialization you need.
  *
  * @api
- * @package Saft\Data
+ *
  * @since 0.1
  */
 interface Serializer
@@ -32,7 +32,9 @@ interface Serializer
      *
      * @param array $prefixes An associative array with a prefix mapping of the prefixes. The key
      *                        will be the prefix, while the values contains the according namespace URI.
+     *
      * @api
+     *
      * @since 0.1
      */
     public function setPrefixes(array $prefixes);
@@ -40,12 +42,15 @@ interface Serializer
     /**
      * Transforms the statements of a StatementIterator instance into a stream, a file for instance.
      *
-     * @param StatementIterator $statements   The StatementIterator containing all the Statements which
-     *                                        should be serialized by the serializer.
+     * @param StatementIterator $statements   the StatementIterator containing all the Statements which
+     *                                        should be serialized by the serializer
      * @param string|resource   $outputStream filename or file pointer to the stream to where the serialization
-     *                                        should be written.
-     * @throws \Exception if unknown format was given.
+     *                                        should be written
+     *
+     * @throws \Exception if unknown format was given
+     *
      * @api
+     *
      * @since 0.1
      */
     public function serializeIteratorToStream(StatementIterator $statements, $outputStream);
@@ -53,8 +58,10 @@ interface Serializer
     /**
      * Returns a list of all supported serialization types.
      *
-     * @return array Array of supported serialization types which can be used by this serializer.
+     * @return array array of supported serialization types which can be used by this serializer
+     *
      * @api
+     *
      * @since 0.1
      */
     public function getSupportedSerializations();

@@ -12,13 +12,12 @@
 
 namespace Saft\Data\Test;
 
-use Saft\Rdf\NodeUtils;
-use Saft\Test\TestCase;
+use Saft\Rdf\Test\TestCase;
 
 /**
  * @codeCoverageIgnore
  */
-abstract class SerializerFactoryAbstractTest extends TestCase
+abstract class AbstractSerializerFactoryTest extends TestCase
 {
     /**
      * This list represents all serializations that are supported by the Serializers behind the ParserFactory
@@ -26,7 +25,7 @@ abstract class SerializerFactoryAbstractTest extends TestCase
      *
      * @var array
      */
-    protected $availableSerializations = array();
+    protected $availableSerializations = [];
 
     /**
      * @return SerializerFactory

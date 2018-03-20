@@ -16,15 +16,16 @@ use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementImpl;
-use Saft\Test\TestCase;
+use Saft\Rdf\Test\TestCase;
 
 /**
  * @codeCoverageIgnore
  */
-abstract class SerializerAbstractTest extends TestCase
+abstract class AbstractSerializerTest extends TestCase
 {
     /**
      * @param string $serialization
+     *
      * @return Serializer
      */
     abstract protected function newInstance($serialization);
@@ -45,7 +46,7 @@ abstract class SerializerAbstractTest extends TestCase
         $this->setExpectedException('Exception');
 
         $this->fixture->serializeIteratorToStream(
-            new ArrayStatementIteratorImpl(array()),
+            new ArrayStatementIteratorImpl([]),
             42
         );
     }
@@ -59,27 +60,27 @@ abstract class SerializerAbstractTest extends TestCase
             $this->markTestSkipped($e->getMessage());
         }
 
-        $iterator = new ArrayStatementIteratorImpl(array(
+        $iterator = new ArrayStatementIteratorImpl([
             new StatementImpl(
-                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/'),
-                new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Foo')
+                new NamedNodeImpl('http://saft/example/'),
+                new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                new NamedNodeImpl('http://saft/example/Foo')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/2'),
-                new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Foo')
+                new NamedNodeImpl('http://saft/example/2'),
+                new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                new NamedNodeImpl('http://saft/example/Foo')
             ),
-        ));
+        ]);
 
         $filepath = tempnam(sys_get_temp_dir(), 'saft_');
 
-        $this->fixture->serializeIteratorToStream($iterator, 'file://' . $filepath, 'n-quads');
+        $this->fixture->serializeIteratorToStream($iterator, 'file://'.$filepath, 'n-quads');
 
         // check
         $this->assertEquals(
             '<http://saft/example/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> '.
-            '<http://saft/example/Foo> .'. PHP_EOL .
+            '<http://saft/example/Foo> .'.PHP_EOL.
             '<http://saft/example/2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> '.
             '<http://saft/example/Foo> .',
             trim(file_get_contents($filepath))
@@ -99,28 +100,28 @@ abstract class SerializerAbstractTest extends TestCase
             $this->markTestSkipped($e->getMessage());
         }
 
-        $iterator = new ArrayStatementIteratorImpl(array(
+        $iterator = new ArrayStatementIteratorImpl([
             new StatementImpl(
-                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/'),
-                new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Foo')
+                new NamedNodeImpl('http://saft/example/'),
+                new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                new NamedNodeImpl('http://saft/example/Foo')
             ),
             new StatementImpl(
-                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/2'),
-                new NamedNodeImpl(new RdfHelpers(), 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                new NamedNodeImpl(new RdfHelpers(), 'http://saft/example/Foo')
+                new NamedNodeImpl('http://saft/example/2'),
+                new NamedNodeImpl('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                new NamedNodeImpl('http://saft/example/Foo')
             ),
-        ));
+        ]);
 
         $filepath = tempnam(sys_get_temp_dir(), 'saft_');
-        $testFile = fopen('file://' . $filepath, 'w+');
+        $testFile = fopen('file://'.$filepath, 'w+');
 
         $this->fixture->serializeIteratorToStream($iterator, $testFile, 'n-triples');
 
         // check
         $this->assertEquals(
             '<http://saft/example/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> '.
-            '<http://saft/example/Foo> .'. PHP_EOL .
+            '<http://saft/example/Foo> .'.PHP_EOL.
             '<http://saft/example/2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> '.
             '<http://saft/example/Foo> .',
             trim(file_get_contents($filepath))
@@ -137,6 +138,6 @@ abstract class SerializerAbstractTest extends TestCase
         // $this->setExpectedException('\Exception');
 
         $this->fixture = $this->newInstance('n-triples');
-        $this->assertNull($this->fixture->setPrefixes(array()));
+        $this->assertNull($this->fixture->setPrefixes([]));
     }
 }

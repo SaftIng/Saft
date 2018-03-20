@@ -17,7 +17,7 @@ namespace Saft\Data;
  * serializer for a given serialization, if available. It also provides a list of supported serializations.
  *
  * @api
- * @package Saft\Data;
+ *
  * @since 0.1
  */
 interface SerializerFactory
@@ -27,9 +27,13 @@ interface SerializerFactory
      *
      * @param string $serialization The serialization you need a serializer for. In case it is not available,
      *                              an exception will be thrown.
-     * @return Parser Suitable serializer for the requested serialization.
-     * @throws \Exception if serializer for requested serialization is not available.
+     *
+     * @return Parser suitable serializer for the requested serialization
+     *
+     * @throws \Exception if serializer for requested serialization is not available
+     *
      * @api
+     *
      * @since 0.1
      */
     public function createSerializerFor($serialization);
@@ -37,8 +41,10 @@ interface SerializerFactory
     /**
      * Returns a list of all supported serialization types.
      *
-     * @return array Array of supported serialization types.
+     * @return array array of supported serialization types
+     *
      * @api
+     *
      * @since 0.1
      */
     public function getSupportedSerializations();
