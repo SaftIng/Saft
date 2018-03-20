@@ -16,6 +16,6 @@
 arc2Config: &arc2Config
     username: "root"
     password: "Pass123"
-    host: "db"
+    host: "sqldb"
     database: "saft"
     table-prefix: "saft"
