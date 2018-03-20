@@ -2,7 +2,7 @@
 
 Saft stands for **S**emantic **A**pplication **F**ramework Saf**t** and is a PHP framework, which provides RDF handling and support for Semantic Web technologies. It consists of the core library (_Saft.data_, _Saft.rdf_, _Saft.sparql_ and _Saft.store_) and some additions (e.g. adapter for triple stores or integration of libraries like ARC2 and EasyRdf), which extend the core with application specific code.
 
-There are currently 4 other RDF-libraries for PHP available (EasyRdf, Erfurt, hardf, ARC2). Each implements different areas with various quality and feature-coverage. Combined, they provide a rich feature-set from RDF data handling, serialization and parsing to database access. With Saft we aim to provide an integration layer to enable the usage of all these libraries at the same time. 
+There are currently 4 other RDF-libraries for PHP available (EasyRdf, Erfurt, hardf, ARC2). Each implements different areas with various quality and feature-coverage. Combined, they provide a rich feature-set from RDF data handling, serialization and parsing to database access. With Saft we aim to provide an integration layer to enable the usage of most of these libraries at the same time.
 
 ### Build status and code coverage
 
@@ -13,10 +13,10 @@ There are currently 4 other RDF-libraries for PHP available (EasyRdf, Erfurt, ha
 | Sparql         | [![Build Status](https://travis-ci.org/SaftIng/Saft.sparql.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.sparql) | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.sparql/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.sparql?branch=master) |
 | Store          | [![Build Status](https://travis-ci.org/SaftIng/Saft.store.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.store)   | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.store/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.store?branch=master)   |
 
-| Addition | Build Status                                                                                                              | Code Coverage                                                                                                                                                      |
-|:---------------|:--------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ARC2           | [![Build Status](https://travis-ci.org/SaftIng/Saft.arc2.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.arc2)     | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.arc2/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.arc2?branch=master)     |
-| hardf           | [![Build Status](https://travis-ci.org/SaftIng/Saft.hardf.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.hardf)     | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.hardf/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.hardf?branch=master)     |
+| Addition | Build Status                                                                                                            | Code Coverage                                                                                                                                                    |
+|:---------|:------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ARC2     | [![Build Status](https://travis-ci.org/SaftIng/Saft.arc2.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.arc2)   | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.arc2/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.arc2?branch=master)   |
+| hardf    | [![Build Status](https://travis-ci.org/SaftIng/Saft.hardf.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.hardf) | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.hardf/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.hardf?branch=master) |
 
 ## License
 
@@ -30,5 +30,4 @@ Saft provides (basic) support for the following RDF libraries for PHP:
 
 * ARC2 (currently only data storage)
 * EasyRDF (currently only parser and serializer)
-* Erfurt (currently only QueryCache)
 * hardf (parser and serializer)
