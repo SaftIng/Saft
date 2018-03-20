@@ -101,7 +101,7 @@ abstract class AbstractStoreTest extends TestCase
     {
         $subject2 = $this->nodeFactory->createNamedNode('http://saft/test/s1');
         $predicate2 = $this->nodeFactory->createNamedNode('http://saft/test/p2');
-        $object2 = new LiteralImpl(new RdfHelpers(), 'John');
+        $object2 = new LiteralImpl('John');
 
         return new StatementImpl($subject2, $predicate2, $object2, $this->testGraph);
     }
@@ -119,7 +119,7 @@ abstract class AbstractStoreTest extends TestCase
         $stmtTwo = new StatementImpl(
             $this->nodeFactory->createNamedNode('http://s/'),
             $this->nodeFactory->createNamedNode('http://p/'),
-            new LiteralImpl(new RdfHelpers(), 'test literal')
+            new LiteralImpl('test literal')
         );
 
         if ($this->fixture->hasMatchingStatement($stmtOne) || $this->fixture->hasMatchingStatement($stmtTwo)) {
@@ -174,7 +174,7 @@ abstract class AbstractStoreTest extends TestCase
             new StatementImpl(
                 $this->nodeFactory->createNamedNode('http://s/'),
                 $this->nodeFactory->createNamedNode('http://p/'),
-                new LiteralImpl(new RdfHelpers(), 'test literal')
+                new LiteralImpl('test literal')
             ),
         ]);
 
@@ -219,12 +219,12 @@ abstract class AbstractStoreTest extends TestCase
             new StatementImpl(
                 $this->nodeFactory->createNamedNode('http://s/'),
                 $this->nodeFactory->createNamedNode('http://p/'),
-                new LiteralImpl(new RdfHelpers(), 'test literal', null, 'en')
+                new LiteralImpl('test literal', null, 'en')
             ),
             new StatementImpl(
                 $this->nodeFactory->createNamedNode('http://s/'),
                 $this->nodeFactory->createNamedNode('http://p/'),
-                new LiteralImpl(new RdfHelpers(), 'test literal', null, 'de')
+                new LiteralImpl('test literal', null, 'de')
             ),
         ]);
 
@@ -286,7 +286,7 @@ abstract class AbstractStoreTest extends TestCase
             new StatementImpl(
                 $this->nodeFactory->createNamedNode('http://s/'),
                 $this->nodeFactory->createNamedNode('http://p/'),
-                new LiteralImpl(new RdfHelpers(), 'test literal'),
+                new LiteralImpl('test literal'),
                 $this->testGraph
             ),
         ]);
@@ -325,7 +325,7 @@ abstract class AbstractStoreTest extends TestCase
             new StatementImpl(
                 $this->nodeFactory->createNamedNode('http://s/'),
                 $this->nodeFactory->createNamedNode('http://p/'),
-                new LiteralImpl(new RdfHelpers(), 'test literal')
+                new LiteralImpl('test literal')
             ),
         ];
 
@@ -439,7 +439,7 @@ abstract class AbstractStoreTest extends TestCase
             new StatementImpl(
                 $this->nodeFactory->createNamedNode('http://s/'),
                 $this->nodeFactory->createNamedNode('http://p/'),
-                new LiteralImpl(new RdfHelpers(), 'test literal')
+                new LiteralImpl('test literal')
             ),
         ]);
 
@@ -488,7 +488,7 @@ abstract class AbstractStoreTest extends TestCase
             new StatementImpl(
                 $this->nodeFactory->createNamedNode('http://s/'),
                 $this->nodeFactory->createNamedNode('http://p/'),
-                new LiteralImpl(new RdfHelpers(), 'test literal'),
+                new LiteralImpl('test literal'),
                 $this->testGraph
             ),
         ]);
@@ -542,7 +542,7 @@ abstract class AbstractStoreTest extends TestCase
             new StatementImpl(
                 $this->nodeFactory->createNamedNode('http://s/'),
                 $this->nodeFactory->createNamedNode('http://p/'),
-                new LiteralImpl(new RdfHelpers(), 'test literal')
+                new LiteralImpl('test literal')
             ),
         ]);
 
@@ -687,7 +687,7 @@ abstract class AbstractStoreTest extends TestCase
             new StatementImpl(
                 $this->nodeFactory->createNamedNode('http://s/'),
                 $this->nodeFactory->createNamedNode('http://p/'),
-                new LiteralImpl(new RdfHelpers(), 'test literal')
+                new LiteralImpl('test literal')
             ),
         ]);
 
@@ -713,7 +713,7 @@ abstract class AbstractStoreTest extends TestCase
             new StatementImpl(
                 $this->nodeFactory->createNamedNode('http://s/'),
                 $this->nodeFactory->createNamedNode('http://p/'),
-                new LiteralImpl(new RdfHelpers(), 'test literal'),
+                new LiteralImpl('test literal'),
                 $this->testGraph
             ),
         ]);
@@ -749,7 +749,7 @@ abstract class AbstractStoreTest extends TestCase
             new StatementImpl(
                 $this->nodeFactory->createNamedNode('http://s/'),
                 $this->nodeFactory->createNamedNode('http://p/'),
-                new LiteralImpl(new RdfHelpers(), 'test literal')
+                new LiteralImpl('test literal')
             ),
         ]);
 
@@ -896,7 +896,7 @@ abstract class AbstractStoreTest extends TestCase
             new StatementImpl(
                 $this->nodeFactory->createNamedNode('http://s/'),
                 $this->nodeFactory->createNamedNode('http://p/'),
-                new LiteralImpl(new RdfHelpers(), 'test literal')
+                new LiteralImpl('test literal')
             ),
         ]);
 
@@ -971,7 +971,7 @@ abstract class AbstractStoreTest extends TestCase
             new StatementImpl(
                 $this->nodeFactory->createNamedNode('http://s/'),
                 $this->nodeFactory->createNamedNode('http://p/'),
-                new LiteralImpl(new RdfHelpers(), '42')
+                new LiteralImpl('42')
             ),
         ]);
 
@@ -995,7 +995,7 @@ abstract class AbstractStoreTest extends TestCase
                     ],
                     [
                         's' => $this->nodeFactory->createNamedNode('http://s/'),
-                        'o' => new LiteralImpl(new RdfHelpers(), '42'),
+                        'o' => new LiteralImpl('42'),
                     ],
                     [
                         's' => $this->nodeFactory->createNamedNode('http://s/'),
@@ -1168,7 +1168,7 @@ abstract class AbstractStoreTest extends TestCase
 
         $subject2 = $this->nodeFactory->createNamedNode('http://saft/test/s1');
         $predicate2 = $this->nodeFactory->createNamedNode('http://saft/test/p2');
-        $object2 = new LiteralImpl(new RdfHelpers(), 'Emma');
+        $object2 = new LiteralImpl('Emma');
         $statement = new StatementImpl($subject2, $predicate2, $object2);
 
         // add two statements with literal
