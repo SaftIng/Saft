@@ -20,7 +20,6 @@ php:
     - nightly
 
 env:
-    - VIRTUOSO=6.1.x
     - VIRTUOSO=7.2.4.2
 
 matrix:
@@ -40,7 +39,7 @@ sudo: true
 
 before_install:
     - bash ./scripts/install-extensions.sh
-    - bash ./scripts/install-services.sh
+    - bash ./scripts/install-virtuoso.sh
     - composer require satooshi/php-coveralls:*
     - travis_retry composer install --dev --no-interaction
 
