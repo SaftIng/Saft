@@ -1245,7 +1245,7 @@ abstract class AbstractStoreTest extends TestCase
 
         $result = $this->fixture->query('SELECT * FROM <'.$this->testGraph->getUri().'> WHERE {
             ?s ?p ?o.
-            ?s rdf:type foo:Bar .
+            ?s rdf:type rdf:nothin-there .
         }');
 
         $this->assertCountStatementIterator(0, $result);
