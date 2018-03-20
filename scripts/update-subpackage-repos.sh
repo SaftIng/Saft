@@ -8,7 +8,6 @@ repos[saft.data]=src/Saft/Data
 repos[saft.rdf]=src/Saft/Rdf
 repos[saft.sparql]=src/Saft/Sparql
 repos[saft.store]=src/Saft/Store
-repos[saft.test]=src/Saft/Test
 
 # additional packages
 repos[saft.arc2]=src/Saft/Addition/ARC2

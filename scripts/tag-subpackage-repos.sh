@@ -15,12 +15,10 @@ repos[saft.data]=src/Saft/Data
 repos[saft.rdf]=src/Saft/Rdf
 repos[saft.sparql]=src/Saft/Sparql
 repos[saft.store]=src/Saft/Store
-repos[saft.test]=src/Saft/Test
 
 # additional packages
 repos[saft.arc2]=src/Saft/Addition/ARC2
 repos[saft.easyrdf]=src/Saft/Addition/EasyRdf
-repos[saft.erfurt]=src/Saft/Addition/Erfurt
 repos[saft.store.http]=src/Saft/Addition/HttpStore
 repos[saft.store.virtuoso]=src/Saft/Addition/Virtuoso
 
