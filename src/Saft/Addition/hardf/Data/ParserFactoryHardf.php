@@ -39,14 +39,14 @@ class ParserFactoryHardf implements ParserFactory
         StatementIteratorFactory $statementIteratorFactory,
         RdfHelpers $rdfHelpers
     ) {
-        /**
+        /*
          * Map of serializations. It maps the Saft term on according the EasyRdf format.
          */
-        $this->serializationMap = array(
+        $this->serializationMap = [
             'n-triples' => 'n-triples',
             'n-quads' => 'n-quads',
             'turtle' => 'turtle',
-        );
+        ];
 
         $this->nodeFactory = $nodeFactory;
         $this->RdfHelpers = $rdfHelpers;
@@ -59,14 +59,16 @@ class ParserFactoryHardf implements ParserFactory
      *
      * @param string $serialization The serialization you need a parser for. In case it is not
      *                              available, an exception will be thrown.
-     * @return Parser Suitable parser for the requested serialization.
-     * @throws \Exception If parser for requested serialization is not available.
+     *
+     * @return Parser suitable parser for the requested serialization
+     *
+     * @throws \Exception if parser for requested serialization is not available
      */
     public function createParserFor($serialization)
     {
         if (!in_array($serialization, $this->getSupportedSerializations())) {
             throw new \Exception(
-                'Requested serialization '. $serialization .' is not available in: '.
+                'Requested serialization '.$serialization.' is not available in: '.
                 implode(', ', $this->getSupportedSerializations())
             );
         }
@@ -81,10 +83,10 @@ class ParserFactoryHardf implements ParserFactory
     }
 
     /**
-    * Returns an array which contains supported serializations.
-    *
-    * @return array Array of supported serializations which are understood by this parser.
-    */
+     * Returns an array which contains supported serializations.
+     *
+     * @return array array of supported serializations which are understood by this parser
+     */
     public function getSupportedSerializations()
     {
         return array_keys($this->serializationMap);

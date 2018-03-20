@@ -13,13 +13,13 @@
 namespace Saft\Addition\hardf\Test;
 
 use Saft\Addition\hardf\Data\ParserFactoryHardf;
-use Saft\Data\Test\ParserFactoryAbstractTest;
+use Saft\Data\Test\AbstractParserFactoryTest;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 
-class ParserFactoryHardfTest extends ParserFactoryAbstractTest
+class ParserFactoryHardfTest extends AbstractParserFactoryTest
 {
     /**
      * This list represents all serializations that are supported by the Parsers behind the ParserFactory
@@ -27,11 +27,11 @@ class ParserFactoryHardfTest extends ParserFactoryAbstractTest
      *
      * @var array
      */
-    protected $availableSerializations = array(
+    protected $availableSerializations = [
         'n-triples',
         'n-quads',
-        'turtle'
-    );
+        'turtle',
+    ];
 
     /**
      * @return ParserFactory
@@ -39,7 +39,7 @@ class ParserFactoryHardfTest extends ParserFactoryAbstractTest
     protected function newInstance()
     {
         return new ParserFactoryHardf(
-            new NodeFactoryImpl(new RdfHelpers()),
+            new NodeFactoryImpl(),
             new StatementFactoryImpl(),
             new StatementIteratorFactoryImpl(),
             new RdfHelpers()

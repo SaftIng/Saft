@@ -12,16 +12,14 @@
 
 namespace Saft\Addition\hardf\Test;
 
-use Saft\Addition\hardf\Data\ParserHardf;
 use Saft\Addition\hardf\Data\ParserFactoryHardf;
-use Saft\Data\Test\ParserAbstractTest;
+use Saft\Data\Test\AbstractParserTest;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
-use Saft\Store\Store;
 
-class ParserHardfTest extends ParserAbstractTest
+class ParserHardfTest extends AbstractParserTest
 {
     protected $factory;
 
@@ -30,7 +28,7 @@ class ParserHardfTest extends ParserAbstractTest
         parent::setUp();
 
         $this->factory = new ParserFactoryHardf(
-            new NodeFactoryImpl(new RdfHelpers()),
+            new NodeFactoryImpl(),
             new StatementFactoryImpl(),
             new StatementIteratorFactoryImpl(),
             new RdfHelpers()
@@ -66,7 +64,7 @@ class ParserHardfTest extends ParserAbstractTest
         );
 
         $statementIteratorFactory = new StatementIteratorFactoryImpl();
-        $expected = $statementIteratorFactory->createStatementIteratorFromArray(array(
+        $expected = $statementIteratorFactory->createStatementIteratorFromArray([
             $this->statementFactory->createStatement(
                 $this->nodeFactory->createNamedNode('http://foo/bar1'),
                 $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
@@ -112,7 +110,7 @@ class ParserHardfTest extends ParserAbstractTest
                 $this->nodeFactory->createNamedNode('http://foo/baz2'),
                 $this->nodeFactory->createNamedNode('http://foo/baz3')
             ),
-        ));
+        ]);
 
         $this->assertEquals($expected, $iterator);
     }
@@ -120,7 +118,7 @@ class ParserHardfTest extends ParserAbstractTest
     // test that guessFormat doesn't confuse n-triples with turtle
     public function testParseStringToIteratorRegression1()
     {
-        $fileContent = file_get_contents(__DIR__ .'/resources/guessFormat-regression1.ttl');
+        $fileContent = file_get_contents(__DIR__.'/resources/guessFormat-regression1.ttl');
 
         $this->assertCountStatementIterator(1165, $this->newInstance('turtle')->parseStringToIterator($fileContent));
     }
