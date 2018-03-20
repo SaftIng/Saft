@@ -22,8 +22,7 @@ default:
 	@echo ""
 	@echo "You can execute:"
 	@echo "- make apidoc                      - Update API doc."
-	@echo "- make codesniffer                 - Check code format."
-	@echo "- make codebeautifier              - Clean and format code."
+	@echo "- make cs                 		  - Fixes coding standard issues."
 	@echo "- make clean                       - Remove temporary folders and vendor folder."
 	@echo "- make commit                      - Runs some quality checks before call git commit."
 	@echo "- make remove-subpackage-branches  - Removes subpackage branches."
@@ -37,11 +36,8 @@ default:
 apidoc:
 	$(SAMI) update -n -v --force $(SAMI-CONFIG)
 
-codesniffer:
-	$(PHPCS) --standard=$(PHPCS-RULES) --extensions=php -p src/*
-
-codebeautifier:
-	$(PHPCBF) --standard=$(PHPCS-RULES) --extensions=php -p src/*
+cs:
+	vendor/bin/php-cs-fixer fix
 
 clean:
 	rm -r ./gen ./tmp ./vendor

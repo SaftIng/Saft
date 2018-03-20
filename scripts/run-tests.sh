@@ -13,7 +13,7 @@ components[store]=src/Saft/Store
 components[arc2]=src/Saft/Addition/ARC2
 components[easyrdf]=src/Saft/Addition/EasyRdf
 components[hardf]=src/Saft/Addition/hardf
-components[httpstore]=src/Saft/Addition/HttpStore
+# TODO components[httpstore]=src/Saft/Addition/HttpStore
 components[virtuoso]=src/Saft/Addition/Virtuoso
 
 for i in "${!components[@]}"
