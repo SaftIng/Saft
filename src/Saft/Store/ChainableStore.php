@@ -14,6 +14,7 @@ namespace Saft\Store;
 
 /**
  * @api
+ *
  * @since 0.1
  */
 interface ChainableStore extends Store
@@ -25,8 +26,10 @@ interface ChainableStore extends Store
      * E.g. you chain a query cache and a virtuoso instance. In this example all queries will be handled by
      * the query cache first, but if no cache entry was found, the virtuoso instance gets called.
      *
-     * @param Store $successor An instance of a class which implements Store interface.
+     * @param Store $successor an instance of a class which implements Store interface
+     *
      * @api
+     *
      * @since 0.1
      */
     public function setChainSuccessor(Store $successor);

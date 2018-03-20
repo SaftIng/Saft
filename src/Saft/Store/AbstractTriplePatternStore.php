@@ -17,7 +17,6 @@ use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
-use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\Query;
 use Saft\Sparql\Query\QueryFactory;
 use Saft\Sparql\Query\QueryUtils;
@@ -25,7 +24,9 @@ use Saft\Sparql\Query\QueryUtils;
 /**
  * Predefined Pattern-statement Store. The Triple-methods need to be implemented in the specific statement-store.
  * The query method is defined in the abstract class and reroute to the triple-methods.
+ *
  * @api
+ *
  * @since 0.1
  */
 abstract class AbstractTriplePatternStore implements Store
@@ -53,11 +54,13 @@ abstract class AbstractTriplePatternStore implements Store
     /**
      * Constructor.
      *
-     * @param NodeFactory              $nodeFactory Instance of NodeFactory.
-     * @param StatementFactory         $statementFactory Instance of StatementFactory.
-     * @param QueryFactory             $queryFactory Instance of QueryFactory.
-     * @param StatementIteratorFactory $statementIteratorFactory Instance of StatementIteratorFactory.
+     * @param NodeFactory              $nodeFactory              instance of NodeFactory
+     * @param StatementFactory         $statementFactory         instance of StatementFactory
+     * @param QueryFactory             $queryFactory             instance of QueryFactory
+     * @param StatementIteratorFactory $statementIteratorFactory instance of StatementIteratorFactory
+     *
      * @api
+     *
      * @since 0.1
      */
     public function __construct(
@@ -77,15 +80,19 @@ abstract class AbstractTriplePatternStore implements Store
     /**
      * This method sends a SPARQL query to the store.
      *
-     * @param  string     $query            The SPARQL query to send to the store.
-     * @param  array      $options optional It contains key-value pairs and should provide additional
-     *                                      introductions for the store and/or its adapter(s).
-     * @return Result     Returns result of the query. Its type depends on the type of the query.
-     * @throws \Exception If query is no string, is malformed or an execution error occured.
+     * @param string $query   the SPARQL query to send to the store
+     * @param array  $options optional It contains key-value pairs and should provide additional
+     *                        introductions for the store and/or its adapter(s)
+     *
+     * @return Result Returns result of the query. Its type depends on the type of the query.
+     *
+     * @throws \Exception if query is no string, is malformed or an execution error occured
+     *
      * @api
+     *
      * @since 0.1
      */
-    public function query($query, array $options = array())
+    public function query($query, array $options = [])
     {
         $queryObject = $this->queryFactory->createInstanceByQueryString($query);
 
@@ -105,7 +112,7 @@ abstract class AbstractTriplePatternStore implements Store
                 foreach ($statements as $statement) {
                     if (1 <= $i++) {
                         throw new \Exception(
-                            'DELETE query can not contain more than one triple pattern: '. $query
+                            'DELETE query can not contain more than one triple pattern: '.$query
                         );
                     }
 
@@ -133,12 +140,14 @@ abstract class AbstractTriplePatternStore implements Store
              * ASK query
              */
             $statement = $this->getStatement($queryObject);
+
             return $this->hasMatchingStatement($statement);
         } elseif ('selectQuery' == $this->queryUtils->getQueryType($query)) {
             /*
              * SELECT query
              */
             $statement = $this->getStatement($queryObject);
+
             return $this->getMatchingStatements($statement);
         } elseif ('constructQuery' == $this->queryUtils->getQueryType($query)) {
             /*
@@ -146,23 +155,28 @@ abstract class AbstractTriplePatternStore implements Store
              * TODO how to handle it here?
              */
             $statement = $this->getStatement($queryObject);
+
             return $this->getMatchingStatements($statement);
         } else {
             /*
              * Unsupported query
              */
-            throw new \Exception('Unsupported query was given: '. $query);
+            throw new \Exception('Unsupported query was given: '.$query);
         }
     }
 
     /**
      * Create Statement instance based on a given Query instance.
      *
-     * @param Query     $queryObject Query object which represents a SPARQL query.
-     * @return Statement Statement object itself.
-     * @throws \Exception if query contains more than one triple pattern.
-     * @throws \Exception if more than one graph was found.
+     * @param Query $queryObject query object which represents a SPARQL query
+     *
+     * @return Statement statement object itself
+     *
+     * @throws \Exception if query contains more than one triple pattern
+     * @throws \Exception if more than one graph was found
+     *
      * @api
+     *
      * @since 0.1
      */
     protected function getStatement(Query $queryObject)
@@ -172,26 +186,26 @@ abstract class AbstractTriplePatternStore implements Store
         $tupleInformaton = null;
         $tupleType = null;
 
-        /**
+        /*
          * Use triple pattern
          */
         if (true === isset($queryParts['triple_pattern'])) {
             $tupleInformation = $queryParts['triple_pattern'];
             $tupleType = 'triple';
 
-        /**
+        /*
          * Use quad pattern
          */
         } elseif (true === isset($queryParts['quad_pattern'])) {
             $tupleInformation = $queryParts['quad_pattern'];
             $tupleType = 'quad';
 
-        /**
+        /*
          * Neither triple nor quad information
          */
         } else {
             throw new \Exception(
-                'Neither triple nor quad information available in given query object: ' . $queryObject->getQuery()
+                'Neither triple nor quad information available in given query object: '.$queryObject->getQuery()
             );
         }
 
@@ -199,7 +213,7 @@ abstract class AbstractTriplePatternStore implements Store
             throw new \Exception('Query contains more than one triple- respectivly quad pattern.');
         }
 
-        /**
+        /*
          * Triple
          */
         if ('triple' == $tupleType) {
@@ -208,7 +222,7 @@ abstract class AbstractTriplePatternStore implements Store
             $object = $this->createNodeByValueAndType($tupleInformation[0]['o'], $tupleInformation[0]['o_type']);
             $graph = null;
 
-        /**
+        /*
          * Quad
          */
         } elseif ('quad' == $tupleType) {
@@ -227,25 +241,29 @@ abstract class AbstractTriplePatternStore implements Store
     /**
      * Create statements from query.
      *
-     * @param Query $queryObject Query object which represents a SPARQL query.
+     * @param Query $queryObject query object which represents a SPARQL query
+     *
      * @return StatementIterator StatementIterator object
-     * @throws \Exception if query contains quads and triples at the same time.
-     * @throws \Exception if query contains neither quads nor triples.
+     *
+     * @throws \Exception if query contains quads and triples at the same time
+     * @throws \Exception if query contains neither quads nor triples
+     *
      * @api
+     *
      * @since 0.1
      */
     protected function getStatements(Query $queryObject)
     {
         $queryParts = $queryObject->getQueryParts();
 
-        $statementArray = array();
+        $statementArray = [];
 
         // if only triples, but no quads
         if (true === isset($queryParts['triple_pattern'])
             && false === isset($queryParts['quad_pattern'])) {
             foreach ($queryParts['triple_pattern'] as $pattern) {
                 /**
-                 * Create Node instances for S, P and O to build a Statement instance later on
+                 * Create Node instances for S, P and O to build a Statement instance later on.
                  */
                 $s = $this->createNodeByValueAndType($pattern['s'], $pattern['s_type']);
                 $p = $this->createNodeByValueAndType($pattern['p'], $pattern['p_type']);
@@ -255,12 +273,12 @@ abstract class AbstractTriplePatternStore implements Store
                 $statementArray[] = $this->statementFactory->createStatement($s, $p, $o, $g);
             }
 
-        // if only quads, but not triples
+            // if only quads, but not triples
         } elseif (false === isset($queryParts['triple_pattern'])
             && true === isset($queryParts['quad_pattern'])) {
             foreach ($queryParts['quad_pattern'] as $pattern) {
                 /**
-                 * Create Node instances for S, P and O to build a Statement instance later on
+                 * Create Node instances for S, P and O to build a Statement instance later on.
                  */
                 $s = $this->createNodeByValueAndType($pattern['s'], $pattern['s_type']);
                 $p = $this->createNodeByValueAndType($pattern['p'], $pattern['p_type']);
@@ -270,11 +288,10 @@ abstract class AbstractTriplePatternStore implements Store
                 $statementArray[] = $this->statementFactory->createStatement($s, $p, $o, $g);
             }
 
-        // found quads and triples
+            // found quads and triples
         } elseif (true === isset($queryParts['triple_pattern'])
             && true === isset($queryParts['quad_pattern'])) {
             throw new \Exception('Query contains quads and triples. That is not supported yet.');
-
         // neither quads nor triples
         } else {
             throw new \Exception('Query contains neither quads nor triples.');
@@ -288,36 +305,40 @@ abstract class AbstractTriplePatternStore implements Store
      *
      * @param mixed  $value
      * @param string $type
-     * @return Node Instance of Node interface.
-     * @throws \Exception if an unknown type was given.
+     *
+     * @return Node instance of Node interface
+     *
+     * @throws \Exception if an unknown type was given
+     *
      * @api
+     *
      * @since 0.1
      */
     protected function createNodeByValueAndType($value, $type)
     {
-        /**
+        /*
          * URI
          */
         if ('uri' == $type) {
             return $this->nodeFactory->createNamedNode($value);
 
-        /**
+        /*
          * Any Pattern
          */
         } elseif ('var' == $type) {
             return $this->nodeFactory->createAnyPattern();
 
-        /**
+        /*
          * Typed Literal or Literal
          */
         } elseif ('typed-literal' == $type || 'literal' == $type) {
             return $this->nodeFactory->createLiteral($value);
 
-        /**
+        /*
          * Unknown type
          */
         } else {
-            throw new \Exception('Unknown type given: '. $type);
+            throw new \Exception('Unknown type given: '.$type);
         }
     }
 }

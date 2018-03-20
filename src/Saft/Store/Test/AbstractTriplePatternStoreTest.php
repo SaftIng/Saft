@@ -20,11 +20,9 @@ use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
-use Saft\Sparql\SparqlUtils;
+use Saft\Rdf\Test\TestCase;
 use Saft\Sparql\Query\QueryFactoryImpl;
-use Saft\Sparql\Query\QueryUtils;
 use Saft\Store\BasicTriplePatternStore;
-use Saft\Test\TestCase;
 
 class AbstractTriplePatternStoreTest extends TestCase
 {
@@ -32,14 +30,14 @@ class AbstractTriplePatternStoreTest extends TestCase
 
     public function setUp()
     {
+        $this->rdfHelpers = new RdfHelpers();
+
         $this->fixture = new BasicTriplePatternStore(
-            new NodeFactoryImpl(new RdfHelpers()),
+            new NodeFactoryImpl(),
             new StatementFactoryImpl(),
-            new QueryFactoryImpl(new RdfHelpers()),
+            new QueryFactoryImpl($this->rdfHelpers),
             new StatementIteratorFactoryImpl()
         );
-
-        $this->rdfHelpers = new RdfHelpers();
     }
 
     /*
@@ -48,10 +46,10 @@ class AbstractTriplePatternStoreTest extends TestCase
 
     protected function getTestQuad()
     {
-        $subject1 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/testquad/s1');
-        $predicate1 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/testquad/p1');
-        $object1 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/testquad/o1');
-        $graph1 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/testquad/g1');
+        $subject1 = new NamedNodeImpl('http://saft/testquad/s1');
+        $predicate1 = new NamedNodeImpl('http://saft/testquad/p1');
+        $object1 = new NamedNodeImpl('http://saft/testquad/o1');
+        $graph1 = new NamedNodeImpl('http://saft/testquad/g1');
         $quad = new StatementImpl($subject1, $predicate1, $object1, $graph1);
 
         return new StatementImpl($subject1, $predicate1, $object1, $graph1);
@@ -59,9 +57,9 @@ class AbstractTriplePatternStoreTest extends TestCase
 
     protected function getTestTriple()
     {
-        $subject2 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/testtriple/s2');
-        $predicate2 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/testtriple/p2');
-        $object2 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/testtriple/o2');
+        $subject2 = new NamedNodeImpl('http://saft/testtriple/s2');
+        $predicate2 = new NamedNodeImpl('http://saft/testtriple/p2');
+        $object2 = new NamedNodeImpl('http://saft/testtriple/o2');
         $triple = new StatementImpl($subject2, $predicate2, $object2);
 
         return new StatementImpl($subject2, $predicate2, $object2);
@@ -78,9 +76,10 @@ class AbstractTriplePatternStoreTest extends TestCase
 
     protected function getTestStatementWithLiteral()
     {
-        $subject2 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/test/s1');
-        $predicate2 = new NamedNodeImpl(new RdfHelpers(), 'http://saft/test/p2');
-        $object2 = new LiteralImpl(new RdfHelpers(), 'John');
+        $subject2 = new NamedNodeImpl('http://saft/test/s1');
+        $predicate2 = new NamedNodeImpl('http://saft/test/p2');
+        $object2 = new LiteralImpl('John');
+
         return new StatementImpl($subject2, $predicate2, $object2);
     }
 
@@ -109,9 +108,9 @@ class AbstractTriplePatternStoreTest extends TestCase
         // create the statement
         $query = 'INSERT DATA {
             Graph <http://graph/> {
-                '. $statement->getSubject()->toNQuads() .'
-                '. $statement->getPredicate()->toNQuads() .'
-                '. $statement->getObject()->toNQuads() .'
+                '.$statement->getSubject()->toNQuads().'
+                '.$statement->getPredicate()->toNQuads().'
+                '.$statement->getObject()->toNQuads().'
             }
         }';
 
@@ -124,7 +123,7 @@ class AbstractTriplePatternStoreTest extends TestCase
                 $statement->getSubject(),
                 $statement->getPredicate(),
                 $statement->getObject(),
-                new NamedNodeImpl(new RdfHelpers(), 'http://graph/')
+                new NamedNodeImpl('http://graph/')
             ),
             $resultStatements->current()
         );
@@ -146,7 +145,7 @@ class AbstractTriplePatternStoreTest extends TestCase
         $triple = $this->getTestTriple();
 
         $graphPattern = $this->rdfHelpers->statementsToSparqlFormat([$st, $triple]);
-        $query = 'DELETE DATA { ' . $graphPattern . '}';
+        $query = 'DELETE DATA { '.$graphPattern.'}';
 
         $this->fixture->query($query);
     }
@@ -154,8 +153,8 @@ class AbstractTriplePatternStoreTest extends TestCase
     public function testDeleteMultipleStatementsQuadRecognition()
     {
         $quad = $this->getTestQuad();
-        $graphPattern = $this->rdfHelpers->statementsToSparqlFormat(array($quad));
-        $query = 'DELETE DATA { ' . $graphPattern . '}';
+        $graphPattern = $this->rdfHelpers->statementsToSparqlFormat([$quad]);
+        $query = 'DELETE DATA { '.$graphPattern.'}';
 
         $this->assertNull($this->fixture->query($query));
     }
@@ -164,7 +163,7 @@ class AbstractTriplePatternStoreTest extends TestCase
     {
         $triple = $this->getTestTriple();
 
-        $query = 'DELETE DATA { ' . $this->rdfHelpers->statementsToSparqlFormat([$triple]) . '}';
+        $query = 'DELETE DATA { '.$this->rdfHelpers->statementsToSparqlFormat([$triple]).'}';
 
         $this->assertNull($this->fixture->query($query));
     }
@@ -173,7 +172,7 @@ class AbstractTriplePatternStoreTest extends TestCase
     {
         $statement = $this->getTestPatternStatement();
 
-        $query = 'DELETE DATA { '. $this->rdfHelpers->statementsToSparqlFormat([$statement]) .'}';
+        $query = 'DELETE DATA { '.$this->rdfHelpers->statementsToSparqlFormat([$statement]).'}';
 
         $this->assertNull($this->fixture->query($query));
     }
@@ -182,7 +181,7 @@ class AbstractTriplePatternStoreTest extends TestCase
     {
         $statement = $this->getTestStatementWithLiteral();
 
-        $query = 'DELETE DATA { '. $this->rdfHelpers->statementsToSparqlFormat([$statement]) .'}';
+        $query = 'DELETE DATA { '.$this->rdfHelpers->statementsToSparqlFormat([$statement]).'}';
 
         $this->assertNull($this->fixture->query($query));
     }
@@ -196,9 +195,9 @@ class AbstractTriplePatternStoreTest extends TestCase
     {
         $triple = $this->getTestTriple();
 
-        $this->fixture->addStatements(array($triple), $this->testGraph);
+        $this->fixture->addStatements([$triple], $this->testGraph);
 
-        $query = 'ASK { '. $this->rdfHelpers->statementsToSparqlFormat(array($triple), $this->testGraph) .'}';
+        $query = 'ASK { '.$this->rdfHelpers->statementsToSparqlFormat([$triple], $this->testGraph).'}';
 
         $this->assertTrue($this->fixture->query($query));
     }

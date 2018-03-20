@@ -22,7 +22,6 @@ use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
 use Saft\Sparql\Query\QueryFactory;
 use Saft\Sparql\Result\Result;
-use Saft\Sparql\Result\EmptyResult;
 use Saft\Sparql\Result\ResultFactory;
 
 /**
@@ -30,6 +29,7 @@ use Saft\Sparql\Result\ResultFactory;
  * no longer have to be implemented, but only the Query method / SPARQL interpreter itself.
  *
  * @api
+ *
  * @since 0.1
  */
 abstract class AbstractSparqlStore implements Store
@@ -62,13 +62,15 @@ abstract class AbstractSparqlStore implements Store
     /**
      * Constructor.
      *
-     * @param NodeFactory              $nodeFactory Instance of NodeFactory.
-     * @param StatementFactory         $statementFactory Instance of StatementFactory.
-     * @param QueryFactory             $queryFactory Instance of QueryFactory.
-     * @param ResultFactory            $resultFactory Instance of ResultFactory.
-     * @param StatementIteratorFactory $statementIteratorFactory Instance of StatementIteratorFactory.
-     * @param RdfHelpers              $rdfHelpers
+     * @param NodeFactory              $nodeFactory              instance of NodeFactory
+     * @param StatementFactory         $statementFactory         instance of StatementFactory
+     * @param QueryFactory             $queryFactory             instance of QueryFactory
+     * @param ResultFactory            $resultFactory            instance of ResultFactory
+     * @param StatementIteratorFactory $statementIteratorFactory instance of StatementIteratorFactory
+     * @param RdfHelpers               $rdfHelpers
+     *
      * @api
+     *
      * @since 0.1
      */
     public function __construct(
@@ -90,16 +92,18 @@ abstract class AbstractSparqlStore implements Store
     /**
      * Adds multiple Statements to (default-) graph.
      *
-     * @param StatementIterator|array $statements StatementList instance must contain Statement instances which
-     *                                            are 'concret-' and not 'pattern'-statements.
+     * @param StatementIterator|array $statements statementList instance must contain Statement instances which
+     *                                            are 'concret-' and not 'pattern'-statements
      * @param Node                    $graph      Overrides target graph. If set, all statements will be add to
      *                                            that graph, if it is available. (optional)
      * @param array                   $options    Key-value pairs which provide additional introductions for the
      *                                            store and/or its adapter(s). (optional)
+     *
      * @api
+     *
      * @since 0.1
      */
-    public function addStatements($statements, Node $graph = null, array $options = array())
+    public function addStatements($statements, Node $graph = null, array $options = [])
     {
         $graphUriToUse = null;
 
@@ -108,13 +112,13 @@ abstract class AbstractSparqlStore implements Store
          */
         $counter = 1;
         $batchSize = 100;
-        $batchStatements = array();
+        $batchStatements = [];
 
         foreach ($statements as $statement) {
             // non-concrete Statement instances not allowed
             if (false === $statement->isConcrete()) {
                 // We would need a rollback here, but we don't have any transactions so far
-                throw new \Exception('At least one Statement is not concrete: ' . $statement->toNTriples());
+                throw new \Exception('At least one Statement is not concrete: '.$statement->toNTriples());
             }
 
             // given $graph forces usage of it and not the graph from the statement instance
@@ -124,14 +128,13 @@ abstract class AbstractSparqlStore implements Store
             // use graph from statement
             } elseif (null !== $statement->getGraph()) {
                 $graphUriToUse = $statement->getGraph()->getUri();
-
             } else {
                 $graphUriToUse = null;
             }
 
             // init batch entry for the current graph URI, if not set yet.
             if (false === isset($batchStatements[$graphUriToUse])) {
-                $batchStatements[$graphUriToUse] = array();
+                $batchStatements[$graphUriToUse] = [];
             }
 
             $batchStatements[$graphUriToUse][] = $statement;
@@ -147,17 +150,16 @@ abstract class AbstractSparqlStore implements Store
 
                     foreach ($batch as $batchEntries) {
                         $content .= $this->sparqlFormat(
-                            $this->statementIteratorFactory->createStatementIteratorFromArray(array($batchEntries)),
+                            $this->statementIteratorFactory->createStatementIteratorFromArray([$batchEntries]),
                             $graph
-                        ) .' ';
+                        ).' ';
                     }
 
-                    $this->query('INSERT DATA {'. $content .'}', $options);
+                    $this->query('INSERT DATA {'.$content.'}', $options);
                 }
 
                 // re-init variables
-                $batchStatements = array();
-
+                $batchStatements = [];
             } else {
                 ++$counter;
             }
@@ -170,15 +172,15 @@ abstract class AbstractSparqlStore implements Store
         foreach ($batchStatements as $graphUriToUse => $batch) {
             foreach ($batch as $batchEntries) {
                 $content .= $this->sparqlFormat(
-                    $this->statementIteratorFactory->createStatementIteratorFromArray(array($batchEntries)),
+                    $this->statementIteratorFactory->createStatementIteratorFromArray([$batchEntries]),
                     $graph
-                ) .' ';
+                ).' ';
             }
         }
 
         // if remaining statements are available
         if (0 < count($batchStatements)) {
-            $this->query('INSERT DATA {'. $content .'}', $options);
+            $this->query('INSERT DATA {'.$content.'}', $options);
         }
     }
 
@@ -186,31 +188,36 @@ abstract class AbstractSparqlStore implements Store
      * Create a new graph with the URI given as Node. If the underlying store implementation doesn't
      * support empty graphs this method will have no effect.
      *
-     * @param NamedNode $graph   Instance of NamedNode containing the URI of the graph to create.
+     * @param NamedNode $graph   instance of NamedNode containing the URI of the graph to create
      * @param array     $options It contains key-value pairs and should provide additional introductions for the
      *                           store and/or its adapter(s). (optional)
-     * @throws \Exception if given $graph is not a NamedNode.
-     * @throws \Exception if the given graph could not be created.
+     *
+     * @throws \Exception if given $graph is not a NamedNode
+     * @throws \Exception if the given graph could not be created
+     *
      * @api
+     *
      * @since 0.1
      */
-    public function createGraph(NamedNode $graph, array $options = array())
+    public function createGraph(NamedNode $graph, array $options = [])
     {
-        $this->query('CREATE SILENT GRAPH <'. $graph->getUri() .'>');
+        $this->query('CREATE SILENT GRAPH <'.$graph->getUri().'>');
     }
 
     /**
      * Removes all statements from a (default-) graph which match with given statement.
      *
-     * @param Statement $statement It can be either a concrete or pattern-statement.
+     * @param Statement $statement it can be either a concrete or pattern-statement
      * @param Node      $graph     Overrides target graph. If set, all statements will be delete in that
      *                             graph. (optional)
      * @param array     $options   Key-value pairs which provide additional introductions for the store and/or its
      *                             adapter(s). (optional)
+     *
      * @api
+     *
      * @since 0.1
      */
-    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
+    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = [])
     {
         // given $graph forces usage of it and not the graph from the statement instance
         if (null !== $graph) {
@@ -220,30 +227,32 @@ abstract class AbstractSparqlStore implements Store
         } elseif (null !== $statement->getGraph()) {
             $graph = $statement->getGraph();
             $graphUriToUse = $graph->getUri();
-
         }
 
         $statementIterator = $this->statementIteratorFactory->createStatementIteratorFromArray(
-            array($statement)
+            [$statement]
         );
 
-        $this->query('DELETE WHERE { '. $this->sparqlFormat($statementIterator, $graph) .'}', $options);
+        $this->query('DELETE WHERE { '.$this->sparqlFormat($statementIterator, $graph).'}', $options);
     }
 
     /**
      * Removes the given graph from the store.
      *
-     * @param NamedNode  $graph   Instance of NamedNode containing the URI of the graph to drop.
-     * @param array      $options It contains key-value pairs and should provide additional introductions for the
-     *                            store and/or its adapter(s). (optional)
-     * @throws \Exception if given $graph is not a NamedNode.
+     * @param NamedNode $graph   instance of NamedNode containing the URI of the graph to drop
+     * @param array     $options It contains key-value pairs and should provide additional introductions for the
+     *                           store and/or its adapter(s). (optional)
+     *
+     * @throws \Exception if given $graph is not a NamedNode
      * @throws \Exception if the given graph could not be droped
+     *
      * @api
+     *
      * @since 0.1
      */
-    public function dropGraph(NamedNode $graph, array $options = array())
+    public function dropGraph(NamedNode $graph, array $options = [])
     {
-        $this->query('DROP SILENT GRAPH <'. $graph->getUri() .'>');
+        $this->query('DROP SILENT GRAPH <'.$graph->getUri().'>');
     }
 
     /**
@@ -251,16 +260,18 @@ abstract class AbstractSparqlStore implements Store
      * to only returned available graphs in the current context. But that depends on the implementation
      * and can differ.
      *
-     * @return array Simple array of key-value-pairs, which consists of graph URIs as key and NamedNode
-     *               instance as value.
+     * @return array simple array of key-value-pairs, which consists of graph URIs as key and NamedNode
+     *               instance as value
+     *
      * @api
+     *
      * @since 0.1
      */
     public function getGraphs()
     {
         $result = $this->query('SELECT DISTINCT ?g WHERE { GRAPH ?g {?s ?p ?o.} }');
 
-        $graphs = array();
+        $graphs = [];
 
         foreach ($result as $entry) {
             $graphNode = $entry['g'];
@@ -278,18 +289,22 @@ abstract class AbstractSparqlStore implements Store
      *   it is null.
      * - statement's object is either equal to the object of a statement of the graph or it is null.
      *
-     * @param Statement $statement It can be either a concrete or pattern-statement.
+     * @param Statement $statement it can be either a concrete or pattern-statement
      * @param Node      $graph     Overrides target graph. If set, you will get all matching statements of that
      *                             graph. (optional)
      * @param array     $options   It contains key-value pairs and should provide additional introductions
      *                             for the store and/or its adapter(s). (optional)
-     * @return StatementIterator It contains Statement instances  of all matching statements of the given graph.
+     *
+     * @return StatementIterator it contains Statement instances  of all matching statements of the given graph
+     *
      * @api
+     *
      * @since 0.1
+     *
      * @todo check if graph URI is valid
      * @todo make it possible to read graphUri from $statement, if given $graphUri is null
      */
-    public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
+    public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = [])
     {
         // otherwise check, if graph was set in the statement and it is a named node and use it, if so.
         if (null === $graph && $statement->isQuad()) {
@@ -311,22 +326,22 @@ abstract class AbstractSparqlStore implements Store
 
         // add filter, if subject is a named node or literal
         if (!$subject->isPattern()) {
-            $query .= 'FILTER (?s = '. $subject->toNQuads() .') ';
+            $query .= 'FILTER (?s = '.$subject->toNQuads().') ';
         }
 
         // add filter, if predicate is a named node or literal
         if (!$predicate->isPattern()) {
-            $query .= 'FILTER (?p = '. $predicate->toNQuads() .') ';
+            $query .= 'FILTER (?p = '.$predicate->toNQuads().') ';
         }
 
         // add filter, if object is a named node or literal
         if (!$object->isPattern()) {
-            $query .= 'FILTER (?o = '. $object->toNQuads() .') ';
+            $query .= 'FILTER (?o = '.$object->toNQuads().') ';
         }
 
         // add filter, if graph is a named node or literal
         if ($graph !== null && !$graph->isPattern()) {
-            $query .= 'FILTER (?g = '. $graph->toNQuads() .') ';
+            $query .= 'FILTER (?g = '.$graph->toNQuads().') ';
         }
 
         $query .= '}';
@@ -338,7 +353,7 @@ abstract class AbstractSparqlStore implements Store
         /*
          * Transform SetResult entries to Statement instances.
          */
-        $statementList = array();
+        $statementList = [];
         if ($graph !== null) {
             foreach ($result as $entry) {
                 $statementList[] = $this->statementFactory->createStatement(
@@ -365,15 +380,18 @@ abstract class AbstractSparqlStore implements Store
     /**
      * Returns true or false depending on whether or not the statements pattern has any matches in the given graph.
      *
-     * @param Statement $statement It can be either a concrete or pattern-statement.
+     * @param Statement $statement it can be either a concrete or pattern-statement
      * @param Node      $graph     Overrides target graph. (optional)
      * @param array     $options   It contains key-value pairs and should provide additional
      *                             introductions for the store and/or its adapter(s). (optional)
-     * @return boolean Returns true if at least one match was found, false otherwise.
+     *
+     * @return bool returns true if at least one match was found, false otherwise
+     *
      * @api
+     *
      * @since 0.1
      */
-    public function hasMatchingStatement(Statement $statement, Node $graph = null, array $options = array())
+    public function hasMatchingStatement(Statement $statement, Node $graph = null, array $options = [])
     {
         // if $graph was given, but its not a named node, set it to null.
         if (null !== $graph && false === $graph->isNamed()) {
@@ -387,10 +405,10 @@ abstract class AbstractSparqlStore implements Store
         }
 
         $statementIterator = $this->statementIteratorFactory->createStatementIteratorFromArray(
-            array($statement)
+            [$statement]
         );
 
-        $result = $this->query('ASK { '. $this->sparqlFormat($statementIterator, $graph) .'}', $options);
+        $result = $this->query('ASK { '.$this->sparqlFormat($statementIterator, $graph).'}', $options);
 
         if (true === is_object($result)) {
             return $result->getValue();
@@ -402,11 +420,14 @@ abstract class AbstractSparqlStore implements Store
     /**
      * Returns the Statement-Data in sparql-Format.
      *
-     * @param StatementIterator $statements List of statements to format as SPARQL string.
-     * @param string            $graphUri   Use if each statement is a triple and to use another graph as
-     *                                      the default.
+     * @param StatementIterator $statements list of statements to format as SPARQL string
+     * @param string            $graphUri   use if each statement is a triple and to use another graph as
+     *                                      the default
+     *
      * @return string, part of query
+     *
      * @api
+     *
      * @since 0.1
      */
     protected function sparqlFormat(StatementIterator $statements, Node $graph = null)
@@ -418,7 +439,8 @@ abstract class AbstractSparqlStore implements Store
      * Helper function which transforms an result entry to its proper Node instance.
      *
      * @param array $entry
-     * @return Node Instance of Node.
+     *
+     * @return Node instance of Node
      * @unstable
      */
     public function transformEntryToNode($entry)
@@ -443,7 +465,7 @@ abstract class AbstractSparqlStore implements Store
         $newEntry = null;
 
         switch ($entry['type']) {
-            /**
+            /*
              * Literal (language'd)
              */
             case 'literal':
@@ -460,21 +482,21 @@ abstract class AbstractSparqlStore implements Store
 
                 break;
 
-            /**
+            /*
              * Typed-Literal
              */
             case 'typed-literal':
                 $newEntry = $this->nodeFactory->createLiteral($entry['value'], $entry['datatype']);
                 break;
 
-            /**
+            /*
              * NamedNode
              */
             case 'uri':
                 $newEntry = $this->nodeFactory->createNamedNode($entry['value']);
                 break;
 
-            /**
+            /*
              * BlankNode
              */
             case 'bnode':
@@ -482,7 +504,7 @@ abstract class AbstractSparqlStore implements Store
                 break;
 
             default:
-                throw new \Exception('Unknown type given: ' . $entry['type']);
+                throw new \Exception('Unknown type given: '.$entry['type']);
                 break;
         }
 
