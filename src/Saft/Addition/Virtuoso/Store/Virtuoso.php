@@ -296,8 +296,6 @@ class Virtuoso extends AbstractSparqlStore
                 (string) $this->configuration['username'],
                 (string) $this->configuration['password']
             );
-            $this->connection->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
-            $this->connection->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
             $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         }
 
