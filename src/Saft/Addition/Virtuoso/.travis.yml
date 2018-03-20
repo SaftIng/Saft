@@ -10,6 +10,8 @@
 
 language: php
 
+dist: trusty
+
 php:
     - '5.6'
     - '7.0'
@@ -18,8 +20,7 @@ php:
     - nightly
 
 env:
-    - VIRTUOSO=6.1.7
-    - VIRTUOSO=7.1.0
+    - VIRTUOSO=6.1.x
     - VIRTUOSO=7.2.4.2
 
 matrix:
@@ -27,8 +28,6 @@ matrix:
     include:
         - php: hhvm
     allow_failures:
-        - env: VIRTUOSO=6.1.4
-        - env: VIRTUOSO=6.1.6
         - php: nightly
         - php: hhvm
 
