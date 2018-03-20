@@ -23,25 +23,28 @@ class ResultFactoryImpl implements ResultFactory
     }
 
     /**
-     * @param  \Iterator|array|null $list optional, default is array()
+     * @param \Iterator|array|null $list optional, default is array()
+     *
      * @return SetResult
      */
-    public function createSetResult($list = array())
+    public function createSetResult($list = [])
     {
         return new SetResultImpl($list);
     }
 
     /**
-     * @param  \Iterator|array|null $list optional, default is array()
+     * @param \Iterator|array|null $list optional, default is array()
+     *
      * @return SetResult
      */
-    public function createStatementResult($list = array())
+    public function createStatementResult($list = [])
     {
         return new StatementSetResultImpl($list);
     }
 
     /**
      * @param mixed $scalar
+     *
      * @return ValueResult
      */
     public function createValueResult($scalar)

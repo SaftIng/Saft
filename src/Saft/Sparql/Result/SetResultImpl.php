@@ -22,18 +22,19 @@ class SetResultImpl extends \ArrayIterator implements SetResult
      *
      * @var array
      */
-    protected $variables = array();
+    protected $variables = [];
 
     /**
      * Constructor.
      *
-     * @param  object|array              $array The array or object to be iterated on.
-     * @param  int                       $flags Flags to control the behaviour of the ArrayIterator object.
-     *                                          See ArrayIterator::setFlags for more information:
-     *                                          http://php.net/manual/de/arrayiterator.setflags.php
-     * @throws \InvalidArgumentException If anything besides an array or an object is given.
+     * @param object|array $array the array or object to be iterated on
+     * @param int          $flags Flags to control the behaviour of the ArrayIterator object.
+     *                            See ArrayIterator::setFlags for more information:
+     *                            http://php.net/manual/de/arrayiterator.setflags.php
+     *
+     * @throws \InvalidArgumentException if anything besides an array or an object is given
      */
-    public function __construct($array = array(), $flags = 0)
+    public function __construct($array = [], $flags = 0)
     {
         parent::__construct($array, $flags);
 
@@ -54,7 +55,7 @@ class SetResultImpl extends \ArrayIterator implements SetResult
     }
 
     /**
-     * @return boolean True
+     * @return bool True
      */
     public function isEmptyResult()
     {
@@ -62,7 +63,7 @@ class SetResultImpl extends \ArrayIterator implements SetResult
     }
 
     /**
-     * @return boolean True
+     * @return bool True
      */
     public function isSetResult()
     {
@@ -70,7 +71,7 @@ class SetResultImpl extends \ArrayIterator implements SetResult
     }
 
     /**
-     * @return boolean False
+     * @return bool False
      */
     public function isStatementSetResult()
     {
@@ -78,7 +79,7 @@ class SetResultImpl extends \ArrayIterator implements SetResult
     }
 
     /**
-     * @return boolean True
+     * @return bool True
      */
     public function isValueResult()
     {

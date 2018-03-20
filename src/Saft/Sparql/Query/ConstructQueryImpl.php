@@ -13,7 +13,6 @@
 namespace Saft\Sparql\Query;
 
 use Saft\Rdf\RdfHelpers;
-use Saft\Sparql\Query\AbstractQuery;
 
 /**
  * Represents an Construct query.
@@ -23,8 +22,9 @@ class ConstructQueryImpl extends AbstractQuery
     /**
      * Constructor.
      *
-     * @param  string     optional $query SPARQL query string to initialize this instance.
-     * @throws \Exception If no where part was found in query.
+     * @param string     optional $query SPARQL query string to initialize this instance
+     *
+     * @throws \Exception if no where part was found in query
      */
     public function __construct($query = '', RdfHelpers $rdfHelpers)
     {
@@ -38,7 +38,7 @@ class ConstructQueryImpl extends AbstractQuery
             if (false !== $result && true === isset($match[1])) {
                 $this->queryParts['where'] = trim($match[1]);
             } else {
-                throw new \Exception('No where part found in query: '. $query);
+                throw new \Exception('No where part found in query: '.$query);
             }
         }
     }
@@ -46,8 +46,8 @@ class ConstructQueryImpl extends AbstractQuery
     /**
      * Return parts of the query on which this instance based on.
      *
-     * @return array $queryParts Query parts; parts which have no elements will be unset.
-    */
+     * @return array $queryParts query parts; parts which have no elements will be unset
+     */
     public function getQueryParts()
     {
         // remove prefix information from query to be able to simply use extractGraphs on query string.
@@ -72,7 +72,7 @@ class ConstructQueryImpl extends AbstractQuery
     /**
      * Represents it an ASK query?
      *
-     * @return boolean True
+     * @return bool True
      */
     public function isAskQuery()
     {
@@ -82,7 +82,7 @@ class ConstructQueryImpl extends AbstractQuery
     /**
      * Represents it a CONSTRUCT query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isConstructQuery()
     {
@@ -92,7 +92,7 @@ class ConstructQueryImpl extends AbstractQuery
     /**
      * Represents it a Describe Query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isDescribeQuery()
     {
@@ -102,7 +102,7 @@ class ConstructQueryImpl extends AbstractQuery
     /**
      * Represents it a Graph Query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isGraphQuery()
     {
@@ -112,7 +112,7 @@ class ConstructQueryImpl extends AbstractQuery
     /**
      * Represents it a Select Query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isSelectQuery()
     {
@@ -122,29 +122,26 @@ class ConstructQueryImpl extends AbstractQuery
     /**
      * Represents it an Update Query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isUpdateQuery()
     {
         return false;
     }
 
-    /**
-     *
-     */
     public function __toString()
     {
         $prefixes = '';
         foreach ($this->queryParts['prefixes'] as $prefix => $uri) {
-            $prefixes .= 'PREFIX '. $prefix . ': <'. $uri .'> ';
+            $prefixes .= 'PREFIX '.$prefix.': <'.$uri.'> ';
         }
 
         $graphUris = '';
         foreach ($this->queryParts['graphs'] as $graphUri) {
-            $graphUris .= ' FROM <'. $graphUri .'> ';
+            $graphUris .= ' FROM <'.$graphUri.'> ';
         }
 
-        $query = $prefixes . ' ASK ' . $graphUris .' { '. $this->queryParts['where'] .' }';
+        $query = $prefixes.' ASK '.$graphUris.' { '.$this->queryParts['where'].' }';
 
         return $query;
     }

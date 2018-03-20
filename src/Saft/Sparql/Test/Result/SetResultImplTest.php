@@ -18,6 +18,7 @@ class SetResultImplTest extends SetResultAbstractTest
 {
     /**
      * @param \Iterator $list
+     *
      * @return SetResult
      */
     public function newInstance($list)

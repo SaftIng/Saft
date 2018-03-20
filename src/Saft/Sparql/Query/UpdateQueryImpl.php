@@ -13,7 +13,6 @@
 namespace Saft\Sparql\Query;
 
 use Saft\Rdf\RdfHelpers;
-use Saft\Sparql\Query\AbstractQuery;
 
 /**
  * Represents the following types of SPARQL queries:
@@ -22,22 +21,23 @@ use Saft\Sparql\Query\AbstractQuery;
  * - DELETE DATA
  * - DELETE WHERE
  * - WITH ... DELETE ... WHERE
- * - WITH ... DELETE ... INSERT ... WHERE
+ * - WITH ... DELETE ... INSERT ... WHERE.
  */
 class UpdateQueryImpl extends AbstractQuery
 {
     /**
      * Constructor.
      *
-     * @param string     $query SPARQL query string to initialize this instance.
+     * @param string     $query      SPARQL query string to initialize this instance
      * @param RdfHelpers $rdfHelpers
-     * @throws \Exception If no where part was found in query.
-     * @throws \Exception If given query is not suitable for UpdateQuery.
-     * @throws \Exception If no triple part after INSERT DATA found.
-     * @throws \Exception If no triple part after DELETE DATA found.
+     *
+     * @throws \Exception if no where part was found in query
+     * @throws \Exception if given query is not suitable for UpdateQuery
+     * @throws \Exception if no triple part after INSERT DATA found
+     * @throws \Exception if no triple part after DELETE DATA found
      * @throws \Exception If no valid WITH <> DELETE {...} WHERE { ...} query given.
      * @throws \Exception If no valid WITH <> DELETE {...} INSERT { ... } WHERE { ...} query given.
-     * @throws \Exception If there is either no triple part after INSERT INTO GRAPH or no graph set.
+     * @throws \Exception if there is either no triple part after INSERT INTO GRAPH or no graph set
      */
     public function __construct($query = '', RdfHelpers $rdfHelpers)
     {
@@ -50,7 +50,7 @@ class UpdateQueryImpl extends AbstractQuery
         $subType = $this->getSubType();
 
         if (null !== $subType) {
-            /**
+            /*
              * Save parts for INSERT DATA
              */
             if ('insertData' === $subType) {
@@ -60,9 +60,9 @@ class UpdateQueryImpl extends AbstractQuery
                     throw new \Exception('No triple part after INSERT DATA found.');
                 }
 
-            /**
-             * Save parts for INSERT INTO GRAPH <> {} or INSERT INTO <> {}
-             */
+                /*
+                 * Save parts for INSERT INTO GRAPH <> {} or INSERT INTO <> {}
+                 */
             } elseif ('insertInto' === $subType) {
                 preg_match('/INSERT\s+INTO\s+[GRAPH]{0,}\s*\<(.*)\>\s*\{(.*)\}/si', $query, $matches);
 
@@ -72,9 +72,9 @@ class UpdateQueryImpl extends AbstractQuery
                     );
                 }
 
-            /**
-             * Save parts for DELETE DATA {}
-             */
+                /*
+                 * Save parts for DELETE DATA {}
+                 */
             } elseif ('deleteData' === $subType) {
                 preg_match('/DELETE\s+DATA\s*\{(.*)\}/si', $query, $matches);
 
@@ -82,9 +82,9 @@ class UpdateQueryImpl extends AbstractQuery
                     throw new \Exception('No triple part after DELETE DATA found.');
                 }
 
-            /**
-             * Save parts for WITH <> DELETE {} WHERE {}
-             */
+                /*
+                 * Save parts for WITH <> DELETE {} WHERE {}
+                 */
             } elseif ('withDeleteWhere' === $subType) {
                 preg_match('/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/si', $query, $matches);
 
@@ -94,9 +94,9 @@ class UpdateQueryImpl extends AbstractQuery
                     );
                 }
 
-            /**
-             * Save parts for WITH <> DELETE {} INSERT {} WHERE {}
-             */
+                /*
+                 * Save parts for WITH <> DELETE {} INSERT {} WHERE {}
+                 */
             } elseif ('withDeleteWhere' === $subType) {
                 preg_match(
                     '/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*INSERT\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/si',
@@ -110,23 +110,22 @@ class UpdateQueryImpl extends AbstractQuery
                     );
                 }
             }
-
         } else {
-            throw new \Exception('Given query is not suitable for UpdateQuery: ' . $query);
+            throw new \Exception('Given query is not suitable for UpdateQuery: '.$query);
         }
     }
 
     /**
-     *
      * @param string $query
+     *
      * @return array
      */
     public function extractGraphs($query)
     {
-        $graphs = array();
+        $graphs = [];
 
         /**
-         * Matches the following pattern: Graph <http://uri/>
+         * Matches the following pattern: Graph <http://uri/>.
          */
         $result = preg_match_all('/GRAPH\s*\<([a-z0-9\:\/]+)\>/si', $query, $matches);
 
@@ -140,13 +139,12 @@ class UpdateQueryImpl extends AbstractQuery
     }
 
     /**
-     *
      * @return string|null
      */
     public function getSubType()
     {
         /**
-         * First we get rid of all PREFIX information
+         * First we get rid of all PREFIX information.
          */
         $adaptedQuery = preg_replace('/PREFIX\s+[a-z0-9]+\:\s*\<[a-z0-9\:\/\.\#\-]+\>/si', '', $this->getQuery());
 
@@ -215,20 +213,19 @@ class UpdateQueryImpl extends AbstractQuery
     }
 
     /**
-     *
      * @return array
      */
     public function getQueryParts()
     {
         $queryFromDelete = substr($this->getQuery(), strpos($this->getQuery(), 'DELETE'));
 
-        $this->queryParts = array(
+        $this->queryParts = [
             'graphs' => $this->extractGraphs($this->getQuery()),
             'sub_type' => $this->getSubType(),
-        );
+        ];
         $tripleRelatedPart = $this->getQuery();
 
-        /**
+        /*
          * Save parts for INSERT DATA
          */
         if ('insertData' === $this->queryParts['sub_type']) {
@@ -239,22 +236,22 @@ class UpdateQueryImpl extends AbstractQuery
                 $this->queryParts['deleteData'] = null;
                 $this->queryParts['deleteWhere'] = null;
 
-                /**
-                 * TODO extract graphs
-                 */
+            /*
+             * TODO extract graphs
+             */
             } else {
                 throw new \Exception('No triple part after INSERT DATA found.');
             }
 
-        /**
-         * Save parts for INSERT INTO GRAPH <> {}
-         */
+            /*
+             * Save parts for INSERT INTO GRAPH <> {}
+             */
         } elseif ('insertInto' === $this->queryParts['sub_type']) {
             preg_match('/INSERT\s+INTO\s+[GRAPH]{0,1}\s*\<(.*)\>\s*\{(.*)\}/si', $this->getQuery(), $matches);
 
             if (true === isset($matches[1]) && true === isset($matches[2])) {
                 // graph
-                $this->queryParts['graphs'] = array(trim($matches[1]));
+                $this->queryParts['graphs'] = [trim($matches[1])];
                 // triples
                 $this->queryParts['insertData'] = trim($matches[2]);
             } else {
@@ -263,9 +260,9 @@ class UpdateQueryImpl extends AbstractQuery
                 );
             }
 
-        /**
-         * Save parts for DELETE DATA {}
-         */
+            /*
+             * Save parts for DELETE DATA {}
+             */
         } elseif ('deleteData' === $this->queryParts['sub_type']) {
             preg_match('/DELETE\s+DATA\s*\{(.*)\}/s', $this->getQuery(), $matches);
 
@@ -273,32 +270,31 @@ class UpdateQueryImpl extends AbstractQuery
                 // triples
                 $this->queryParts['deleteData'] = trim($matches[1]);
 
-                /**
-                 * TODO extract graphs
-                 */
+            /*
+             * TODO extract graphs
+             */
             } else {
                 throw new \Exception('No triple part after DELETE DATA found.');
             }
 
-        /**
-         * Save parts for DELETE FROM <> { } WHERE { }
-         */
+            /*
+             * Save parts for DELETE FROM <> { } WHERE { }
+             */
         } elseif ('deleteFromWhere' === $this->queryParts['sub_type']) {
             preg_match('/DELETE\s+FROM\s*\<(.*)\>\s*[WHERE]{0,}\s*\{(.*)\}/si', $this->getQuery(), $matches);
 
             if (true === isset($matches[1])) {
                 // graph
-                $this->queryParts['graphs'] = array(trim($matches[1]));
+                $this->queryParts['graphs'] = [trim($matches[1])];
                 // triples
                 $this->queryParts['deleteData'] = trim($matches[2]);
-
             } else {
                 throw new \Exception('No triple part after DELETE FROM <> found.');
             }
 
-        /**
-         * Save parts for DELETE WHERE {}
-         */
+            /*
+             * Save parts for DELETE WHERE {}
+             */
         } elseif ('deleteWhere' === $this->queryParts['sub_type']) {
             preg_match('/DELETE\s+WHERE\s*\{(.*)\}/s', $this->getQuery(), $matches);
 
@@ -306,16 +302,16 @@ class UpdateQueryImpl extends AbstractQuery
                 // matching clause
                 $this->queryParts['deleteWhere'] = trim($matches[1]);
 
-                /**
-                 * TODO extract graphs
-                 */
+            /*
+             * TODO extract graphs
+             */
             } else {
                 throw new \Exception('Where part after DELETE WHERE is empty.');
             }
 
-        /*
-         * Save parts for DELETE {} WHERE {}
-         */
+            /*
+             * Save parts for DELETE {} WHERE {}
+             */
         } elseif ('deletePrologWhere' === $this->queryParts['sub_type']) {
             // TODO extract graphs
             preg_match('/DELETE\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/im', $this->getQuery(), $matches);
@@ -327,31 +323,31 @@ class UpdateQueryImpl extends AbstractQuery
                 throw new \Exception('Where part after DELETE WHERE is empty.');
             }
 
-        /**
-         * Save parts for WITH <> DELETE {} WHERE {}
-         */
+            /*
+             * Save parts for WITH <> DELETE {} WHERE {}
+             */
         } elseif ('withDeleteWhere' === $this->queryParts['sub_type']) {
             preg_match('/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/si', $this->getQuery(), $matches);
 
             if (true === isset($matches[1])) {
                 $this->queryParts['deleteData'] = trim($matches[2]);
                 $this->queryParts['deleteWhere'] = trim($matches[3]);
-                $this->queryParts['graphs'] = array(trim($matches[1]));
+                $this->queryParts['graphs'] = [trim($matches[1])];
 
-                $tripleRelatedPart = $this->queryParts['deleteData'] . $this->queryParts['deleteWhere'];
+                $tripleRelatedPart = $this->queryParts['deleteData'].$this->queryParts['deleteWhere'];
 
-                /**
-                 * TODO extract graphs
-                 */
+            /*
+             * TODO extract graphs
+             */
             } else {
                 throw new \Exception(
                     'No valid WITH <> DELETE {...} WHERE { ...} query given.'
                 );
             }
 
-        /**
-         * Save parts for WITH <> DELETE {} INSERT {} WHERE {}
-         */
+            /*
+             * Save parts for WITH <> DELETE {} INSERT {} WHERE {}
+             */
         } elseif ('withDeleteInsertWhere' === $this->queryParts['sub_type']) {
             preg_match(
                 '/WITH\s*\<(.*)\>\s*DELETE\s*\{(.*)\}\s*INSERT\s*\{(.*)\}\s*WHERE\s*\{(.*)\}/',
@@ -364,11 +360,11 @@ class UpdateQueryImpl extends AbstractQuery
                 $this->queryParts['deleteWhere'] = trim($matches[4]);
                 $this->queryParts['insertData'] = trim($matches[3]);
 
-                $this->queryParts['graphs'] = array(trim($matches[1]));
+                $this->queryParts['graphs'] = [trim($matches[1])];
 
-                /**
-                 * TODO extract graphs
-                 */
+            /*
+             * TODO extract graphs
+             */
             } else {
                 throw new \Exception(
                     'No valid WITH <> DELETE {...} INSERT { ... } WHERE { ...} query given.'
@@ -376,14 +372,14 @@ class UpdateQueryImpl extends AbstractQuery
             }
         }
 
-        $this->queryParts = array_merge($this->queryParts, array(
+        $this->queryParts = array_merge($this->queryParts, [
             'filter_pattern' => $this->extractFilterPattern($this->getQuery()),
             'namespaces' => $this->extractNamespacesFromQuery($queryFromDelete),
             'prefixes' => $this->extractPrefixesFromQuery($this->getQuery()),
             'quad_pattern' => $this->extractQuads($this->getQuery()),
             'triple_pattern' => $this->extractTriplePattern($tripleRelatedPart),
-            'variables' => $this->extractVariablesFromQuery($this->getQuery())
-        ));
+            'variables' => $this->extractVariablesFromQuery($this->getQuery()),
+        ]);
 
         $this->unsetEmptyValues($this->queryParts);
 
@@ -393,7 +389,7 @@ class UpdateQueryImpl extends AbstractQuery
     /**
      * Is instance of AskQuery?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isAskQuery()
     {
@@ -403,7 +399,7 @@ class UpdateQueryImpl extends AbstractQuery
     /**
      * Represents it a CONSTRUCT query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isConstructQuery()
     {
@@ -413,7 +409,7 @@ class UpdateQueryImpl extends AbstractQuery
     /**
      * Is instance of DescribeQuery?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isDescribeQuery()
     {
@@ -423,7 +419,7 @@ class UpdateQueryImpl extends AbstractQuery
     /**
      * Is instance of GraphQuery?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isGraphQuery()
     {
@@ -433,7 +429,7 @@ class UpdateQueryImpl extends AbstractQuery
     /**
      * Is instance of SelectQuery?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isSelectQuery()
     {
@@ -443,7 +439,7 @@ class UpdateQueryImpl extends AbstractQuery
     /**
      * Is instance of UpdateQuery?
      *
-     * @return boolean True
+     * @return bool True
      */
     public function isUpdateQuery()
     {

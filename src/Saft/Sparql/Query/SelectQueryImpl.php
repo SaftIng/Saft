@@ -22,7 +22,7 @@ class SelectQueryImpl extends AbstractQuery
     /**
      * Constructor.
      *
-     * @param  string optional $query SPARQL query string to initialize this instance.
+     * @param string optional $query SPARQL query string to initialize this instance
      */
     public function __construct($query = '', RdfHelpers $rdfHelpers)
     {
@@ -32,21 +32,21 @@ class SelectQueryImpl extends AbstractQuery
             return;
         }
 
-        $parts = array(
-            'select'     => array(),
-            'from'       => array(),
-            'from_named' => array(),
-            'where'      => array(),
-            'order'      => array(),
-            'limit'      => array(),
-            'offset'     => array()
-        );
+        $parts = [
+            'select' => [],
+            'from' => [],
+            'from_named' => [],
+            'where' => [],
+            'order' => [],
+            'limit' => [],
+            'offset' => [],
+        ];
 
         // regex for variables
         $var = '[?$]{1}[\w\d]+';
 
-        $tokens = array(
-            'select'   => '/(' .
+        $tokens = [
+            'select' => '/('.
                             // SELECT part
                             '((SELECT(\s)+)(DISTINCT(\s)+)'.
 
@@ -57,13 +57,13 @@ class SelectQueryImpl extends AbstractQuery
                             '(\(LANG\(\?[a-zA-Z0-9\_]+\)\)* as{1}\s\?[a-zA-Z0-9\_]+)*'.
 
                             ')/si',
-            'from'       => '/FROM\s+<(.+?)>/i',
+            'from' => '/FROM\s+<(.+?)>/i',
             'from_named' => '/FROM\s+NAMED\s+<(.+?)>/i',
-            'where'      => '/(WHERE\s+)?\{.*\}/si',
-            'order'      => '/ORDER\s+BY((\s+' . $var . '|\s+(ASC|DESC)\s*\(\s*' . $var . '\s*\))+)/i',
-            'limit'      => '/LIMIT\s+(\d+)/i',
-            'offset'     => '/OFFSET\s+(\d+)/i'
-        );
+            'where' => '/(WHERE\s+)?\{.*\}/si',
+            'order' => '/ORDER\s+BY((\s+'.$var.'|\s+(ASC|DESC)\s*\(\s*'.$var.'\s*\))+)/i',
+            'limit' => '/LIMIT\s+(\d+)/i',
+            'offset' => '/OFFSET\s+(\d+)/i',
+        ];
 
         foreach ($tokens as $key => $pattern) {
             preg_match_all($pattern, $query, $parts[$key]);
@@ -73,42 +73,42 @@ class SelectQueryImpl extends AbstractQuery
             $this->queryParts['select'] = trim($parts['select'][0][0]);
         }
 
-        /**
+        /*
          * FROM
          */
         if (isset($parts['from'][1][0])) {
             $this->queryParts['graphs'] = $parts['from'][1];
         }
 
-        /**
+        /*
          * FROM NAMED
          */
         if (isset($parts['from_named'][1][0])) {
             $this->queryParts['named_graphs'] = $parts['from_named'][1];
         }
 
-        /**
+        /*
          * WHERE
          */
         if (isset($parts['where'][0][0])) {
             $this->queryParts['where'] = $parts['where'][0][0];
         }
 
-        /**
+        /*
          * ORDER BY
          */
         if (isset($parts['order'][1][0])) {
             $this->queryParts['order'] = trim($parts['order'][1][0]);
         }
 
-        /**
+        /*
          * LIMIT
          */
         if (isset($parts['limit'][1][0])) {
             $this->queryParts['limit'] = $parts['limit'][1][0];
         }
 
-        /**
+        /*
          * OFFSET
          */
         if (isset($parts['offset'][1][0])) {
@@ -116,37 +116,34 @@ class SelectQueryImpl extends AbstractQuery
         }
     }
 
-    /**
-     *
-     */
     public function __toString()
     {
-        $queryString = $this->queryParts['select'] .' '. PHP_EOL;
+        $queryString = $this->queryParts['select'].' '.PHP_EOL;
 
         if (true === isset($this->queryParts['graphs'])) {
             foreach (array_unique($this->queryParts['graphs']) as $graphUri) {
-                $queryString .= 'FROM <' . $graphUri . '>' . PHP_EOL;
+                $queryString .= 'FROM <'.$graphUri.'>'.PHP_EOL;
             }
         }
 
         if (true === isset($this->queryParts['named_graphs'])) {
             foreach (array_unique($this->queryParts['named_graphs']) as $graphUri) {
-                $queryString .= 'FROM NAMED <' . $graphUri . '>' . PHP_EOL;
+                $queryString .= 'FROM NAMED <'.$graphUri.'>'.PHP_EOL;
             }
         }
 
-        $queryString .= $this->queryParts['where'] . ' ';
+        $queryString .= $this->queryParts['where'].' ';
 
         if (true === isset($this->queryParts['order'])) {
-            $queryString .= 'ORDER BY ' . $this->queryParts['order'] . PHP_EOL;
+            $queryString .= 'ORDER BY '.$this->queryParts['order'].PHP_EOL;
         }
 
         if (true === isset($this->queryParts['limit'])) {
-            $queryString .= 'LIMIT ' . $this->queryParts['limit'] . PHP_EOL;
+            $queryString .= 'LIMIT '.$this->queryParts['limit'].PHP_EOL;
         }
 
         if (true === isset($this->queryParts['offset'])) {
-            $queryString .= 'OFFSET ' . $this->queryParts['offset'] . PHP_EOL;
+            $queryString .= 'OFFSET '.$this->queryParts['offset'].PHP_EOL;
         }
 
         return $queryString;
@@ -155,8 +152,8 @@ class SelectQueryImpl extends AbstractQuery
     /**
      * Return parts of the query on which this instance based on.
      *
-     * @return array $queryParts Query parts; parts which have no elements will be unset.
-    */
+     * @return array $queryParts query parts; parts which have no elements will be unset
+     */
     public function getQueryParts()
     {
         $this->queryParts['filter_pattern'] = $this->extractFilterPattern($this->queryParts['where']);
@@ -177,7 +174,7 @@ class SelectQueryImpl extends AbstractQuery
     /**
      * Is instance of AskQuery?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isAskQuery()
     {
@@ -187,7 +184,7 @@ class SelectQueryImpl extends AbstractQuery
     /**
      * Represents it a CONSTRUCT query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isConstructQuery()
     {
@@ -197,7 +194,7 @@ class SelectQueryImpl extends AbstractQuery
     /**
      * Is instance of DescribeQuery?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isDescribeQuery()
     {
@@ -207,7 +204,7 @@ class SelectQueryImpl extends AbstractQuery
     /**
      * Is instance of GraphQuery?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isGraphQuery()
     {
@@ -217,7 +214,7 @@ class SelectQueryImpl extends AbstractQuery
     /**
      * Is instance of SelectQuery?
      *
-     * @return boolean True
+     * @return bool True
      */
     public function isSelectQuery()
     {
@@ -227,7 +224,7 @@ class SelectQueryImpl extends AbstractQuery
     /**
      * Is instance of UpdateQuery?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isUpdateQuery()
     {

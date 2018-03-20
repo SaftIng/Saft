@@ -12,10 +12,7 @@
 
 namespace Saft\Sparql\Test\Result;
 
-use Saft\Rdf\AnyPatternImpl;
-use Saft\Rdf\StatementImpl;
-use Saft\Sparql\Result\StatementResult;
-use Saft\Test\TestCase;
+use Saft\Rdf\Test\TestCase;
 
 abstract class StatementSetResultAbstractTest extends TestCase
 {

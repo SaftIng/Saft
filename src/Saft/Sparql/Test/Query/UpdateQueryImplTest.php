@@ -12,13 +12,10 @@
 
 namespace Saft\Sparql\Test\Query;
 
-use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\RdfHelpers;
-use Saft\Sparql\Query\QueryUtils;
-use Saft\Sparql\Query\AbstractQuery;
+use Saft\Rdf\Test\TestCase;
 use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Sparql\Query\UpdateQueryImpl;
-use Saft\Test\TestCase;
 
 class UpdateQueryImplTest extends TestCase
 {
@@ -86,7 +83,7 @@ class UpdateQueryImplTest extends TestCase
         $queryParts = $this->fixture->getQueryParts();
 
         $this->assertEquals(
-            array('http://saft/test/g1', 'http://saft/test/g2'),
+            ['http://saft/test/g1', 'http://saft/test/g2'],
             $queryParts['graphs']
         );
     }
@@ -102,7 +99,7 @@ class UpdateQueryImplTest extends TestCase
 
         $queryParts = $this->fixture->getQueryParts();
 
-        $this->assertEquals(array('http://saft/test/g1'), $queryParts['graphs']);
+        $this->assertEquals(['http://saft/test/g1'], $queryParts['graphs']);
     }
 
     /*
@@ -118,7 +115,7 @@ class UpdateQueryImplTest extends TestCase
 
         $queryParts = $this->fixture->getQueryParts();
 
-        $this->assertEquals(array('ns-0' => 'http://foo/'), $queryParts['namespaces']);
+        $this->assertEquals(['ns-0' => 'http://foo/'], $queryParts['namespaces']);
     }
 
     public function testExtractNamespacesFromQueryNoNamespaces()
@@ -147,7 +144,7 @@ class UpdateQueryImplTest extends TestCase
 
         $queryParts = $this->fixture->getQueryParts();
 
-        $this->assertEquals(array('foaf' => 'http://xmlns.com/foaf/0.1/'), $queryParts['prefixes']);
+        $this->assertEquals(['foaf' => 'http://xmlns.com/foaf/0.1/'], $queryParts['prefixes']);
     }
 
     public function testExtractPrefixesFromQueryNoPrefixes()
@@ -241,38 +238,38 @@ class UpdateQueryImplTest extends TestCase
         );
         $this->assertEquals('?s ?p ?o. FILTER(?o < 40)', $queryParts['deleteWhere']);
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     'type' => 'expression',
                     'sub_type' => 'relational',
-                    'patterns' => array(
-                        array(
+                    'patterns' => [
+                        [
                             'value' => 'o',
                             'type' => 'var',
-                            'operator' => ''
-                        ),
-                        array(
+                            'operator' => '',
+                        ],
+                        [
                             'value' => '40',
                             'type' => 'literal',
                             'operator' => '',
-                            'datatype' => 'http://www.w3.org/2001/XMLSchema#integer'
-                        ),
-                    ),
-                    'operator' => '<'
-                )
-            ),
+                            'datatype' => 'http://www.w3.org/2001/XMLSchema#integer',
+                        ],
+                    ],
+                    'operator' => '<',
+                ],
+            ],
             $queryParts['filter_pattern']
         );
-        $this->assertEquals(array('http://graph/'), $queryParts['graphs']);
+        $this->assertEquals(['http://graph/'], $queryParts['graphs']);
         $this->assertEquals(
-            array('ns-0' => 'http://namespace/', 'xsd' => 'http://www.w3.org/2001/XMLSchema#'),
+            ['ns-0' => 'http://namespace/', 'xsd' => 'http://www.w3.org/2001/XMLSchema#'],
             $queryParts['namespaces']
         );
-        $this->assertEquals(array('foaf' => 'http://xmlns.com/foaf/0.1/'), $queryParts['prefixes']);
+        $this->assertEquals(['foaf' => 'http://xmlns.com/foaf/0.1/'], $queryParts['prefixes']);
         $this->assertEquals('withDeleteWhere', $queryParts['sub_type']);
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     's' => 'x',
                     'p' => 'http://xmlns.com/foaf/0.1/name',
                     'o' => 'Alice',
@@ -280,9 +277,9 @@ class UpdateQueryImplTest extends TestCase
                     'p_type' => 'uri',
                     'o_type' => 'typed-literal',
                     'o_datatype' => 'http://www.w3.org/2001/XMLSchema#string',
-                    'o_lang' => null
-                ),
-                array(
+                    'o_lang' => null,
+                ],
+                [
                     's' => 'x',
                     'p' => 'http://namespace/aa',
                     'o' => 'y',
@@ -290,9 +287,9 @@ class UpdateQueryImplTest extends TestCase
                     'p_type' => 'uri',
                     'o_type' => 'var',
                     'o_datatype' => null,
-                    'o_lang' => null
-                ),
-                array(
+                    'o_lang' => null,
+                ],
+                [
                     's' => 's',
                     'p' => 'p',
                     'o' => 'o',
@@ -300,12 +297,12 @@ class UpdateQueryImplTest extends TestCase
                     'p_type' => 'var',
                     'o_type' => 'var',
                     'o_datatype' => null,
-                    'o_lang' => null
-                ),
-            ),
+                    'o_lang' => null,
+                ],
+            ],
             $queryParts['triple_pattern']
         );
-        $this->assertEqualsArrays(array('s', 'p', 'o', 'x', 'y'), $queryParts['variables']);
+        $this->assertEqualsArrays(['s', 'p', 'o', 'x', 'y'], $queryParts['variables']);
     }
 
     // test if it recognizes the query right

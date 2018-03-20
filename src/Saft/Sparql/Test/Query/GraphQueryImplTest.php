@@ -12,10 +12,9 @@
 
 namespace Saft\Sparql\Test\Query;
 
-use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\RdfHelpers;
+use Saft\Rdf\Test\TestCase;
 use Saft\Sparql\Query\GraphQueryImpl;
-use Saft\Test\TestCase;
 
 class GraphQueryImplTest extends TestCase
 {
@@ -32,9 +31,9 @@ class GraphQueryImplTest extends TestCase
 
     public function testConstructor()
     {
-        $this->fixture = new GraphQueryImpl('CREATE GRAPH <'. $this->testGraph->getUri() .'>', new RdfHelpers());
+        $this->fixture = new GraphQueryImpl('CREATE GRAPH <'.$this->testGraph->getUri().'>', new RdfHelpers());
 
-        $this->assertEquals('CREATE GRAPH <'. $this->testGraph->getUri() .'>', $this->fixture->getQuery());
+        $this->assertEquals('CREATE GRAPH <'.$this->testGraph->getUri().'>', $this->fixture->getQuery());
     }
 
     /*
@@ -43,7 +42,7 @@ class GraphQueryImplTest extends TestCase
 
     public function testExtractFilterPattern()
     {
-        $this->assertEquals(array(), $this->fixture->extractFilterPattern(''));
+        $this->assertEquals([], $this->fixture->extractFilterPattern(''));
     }
 
     /*
@@ -52,7 +51,7 @@ class GraphQueryImplTest extends TestCase
 
     public function testExtractNamespacesFromQuery()
     {
-        $this->assertEquals(array(), $this->fixture->extractNamespacesFromQuery(''));
+        $this->assertEquals([], $this->fixture->extractNamespacesFromQuery(''));
     }
 
     /*
@@ -61,7 +60,7 @@ class GraphQueryImplTest extends TestCase
 
     public function testExtractPrefixesFromQuery()
     {
-        $this->assertEquals(array(), $this->fixture->extractPrefixesFromQuery(''));
+        $this->assertEquals([], $this->fixture->extractPrefixesFromQuery(''));
     }
 
     /*
@@ -70,7 +69,7 @@ class GraphQueryImplTest extends TestCase
 
     public function testExtractTriplePattern()
     {
-        $this->assertEquals(array(), $this->fixture->extractTriplePattern(''));
+        $this->assertEquals([], $this->fixture->extractTriplePattern(''));
     }
 
     /*
@@ -79,7 +78,7 @@ class GraphQueryImplTest extends TestCase
 
     public function testExtractVariablesFromQuery()
     {
-        $this->assertEquals(array(), $this->fixture->extractVariablesFromQuery(''));
+        $this->assertEquals([], $this->fixture->extractVariablesFromQuery(''));
     }
 
     /*
@@ -88,12 +87,12 @@ class GraphQueryImplTest extends TestCase
 
     public function testGetQueryParts()
     {
-        $this->fixture = new GraphQueryImpl('CLEAR GRAPH <'. $this->testGraph->getUri() .'>', new RdfHelpers());
+        $this->fixture = new GraphQueryImpl('CLEAR GRAPH <'.$this->testGraph->getUri().'>', new RdfHelpers());
 
         $queryParts = $this->fixture->getQueryParts();
 
         $this->assertEquals(2, count($queryParts));
-        $this->assertEquals(array($this->testGraph->getUri()), $queryParts['graphs']);
+        $this->assertEquals([$this->testGraph->getUri()], $queryParts['graphs']);
         $this->assertEquals('clearGraph', $queryParts['sub_type']);
     }
 
@@ -105,27 +104,27 @@ class GraphQueryImplTest extends TestCase
     {
         $this->assertEquals(
             'clearGraph',
-            $this->fixture->determineSubType('CLEAR GRAPH <'. $this->testGraph->getUri() .'>')
+            $this->fixture->determineSubType('CLEAR GRAPH <'.$this->testGraph->getUri().'>')
         );
 
         $this->assertEquals(
             'createGraph',
-            $this->fixture->determineSubType('CREATE GRAPH <'. $this->testGraph->getUri() .'>')
+            $this->fixture->determineSubType('CREATE GRAPH <'.$this->testGraph->getUri().'>')
         );
 
         $this->assertEquals(
             'createSilentGraph',
-            $this->fixture->determineSubType('CREATE SILENT GRAPH <'. $this->testGraph->getUri() .'>')
+            $this->fixture->determineSubType('CREATE SILENT GRAPH <'.$this->testGraph->getUri().'>')
         );
 
         $this->assertEquals(
             'dropGraph',
-            $this->fixture->determineSubType('DROP GRAPH <'. $this->testGraph->getUri() .'>')
+            $this->fixture->determineSubType('DROP GRAPH <'.$this->testGraph->getUri().'>')
         );
 
         $this->assertEquals(
             'dropSilentGraph',
-            $this->fixture->determineSubType('DROP SILENT GRAPH <'. $this->testGraph->getUri() .'>')
+            $this->fixture->determineSubType('DROP SILENT GRAPH <'.$this->testGraph->getUri().'>')
         );
     }
 

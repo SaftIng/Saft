@@ -12,16 +12,14 @@
 
 namespace Saft\Sparql\Test\Query;
 
-use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\RdfHelpers;
-use Saft\Sparql\Query\AbstractQuery;
+use Saft\Rdf\Test\TestCase;
 use Saft\Sparql\Query\AskQuery;
 use Saft\Sparql\Query\DescribeQuery;
 use Saft\Sparql\Query\GraphQuery;
 use Saft\Sparql\Query\QueryFactoryImpl;
 use Saft\Sparql\Query\SelectQuery;
 use Saft\Sparql\Query\UpdateQuery;
-use Saft\Test\TestCase;
 
 class AbstractQueryUnitTest extends TestCase
 {
@@ -79,7 +77,7 @@ class AbstractQueryUnitTest extends TestCase
     {
         $this->assertEquals('literal', $this->fixture->determineEntityType('"foo"@en'));
         $this->assertEquals('typed-literal', $this->fixture->determineEntityType('"foo"^^<http://foobar/>'));
-        $this->assertEquals('uri', $this->fixture->determineEntityType('<'. $this->testGraph->getUri() .'>'));
+        $this->assertEquals('uri', $this->fixture->determineEntityType('<'.$this->testGraph->getUri().'>'));
         $this->assertEquals('var', $this->fixture->determineEntityType('Foo'));
     }
 
@@ -159,25 +157,25 @@ class AbstractQueryUnitTest extends TestCase
         );
 
         $this->assertEquals(
-            array(
-                array(
-                    'args' => array(
-                        array(
+            [
+                [
+                    'args' => [
+                        [
                             'value' => 'title',
                             'type' => 'var',
-                            'operator' => ''
-                        ),
-                        array(
+                            'operator' => '',
+                        ],
+                        [
                             'value' => 'en',
                             'type' => 'literal',
                             'sub_type' => 'literal2',
-                            'operator' => ''
-                        )
-                    ),
+                            'operator' => '',
+                        ],
+                    ],
                     'type' => 'built_in_call',
-                    'call' => 'lang'
-                ),
-            ),
+                    'call' => 'lang',
+                ],
+            ],
             $queryParts['filter_pattern']
         );
     }
@@ -193,25 +191,25 @@ class AbstractQueryUnitTest extends TestCase
         $queryParts = $this->fixture->getQueryParts();
 
         $this->assertEquals(
-            array(
-                array(
-                    'args' => array(
-                        array(
+            [
+                [
+                    'args' => [
+                        [
                             'value' => 'g',
                             'type' => 'var',
-                            'operator' => ''
-                        ),
-                        array(
+                            'operator' => '',
+                        ],
+                        [
                             'value' => 'aar',
                             'type' => 'literal',
                             'sub_type' => 'literal2',
-                            'operator' => ''
-                        )
-                    ),
+                            'operator' => '',
+                        ],
+                    ],
                     'type' => 'built_in_call',
-                    'call' => 'regex'
-                ),
-            ),
+                    'call' => 'regex',
+                ],
+            ],
             $queryParts['filter_pattern']
         );
     }
@@ -227,31 +225,31 @@ class AbstractQueryUnitTest extends TestCase
         $queryParts = $this->fixture->getQueryParts();
 
         $this->assertEquals(
-            array(
-                array(
-                    'args' => array(
-                        array(
+            [
+                [
+                    'args' => [
+                        [
                             'value' => 'g',
                             'type' => 'var',
-                            'operator' => ''
-                        ),
-                        array(
+                            'operator' => '',
+                        ],
+                        [
                             'value' => 'aar',
                             'type' => 'literal',
                             'sub_type' => 'literal2',
-                            'operator' => ''
-                        ),
-                        array(
+                            'operator' => '',
+                        ],
+                        [
                             'value' => 'i',
                             'type' => 'literal',
                             'sub_type' => 'literal2',
-                            'operator' => ''
-                        ),
-                    ),
+                            'operator' => '',
+                        ],
+                    ],
                     'type' => 'built_in_call',
-                    'call' => 'regex'
-                ),
-            ),
+                    'call' => 'regex',
+                ],
+            ],
             $queryParts['filter_pattern']
         );
     }
@@ -267,26 +265,26 @@ class AbstractQueryUnitTest extends TestCase
         $queryParts = $this->fixture->getQueryParts();
 
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     'type' => 'expression',
                     'sub_type' => 'relational',
-                    'patterns' => array(
-                        array(
+                    'patterns' => [
+                        [
                             'value' => 'o',
                             'type' => 'var',
-                            'operator' => ''
-                        ),
-                        array(
+                            'operator' => '',
+                        ],
+                        [
                             'value' => '40',
                             'type' => 'literal',
                             'operator' => '',
-                            'datatype' => 'http://www.w3.org/2001/XMLSchema#integer'
-                        ),
-                    ),
-                    'operator' => '<'
-                ),
-            ),
+                            'datatype' => 'http://www.w3.org/2001/XMLSchema#integer',
+                        ],
+                    ],
+                    'operator' => '<',
+                ],
+            ],
             $queryParts['filter_pattern']
         );
     }
@@ -309,10 +307,10 @@ class AbstractQueryUnitTest extends TestCase
         //      as last character
 
         $this->assertEquals(
-            array(
+            [
                 'ns-0' => 'http://foobar/',
-                'xsd' => 'http://www.w3.org/2001/XMLSchema#'
-            ),
+                'xsd' => 'http://www.w3.org/2001/XMLSchema#',
+            ],
             $queryParts['namespaces']
         );
     }
@@ -353,7 +351,7 @@ class AbstractQueryUnitTest extends TestCase
 
         $queryParts = $this->fixture->getQueryParts();
 
-        $this->assertEquals(array('foo' => 'http://bar.de'), $queryParts['prefixes']);
+        $this->assertEquals(['foo' => 'http://bar.de'], $queryParts['prefixes']);
     }
 
     /*
@@ -377,8 +375,8 @@ class AbstractQueryUnitTest extends TestCase
         $queryParts = $this->fixture->getQueryParts();
 
         $this->assertEqualsArrays(
-            array(
-                array(
+            [
+                [
                     's' => 'http://saft/test/s1',
                     'p' => 'http://foo/bar/p1',
                     'o' => 'http://saft/test/o1',
@@ -389,8 +387,8 @@ class AbstractQueryUnitTest extends TestCase
                     'o_lang' => null,
                     'g' => 'http://saft/test/g1',
                     'g_type' => 'uri',
-                ),
-                array(
+                ],
+                [
                     's' => 'http://saft/test/s2',
                     'p' => 'http://test/p2',
                     'o' => 'http://saft/test/o2',
@@ -401,8 +399,8 @@ class AbstractQueryUnitTest extends TestCase
                     'o_lang' => null,
                     'g' => 'http://saft/test/g1',
                     'g_type' => 'uri',
-                ),
-                array(
+                ],
+                [
                     's' => 'http://saft/test/s3',
                     'p' => 'http://foo/bar/p3',
                     'o' => 'abc',
@@ -413,8 +411,8 @@ class AbstractQueryUnitTest extends TestCase
                     'o_lang' => null,
                     'g' => 'http://saft/test/g2',
                     'g_type' => 'uri',
-                ),
-            ),
+                ],
+            ],
             $queryParts['quad_pattern']
         );
     }
@@ -441,8 +439,8 @@ class AbstractQueryUnitTest extends TestCase
         );
 
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     's' => '_:foo',
                     'p' => 'http://purl.org/linked-data/cube#foo',
                     'o' => 'http://purl.org/linked-data/cube#bar',
@@ -450,9 +448,9 @@ class AbstractQueryUnitTest extends TestCase
                     'p_type' => 'uri',
                     'o_type' => 'uri',
                     'o_datatype' => null,
-                    'o_lang' => null
-                )
-            ),
+                    'o_lang' => null,
+                ],
+            ],
             $queryParts['triple_pattern']
         );
     }
@@ -460,8 +458,8 @@ class AbstractQueryUnitTest extends TestCase
     public function testExtractTriplePatternLiteral()
     {
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     's' => 's',
                     'p' => 'http://www.w3.org/2000/01/rdf-schema#label',
                     'o' => 'Foo',
@@ -469,9 +467,9 @@ class AbstractQueryUnitTest extends TestCase
                     'p_type' => 'uri',
                     'o_type' => 'literal',
                     'o_datatype' => '',
-                    'o_lang' => 'en'
-                )
-            ),
+                    'o_lang' => 'en',
+                ],
+            ],
             $this->fixture->extractTriplePattern(
                 '?s <http://www.w3.org/2000/01/rdf-schema#label> "Foo"@en .'
             )
@@ -481,8 +479,8 @@ class AbstractQueryUnitTest extends TestCase
     public function testExtractTriplePatternPrefix()
     {
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     's' => 's',
                     'p' => 'rdfs:label',
                     'o' => 'Foo',
@@ -490,9 +488,9 @@ class AbstractQueryUnitTest extends TestCase
                     'p_type' => 'uri',
                     'o_type' => 'literal',
                     'o_datatype' => null,
-                    'o_lang' => 'en'
-                )
-            ),
+                    'o_lang' => 'en',
+                ],
+            ],
             $this->fixture->extractTriplePattern(
                 'WHERE {
                     ?s rdfs:label "Foo"@en
@@ -504,8 +502,8 @@ class AbstractQueryUnitTest extends TestCase
     public function testExtractTriplePatternPrefixNotFound()
     {
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     's' => 's',
                     'p' => 'rdfs:label',
                     'o' => 'Foo',
@@ -513,9 +511,9 @@ class AbstractQueryUnitTest extends TestCase
                     'p_type' => 'uri',
                     'o_type' => 'literal',
                     'o_datatype' => null,
-                    'o_lang' => 'en'
-                )
-            ),
+                    'o_lang' => 'en',
+                ],
+            ],
             $this->fixture->extractTriplePattern(
                 'WHERE {
                     ?s rdfs:label "Foo"@en
@@ -527,8 +525,8 @@ class AbstractQueryUnitTest extends TestCase
     public function testExtractTriplePatternSimpleString()
     {
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     's' => 's',
                     'p' => 'rdfs:label',
                     'o' => 'Foo',
@@ -536,9 +534,9 @@ class AbstractQueryUnitTest extends TestCase
                     'p_type' => 'uri',
                     'o_type' => 'typed-literal',
                     'o_datatype' => 'http://www.w3.org/2001/XMLSchema#string',
-                    'o_lang' => null
-                )
-            ),
+                    'o_lang' => null,
+                ],
+            ],
             $this->fixture->extractTriplePattern(
                 'WHERE {
                     ?s rdfs:label "Foo"
@@ -550,8 +548,8 @@ class AbstractQueryUnitTest extends TestCase
     public function testExtractTriplePatternTypedLiteral()
     {
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     's' => 's',
                     'p' => 'http://www.w3.org/2000/01/rdf-schema#label',
                     'o' => 'Foo',
@@ -559,9 +557,9 @@ class AbstractQueryUnitTest extends TestCase
                     'p_type' => 'uri',
                     'o_type' => 'typed-literal',
                     'o_datatype' => 'http://www.w3.org/2001/XMLSchema#string',
-                    'o_lang' => ''
-                )
-            ),
+                    'o_lang' => '',
+                ],
+            ],
             $this->fixture->extractTriplePattern(
                 '?s <http://www.w3.org/2000/01/rdf-schema#label> "Foo"^^<http://www.w3.org/2001/XMLSchema#string> .'
             )
@@ -571,8 +569,8 @@ class AbstractQueryUnitTest extends TestCase
     public function testExtractTriplePatternUri()
     {
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     's' => 's',
                     'p' => 'p',
                     'o' => 'http://www.w3.org/2001/XMLSchema#string',
@@ -580,9 +578,9 @@ class AbstractQueryUnitTest extends TestCase
                     'p_type' => 'var',
                     'o_type' => 'uri',
                     'o_datatype' => null,
-                    'o_lang' => null
-                )
-            ),
+                    'o_lang' => null,
+                ],
+            ],
             $this->fixture->extractTriplePattern(
                 '?s ?p <http://www.w3.org/2001/XMLSchema#string> .'
             )
@@ -592,8 +590,8 @@ class AbstractQueryUnitTest extends TestCase
     public function testExtractTriplePatternUrisWithUnderscore()
     {
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     's' => 'http://aksw.org/Partner/TomTom_pl',
                     'p' => 'http://example.org/prop_1',
                     'o' => 'http://example.org/value_1',
@@ -601,12 +599,12 @@ class AbstractQueryUnitTest extends TestCase
                     'p_type' => 'uri',
                     'o_type' => 'uri',
                     'o_datatype' => null,
-                    'o_lang' => null
-                )
-            ),
+                    'o_lang' => null,
+                ],
+            ],
             $this->fixture->extractTriplePattern(
-                '<http://aksw.org/Partner/TomTom_pl> ' .
-                '<http://example.org/prop_1> ' .
+                '<http://aksw.org/Partner/TomTom_pl> '.
+                '<http://example.org/prop_1> '.
                 '<http://example.org/value_1> .'
             )
         );
@@ -615,8 +613,8 @@ class AbstractQueryUnitTest extends TestCase
     public function testExtractTriplePatternVariables()
     {
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     's' => 's',
                     'p' => 'p',
                     'o' => 'o',
@@ -624,15 +622,15 @@ class AbstractQueryUnitTest extends TestCase
                     'p_type' => 'var',
                     'o_type' => 'var',
                     'o_datatype' => null,
-                    'o_lang' => null
-                )
-            ),
+                    'o_lang' => null,
+                ],
+            ],
             $this->fixture->extractTriplePattern('?s ?p ?o.')
         );
 
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     's' => 's',
                     'p' => 'p',
                     'o' => 'o',
@@ -640,64 +638,64 @@ class AbstractQueryUnitTest extends TestCase
                     'p_type' => 'var',
                     'o_type' => 'var',
                     'o_datatype' => null,
-                    'o_lang' => null
-                )
-            ),
+                    'o_lang' => null,
+                ],
+            ],
             $this->fixture->extractTriplePattern('?s?p?o')
         );
     }
 
     /**
-     * Tests that all common namespaces are available
+     * Tests that all common namespaces are available.
      */
     public function testGetCommmonNamespaces()
     {
         $this->assertEquals(
-            array(
-                'bibo'    => 'http://purl.org/ontology/bibo/',
-                'cc'      => 'http://creativecommons.org/ns#',
-                'cert'    => 'http://www.w3.org/ns/auth/cert#',
-                'ctag'    => 'http://commontag.org/ns#',
-                'dc'      => 'http://purl.org/dc/terms/',
-                'dc11'    => 'http://purl.org/dc/elements/1.1/',
-                'dcat'    => 'http://www.w3.org/ns/dcat#',
+            [
+                'bibo' => 'http://purl.org/ontology/bibo/',
+                'cc' => 'http://creativecommons.org/ns#',
+                'cert' => 'http://www.w3.org/ns/auth/cert#',
+                'ctag' => 'http://commontag.org/ns#',
+                'dc' => 'http://purl.org/dc/terms/',
+                'dc11' => 'http://purl.org/dc/elements/1.1/',
+                'dcat' => 'http://www.w3.org/ns/dcat#',
                 'dcterms' => 'http://purl.org/dc/terms/',
-                'doap'    => 'http://usefulinc.com/ns/doap#',
-                'exif'    => 'http://www.w3.org/2003/12/exif/ns#',
-                'foaf'    => 'http://xmlns.com/foaf/0.1/',
-                'geo'     => 'http://www.w3.org/2003/01/geo/wgs84_pos#',
-                'gr'      => 'http://purl.org/goodrelations/v1#',
-                'grddl'   => 'http://www.w3.org/2003/g/data-view#',
-                'ical'    => 'http://www.w3.org/2002/12/cal/icaltzd#',
-                'ma'      => 'http://www.w3.org/ns/ma-ont#',
-                'og'      => 'http://ogp.me/ns#',
-                'org'     => 'http://www.w3.org/ns/org#',
-                'owl'     => 'http://www.w3.org/2002/07/owl#',
-                'prov'    => 'http://www.w3.org/ns/prov#',
-                'qb'      => 'http://purl.org/linked-data/cube#',
-                'rdf'     => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-                'rdfa'    => 'http://www.w3.org/ns/rdfa#',
-                'rdfs'    => 'http://www.w3.org/2000/01/rdf-schema#',
-                'rev'     => 'http://purl.org/stuff/rev#',
-                'rif'     => 'http://www.w3.org/2007/rif#',
-                'rr'      => 'http://www.w3.org/ns/r2rml#',
-                'rss'     => 'http://purl.org/rss/1.0/',
-                'schema'  => 'http://schema.org/',
-                'sd'      => 'http://www.w3.org/ns/sparql-service-description#',
-                'sioc'    => 'http://rdfs.org/sioc/ns#',
-                'skos'    => 'http://www.w3.org/2004/02/skos/core#',
-                'skosxl'  => 'http://www.w3.org/2008/05/skos-xl#',
-                'synd'    => 'http://purl.org/rss/1.0/modules/syndication/',
-                'v'       => 'http://rdf.data-vocabulary.org/#',
-                'vcard'   => 'http://www.w3.org/2006/vcard/ns#',
-                'void'    => 'http://rdfs.org/ns/void#',
-                'wdr'     => 'http://www.w3.org/2007/05/powder#',
-                'wdrs'    => 'http://www.w3.org/2007/05/powder-s#',
-                'wot'     => 'http://xmlns.com/wot/0.1/',
-                'xhv'     => 'http://www.w3.org/1999/xhtml/vocab#',
-                'xml'     => 'http://www.w3.org/XML/1998/namespace',
-                'xsd'     => 'http://www.w3.org/2001/XMLSchema#',
-            ),
+                'doap' => 'http://usefulinc.com/ns/doap#',
+                'exif' => 'http://www.w3.org/2003/12/exif/ns#',
+                'foaf' => 'http://xmlns.com/foaf/0.1/',
+                'geo' => 'http://www.w3.org/2003/01/geo/wgs84_pos#',
+                'gr' => 'http://purl.org/goodrelations/v1#',
+                'grddl' => 'http://www.w3.org/2003/g/data-view#',
+                'ical' => 'http://www.w3.org/2002/12/cal/icaltzd#',
+                'ma' => 'http://www.w3.org/ns/ma-ont#',
+                'og' => 'http://ogp.me/ns#',
+                'org' => 'http://www.w3.org/ns/org#',
+                'owl' => 'http://www.w3.org/2002/07/owl#',
+                'prov' => 'http://www.w3.org/ns/prov#',
+                'qb' => 'http://purl.org/linked-data/cube#',
+                'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                'rdfa' => 'http://www.w3.org/ns/rdfa#',
+                'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
+                'rev' => 'http://purl.org/stuff/rev#',
+                'rif' => 'http://www.w3.org/2007/rif#',
+                'rr' => 'http://www.w3.org/ns/r2rml#',
+                'rss' => 'http://purl.org/rss/1.0/',
+                'schema' => 'http://schema.org/',
+                'sd' => 'http://www.w3.org/ns/sparql-service-description#',
+                'sioc' => 'http://rdfs.org/sioc/ns#',
+                'skos' => 'http://www.w3.org/2004/02/skos/core#',
+                'skosxl' => 'http://www.w3.org/2008/05/skos-xl#',
+                'synd' => 'http://purl.org/rss/1.0/modules/syndication/',
+                'v' => 'http://rdf.data-vocabulary.org/#',
+                'vcard' => 'http://www.w3.org/2006/vcard/ns#',
+                'void' => 'http://rdfs.org/ns/void#',
+                'wdr' => 'http://www.w3.org/2007/05/powder#',
+                'wdrs' => 'http://www.w3.org/2007/05/powder-s#',
+                'wot' => 'http://xmlns.com/wot/0.1/',
+                'xhv' => 'http://www.w3.org/1999/xhtml/vocab#',
+                'xml' => 'http://www.w3.org/XML/1998/namespace',
+                'xsd' => 'http://www.w3.org/2001/XMLSchema#',
+            ],
             $this->fixture->getCommonNamespaces()
         );
     }
@@ -776,7 +774,7 @@ class AbstractQueryUnitTest extends TestCase
     public function testGetQueryTypeSelect()
     {
         $query = ' SELECT ?x
-                  FROM <'. $this->testGraph->getUri() .'>
+                  FROM <'.$this->testGraph->getUri().'>
                   WHERE { ?x foaf:mbox <mailto:alice@org> }';
 
         $this->assertEquals('selectQuery', $this->rdfHelpers->getQueryType($query));
@@ -785,7 +783,7 @@ class AbstractQueryUnitTest extends TestCase
     public function testGetQueryTypeUpdate()
     {
         /**
-         * INSERT DATA
+         * INSERT DATA.
          */
         $query = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                   INSERT DATA {Graph <>}';
@@ -793,21 +791,21 @@ class AbstractQueryUnitTest extends TestCase
         $this->assertEquals('updateQuery', $this->rdfHelpers->getQueryType($query));
 
         /**
-         * INSERT INTO GRAPH
+         * INSERT INTO GRAPH.
          */
         $query = 'INSERT INTO GRAPH {}';
 
         $this->assertEquals('updateQuery', $this->rdfHelpers->getQueryType($query));
 
         /**
-         * DELETE
+         * DELETE.
          */
         $query = 'DELETE {}';
 
         $this->assertEquals('updateQuery', $this->rdfHelpers->getQueryType($query));
 
         /**
-         * DELETE DATA
+         * DELETE DATA.
          */
         $query = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                   DELETE DATA {}';

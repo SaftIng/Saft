@@ -15,7 +15,7 @@ namespace Saft\Sparql\Test\Query;
 use Saft\Rdf\RdfHelpers;
 use Saft\Sparql\Query\QueryFactoryImpl;
 
-class QueryFactoryImplTest extends QueryFactoryAbstractTest
+class QueryFactoryImplTest extends AbstractQueryFactoryTest
 {
     /**
      * Returns subject to test.

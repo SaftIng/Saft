@@ -24,11 +24,31 @@ class AbstractQueryChild extends AbstractQuery
     /*
      * The following methods are only dummys to enable instantiation of the class.
      */
-    public function getQueryParts() {}
-    public function isAskQuery() {}
-    public function isConstructQuery() {}
-    public function isDescribeQuery() {}
-    public function isGraphQuery() {}
-    public function isSelectQuery() {}
-    public function isUpdateQuery() {}
+    public function getQueryParts()
+    {
+    }
+
+    public function isAskQuery()
+    {
+    }
+
+    public function isConstructQuery()
+    {
+    }
+
+    public function isDescribeQuery()
+    {
+    }
+
+    public function isGraphQuery()
+    {
+    }
+
+    public function isSelectQuery()
+    {
+    }
+
+    public function isUpdateQuery()
+    {
+    }
 }

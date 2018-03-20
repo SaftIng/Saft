@@ -27,42 +27,42 @@ interface Query
     /**
      * Is instance of AskQuery?
      *
-     * @return boolean
+     * @return bool
      */
     public function isAskQuery();
 
     /**
      * Is instance of ConstructQuery?
      *
-     * @return boolean
+     * @return bool
      */
     public function isConstructQuery();
 
     /**
      * Is instance of DescribeQuery?
      *
-     * @return boolean
+     * @return bool
      */
     public function isDescribeQuery();
 
     /**
      * Is instance of GraphQuery?
      *
-     * @return boolean
+     * @return bool
      */
     public function isGraphQuery();
 
     /**
      * Is instance of SelectQuery?
      *
-     * @return boolean
+     * @return bool
      */
     public function isSelectQuery();
 
     /**
      * Is instance of UpdateQuery?
      *
-     * @return boolean
+     * @return bool
      */
     public function isUpdateQuery();
 }

@@ -12,27 +12,25 @@
 
 namespace Saft\Sparql\Query;
 
-use Saft\Sparql\Query\AbstractQuery;
-
 /**
  * Represents the following types of SPARQL queries:
  * - CLEAR GRAPH
  * - CREATE GRAPH
  * - CREATE SILENT GRAPH
  * - DROP GRAPH
- * - DROP SILENT GRAPH
+ * - DROP SILENT GRAPH.
  */
 class GraphQueryImpl extends AbstractQuery
 {
     /**
+     * @param string $query
      *
-     * @param string       $query
      * @return string|null
      */
     public function determineSubType($query)
     {
         /**
-         * First we get rid of all PREFIX information
+         * First we get rid of all PREFIX information.
          */
         $adaptedQuery = preg_replace('/PREFIX\s+[a-z0-9]+\:\s*\<[a-z0-9\:\/\.\#\-]+\>/', '', $query);
 
@@ -73,23 +71,25 @@ class GraphQueryImpl extends AbstractQuery
     /**
      * Has no function here.
      *
-     * @param  string $where WHERE part of the query.
+     * @param string $where WHERE part of the query
+     *
      * @return array
      */
     public function extractFilterPattern($where)
     {
-        return array();
+        return [];
     }
 
     /**
      * Extracts graph(s) from queryPart. Overrides parent method to ignore FROM part.
      *
-     * @param  string $queryPart SPARQL query part.
+     * @param string $queryPart SPARQL query part
+     *
      * @return array
      */
     public function extractGraphs($queryPart)
     {
-        $graphs = array();
+        $graphs = [];
 
         $result = preg_match_all('/\\<(.*)\\>/', $queryPart, $matches);
 
@@ -103,59 +103,63 @@ class GraphQueryImpl extends AbstractQuery
     /**
      * Has no function here.
      *
-     * @param  string $query Query to get prefixes from.
-     * @return array         List of extracted prefixes.
+     * @param string $query query to get prefixes from
+     *
+     * @return array list of extracted prefixes
      */
     public function extractNamespacesFromQuery($query)
     {
-        return array();
+        return [];
     }
 
     /**
      * Has no function here.
      *
-     * @param  string $query Query to get prologue prefixes from.
-     * @return array         List of extracted prefixes.
+     * @param string $query query to get prologue prefixes from
+     *
+     * @return array list of extracted prefixes
      */
     public function extractPrefixesFromQuery($query)
     {
-        return array();
+        return [];
     }
 
     /**
      * Has no function here.
      *
-     * @param  string $where WHERE part of the query.
+     * @param string $where WHERE part of the query
+     *
      * @return array
      */
     public function extractTriplePattern($where)
     {
-        return array();
+        return [];
     }
 
     /**
      * Has no function here.
      *
-     * @param  string $query Query to get prefixes from.
-     * @return array List of extracted variables.
+     * @param string $query query to get prefixes from
+     *
+     * @return array list of extracted variables
      */
     public function extractVariablesFromQuery($query)
     {
-        return array();
+        return [];
     }
 
     /**
      * Return parts of the query on which this instance based on. It overrides the parent function and sets
      * all values to null.
      *
-     * @return array $queryParts Query parts; parts which have no elements or are unset will be marked with null.
-    */
+     * @return array $queryParts query parts; parts which have no elements or are unset will be marked with null
+     */
     public function getQueryParts()
     {
-        $this->queryParts = array(
+        $this->queryParts = [
             'graphs' => $this->extractGraphs($this->getQuery()),
             'sub_type' => $this->determineSubType($this->getQuery()),
-        );
+        ];
 
         $this->unsetEmptyValues($this->queryParts);
 
@@ -165,7 +169,7 @@ class GraphQueryImpl extends AbstractQuery
     /**
      * Represents it an Ask Query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isAskQuery()
     {
@@ -175,7 +179,7 @@ class GraphQueryImpl extends AbstractQuery
     /**
      * Represents it a CONSTRUCT query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isConstructQuery()
     {
@@ -185,7 +189,7 @@ class GraphQueryImpl extends AbstractQuery
     /**
      * Represents it a Describe Query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isDescribeQuery()
     {
@@ -195,7 +199,7 @@ class GraphQueryImpl extends AbstractQuery
     /**
      * Represents it a Graph Query?
      *
-     * @return boolean True
+     * @return bool True
      */
     public function isGraphQuery()
     {
@@ -205,7 +209,7 @@ class GraphQueryImpl extends AbstractQuery
     /**
      * Represents it a Select Query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isSelectQuery()
     {
@@ -215,7 +219,7 @@ class GraphQueryImpl extends AbstractQuery
     /**
      * Represents it an Update Query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isUpdateQuery()
     {

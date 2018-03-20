@@ -40,7 +40,7 @@ class ValueResultImpl implements ValueResult
     }
 
     /**
-     * @return boolean False
+     * @return bool False
      */
     public function isEmptyResult()
     {
@@ -48,7 +48,7 @@ class ValueResultImpl implements ValueResult
     }
 
     /**
-     * @return boolean False
+     * @return bool False
      */
     public function isSetResult()
     {
@@ -56,7 +56,7 @@ class ValueResultImpl implements ValueResult
     }
 
     /**
-     * @return boolean False
+     * @return bool False
      */
     public function isStatementSetResult()
     {
@@ -64,7 +64,7 @@ class ValueResultImpl implements ValueResult
     }
 
     /**
-     * @return boolean True
+     * @return bool True
      */
     public function isValueResult()
     {

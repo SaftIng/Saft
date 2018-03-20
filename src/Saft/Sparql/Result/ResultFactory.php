@@ -20,19 +20,22 @@ interface ResultFactory
     public function createEmptyResult();
 
     /**
-     * @param  \Iterator|array|null $list optional
+     * @param \Iterator|array|null $list optional
+     *
      * @return SetResult
      */
     public function createSetResult($list);
 
     /**
-     * @param  \Iterator|array|null $list optional
+     * @param \Iterator|array|null $list optional
+     *
      * @return SetResult
      */
     public function createStatementResult($list);
 
     /**
-     * @param  mixed $scalar
+     * @param mixed $scalar
+     *
      * @return ValueResult
      */
     public function createValueResult($scalar);

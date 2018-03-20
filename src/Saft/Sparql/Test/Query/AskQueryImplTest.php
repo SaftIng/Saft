@@ -13,8 +13,8 @@
 namespace Saft\Sparql\Test\Query;
 
 use Saft\Rdf\RdfHelpers;
+use Saft\Rdf\Test\TestCase;
 use Saft\Sparql\Query\AskQueryImpl;
-use Saft\Test\TestCase;
 
 class AskQueryImplTest extends TestCase
 {
@@ -61,7 +61,7 @@ class AskQueryImplTest extends TestCase
         $queryParts = $this->fixture->getQueryParts();
 
         $this->assertEquals(
-            array('ns-0' => 'http://foobar/', 'xsd' => 'http://www.w3.org/2001/XMLSchema#'),
+            ['ns-0' => 'http://foobar/', 'xsd' => 'http://www.w3.org/2001/XMLSchema#'],
             $queryParts['namespaces']
         );
     }
@@ -89,7 +89,7 @@ class AskQueryImplTest extends TestCase
 
         $queryParts = $this->fixture->getQueryParts();
 
-        $this->assertEquals(array('foo' => 'http://bar.de'), $queryParts['prefixes']);
+        $this->assertEquals(['foo' => 'http://bar.de'], $queryParts['prefixes']);
     }
 
     public function testExtractPrefixesFromQueryNoPrefixes()
@@ -118,33 +118,33 @@ class AskQueryImplTest extends TestCase
         $this->assertEquals(6, count($queryParts));
 
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     'type' => 'expression',
                     'sub_type' => 'relational',
-                    'patterns' => array(
-                        array(
+                    'patterns' => [
+                        [
                             'value' => 'o',
                             'type' => 'var',
-                            'operator' => ''
-                        ),
-                        array(
+                            'operator' => '',
+                        ],
+                        [
                             'value' => '40',
                             'type' => 'literal',
                             'operator' => '',
-                            'datatype' => 'http://www.w3.org/2001/XMLSchema#integer'
-                        ),
-                    ),
-                    'operator' => '<'
-                )
-            ),
+                            'datatype' => 'http://www.w3.org/2001/XMLSchema#integer',
+                        ],
+                    ],
+                    'operator' => '<',
+                ],
+            ],
             $queryParts['filter_pattern']
         );
-        $this->assertEquals(array('http://foobar/'), $queryParts['graphs']);
-        $this->assertEquals(array('foo' => 'http://bar.de'), $queryParts['prefixes']);
+        $this->assertEquals(['http://foobar/'], $queryParts['graphs']);
+        $this->assertEquals(['foo' => 'http://bar.de'], $queryParts['prefixes']);
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     's' => 's',
                     'p' => 'p',
                     'o' => 'o',
@@ -152,12 +152,12 @@ class AskQueryImplTest extends TestCase
                     'p_type' => 'var',
                     'o_type' => 'var',
                     'o_datatype' => null,
-                    'o_lang' => null
-                )
-            ),
+                    'o_lang' => null,
+                ],
+            ],
             $queryParts['triple_pattern']
         );
-        $this->assertEquals(array('s', 'p', 'o'), $queryParts['variables']);
+        $this->assertEquals(['s', 'p', 'o'], $queryParts['variables']);
         $this->assertEquals('?s ?p ?o. FILTER (?o < 40)', $queryParts['where']);
     }
 
@@ -169,10 +169,10 @@ class AskQueryImplTest extends TestCase
 
         $this->assertEquals(4, count($queryParts));
 
-        $this->assertEquals(array('foo' => 'http://bar.de'), $queryParts['prefixes']);
+        $this->assertEquals(['foo' => 'http://bar.de'], $queryParts['prefixes']);
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     's' => 's',
                     'p' => 'p',
                     'o' => 'o',
@@ -180,12 +180,12 @@ class AskQueryImplTest extends TestCase
                     'p_type' => 'var',
                     'o_type' => 'var',
                     'o_datatype' => null,
-                    'o_lang' => null
-                )
-            ),
+                    'o_lang' => null,
+                ],
+            ],
             $queryParts['triple_pattern']
         );
-        $this->assertEquals(array('s', 'p', 'o'), $queryParts['variables']);
+        $this->assertEquals(['s', 'p', 'o'], $queryParts['variables']);
         $this->assertEquals('?s ?p ?o', $queryParts['where']);
     }
 

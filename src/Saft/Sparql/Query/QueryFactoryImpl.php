@@ -29,8 +29,9 @@ class QueryFactoryImpl implements QueryFactory
     /**
      * Creates an instance of Query based on given query string.
      *
-     * @param  string $query SPARQL query string to use for class instantiation.
-     * @return Query Instance of Query.
+     * @param string $query SPARQL query string to use for class instantiation
+     *
+     * @return Query instance of Query
      */
     public function createInstanceByQueryString($query)
     {
@@ -54,7 +55,7 @@ class QueryFactoryImpl implements QueryFactory
                 return new UpdateQueryImpl($query, $this->rdfHelpers);
 
             default:
-                throw new \Exception('Unknown query type: '. $query);
+                throw new \Exception('Unknown query type: '.$query);
         }
     }
 }

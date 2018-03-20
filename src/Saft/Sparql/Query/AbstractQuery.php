@@ -13,7 +13,6 @@
 namespace Saft\Sparql\Query;
 
 use Saft\Rdf\RdfHelpers;
-use Saft\Rdf\NodeFactoryImpl;
 
 /**
  * Represents a SPARQL query.
@@ -25,51 +24,51 @@ abstract class AbstractQuery implements Query
      *
      * @var array
      */
-    protected $commonNamespaces = array(
-        'bibo'    => 'http://purl.org/ontology/bibo/',
-        'cc'      => 'http://creativecommons.org/ns#',
-        'cert'    => 'http://www.w3.org/ns/auth/cert#',
-        'ctag'    => 'http://commontag.org/ns#',
-        'dc'      => 'http://purl.org/dc/terms/',
-        'dc11'    => 'http://purl.org/dc/elements/1.1/',
-        'dcat'    => 'http://www.w3.org/ns/dcat#',
+    protected $commonNamespaces = [
+        'bibo' => 'http://purl.org/ontology/bibo/',
+        'cc' => 'http://creativecommons.org/ns#',
+        'cert' => 'http://www.w3.org/ns/auth/cert#',
+        'ctag' => 'http://commontag.org/ns#',
+        'dc' => 'http://purl.org/dc/terms/',
+        'dc11' => 'http://purl.org/dc/elements/1.1/',
+        'dcat' => 'http://www.w3.org/ns/dcat#',
         'dcterms' => 'http://purl.org/dc/terms/',
-        'doap'    => 'http://usefulinc.com/ns/doap#',
-        'exif'    => 'http://www.w3.org/2003/12/exif/ns#',
-        'foaf'    => 'http://xmlns.com/foaf/0.1/',
-        'geo'     => 'http://www.w3.org/2003/01/geo/wgs84_pos#',
-        'gr'      => 'http://purl.org/goodrelations/v1#',
-        'grddl'   => 'http://www.w3.org/2003/g/data-view#',
-        'ical'    => 'http://www.w3.org/2002/12/cal/icaltzd#',
-        'ma'      => 'http://www.w3.org/ns/ma-ont#',
-        'og'      => 'http://ogp.me/ns#',
-        'org'     => 'http://www.w3.org/ns/org#',
-        'owl'     => 'http://www.w3.org/2002/07/owl#',
-        'prov'    => 'http://www.w3.org/ns/prov#',
-        'qb'      => 'http://purl.org/linked-data/cube#',
-        'rdf'     => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-        'rdfa'    => 'http://www.w3.org/ns/rdfa#',
-        'rdfs'    => 'http://www.w3.org/2000/01/rdf-schema#',
-        'rev'     => 'http://purl.org/stuff/rev#',
-        'rif'     => 'http://www.w3.org/2007/rif#',
-        'rr'      => 'http://www.w3.org/ns/r2rml#',
-        'rss'     => 'http://purl.org/rss/1.0/',
-        'schema'  => 'http://schema.org/',
-        'sd'      => 'http://www.w3.org/ns/sparql-service-description#',
-        'sioc'    => 'http://rdfs.org/sioc/ns#',
-        'skos'    => 'http://www.w3.org/2004/02/skos/core#',
-        'skosxl'  => 'http://www.w3.org/2008/05/skos-xl#',
-        'synd'    => 'http://purl.org/rss/1.0/modules/syndication/',
-        'v'       => 'http://rdf.data-vocabulary.org/#',
-        'vcard'   => 'http://www.w3.org/2006/vcard/ns#',
-        'void'    => 'http://rdfs.org/ns/void#',
-        'wdr'     => 'http://www.w3.org/2007/05/powder#',
-        'wdrs'    => 'http://www.w3.org/2007/05/powder-s#',
-        'wot'     => 'http://xmlns.com/wot/0.1/',
-        'xhv'     => 'http://www.w3.org/1999/xhtml/vocab#',
-        'xml'     => 'http://www.w3.org/XML/1998/namespace',
-        'xsd'     => 'http://www.w3.org/2001/XMLSchema#',
-    );
+        'doap' => 'http://usefulinc.com/ns/doap#',
+        'exif' => 'http://www.w3.org/2003/12/exif/ns#',
+        'foaf' => 'http://xmlns.com/foaf/0.1/',
+        'geo' => 'http://www.w3.org/2003/01/geo/wgs84_pos#',
+        'gr' => 'http://purl.org/goodrelations/v1#',
+        'grddl' => 'http://www.w3.org/2003/g/data-view#',
+        'ical' => 'http://www.w3.org/2002/12/cal/icaltzd#',
+        'ma' => 'http://www.w3.org/ns/ma-ont#',
+        'og' => 'http://ogp.me/ns#',
+        'org' => 'http://www.w3.org/ns/org#',
+        'owl' => 'http://www.w3.org/2002/07/owl#',
+        'prov' => 'http://www.w3.org/ns/prov#',
+        'qb' => 'http://purl.org/linked-data/cube#',
+        'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+        'rdfa' => 'http://www.w3.org/ns/rdfa#',
+        'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
+        'rev' => 'http://purl.org/stuff/rev#',
+        'rif' => 'http://www.w3.org/2007/rif#',
+        'rr' => 'http://www.w3.org/ns/r2rml#',
+        'rss' => 'http://purl.org/rss/1.0/',
+        'schema' => 'http://schema.org/',
+        'sd' => 'http://www.w3.org/ns/sparql-service-description#',
+        'sioc' => 'http://rdfs.org/sioc/ns#',
+        'skos' => 'http://www.w3.org/2004/02/skos/core#',
+        'skosxl' => 'http://www.w3.org/2008/05/skos-xl#',
+        'synd' => 'http://purl.org/rss/1.0/modules/syndication/',
+        'v' => 'http://rdf.data-vocabulary.org/#',
+        'vcard' => 'http://www.w3.org/2006/vcard/ns#',
+        'void' => 'http://rdfs.org/ns/void#',
+        'wdr' => 'http://www.w3.org/2007/05/powder#',
+        'wdrs' => 'http://www.w3.org/2007/05/powder-s#',
+        'wot' => 'http://xmlns.com/wot/0.1/',
+        'xhv' => 'http://www.w3.org/1999/xhtml/vocab#',
+        'xml' => 'http://www.w3.org/XML/1998/namespace',
+        'xsd' => 'http://www.w3.org/2001/XMLSchema#',
+    ];
 
     /**
      * @var RdfHelpers
@@ -84,18 +83,19 @@ abstract class AbstractQuery implements Query
     /**
      * @var array
      */
-    protected $queryParts = array();
+    protected $queryParts = [];
 
     /**
      * Constructor.
      *
-     * @param string optional $query SPARQL query string to initialize this instance.
-     * @param RdfHelpers $rdfHelpers
-     * @throws \Exception If parameter $query is empty, null or not a string.
+     * @param string optional $query      SPARQL query string to initialize this instance
+     * @param RdfHelpers      $rdfHelpers
+     *
+     * @throws \Exception if parameter $query is empty, null or not a string
      */
     public function __construct($query = '', RdfHelpers $rdfHelpers)
     {
-        $this->RdfHelpers = $rdfHelpers;
+        $this->rdfHelpers = $rdfHelpers;
 
         if (true === empty($query) || null === $query || false === is_string($query)) {
             return;
@@ -107,24 +107,25 @@ abstract class AbstractQuery implements Query
     /**
      * Determines type of a entity.
      *
-     * @param  string $entity Entity string.
-     * @return string|null    Returns either literal, typed-literal, uri or var. Returns null if it couldnt be
-     *                        determined.
+     * @param string $entity entity string
+     *
+     * @return string|null Returns either literal, typed-literal, uri or var. Returns null if it couldnt be
+     *                     determined.
      */
     public function determineEntityType($entity)
     {
         // remove braces at the beginning (only if $entity looks like <http://...>)
         if ('<' == substr($entity, 0, 1)) {
-            $entity = str_replace(array('>', '<'), '', $entity);
+            $entity = str_replace(['>', '<'], '', $entity);
         }
 
         // checks if $entity is an URL
-        if (true === $this->RdfHelpers->simpleCheckURI($entity)) {
+        if (true === $this->rdfHelpers->simpleCheckURI($entity)) {
             return 'uri';
 
         // checks if ^^< is in $entity OR if $entity is surrounded by quotation marks
         } elseif (false !== strpos($entity, '"^^<')
-            || ('"' == substr($entity, 0, 1) && '"' == substr($entity, strlen($entity)-1, 1))) {
+            || ('"' == substr($entity, 0, 1) && '"' == substr($entity, strlen($entity) - 1, 1))) {
             return 'typed-literal';
 
         // blank node
@@ -153,6 +154,7 @@ abstract class AbstractQuery implements Query
      * Determines SPARQL datatype of a given string, usually of an object value.
      *
      * @param string $objectString Object value, incl. datatype information.
+     *
      * @return string|null Returns datatype of object, e.g. http://www.w3.org/2001/XMLSchema#string. Returns
      *                     null if datatype couldnt be determined.
      */
@@ -167,11 +169,12 @@ abstract class AbstractQuery implements Query
         if ('"' === substr($objectString, 0, 1) && false !== $arrowPos) {
             // extract datatype URI
             $datatype = substr($objectString, $arrowPos + 4);
-            return substr($datatype, 0, strlen($datatype)-1);
+
+            return substr($datatype, 0, strlen($datatype) - 1);
 
         // checks for surrounding ", without ^^<
         } elseif ('"' == substr($objectString, 0, 1)
-            && '"' == substr($objectString, strlen($objectString)-1, 1)) {
+            && '"' == substr($objectString, strlen($objectString) - 1, 1)) {
             // if we land here, there are surrounding quotation marks, but no datatype
             return 'http://www.w3.org/2001/XMLSchema#string';
 
@@ -185,6 +188,7 @@ abstract class AbstractQuery implements Query
      * Determines SPARQL language of a given string, usually of an object value.
      *
      * @param string $objectString Object value, incl. language information.
+     *
      * @return string|null Returns language of object, e.g. en. Returns null if language couldnt be determined.
      */
     public function determineObjectLanguage($objectString)
@@ -194,6 +198,7 @@ abstract class AbstractQuery implements Query
         // check for language @
         if (false !== $atPos) {
             $language = substr($objectString, $atPos + 2);
+
             return 2 <= strlen($language) ? $language : null;
         }
 
@@ -204,6 +209,7 @@ abstract class AbstractQuery implements Query
      * Determines SPARQL language of a given string, usually of an object value.
      *
      * @param string $objectString Object value, incl. language information.
+     *
      * @return string Returns value of object. Returns null, if value couldnt be determined.
      */
     public function determineObjectValue($objectString)
@@ -214,12 +220,12 @@ abstract class AbstractQuery implements Query
 
         // checks if $objectString starts with " and contains "^^<
         if ('"' === substr($objectString, 0, 1) && false !== $arrowPos) {
-            return substr($objectString, 1, $arrowPos-1);
+            return substr($objectString, 1, $arrowPos - 1);
 
         // checks for surrounding ", without ^^<
         } elseif ('"' == substr($objectString, 0, 1)
-            && '"' == substr($objectString, strlen($objectString)-1, 1)) {
-            return substr($objectString, 1, strlen($objectString)-2);
+            && '"' == substr($objectString, strlen($objectString) - 1, 1)) {
+            return substr($objectString, 1, strlen($objectString) - 2);
 
         // checks for "@
         } elseif (false !== $atPos) {
@@ -228,8 +234,7 @@ abstract class AbstractQuery implements Query
         // checks for ? at the beginning
         } elseif ('?' === substr($objectString, 0, 1)) {
             return substr($objectString, 1);
-
-        } elseif ($this->RdfHelpers->simpleCheckURI($objectString)) {
+        } elseif ($this->rdfHelpers->simpleCheckURI($objectString)) {
             return $objectString;
 
         // malformed string, return null as datatype
@@ -241,10 +246,11 @@ abstract class AbstractQuery implements Query
     /**
      * Extracts filter pattern out of a given string.
      *
-     * @param  string $where WHERE part of the query.
+     * @param string $where WHERE part of the query
+     *
      * @return array
-     * TODO   simplify function
-     * TODO   extend support for further filters
+     *               TODO   simplify function
+     *               TODO   extend support for further filters
      */
     public function extractFilterPattern($where)
     {
@@ -254,7 +260,7 @@ abstract class AbstractQuery implements Query
          *  - FILTER (isURI(?person) && !bound(?person))
          */
 
-        $pattern = array();
+        $pattern = [];
 
         preg_match_all(
             '/FILTER(\s*|\s*[a-zA-Z0-9]*)\((.*)\)/',
@@ -265,18 +271,18 @@ abstract class AbstractQuery implements Query
         foreach ($matches[2] as $match) {
             // TODO optimize REGEX to ignore " at the end to save the lastChar check later on.
 
-            /**
+            /*
              * Covers filters such as:
              * - FILTER (?o < 40)
              * - FILTER (?s = "foo")
              */
             preg_match_all(
-                '/' .
+                '/'.
                 '\?([a-zA-Z0-9\_]+)'. // e.g. ?s
-                '\s*' .               // space
-                '(=|<|>|!=)' .        // operator, e.g. =
-                '\s*' .               // space
-                '"*(.*)"*' .          // constrain, e.g. 40 or "Bar"
+                '\s*'.               // space
+                '(=|<|>|!=)'.        // operator, e.g. =
+                '\s*'.               // space
+                '"*(.*)"*'.          // constrain, e.g. 40 or "Bar"
                 '/si',
                 $match,
                 $parts
@@ -284,28 +290,28 @@ abstract class AbstractQuery implements Query
 
             if (true == isset($parts[3][0])) {
                 // if last char is " or ', cut it out
-                $lastChar = substr($parts[3][0], strlen($parts[3][0])-1);
+                $lastChar = substr($parts[3][0], strlen($parts[3][0]) - 1);
                 if ('"' == $lastChar || "'" == $lastChar) {
-                    $parts[3][0] = substr($parts[3][0], 0, strlen($parts[3][0])-1);
+                    $parts[3][0] = substr($parts[3][0], 0, strlen($parts[3][0]) - 1);
                 }
 
-                $entry = array(
-                    'type'      => 'expression',
-                    'sub_type'  => 'relational',
-                    'patterns'  => array(
-                        array(
-                            'value'     => $parts[1][0], // e.g. ?s
-                            'type'      => 'var', // its always a variable
-                            'operator'  => ''
-                        ),
-                        array(
-                            'value'     => $parts[3][0], // e.g. "Bar"
-                            'type'      => 'literal',
-                            'operator'  => ''
-                        )
-                    ),
-                    'operator'  => $parts[2][0] // operator, e.g. <
-                );
+                $entry = [
+                    'type' => 'expression',
+                    'sub_type' => 'relational',
+                    'patterns' => [
+                        [
+                            'value' => $parts[1][0], // e.g. ?s
+                            'type' => 'var', // its always a variable
+                            'operator' => '',
+                        ],
+                        [
+                            'value' => $parts[3][0], // e.g. "Bar"
+                            'type' => 'literal',
+                            'operator' => '',
+                        ],
+                    ],
+                    'operator' => $parts[2][0], // operator, e.g. <
+                ];
 
                 // set datatype and sub_type
                 if (true === ctype_digit($parts[3][0])) {
@@ -321,7 +327,7 @@ abstract class AbstractQuery implements Query
                 continue;
             }
 
-            /**
+            /*
              * Covers regex filters such as:
              * - FILTER regex(?g, "aar")
              * - FILTER regex(?g, "aar", "i")
@@ -333,32 +339,32 @@ abstract class AbstractQuery implements Query
             );
 
             if (true == isset($parts[1][0])) {
-                $entry = array(
-                    'args' => array(
-                        array(
+                $entry = [
+                    'args' => [
+                        [
                             'value' => $parts[1][0],
                             'type' => 'var',
-                            'operator' => ''
-                        ),
-                        array(
+                            'operator' => '',
+                        ],
+                        [
                             'value' => $parts[2][0],
                             'type' => 'literal',
                             'sub_type' => 'literal2',
-                            'operator' => ''
-                        )
-                    ),
+                            'operator' => '',
+                        ],
+                    ],
                     'type' => 'built_in_call',
                     'call' => 'regex',
-                );
+                ];
 
                 // if optional part is set, which means the regex function got 3 parameter
                 if (0 < strlen($parts[4][0])) {
-                    $entry['args'][] = array(
+                    $entry['args'][] = [
                         'value' => $parts[4][0],  // optional part, i
                         'type' => 'literal',
                         'sub_type' => 'literal2',
-                        'operator' => ''
-                    );
+                        'operator' => '',
+                    ];
                 }
 
                 $pattern[] = $entry;
@@ -366,7 +372,7 @@ abstract class AbstractQuery implements Query
                 continue;
             }
 
-            /**
+            /*
              * Covers regex filters such as:
              * - FILTER (lang(?title) = 'en')
              */
@@ -377,23 +383,23 @@ abstract class AbstractQuery implements Query
             );
 
             if (true == isset($parts[1][0])) {
-                $entry = array(
-                    'args' => array(
-                        array(
+                $entry = [
+                    'args' => [
+                        [
                             'value' => $parts[1][0],
                             'type' => 'var',
-                            'operator' => ''
-                        ),
-                        array(
+                            'operator' => '',
+                        ],
+                        [
                             'value' => $parts[2][0],
                             'type' => 'literal',
                             'sub_type' => 'literal2',
-                            'operator' => ''
-                        )
-                    ),
+                            'operator' => '',
+                        ],
+                    ],
                     'type' => 'built_in_call',
                     'call' => 'lang',
-                );
+                ];
 
                 $pattern[] = $entry;
 
@@ -407,12 +413,13 @@ abstract class AbstractQuery implements Query
     /**
      * Extracts graph(s) from queryPart.
      *
-     * @param  string $queryPart SPARQL query part.
+     * @param string $queryPart SPARQL query part
+     *
      * @return array
      */
     public function extractGraphs($queryPart)
     {
-        $graphs = array();
+        $graphs = [];
 
         $result = preg_match_all('/\FROM\s*\<(.*?)\>/', $queryPart, $matches);
 
@@ -426,12 +433,13 @@ abstract class AbstractQuery implements Query
     /**
      * Extracts named graph(s) from queryPart.
      *
-     * @param  string $queryPart SPARQL query part.
+     * @param string $queryPart SPARQL query part
+     *
      * @return array
      */
     public function extractNamedGraphs($queryPart)
     {
-        $graphs = array();
+        $graphs = [];
 
         $result = preg_match_all('/\FROM NAMED\s*\<(.*?)\\>/', $queryPart, $matches);
 
@@ -445,14 +453,15 @@ abstract class AbstractQuery implements Query
     /**
      * Extracts prefixes from a given query.
      *
-     * @param  string $query Query to get prefixes from.
-     * @return array         List of extracted prefixes.
+     * @param string $query query to get prefixes from
+     *
+     * @return array list of extracted prefixes
      */
     public function extractNamespacesFromQuery($query)
     {
         preg_match_all('/\<([a-zA-Z\\\.\/\-\#\:0-9]+)\>/', $query, $matches);
 
-        $uris = array();
+        $uris = [];
 
         // only use URI until the last occurence of one of these chars: # /
         foreach ($matches[1] as $match) {
@@ -461,7 +470,6 @@ abstract class AbstractQuery implements Query
             // check for last #
             if (false !== $hashPos) {
                 $uri = substr($match, 0, $hashPos + 1);
-
             } else {
                 if (7 < strlen($match)) {
                     $slashPos = strrpos($match, '/', 7);
@@ -481,7 +489,7 @@ abstract class AbstractQuery implements Query
         }
 
         $uris = array_values($uris);
-        $prefixes = array();
+        $prefixes = [];
         $uriSet = false;
         $prefixNumber = 0;
 
@@ -498,7 +506,7 @@ abstract class AbstractQuery implements Query
             }
             // in case, it couldnt find according prefix, generate one
             if (false === $uriSet) {
-                $prefixes['ns-'. $prefixNumber++] = $uri;
+                $prefixes['ns-'.$prefixNumber++] = $uri;
             }
         }
 
@@ -508,14 +516,15 @@ abstract class AbstractQuery implements Query
     /**
      * Extracts prefixes from the prologue part of the given query.
      *
-     * @param  string $query Query to get prologue prefixes from.
-     * @return array         List of extracted prefixes.
+     * @param string $query query to get prologue prefixes from
+     *
+     * @return array list of extracted prefixes
      */
     public function extractPrefixesFromQuery($query)
     {
         preg_match_all('/PREFIX\s+([a-z0-9]+)\:\s*\<([a-z0-9\:\/\.\#\-]+)\>/', $query, $matches);
 
-        $prefixes = array();
+        $prefixes = [];
 
         foreach ($matches[1] as $index => $key) {
             $prefixes[$key] = $matches[2][$index];
@@ -528,11 +537,12 @@ abstract class AbstractQuery implements Query
      * Extracts quads from query, if available.
      *
      * @param string $query
+     *
      * @return array
      */
     public function extractQuads($query)
     {
-        $quads = array();
+        $quads = [];
 
         /**
          * Matches the following pattern: Graph <http://uri/> { ?s ?p ?o }
@@ -553,7 +563,7 @@ abstract class AbstractQuery implements Query
                 // TODO Handle case that more than one triple pattern was found
 
                 if (0 == count($triplePattern)) {
-                    throw new \Exception('Quad related part of the query is invalid: '. $matches[2][$key]);
+                    throw new \Exception('Quad related part of the query is invalid: '.$matches[2][$key]);
                 }
 
                 $quad = $triplePattern[0];
@@ -570,7 +580,8 @@ abstract class AbstractQuery implements Query
     /**
      * Extracts triple pattern out of a given string.
      *
-     * @param  string $where WHERE part of the query.
+     * @param string $where WHERE part of the query
+     *
      * @return array
      */
     public function extractTriplePattern($where)
@@ -594,33 +605,33 @@ abstract class AbstractQuery implements Query
         $quads = $this->extractQuads($where);
 
         if (0 < count($quads)) {
-            return array();
+            return [];
         }
 
         /**
          * Here we know, no quads are there.
          */
-        $regex = '/' .
-            $this->RdfHelpers->getRegexStringForNodeRecognition(
+        $regex = '/'.
+            $this->rdfHelpers->getRegexStringForNodeRecognition(
                 true, true, false, false, false, false, true
-            ) .'\s*|\t*'.
-            $this->RdfHelpers->getRegexStringForNodeRecognition(
+            ).'\s*|\t*'.
+            $this->rdfHelpers->getRegexStringForNodeRecognition(
                 true, true, false, false, false, false, true
-            ) .'\s*|\t*'.
-            $this->RdfHelpers->getRegexStringForNodeRecognition(
+            ).'\s*|\t*'.
+            $this->rdfHelpers->getRegexStringForNodeRecognition(
                 true, true, true, true, true, true, true
-            ) .'/is';
+            ).'/is';
 
         preg_match_all($regex, $where, $matches);
 
         $lineIndex = -1;
-        $pattern = array();
+        $pattern = [];
         $s = $p = $o = '';
 
         foreach ($matches[0] as $match) {
-            $lineIndex++;
+            ++$lineIndex;
 
-            /**
+            /*
              * Handle type and value of subject and predicate
              */
             if (0 == $lineIndex) {
@@ -633,24 +644,24 @@ abstract class AbstractQuery implements Query
                 $o = $match;
                 $lineIndex = -1;
             } else {
-                throw new \Exception('This should never happen: ' . $lineIndex);
+                throw new \Exception('This should never happen: '.$lineIndex);
             }
 
             $oIsUri = false;
             if ('<' == substr($o, 0, 1)) {
-                $o = str_replace(array('>', '<'), '', $o);
+                $o = str_replace(['>', '<'], '', $o);
                 $oIsUri = true;
             }
 
             /**
-             * Determine types of subject, predicate and object
+             * Determine types of subject, predicate and object.
              */
             $sType = $this->determineEntityType($s);
             $pType = $this->determineEntityType($p);
             $oType = $this->determineEntityType($o);
 
             /**
-             * Check for prefixes and replace them with original URI
+             * Check for prefixes and replace them with original URI.
              */
             $prefixes = $this->extractPrefixesFromQuery($this->getQuery());
 
@@ -658,7 +669,7 @@ abstract class AbstractQuery implements Query
             $p = $this->replacePrefixWithUri($p, $prefixes);
             $o = $this->replacePrefixWithUri($o, $prefixes);
 
-            /**
+            /*
              * If S or P are starting with a ?, remove it
              */
             if ('?' == substr($s, 0, 1)) {
@@ -670,7 +681,7 @@ abstract class AbstractQuery implements Query
             }
 
             /**
-             * Determine all aspects of the object
+             * Determine all aspects of the object.
              */
             $oDatatype = $this->determineObjectDatatype($o);
             $oLang = $this->determineObjectLanguage($o);
@@ -681,16 +692,16 @@ abstract class AbstractQuery implements Query
             }
 
             // set pattern array
-            $pattern[] = array(
-                's'             => str_replace(array('<', '>'), '', $s),
-                'p'             => str_replace(array('<', '>'), '', $p),
-                'o'             => $oValue,
-                's_type'        => $sType,
-                'p_type'        => $pType,
-                'o_type'        => $oType,
-                'o_datatype'    => $oDatatype,
-                'o_lang'        => $oLang
-            );
+            $pattern[] = [
+                's' => str_replace(['<', '>'], '', $s),
+                'p' => str_replace(['<', '>'], '', $p),
+                'o' => $oValue,
+                's_type' => $sType,
+                'p_type' => $pType,
+                'o_type' => $oType,
+                'o_datatype' => $oDatatype,
+                'o_lang' => $oLang,
+            ];
         }
 
         return $pattern;
@@ -699,8 +710,9 @@ abstract class AbstractQuery implements Query
     /**
      * Extracts variables array from a given query.
      *
-     * @param  string $query Query to get prefixes from.
-     * @return array List of extracted variables.
+     * @param string $query query to get prefixes from
+     *
+     * @return array list of extracted variables
      */
     public function extractVariablesFromQuery($query)
     {
@@ -732,10 +744,11 @@ abstract class AbstractQuery implements Query
     }
 
     /**
-     * Replaces the prefix in a string with the original URI
+     * Replaces the prefix in a string with the original URI.
      *
-     * @param  string $prefixedString String to adapt.
-     * @param  array  $prefixes       Array containing prefixes as keys and according URI as value.
+     * @param string $prefixedString string to adapt
+     * @param array  $prefixes       array containing prefixes as keys and according URI as value
+     *
      * @return string
      */
     public function replacePrefixWithUri($prefixedString, $prefixes)
@@ -748,7 +761,7 @@ abstract class AbstractQuery implements Query
 
             // if a prefix
             if (true === isset($prefixes[$prefix])) {
-                $prefixedString = str_replace($prefix . ':', $prefixes[$prefix], $prefixedString);
+                $prefixedString = str_replace($prefix.':', $prefixes[$prefix], $prefixedString);
             }
         }
 
@@ -766,9 +779,9 @@ abstract class AbstractQuery implements Query
     }
 
     /**
-     * Unsets values if its is empty
+     * Unsets values if its is empty.
      *
-     * @param array &$array Reference to array to adapt.
+     * @param array &$array Reference to array to adapt
      */
     public function unsetEmptyValues(&$array)
     {

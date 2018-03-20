@@ -12,8 +12,8 @@
 
 namespace Saft\Sparql\Test\Result;
 
+use Saft\Rdf\Test\TestCase;
 use Saft\Sparql\Result\EmptyResultImpl;
-use Saft\Test\TestCase;
 
 class EmptyResultImplTest extends TestCase
 {

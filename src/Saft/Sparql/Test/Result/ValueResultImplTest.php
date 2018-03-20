@@ -18,6 +18,7 @@ class ValueResultImplTest extends ValueResultAbstractTest
 {
     /**
      * @param  $mixed $scalar
+     *
      * @return Result
      */
     public function newInstance($scalar)

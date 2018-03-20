@@ -30,8 +30,11 @@ class QueryUtils
      * Get type for a given SPARQL query.
      *
      * @param string $query
+     *
      * @return string Type, which is either askQuery, describeQuery, graphQuery, updateQuery or selectQuery
-     * @throws \Exception if unknown query type.
+     *
+     * @throws \Exception if unknown query type
+     *
      * @deprecated Use Saft/Rdf/RdfHelpers!
      */
     public function getQueryType($query)

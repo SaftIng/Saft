@@ -22,11 +22,11 @@ class EmptyResultImpl implements Result
      */
     public function getVariables()
     {
-        return array();
+        return [];
     }
 
     /**
-     * @return boolean True
+     * @return bool True
      */
     public function isEmptyResult()
     {
@@ -34,7 +34,7 @@ class EmptyResultImpl implements Result
     }
 
     /**
-     * @return boolean False
+     * @return bool False
      */
     public function isSetResult()
     {
@@ -42,7 +42,7 @@ class EmptyResultImpl implements Result
     }
 
     /**
-     * @return boolean False
+     * @return bool False
      */
     public function isStatementSetResult()
     {
@@ -50,7 +50,7 @@ class EmptyResultImpl implements Result
     }
 
     /**
-     * @return boolean False
+     * @return bool False
      */
     public function isValueResult()
     {

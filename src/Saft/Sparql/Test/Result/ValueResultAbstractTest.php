@@ -12,29 +12,26 @@
 
 namespace Saft\Sparql\Test\Result;
 
+use Saft\Rdf\Test\TestCase;
 use Saft\Sparql\Result\ValueResultImpl;
-use Saft\Test\TestCase;
 
 abstract class ValueResultAbstractTest extends TestCase
 {
     /**
      * @param  $mixed $scalar
+     *
      * @return Result An instance Of ValueResult
      */
     abstract public function newInstance($scalar);
 
-    /**
-     *
-     */
     public function setUp()
     {
         $this->fixture = new ValueResultImpl(0);
     }
 
     /**
-     * Tests for __construct
+     * Tests for __construct.
      */
-
     public function testConstructor()
     {
         $this->fixture = new ValueResultImpl(0);
@@ -45,7 +42,7 @@ abstract class ValueResultAbstractTest extends TestCase
     {
         $this->setExpectedException('Exception');
 
-        $this->fixture = new ValueResultImpl(array());
+        $this->fixture = new ValueResultImpl([]);
     }
 
     /*
@@ -58,27 +55,24 @@ abstract class ValueResultAbstractTest extends TestCase
     }
 
     /**
-     * Tests for isSetResult
+     * Tests for isSetResult.
      */
-
     public function testIsSetResult()
     {
         $this->assertFalse($this->fixture->isSetResult());
     }
 
     /**
-     * Tests for isStatementSetResult
+     * Tests for isStatementSetResult.
      */
-
     public function testisStatementSetResult()
     {
         $this->assertFalse($this->fixture->isStatementSetResult());
     }
 
     /**
-     * Tests for isValueResult
+     * Tests for isValueResult.
      */
-
     public function testIsValueResult()
     {
         $this->assertTrue($this->fixture->isValueResult());

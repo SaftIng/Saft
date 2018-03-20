@@ -13,7 +13,6 @@
 namespace Saft\Sparql\Query;
 
 use Saft\Rdf\RdfHelpers;
-use Saft\Sparql\Query\AbstractQuery;
 
 /**
  * Represents a DESCRIBE query.
@@ -23,7 +22,7 @@ class DescribeQueryImpl extends AbstractQuery
     /**
      * Constructor.
      *
-     * @param string optional $query SPARQL query string to initialize this instance.
+     * @param string optional $query SPARQL query string to initialize this instance
      */
     public function __construct($query = '', RdfHelpers $rdfHelpers)
     {
@@ -43,14 +42,14 @@ class DescribeQueryImpl extends AbstractQuery
     /**
      * Return parts of the query on which this instance based on.
      *
-     * @return array $queryParts Query parts; parts which have no elements will be unset.
-    */
+     * @return array $queryParts query parts; parts which have no elements will be unset
+     */
     public function getQueryParts()
     {
         // extract the part before {
         $partBeforeBrace = substr($this->query, 0, strpos($this->query, '{'));
 
-        $this->queryParts = array(
+        $this->queryParts = [
             'filter_pattern' => $this->extractFilterPattern($this->queryParts['where']),
             'graphs' => $this->extractGraphs($this->getQuery()),
             'named_graphs' => $this->extractNamedGraphs($this->getQuery()),
@@ -59,8 +58,8 @@ class DescribeQueryImpl extends AbstractQuery
             'result_variables' => $this->extractVariablesFromQuery($partBeforeBrace),
             'sub_type' => $this->determineSubType($this->getQuery()),
             'triple_pattern' => $this->extractTriplePattern($this->queryParts['where']),
-            'variables' => $this->extractVariablesFromQuery($this->getQuery())
-        );
+            'variables' => $this->extractVariablesFromQuery($this->getQuery()),
+        ];
 
         $this->unsetEmptyValues($this->queryParts);
 
@@ -68,8 +67,8 @@ class DescribeQueryImpl extends AbstractQuery
     }
 
     /**
+     * @param string $query
      *
-     * @param string       $query
      * @return string|null
      */
     public function determineSubType($query)
@@ -87,7 +86,6 @@ class DescribeQueryImpl extends AbstractQuery
             } else {
                 return 'describe';
             }
-
         } else {
             return null;
         }
@@ -96,7 +94,7 @@ class DescribeQueryImpl extends AbstractQuery
     /**
      * Represents it an Ask Query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isAskQuery()
     {
@@ -106,7 +104,7 @@ class DescribeQueryImpl extends AbstractQuery
     /**
      * Represents it a Describe Query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isConstructQuery()
     {
@@ -116,7 +114,7 @@ class DescribeQueryImpl extends AbstractQuery
     /**
      * Represents it a Describe Query?
      *
-     * @return boolean True
+     * @return bool True
      */
     public function isDescribeQuery()
     {
@@ -126,7 +124,7 @@ class DescribeQueryImpl extends AbstractQuery
     /**
      * Represents it a Graph Query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isGraphQuery()
     {
@@ -136,7 +134,7 @@ class DescribeQueryImpl extends AbstractQuery
     /**
      * Represents it a Select Query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isSelectQuery()
     {
@@ -146,7 +144,7 @@ class DescribeQueryImpl extends AbstractQuery
     /**
      * Represents it an Update Query?
      *
-     * @return boolean False
+     * @return bool False
      */
     public function isUpdateQuery()
     {
