@@ -21,11 +21,12 @@ class ArrayStatementIteratorImpl implements StatementIterator
 
     /**
      * @param array $statements array of instances of Statement
-     * @throws \Exception If $statements does contain at least one non-Statement instance.
+     *
+     * @throws \Exception if $statements does contain at least one non-Statement instance
      */
     public function __construct(array $statements)
     {
-        $checkedStatements = array();
+        $checkedStatements = [];
 
         // check that each entry of the array is of type Statement
         foreach ($statements as $statement) {
@@ -37,9 +38,9 @@ class ArrayStatementIteratorImpl implements StatementIterator
             if ($statement->isConcrete()) {
                 $hash = $statement->toNQuads();
             } else {
-                $hash = (string)$statement->getSubject()
-                    . (string)$statement->getPredicate()
-                    . (string)$statement->getObject();
+                $hash = (string) $statement->getSubject()
+                    .(string) $statement->getPredicate()
+                    .(string) $statement->getObject();
             }
             if (isset($checkedStatements[$hash])) {
                 // we already have that statement, go to the next one
@@ -76,16 +77,13 @@ class ArrayStatementIteratorImpl implements StatementIterator
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function valid()
     {
         return $this->arrayIterator->valid();
     }
 
-    /**
-     *
-     */
     public function rewind()
     {
         $this->arrayIterator->rewind();

@@ -16,8 +16,6 @@ use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\LiteralPatternImpl;
 use Saft\Rdf\LiteralImpl;
-use Saft\Rdf\RdfHelpers;
-use Saft\Test\TestCase;
 
 class LiteralPatternImplTest extends TestCase
 {
@@ -44,7 +42,7 @@ class LiteralPatternImplTest extends TestCase
     public function testEqualsCheckLiteralPatternAndLiteral()
     {
         $instanceA = new LiteralPatternImpl('foo', $this->testGraph);
-        $instanceB = new LiteralImpl(new RdfHelpers(), 'foo');
+        $instanceB = new LiteralImpl('foo');
 
         $this->assertFalse($instanceA->equals($instanceB));
     }
@@ -106,7 +104,7 @@ class LiteralPatternImplTest extends TestCase
     public function testMatches()
     {
         $instanceA = new LiteralPatternImpl('foo', $this->testGraph);
-        $instanceB = new LiteralImpl(new RdfHelpers(), 'foo', $this->testGraph);
+        $instanceB = new LiteralImpl('foo', $this->testGraph);
 
         $this->assertTrue($instanceA->matches($instanceB));
     }
@@ -114,7 +112,7 @@ class LiteralPatternImplTest extends TestCase
     public function testMatchesCheckPartialMatchesAreNoMatches()
     {
         $instanceA = new LiteralPatternImpl('foo', $this->testGraph);
-        $instanceB = new LiteralImpl(new RdfHelpers(), 'foo');
+        $instanceB = new LiteralImpl('foo');
 
         $this->assertFalse($instanceA->matches($instanceB));
     }

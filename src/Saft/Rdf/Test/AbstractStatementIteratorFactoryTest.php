@@ -13,9 +13,8 @@
 namespace Saft\Rdf\Test;
 
 use Saft\Rdf\StatementIteratorFactory;
-use Saft\Test\TestCase;
 
-abstract class StatementIteratorFactoryAbstractTest extends TestCase
+abstract class AbstractStatementIteratorFactoryTest extends TestCase
 {
     /**
      * @return StatementIteratorFactory
@@ -29,7 +28,7 @@ abstract class StatementIteratorFactoryAbstractTest extends TestCase
     public function testCreateStatementIteratorFromArrayArrayGiven()
     {
         $this->fixture = $this->newInstance();
-        $parameter = array();
+        $parameter = [];
 
         $this->assertClassOfInstanceImplements(
             $this->fixture->createStatementIteratorFromArray($parameter),
@@ -41,7 +40,7 @@ abstract class StatementIteratorFactoryAbstractTest extends TestCase
     {
         $this->setExpectedException('\Exception');
 
-        $parameter = array('invalid parameter');
+        $parameter = ['invalid parameter'];
         $this->newInstance()->createStatementIteratorFromArray($parameter);
     }
 }

@@ -40,52 +40,49 @@ class LiteralImpl extends AbstractLiteral
     protected $lang = null;
 
     /**
-     * @param RdfHelpers $rdfHelpers
-     * @param string $value The Literal value
+     * @param string    $value    The Literal value
      * @param NamedNode $datatype The datatype of the Literal (respectively defaults to xsd:string or rdf:langString)
-     * @param string $lang The language tag of the Literal (optional)
+     * @param string    $lang     The language tag of the Literal (optional)
      */
-    public function __construct(RdfHelpers $rdfHelpers, $value, NamedNode $datatype = null, $lang = null)
+    public function __construct($value, NamedNode $datatype = null, $lang = null)
     {
-        parent::__construct($rdfHelpers);
-
         if ($value === null) {
             throw new \Exception('Literal value can\'t be null. Please use AnyPattern if you need a variable.');
         } elseif (!is_string($value)) {
-            throw new \Exception("The literal value has to be of type string");
+            throw new \Exception('The literal value has to be of type string');
         }
 
         $this->value = $value;
 
         if ($lang !== null) {
-            $this->lang = (string)$lang;
+            $this->lang = (string) $lang;
         }
 
         if (
             $lang !== null &&
-            $lang !== "" &&
+            $lang !== '' &&
             $datatype !== null &&
             $datatype->isNamed() &&
             $datatype->getUri() !== self::$rdfLangString
         ) {
-            throw new \Exception('Language tagged Literals must have <'. self::$rdfLangString .'> datatype.');
+            throw new \Exception('Language tagged Literals must have <'.self::$rdfLangString.'> datatype.');
         }
 
         if (
-            ($lang === null || $lang == "") &&
+            ($lang === null || $lang == '') &&
             $datatype !== null &&
             $datatype->isNamed() &&
             $datatype->getUri() === self::$rdfLangString
         ) {
-            throw new \Exception('No or empty Language Tag for Literals with <'. self::$rdfLangString .'> datatype.');
+            throw new \Exception('No or empty Language Tag for Literals with <'.self::$rdfLangString.'> datatype.');
         }
 
         if ($datatype !== null) {
             $this->datatype = $datatype;
         } elseif ($lang !== null) {
-            $this->datatype = new NamedNodeImpl($rdfHelpers, self::$rdfLangString);
+            $this->datatype = new NamedNodeImpl(self::$rdfLangString);
         } else {
-            $this->datatype = new NamedNodeImpl($rdfHelpers, self::$xsdString);
+            $this->datatype = new NamedNodeImpl(self::$xsdString);
         }
     }
 

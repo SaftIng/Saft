@@ -16,10 +16,8 @@ use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementImpl;
-use Saft\Test\TestCase;
 
 class RdfHelpersTest extends TestCase
 {
@@ -58,7 +56,7 @@ class RdfHelpersTest extends TestCase
             $this->fixture->getNodeInSparqlFormat($this->testGraph, null)
         );
 
-        $literal = new LiteralImpl($this->fixture, 'foobar');
+        $literal = new LiteralImpl('foobar');
         $this->assertEquals(
             '"foobar"^^<http://www.w3.org/2001/XMLSchema#string>',
             $this->fixture->getNodeInSparqlFormat($literal, null)
@@ -136,8 +134,8 @@ class RdfHelpersTest extends TestCase
     public function testGetValueForNode()
     {
         $this->assertEquals('blankId', $this->fixture->getValueForNode(new BlankNodeImpl('blankId')));
-        $this->assertEquals('http://foo', $this->fixture->getValueForNode(new NamedNodeImpl($this->fixture, 'http://foo')));
-        $this->assertEquals('foo', $this->fixture->getValueForNode(new LiteralImpl($this->fixture, 'foo')));
+        $this->assertEquals('http://foo', $this->fixture->getValueForNode(new NamedNodeImpl('http://foo')));
+        $this->assertEquals('foo', $this->fixture->getValueForNode(new LiteralImpl('foo')));
         $this->assertNull($this->fixture->getValueForNode(new AnyPatternImpl()));
     }
 
@@ -165,7 +163,7 @@ class RdfHelpersTest extends TestCase
     // test that guessFormat doesn't confuse n-triples with turtle
     public function testGuessFormatRegression1()
     {
-        $fileContent = file_get_contents(__DIR__ .'/resources/guessFormat-regression1.ttl');
+        $fileContent = file_get_contents(__DIR__.'/resources/guessFormat-regression1.ttl');
 
         $this->assertEquals('turtle', $this->fixture->guessFormat($fileContent));
     }
@@ -212,16 +210,16 @@ class RdfHelpersTest extends TestCase
     public function testStatementIteratorToSparqlFormatGraphGivenWithTripleAndQuad()
     {
         $triple = new StatementImpl(
-            new NamedNodeImpl($this->fixture, 'http://saft/test/s1'),
-            new NamedNodeImpl($this->fixture, 'http://saft/test/p1'),
-            new LiteralImpl($this->fixture, "42")
+            new NamedNodeImpl('http://saft/test/s1'),
+            new NamedNodeImpl('http://saft/test/p1'),
+            new LiteralImpl('42')
         );
 
         $quad = new StatementImpl(
-            new NamedNodeImpl($this->fixture, 'http://saft/test/s2'),
-            new NamedNodeImpl($this->fixture, 'http://saft/test/p2'),
-            new LiteralImpl($this->fixture, "43"),
-            new NamedNodeImpl($this->fixture, 'http://some/other/graph/2')
+            new NamedNodeImpl('http://saft/test/s2'),
+            new NamedNodeImpl('http://saft/test/p2'),
+            new LiteralImpl('43'),
+            new NamedNodeImpl('http://some/other/graph/2')
         );
 
         $this->assertEquals(
@@ -230,7 +228,7 @@ class RdfHelpersTest extends TestCase
             'Graph <http://localhost/Saft/TestGraph/> {<http://saft/test/s2> <http://saft/test/p2> '.
             '"43"^^<http://www.w3.org/2001/XMLSchema#string> . }',
             trim(
-                $this->fixture->statementIteratorToSparqlFormat(array($triple, $quad), $this->testGraph)
+                $this->fixture->statementIteratorToSparqlFormat([$triple, $quad], $this->testGraph)
             )
         );
     }
@@ -238,15 +236,15 @@ class RdfHelpersTest extends TestCase
     public function testStatementIteratorToSparqlFormatTripleAndQuad()
     {
         $triple = new StatementImpl(
-            new NamedNodeImpl($this->fixture, 'http://saft/test/s1'),
-            new NamedNodeImpl($this->fixture, 'http://saft/test/p1'),
-            new LiteralImpl($this->fixture, '42')
+            new NamedNodeImpl('http://saft/test/s1'),
+            new NamedNodeImpl('http://saft/test/p1'),
+            new LiteralImpl('42')
         );
 
         $quad = new StatementImpl(
-            new NamedNodeImpl($this->fixture, 'http://saft/test/s1'),
-            new NamedNodeImpl($this->fixture, 'http://saft/test/p1'),
-            new LiteralImpl($this->fixture, '42'),
+            new NamedNodeImpl('http://saft/test/s1'),
+            new NamedNodeImpl('http://saft/test/p1'),
+            new LiteralImpl('42'),
             $this->testGraph
         );
 
@@ -254,7 +252,7 @@ class RdfHelpersTest extends TestCase
             '<http://saft/test/s1> <http://saft/test/p1> "42"^^<http://www.w3.org/2001/XMLSchema#string> .  '.
             'Graph <http://localhost/Saft/TestGraph/> {<http://saft/test/s1> <http://saft/test/p1> '.
             '"42"^^<http://www.w3.org/2001/XMLSchema#string> . }',
-            trim($this->fixture->statementIteratorToSparqlFormat(array($triple, $quad)))
+            trim($this->fixture->statementIteratorToSparqlFormat([$triple, $quad]))
         );
     }
 }

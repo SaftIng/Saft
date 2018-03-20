@@ -15,20 +15,19 @@ namespace Saft\Rdf\Test;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\RdfHelpers;
 
-class LiteralImplTest extends LiteralAbstractTest
+class LiteralImplTest extends AbstractLiteralTest
 {
     /**
-     * Return a new instance of LiteralImpl
+     * Return a new instance of LiteralImpl.
      */
     public function newInstance($value, Node $datatype = null, $lang = null)
     {
-        return new LiteralImpl(new RdfHelpers(), $value, $datatype, $lang);
+        return new LiteralImpl($value, $datatype, $lang);
     }
 
     public function getNodeFactory()
     {
-        return new NodeFactoryImpl(new RdfHelpers());
+        return new NodeFactoryImpl();
     }
 }

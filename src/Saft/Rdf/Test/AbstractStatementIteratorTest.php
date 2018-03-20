@@ -16,14 +16,13 @@ use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementImpl;
-use Saft\Test\TestCase;
 
-abstract class StatementIteratorAbstractTest extends TestCase
+abstract class AbstractStatementIteratorTest extends TestCase
 {
     /**
-     * @param  array $statements
+     * @param array $statements
+     *
      * @return StatementIterator
      */
     abstract public function createInstanceWithArray(array $statements);
@@ -35,13 +34,13 @@ abstract class StatementIteratorAbstractTest extends TestCase
     public function testConstructorValidList()
     {
         // empty array must be fine
-        $this->fixture = $this->createInstanceWithArray(array());
+        $this->fixture = $this->createInstanceWithArray([]);
         $this->assertClassOfInstanceImplements($this->fixture, 'Saft\Rdf\StatementIterator');
         $this->assertCountStatementIterator(0, $this->fixture);
 
         // array with Statement instance must be fine
         $this->fixture = $this->createInstanceWithArray(
-            array(new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl()))
+            [new StatementImpl(new AnyPatternImpl(), new AnyPatternImpl(), new AnyPatternImpl())]
         );
         $this->assertCountStatementIterator(1, $this->fixture);
     }
@@ -51,7 +50,7 @@ abstract class StatementIteratorAbstractTest extends TestCase
         // expect exception, because array contains non-Statement instance
         $this->setExpectedException('\Exception');
 
-        $this->fixture = $this->createInstanceWithArray(array(1));
+        $this->fixture = $this->createInstanceWithArray([1]);
     }
 
     /*
@@ -60,26 +59,26 @@ abstract class StatementIteratorAbstractTest extends TestCase
 
     public function testCountAssertionSome()
     {
-        $nodeFactory = new NodeFactoryImpl(new RdfHelpers());
+        $nodeFactory = new NodeFactoryImpl();
         $rdfLangString = $nodeFactory->createNamedNode(
             'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'
         );
         $statements = [
         new StatementImpl(
-            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
-            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
-            new NamedNodeImpl(new RdfHelpers(), 'http://o/')
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new NamedNodeImpl('http://o/')
         ),
         new StatementImpl(
-            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
-            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
-            new LiteralImpl(new RdfHelpers(), 'foobar', $rdfLangString, 'en')
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new LiteralImpl('foobar', $rdfLangString, 'en')
         ),
         new StatementImpl(
-            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
-            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
-            new LiteralImpl(new RdfHelpers(), "42")
-        )];
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new LiteralImpl('42')
+        ), ];
 
         $iterator = $this->createInstanceWithArray($statements);
 
@@ -101,32 +100,32 @@ abstract class StatementIteratorAbstractTest extends TestCase
 
     public function testIterationWithForeachLoop()
     {
-        $nodeFactory = new NodeFactoryImpl(new RdfHelpers());
+        $nodeFactory = new NodeFactoryImpl();
         $rdfLangString = $nodeFactory->createNamedNode(
             'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'
         );
         $statements = [
         new StatementImpl(
-            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
-            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
-            new NamedNodeImpl(new RdfHelpers(), 'http://o/')
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new NamedNodeImpl('http://o/')
         ),
         new StatementImpl(
-            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
-            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
-            new LiteralImpl(new RdfHelpers(), 'foobar', $rdfLangString, 'en')
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new LiteralImpl('foobar', $rdfLangString, 'en')
         ),
         new StatementImpl(
-            new NamedNodeImpl(new RdfHelpers(), 'http://s/'),
-            new NamedNodeImpl(new RdfHelpers(), 'http://p/'),
-            new LiteralImpl(new RdfHelpers(), "42")
-        )];
+            new NamedNodeImpl('http://s/'),
+            new NamedNodeImpl('http://p/'),
+            new LiteralImpl('42')
+        ), ];
 
         $iterator = $this->createInstanceWithArray($statements);
 
         $this->assertTrue($iterator->valid());
 
-        $actual = array();
+        $actual = [];
         foreach ($iterator as $key => $value) {
             $actual[] = $value;
         }

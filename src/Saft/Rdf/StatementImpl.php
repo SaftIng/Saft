@@ -35,7 +35,7 @@ class StatementImpl extends AbstractStatement
     protected $graph;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param Node $subject
      * @param Node $predicate
@@ -86,7 +86,7 @@ class StatementImpl extends AbstractStatement
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isQuad()
     {
@@ -94,7 +94,7 @@ class StatementImpl extends AbstractStatement
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isTriple()
     {

@@ -15,22 +15,24 @@ namespace Saft\Rdf\Test;
 use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementImpl;
-use Saft\Test\TestCase;
 
-abstract class StatementAbstractTest extends TestCase
+abstract class AbstractStatementTest extends TestCase
 {
     abstract public function newLiteralInstance($value, $datatype = null, $lang = null);
+
     abstract public function newNamedNodeInstance($uri);
+
     abstract public function newAnyPatternInstance($value);
+
     abstract public function newBlankNodeInstance($blankId);
 
     /**
      * @param Node $subject
      * @param Node $predicate
      * @param Node $object
-     * @param Node $graph optional
+     * @param Node $graph     optional
+     *
      * @return Statement
      */
     abstract public function newInstance($subject, $predicate, $object, $graph = null);
@@ -42,11 +44,11 @@ abstract class StatementAbstractTest extends TestCase
     public function testEquals()
     {
         $subjectA = new AnyPatternImpl();
-        $subjectB = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
-        $predicate = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
-        $object = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
+        $subjectB = new NamedNodeImpl('http://example.org/');
+        $predicate = new NamedNodeImpl('http://example.org/');
+        $object = new NamedNodeImpl('http://example.org/');
         $graphA = new AnyPatternImpl();
-        $graphB = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
+        $graphB = new NamedNodeImpl('http://example.org/');
 
         $fixtureA = $this->newInstance($subjectA, $predicate, $object);
         $fixtureB = $this->newInstance($subjectB, $predicate, $object);
@@ -74,11 +76,11 @@ abstract class StatementAbstractTest extends TestCase
     public function testIsConcrete()
     {
         $subjectA = new AnyPatternImpl();
-        $subjectB = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
-        $predicate = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
-        $object = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
+        $subjectB = new NamedNodeImpl('http://example.org/');
+        $predicate = new NamedNodeImpl('http://example.org/');
+        $object = new NamedNodeImpl('http://example.org/');
         $graphA = new AnyPatternImpl();
-        $graphB = new NamedNodeImpl(new RdfHelpers(), "http://example.org/");
+        $graphB = new NamedNodeImpl('http://example.org/');
 
         $fixtureA = $this->newInstance($subjectA, $predicate, $object);
         $fixtureB = $this->newInstance($subjectB, $predicate, $object);
@@ -104,11 +106,11 @@ abstract class StatementAbstractTest extends TestCase
 
     public function testMatches()
     {
-        $subject = new NamedNodeImpl(new RdfHelpers(), 'http://foo.net');
-        $predicate = new NamedNodeImpl(new RdfHelpers(), 'http://bar.net');
-        $graphA = new NamedNodeImpl(new RdfHelpers(), 'http://example.net');
-        $graphB = new NamedNodeImpl(new RdfHelpers(), 'http://other.net');
-        $object = new LiteralImpl(new RdfHelpers(), 'baz');
+        $subject = new NamedNodeImpl('http://foo.net');
+        $predicate = new NamedNodeImpl('http://bar.net');
+        $graphA = new NamedNodeImpl('http://example.net');
+        $graphB = new NamedNodeImpl('http://other.net');
+        $object = new LiteralImpl('baz');
         $fixtureA = $this->newInstance($subject, $predicate, $object);
         $fixtureB = $this->newInstance($subject, $predicate, $object, $graphA);
         $fixtureC = $this->newInstance($subject, $predicate, $object, $graphB);
@@ -126,27 +128,27 @@ abstract class StatementAbstractTest extends TestCase
         $this->assertTrue($patternC->matches($fixtureB));
         $this->assertFalse($patternC->matches($fixtureC));
 
-        $subject = new NamedNodeImpl(new RdfHelpers(), 'http://foo.net');
-        $predicate = new NamedNodeImpl(new RdfHelpers(), 'http://bar.net');
-        $object = new LiteralImpl(new RdfHelpers(), 'baz');
+        $subject = new NamedNodeImpl('http://foo.net');
+        $predicate = new NamedNodeImpl('http://bar.net');
+        $object = new LiteralImpl('baz');
         $pattern = new StatementImpl($subject, $predicate, $object);
         $this->assertTrue($pattern->matches($fixtureA));
 
         $subject = new AnyPatternImpl();
-        $predicate = new NamedNodeImpl(new RdfHelpers(), 'http://bar.net');
+        $predicate = new NamedNodeImpl('http://bar.net');
         $object = new AnyPatternImpl();
         $pattern = new StatementImpl($subject, $predicate, $object);
         $this->assertTrue($pattern->matches($fixtureA));
 
         $subject = new AnyPatternImpl();
-        $predicate = new NamedNodeImpl(new RdfHelpers(), 'http://other.net');
+        $predicate = new NamedNodeImpl('http://other.net');
         $object = new AnyPatternImpl();
         $pattern = new StatementImpl($subject, $predicate, $object);
         $this->assertFalse($pattern->matches($fixtureA));
 
-        $subject = new NamedNodeImpl(new RdfHelpers(), 'http://other.net');
-        $predicate = new NamedNodeImpl(new RdfHelpers(), 'http://bar.net');
-        $object = new LiteralImpl(new RdfHelpers(), 'baz');
+        $subject = new NamedNodeImpl('http://other.net');
+        $predicate = new NamedNodeImpl('http://bar.net');
+        $object = new LiteralImpl('baz');
         $pattern = new StatementImpl($subject, $predicate, $object);
         $this->assertFalse($pattern->matches($fixtureA));
     }
@@ -172,16 +174,16 @@ abstract class StatementAbstractTest extends TestCase
 
     public function testToNQuads()
     {
-        $subject = new NamedNodeImpl(new RdfHelpers(), 'http://foo.net');
-        $predicate = new NamedNodeImpl(new RdfHelpers(), 'http://bar.net');
-        $object = new NamedNodeImpl(new RdfHelpers(), 'http://baz.net');
-        $graph = new NamedNodeImpl(new RdfHelpers(), 'http://graph.net');
+        $subject = new NamedNodeImpl('http://foo.net');
+        $predicate = new NamedNodeImpl('http://bar.net');
+        $object = new NamedNodeImpl('http://baz.net');
+        $graph = new NamedNodeImpl('http://graph.net');
         $anyGraph = new AnyPatternImpl();
 
         $fixtureA = $this->newInstance($subject, $predicate, $object, $graph);
         $fixtureB = $this->newInstance($subject, $predicate, $object, $anyGraph);
 
-        $expected = "<http://foo.net> <http://bar.net> <http://baz.net> <http://graph.net> .";
+        $expected = '<http://foo.net> <http://bar.net> <http://baz.net> <http://graph.net> .';
 
         $this->assertTrue($fixtureA->isQuad());
         $this->assertTrue($fixtureB->isQuad());
@@ -242,9 +244,9 @@ abstract class StatementAbstractTest extends TestCase
         $fixture = $this->newInstance($this->testGraph, $this->testGraph, $this->testGraph, $this->testGraph);
 
         $this->assertEquals(
-            '<'. $this->testGraph->getUri() .'> '.
-            '<'. $this->testGraph->getUri() .'> '.
-            '<'. $this->testGraph->getUri() .'> .',
+            '<'.$this->testGraph->getUri().'> '.
+            '<'.$this->testGraph->getUri().'> '.
+            '<'.$this->testGraph->getUri().'> .',
             $fixture->toNTriples()
         );
     }
@@ -254,9 +256,9 @@ abstract class StatementAbstractTest extends TestCase
         $fixture = $this->newInstance($this->testGraph, $this->testGraph, $this->testGraph);
 
         $this->assertEquals(
-            '<'. $this->testGraph->getUri() .'> '.
-            '<'. $this->testGraph->getUri() .'> '.
-            '<'. $this->testGraph->getUri() .'> .',
+            '<'.$this->testGraph->getUri().'> '.
+            '<'.$this->testGraph->getUri().'> '.
+            '<'.$this->testGraph->getUri().'> .',
             $fixture->toNTriples()
         );
     }
@@ -270,10 +272,10 @@ abstract class StatementAbstractTest extends TestCase
         $fixture = $this->newInstance($this->testGraph, $this->testGraph, $this->testGraph, $this->testGraph);
 
         $this->assertEquals(
-            's: '. $this->testGraph->getUri() .
-            ', p: '. $this->testGraph->getUri() .
-            ', o: '. $this->testGraph->getUri() .
-            ', g: '. $this->testGraph->getUri(),
+            's: '.$this->testGraph->getUri().
+            ', p: '.$this->testGraph->getUri().
+            ', o: '.$this->testGraph->getUri().
+            ', g: '.$this->testGraph->getUri(),
             $fixture->__toString()
         );
     }
@@ -283,9 +285,9 @@ abstract class StatementAbstractTest extends TestCase
         $fixture = $this->newInstance($this->testGraph, $this->testGraph, $this->testGraph);
 
         $this->assertEquals(
-            's: '. $this->testGraph->getUri() .
-            ', p: '. $this->testGraph->getUri() .
-            ', o: '. $this->testGraph->getUri(),
+            's: '.$this->testGraph->getUri().
+            ', p: '.$this->testGraph->getUri().
+            ', o: '.$this->testGraph->getUri(),
             $fixture->__toString()
         );
     }

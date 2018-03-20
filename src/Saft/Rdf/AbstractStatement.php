@@ -14,6 +14,7 @@ namespace Saft\Rdf;
 
 /**
  * @api
+ *
  * @since 0.1
  */
 abstract class AbstractStatement implements Statement
@@ -21,9 +22,11 @@ abstract class AbstractStatement implements Statement
     /**
      * Returns true if neither subject, predicate, object nor, if available, graph, are patterns.
      *
-     * @return boolean True, if if neither subject, predicate, object nor, if available, graph, are patterns,
-     *                 false otherwise.
+     * @return bool true, if if neither subject, predicate, object nor, if available, graph, are patterns,
+     *              false otherwise
+     *
      * @api
+     *
      * @since 0.1
      */
     public function isConcrete()
@@ -40,9 +43,11 @@ abstract class AbstractStatement implements Statement
     /**
      * Returns true if at least subject, predicate, object or, if available, graph, are patterns.
      *
-     * @return boolean True, if at least subject, predicate, object or, if available, graph, are patterns,
-     *                 false otherwise.
+     * @return bool true, if at least subject, predicate, object or, if available, graph, are patterns,
+     *              false otherwise
+     *
      * @api
+     *
      * @since 0.1
      */
     public function isPattern()
@@ -53,23 +58,26 @@ abstract class AbstractStatement implements Statement
     /**
      * Transforms content of the Statement to n-quads form.
      *
-     * @return string N-Quads string containing subject, predicate, object and graph, if available.
-     * @throws \Exception if this instance is a non-concrete statement.
+     * @return string N-Quads string containing subject, predicate, object and graph, if available
+     *
+     * @throws \Exception if this instance is a non-concrete statement
+     *
      * @api
+     *
      * @since 0.1
      */
     public function toNQuads()
     {
         if ($this->isConcrete()) {
             if ($this->isQuad()) {
-                return $this->getSubject()->toNQuads() . ' ' .
-                       $this->getPredicate()->toNQuads() . ' ' .
-                       $this->getObject()->toNQuads() . ' ' .
-                       $this->getGraph()->toNQuads() . ' .';
+                return $this->getSubject()->toNQuads().' '.
+                       $this->getPredicate()->toNQuads().' '.
+                       $this->getObject()->toNQuads().' '.
+                       $this->getGraph()->toNQuads().' .';
             } else {
-                return $this->getSubject()->toNQuads() . ' ' .
-                       $this->getPredicate()->toNQuads() . ' ' .
-                       $this->getObject()->toNQuads() . ' .';
+                return $this->getSubject()->toNQuads().' '.
+                       $this->getPredicate()->toNQuads().' '.
+                       $this->getObject()->toNQuads().' .';
             }
         } else {
             throw new \Exception('A Statement has to be concrete in N-Quads.');
@@ -79,17 +87,20 @@ abstract class AbstractStatement implements Statement
     /**
      * Transforms content of the Statement to n-triples form.
      *
-     * @return string N-triples string, containing subject, predicate and object.
-     * @throws \Exception if this instance is a non-concrete statement.
+     * @return string N-triples string, containing subject, predicate and object
+     *
+     * @throws \Exception if this instance is a non-concrete statement
+     *
      * @api
+     *
      * @since 0.1
      */
     public function toNTriples()
     {
         if ($this->isConcrete()) {
-            return $this->getSubject()->toNQuads() . ' ' .
-                   $this->getPredicate()->toNQuads() . ' ' .
-                   $this->getObject()->toNQuads() . ' .';
+            return $this->getSubject()->toNQuads().' '.
+                   $this->getPredicate()->toNQuads().' '.
+                   $this->getObject()->toNQuads().' .';
         } else {
             throw new \Exception('A Statement has to be concrete in N-Triples.');
         }
@@ -99,25 +110,31 @@ abstract class AbstractStatement implements Statement
      * This method is ment for getting some kind of human readable string representation of the current node.
      * It returns a string which contains subject, predicate and object.
      *
-     * @return string Formated string which contains subject, predicate and object.
+     * @return string formated string which contains subject, predicate and object
+     *
      * @api
+     *
      * @since 0.1
      */
     public function __toString()
     {
-        $string = sprintf("s: %s, p: %s, o: %s", $this->getSubject(), $this->getPredicate(), $this->getObject());
+        $string = sprintf('s: %s, p: %s, o: %s', $this->getSubject(), $this->getPredicate(), $this->getObject());
         if ($this->isQuad()) {
-            $string .= ", g: " . $this->getGraph();
+            $string .= ', g: '.$this->getGraph();
         }
+
         return $string;
     }
 
     /**
      * Checks if a given statement is equal to this instance.
      *
-     * @param Statement $toTest Statement to check this instance against.
-     * @return boolean True, if this instance is equal to the given instance, false otherwise.
+     * @param Statement $toTest statement to check this instance against
+     *
+     * @return bool true, if this instance is equal to the given instance, false otherwise
+     *
      * @api
+     *
      * @since 0.1
      */
     public function equals(Statement $toTest)
@@ -133,15 +150,19 @@ abstract class AbstractStatement implements Statement
                 return true;
             }
         }
+
         return false;
     }
 
     /**
      * Checks if this instance matches a given instance.
      *
-     * @param Statement $toTest Statement instance to check for a match.
-     * @return boolean True, if this instance matches a given Statement instance, false otherwise.
+     * @param Statement $toTest statement instance to check for a match
+     *
+     * @return bool true, if this instance matches a given Statement instance, false otherwise
+     *
      * @api
+     *
      * @since 0.1
      */
     public function matches(Statement $toTest)
@@ -175,6 +196,7 @@ abstract class AbstractStatement implements Statement
              * {@url http://www.w3.org/TR/2013/REC-sparql11-query-20130321/#rdfDataset}
              */
         }
+
         return false;
     }
 }

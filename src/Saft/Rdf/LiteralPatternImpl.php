@@ -15,7 +15,7 @@ namespace Saft\Rdf;
 /**
  * This is a specific variable node, which is meant to match certain constructs of literal nodes by specifying
  * parts of the literal.
- * see also {@url http://www.w3.org/TR/2013/REC-sparql11-query-20130321/#matchingRDFLiterals}
+ * see also {@url http://www.w3.org/TR/2013/REC-sparql11-query-20130321/#matchingRDFLiterals}.
  */
 class LiteralPatternImpl implements Node
 {
@@ -39,7 +39,7 @@ class LiteralPatternImpl implements Node
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isBlank()
     {
@@ -47,7 +47,7 @@ class LiteralPatternImpl implements Node
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isConcrete()
     {
@@ -55,7 +55,7 @@ class LiteralPatternImpl implements Node
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isLiteral()
     {
@@ -63,7 +63,7 @@ class LiteralPatternImpl implements Node
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isNamed()
     {
@@ -71,7 +71,7 @@ class LiteralPatternImpl implements Node
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isPattern()
     {
@@ -79,9 +79,10 @@ class LiteralPatternImpl implements Node
     }
 
     /**
-     * @param  Node    $toCompare
-     * @return boolean True if this instance and $toCompare match with value, datatype and language,
-     *                 false otherwise.
+     * @param Node $toCompare
+     *
+     * @return bool true if this instance and $toCompare match with value, datatype and language,
+     *              false otherwise
      */
     public function equals(Node $toCompare)
     {
@@ -92,6 +93,7 @@ class LiteralPatternImpl implements Node
                 && $this->getDatatype() === $toCompare->getDatatype()
                 && $this->getLanguage() === $toCompare->getLanguage();
         }
+
         return false;
     }
 
@@ -113,8 +115,10 @@ class LiteralPatternImpl implements Node
     /**
      * A literal matches only another literal if its value, datatype and language are equal.
      *
-     * @param  Node    $toMatch Node instance to apply the pattern on
-     * @return boolean true, if this pattern matches the node, false otherwise
+     * @param Node $toMatch Node instance to apply the pattern on
+     *
+     * @return bool true, if this pattern matches the node, false otherwise
+     *
      * @todo check if that could be deleted
      */
     public function matches(Node $toMatch)
@@ -125,24 +129,24 @@ class LiteralPatternImpl implements Node
                     && $this->getDatatype() === $toMatch->getDatatype()
                     && $this->getLanguage() === $toMatch->getLanguage();
             }
-            return false;
 
+            return false;
         } else {
             throw new \Exception('The node to match has to be a concrete node');
         }
     }
 
     /**
-     * Returns a string description of the literal pattern representation
+     * Returns a string description of the literal pattern representation.
      */
     public function __toString()
     {
         // TODO to be done
-        return "LITERALPATTERN";
+        return 'LITERALPATTERN';
     }
 
     public function toNQuads()
     {
-        throw new \Exception("The LiteralPattern is not valid in NQuads");
+        throw new \Exception('The LiteralPattern is not valid in NQuads');
     }
 }

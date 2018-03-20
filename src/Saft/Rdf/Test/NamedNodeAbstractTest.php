@@ -12,16 +12,11 @@
 
 namespace Saft\Rdf\Test;
 
-use Saft\Rdf\AnyPatterImpl;
-use Saft\Rdf\BlankNodeImpl;
-use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\LiteralImpl;
-use Saft\Test\TestCase;
-
 abstract class NamedNodeAbstractTest extends TestCase
 {
     /**
-     * An abstract method which returns new instances of NamedNode
+     * An abstract method which returns new instances of NamedNode.
+     *
      * @todo The factory method approach could also be extended to use a factory object
      */
     abstract public function newInstance($uri);

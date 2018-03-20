@@ -13,7 +13,6 @@
 namespace Saft\Rdf\Test;
 
 use Saft\Rdf\CommonNamespaces;
-use Saft\Test\TestCase;
 
 class CommonNamespacesTest extends TestCase
 {

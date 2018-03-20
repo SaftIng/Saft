@@ -16,10 +16,9 @@ use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementImpl;
 
-class StatementImplTest extends StatementAbstractTest
+class StatementImplTest extends AbstractStatementTest
 {
     public function newAnyPatternInstance($value)
     {
@@ -38,11 +37,11 @@ class StatementImplTest extends StatementAbstractTest
 
     public function newLiteralInstance($value, $datatype = null, $lang = null)
     {
-        return new LiteralImpl(new RdfHelpers(), $value, $datatype, $lang);
+        return new LiteralImpl($value, $datatype, $lang);
     }
 
     public function newNamedNodeInstance($uri)
     {
-        return new NamedNodeImpl(new RdfHelpers(), $uri);
+        return new NamedNodeImpl($uri);
     }
 }

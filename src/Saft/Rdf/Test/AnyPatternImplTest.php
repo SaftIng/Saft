@@ -13,12 +13,11 @@
 namespace Saft\Rdf\Test;
 
 use Saft\Rdf\AnyPatternImpl;
-use Saft\Test\TestCase;
 
 class AnyPatternImplTest extends TestCase
 {
     /**
-     * An abstract method which returns new instances of BlankNode
+     * An abstract method which returns new instances of BlankNode.
      */
     public function newInstance()
     {

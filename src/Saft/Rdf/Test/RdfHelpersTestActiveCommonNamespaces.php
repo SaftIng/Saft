@@ -12,12 +12,15 @@
 
 namespace Saft\Rdf\Test;
 
-use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\CommonNamespaces;
+use Saft\Rdf\RdfHelpers;
 
-class ArrayStatementIteratorImplTest extends AbstractStatementIteratorTest
+class RdfHelpersTestActiveCommonNamespaces extends RdfHelpersTest
 {
-    public function createInstanceWithArray(array $statements)
+    public function setUp()
     {
-        return new ArrayStatementIteratorImpl($statements);
+        parent::setUp();
+
+        $this->fixture = new RdfHelpers(new CommonNamespaces());
     }
 }

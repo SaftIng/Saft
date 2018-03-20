@@ -12,23 +12,20 @@
 
 namespace Saft\Rdf\Test;
 
-use Saft\Rdf\BlankNodeImpl;
-use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\Node;
-use Saft\Test\TestCase;
 
 /**
  * This abstract test checks classes implementing the Literal interface for conformity with RDF 1.1
- * {@url http://www.w3.org/TR/rdf11-concepts/#section-Graph-Literal}
- * @package Saft\Rdf\Test
+ * {@url http://www.w3.org/TR/rdf11-concepts/#section-Graph-Literal}.
  */
-abstract class LiteralAbstractTest extends TestCase
+abstract class AbstractLiteralTest extends TestCase
 {
     /**
-     * An abstract method which returns the subject under test (SUT), in this case an instances of Literal
+     * An abstract method which returns the subject under test (SUT), in this case an instances of Literal.
      *
-     * @param string $value the literal value
+     * @param string $value    the literal value
      * @param string $datatype
+     *
      * @return Literal returns an instance of Literal as SUT
      */
     abstract public function newInstance($value, Node $datatype = null, $lang = null);
@@ -50,10 +47,10 @@ abstract class LiteralAbstractTest extends TestCase
             'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'
         );
 
-        $fixtureA = $this->newInstance("true", $xsdBoolean);
-        $fixtureB = $this->newInstance("123", $xsdInt);
-        $fixtureC = $this->newInstance("true", $xsdString);
-        $fixtureD = $this->newInstance("true", $rdfLangString, "en");
+        $fixtureA = $this->newInstance('true', $xsdBoolean);
+        $fixtureB = $this->newInstance('123', $xsdInt);
+        $fixtureC = $this->newInstance('true', $xsdString);
+        $fixtureD = $this->newInstance('true', $rdfLangString, 'en');
 
         $this->assertTrue($fixtureA->getDatatype() instanceof Node);
         $this->assertTrue($fixtureA->getDatatype()->isNamed());
@@ -70,7 +67,7 @@ abstract class LiteralAbstractTest extends TestCase
      */
 
     /**
-     * Tests term equality of two Literal instances:
+     * Tests term equality of two Literal instances:.
      *
      * Literal term equality: Two literals are term-equal (the same RDF literal) if and only if the two lexical forms,
      * the two datatype IRIs, and the two language tags (if any) compare equal, character by character. Thus, two
@@ -86,13 +83,13 @@ abstract class LiteralAbstractTest extends TestCase
     {
         $xsdInt = $this->getNodeFactory()->createNamedNode('http://www.w3.org/2001/XMLSchema#integer');
 
-        $fixtureA = $this->newInstance("true");
-        $fixtureB = $this->newInstance("true");
+        $fixtureA = $this->newInstance('true');
+        $fixtureB = $this->newInstance('true');
 
         $this->assertTrue($fixtureA->equals($fixtureB));
 
-        $fixtureE = $this->newInstance("1");
-        $fixtureF = $this->newInstance("1", $xsdInt);
+        $fixtureE = $this->newInstance('1');
+        $fixtureF = $this->newInstance('1', $xsdInt);
 
         $this->assertFalse($fixtureE->equals($fixtureF));
     }
@@ -107,19 +104,18 @@ abstract class LiteralAbstractTest extends TestCase
     public function testGetDatatypeBoolean()
     {
         $xsdBoolean = $this->getNodeFactory()->createNamedNode('http://www.w3.org/2001/XMLSchema#boolean');
-        $fixture = $this->newInstance("true", $xsdBoolean);
+        $fixture = $this->newInstance('true', $xsdBoolean);
 
         $this->assertEquals($xsdBoolean->getUri(), $fixture->getDatatype()->getUri());
     }
 
     /**
-     *
      * @depends testDatatypeIsNamedNode
      */
     public function testGetDatatypeDecimal()
     {
         $xsdDecimal = $this->getNodeFactory()->createNamedNode('http://www.w3.org/2001/XMLSchema#decimal');
-        $fixture = $this->newInstance("3.18", $xsdDecimal);
+        $fixture = $this->newInstance('3.18', $xsdDecimal);
 
         $this->assertEquals($xsdDecimal->getUri(), $fixture->getDatatype()->getUri());
     }
@@ -131,7 +127,7 @@ abstract class LiteralAbstractTest extends TestCase
     {
         $xsdInt = $this->getNodeFactory()->createNamedNode('http://www.w3.org/2001/XMLSchema#integer');
 
-        $fixture = $this->newInstance("3", $xsdInt);
+        $fixture = $this->newInstance('3', $xsdInt);
 
         $this->assertEquals($xsdInt->getUri(), $fixture->getDatatype()->getUri());
     }
@@ -148,11 +144,11 @@ abstract class LiteralAbstractTest extends TestCase
     {
         $xsdString = $this->getNodeFactory()->createNamedNode('http://www.w3.org/2001/XMLSchema#string');
 
-        $fixtureA = $this->newInstance("foo");
-        $fixtureB = $this->newInstance("5");
-        $fixtureC = $this->newInstance("true");
-        $fixtureD = $this->newInstance("false");
-        $fixtureE = $this->newInstance("3.1415");
+        $fixtureA = $this->newInstance('foo');
+        $fixtureB = $this->newInstance('5');
+        $fixtureC = $this->newInstance('true');
+        $fixtureD = $this->newInstance('false');
+        $fixtureE = $this->newInstance('3.1415');
 
         $this->assertEquals($xsdString->getUri(), $fixtureA->getDatatype()->getUri());
         $this->assertEquals($xsdString->getUri(), $fixtureB->getDatatype()->getUri());
@@ -176,9 +172,9 @@ abstract class LiteralAbstractTest extends TestCase
             'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'
         );
 
-        $fixtureA = $this->newInstance('foo', null, "en-us");
-        $fixtureB = $this->newInstance("etwas", null, "de");
-        $fixtureC = $this->newInstance("123", null, "fr");
+        $fixtureA = $this->newInstance('foo', null, 'en-us');
+        $fixtureB = $this->newInstance('etwas', null, 'de');
+        $fixtureC = $this->newInstance('123', null, 'fr');
 
         $this->assertEquals($rdfLangString->getUri(), $fixtureA->getDatatype()->getUri());
         $this->assertEquals($rdfLangString->getUri(), $fixtureB->getDatatype()->getUri());
@@ -198,7 +194,7 @@ abstract class LiteralAbstractTest extends TestCase
             'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'
         );
 
-        $fixture = $this->newInstance("foo", $rdfLangString, "de");
+        $fixture = $this->newInstance('foo', $rdfLangString, 'de');
         $this->assertEquals($rdfLangString->getUri(), $fixture->getDatatype()->getUri());
         $this->assertEquals('de', $fixture->getLanguage());
     }
@@ -208,12 +204,11 @@ abstract class LiteralAbstractTest extends TestCase
         $xsdString = $this->getNodeFactory()->createNamedNode('http://www.w3.org/2001/XMLSchema#string');
         $this->setExpectedException('\Exception');
 
-        $this->newInstance("foo", $xsdString, "de");
+        $this->newInstance('foo', $xsdString, 'de');
     }
 
     public function testInitializationWithWrongDatatypeType()
     {
-
         if (class_exists('\TypeError')) {
             $this->setExpectedException('TypeError');
         } else {
@@ -221,7 +216,7 @@ abstract class LiteralAbstractTest extends TestCase
         }
 
         // Should result in a PHP error becauseof wrong argument type
-        $this->newInstance("foo", "http://www.w3.org/2001/XMLSchema#string");
+        $this->newInstance('foo', 'http://www.w3.org/2001/XMLSchema#string');
     }
 
     // instanciation with null shouldn't be possible
@@ -288,13 +283,13 @@ abstract class LiteralAbstractTest extends TestCase
     public function testMatches()
     {
         $xsdInteger = $this->getNodeFactory()->createNamedNode('http://www.w3.org/2001/XMLSchema#integer');
-        $fixtureA = $this->newInstance("true");
-        $fixtureB = $this->newInstance("true");
+        $fixtureA = $this->newInstance('true');
+        $fixtureB = $this->newInstance('true');
 
         $this->assertTrue($fixtureA->matches($fixtureB));
 
-        $fixtureE = $this->newInstance("1");
-        $fixtureF = $this->newInstance("1", $xsdInteger);
+        $fixtureE = $this->newInstance('1');
+        $fixtureF = $this->newInstance('1', $xsdInteger);
 
         $this->assertFalse($fixtureE->matches($fixtureF));
     }
@@ -305,16 +300,16 @@ abstract class LiteralAbstractTest extends TestCase
 
     public function testValueIsString()
     {
-        $fixture = $this->newInstance("1.1245");
+        $fixture = $this->newInstance('1.1245');
         $this->assertTrue(is_string($fixture->getValue()));
 
-        $fixture = $this->newInstance("1");
+        $fixture = $this->newInstance('1');
         $this->assertTrue(is_string($fixture->getValue()));
 
-        $fixture = $this->newInstance("1.1245");
+        $fixture = $this->newInstance('1.1245');
         $this->assertTrue(is_string($fixture->getValue()));
 
-        $fixture = $this->newInstance("true");
+        $fixture = $this->newInstance('true');
         $this->assertTrue(is_string($fixture->getValue()));
     }
 
@@ -332,7 +327,7 @@ abstract class LiteralAbstractTest extends TestCase
     public function testToNTValueBoolean()
     {
         $xsdBoolean = $this->getNodeFactory()->createNamedNode('http://www.w3.org/2001/XMLSchema#boolean');
-        $fixture = $this->newInstance("true", $xsdBoolean);
+        $fixture = $this->newInstance('true', $xsdBoolean);
 
         $this->assertEquals(
             '"true"^^<http://www.w3.org/2001/XMLSchema#boolean>',
@@ -343,7 +338,7 @@ abstract class LiteralAbstractTest extends TestCase
     public function testToNTValueInteger()
     {
         $xsdInteger = $this->getNodeFactory()->createNamedNode('http://www.w3.org/2001/XMLSchema#integer');
-        $fixture = $this->newInstance("30", $xsdInteger);
+        $fixture = $this->newInstance('30', $xsdInteger);
 
         $this->assertEquals(
             '"30"^^<http://www.w3.org/2001/XMLSchema#integer>',
@@ -387,8 +382,8 @@ abstract class LiteralAbstractTest extends TestCase
     {
         $fixture = $this->newInstance('literal');
 
-        $this->assertTrue(is_string((string)$fixture));
-        $this->assertTrue(strpos((string)$fixture, $fixture->getValue()) >= 0);
+        $this->assertTrue(is_string((string) $fixture));
+        $this->assertTrue(strpos((string) $fixture, $fixture->getValue()) >= 0);
     }
 
     /*

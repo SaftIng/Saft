@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Saft\Test;
+namespace Saft\Rdf\Test;
 
 /**
  * That constraint tries to match a given regex on a given string. If the regex matches, the constraint is true,
@@ -34,6 +34,6 @@ class RegexMatchConstraint extends \PHPUnit_Framework_Constraint
 
     public function toString()
     {
-        return 'matches the given Regex: '. $this->regex;
+        return 'matches the given Regex: '.$this->regex;
     }
 }

@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Saft\Test;
+namespace Saft\Rdf\Test;
 
 use Saft\Rdf\CommonNamespaces;
 use Saft\Rdf\NodeFactoryImpl;
@@ -25,6 +25,7 @@ use Symfony\Component\Yaml\Parser;
 
 /**
  * @api
+ *
  * @since 0.1
  */
 abstract class TestCase extends \PHPUnit_Framework_TestCase
@@ -60,7 +61,9 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      * @param array  $expected
      * @param array  $actual
      * @param string $message  optional
+     *
      * @api
+     *
      * @since 0.1
      */
     protected function assertEqualsArrays($expected, $actual, $message = '')
@@ -74,9 +77,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     /**
      * It checks of the given instance implements a certain class or interface.
      *
-     * @param object $instance         Instance to check.
-     * @param string $classOrInterface Name of the class or interface to check if it is implemented by $instance.
+     * @param object $instance         instance to check
+     * @param string $classOrInterface name of the class or interface to check if it is implemented by $instance
+     *
      * @api
+     *
      * @since 0.1
      */
     public function assertClassOfInstanceImplements($instance, $classOrInterface)
@@ -94,13 +99,15 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      * @param int               $expectedCount
      * @param StatementIterator $statementIterator
      * @param string            $message
+     *
      * @api
+     *
      * @since 0.1
      */
     public function assertCountStatementIterator($expectedCount, $statementIterator, $message = null)
     {
         if (true == empty($message)) {
-            $message = 'Assertion about count of statements. Expected: '. $expectedCount .', Actual: %s';
+            $message = 'Assertion about count of statements. Expected: '.$expectedCount.', Actual: %s';
         }
 
         $i = 0;
@@ -116,12 +123,14 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      *
      * @param SetResult $expected
      * @param SetResult $actual
+     *
      * @api
+     *
      * @since 0.1
      */
     public function assertSetIteratorEquals(SetResult $expected, SetResult $actual)
     {
-        $expectedEntries = array();
+        $expectedEntries = [];
         foreach ($expected as $entry) {
             // serialize entry and hash it afterwards to use it as key for $entriesToCheck array.
             // later on we only check the other list that each entry, serialized and hashed, has
@@ -131,7 +140,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             foreach ($entry as $key => $nodeInstance) {
                 if ($nodeInstance->isConcrete()) {
                     // build a string of all entries of $entry and generate a hash based on that later on.
-                    $entryString .= $nodeInstance->toNQuads() . ' ';
+                    $entryString .= $nodeInstance->toNQuads().' ';
                 } else {
                     throw new \Exception('Non-concrete Node instance in SetResult instance found.');
                 }
@@ -139,13 +148,13 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             $expectedEntries[$entryString] = $entry;
         }
 
-        $actualEntries = array();
+        $actualEntries = [];
         foreach ($actual as $entry) {
             $entryString = '';
             foreach ($entry as $key => $nodeInstance) {
                 if ($nodeInstance->isConcrete()) {
                     // build a string of all entries of $entry and generate a hash based on that later on.
-                    $entryString .= $nodeInstance->toNQuads() . ' ';
+                    $entryString .= $nodeInstance->toNQuads().' ';
                 } else {
                     throw new \Exception('Non-concrete Node instance in SetResult instance found.');
                 }
@@ -153,21 +162,21 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             $actualEntries[$entryString] = $entry;
         }
 
-        $notFoundEntries = array();
+        $notFoundEntries = [];
         foreach ($expectedEntries as $expectedEntry) {
             $foundExpectedEntry = false;
 
             // 1. generate a string which represents all nodes of an expected set entry
             $expectedEntryString = '';
             foreach ($expectedEntry as $nodeInstance) {
-                $expectedEntryString .= $nodeInstance->toNQuads() . ' ';
+                $expectedEntryString .= $nodeInstance->toNQuads().' ';
             }
 
             // 2. for each actual entry check their generated string against the expected one
             foreach ($actualEntries as $actualEntry) {
                 $actualEntryString = '';
                 foreach ($actualEntry as $nodeInstance) {
-                    $actualEntryString .= $nodeInstance->toNQuads() . ' ';
+                    $actualEntryString .= $nodeInstance->toNQuads().' ';
                 }
                 if ($actualEntryString == $expectedEntryString) {
                     $foundExpectedEntry = true;
@@ -182,24 +191,24 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
         // first simply check of the number of given actual entries and expected
         if (count($actualEntries) != count($expectedEntries)) {
-            $this->fail('Expected '. count($expectedEntries) . ' entries, but got '. count($actualEntries));
+            $this->fail('Expected '.count($expectedEntries).' entries, but got '.count($actualEntries));
         }
 
         if (!empty($notFoundEntries)) {
-            echo PHP_EOL . PHP_EOL . 'Given entries, but not found:' . PHP_EOL;
+            echo PHP_EOL.PHP_EOL.'Given entries, but not found:'.PHP_EOL;
             var_dump($notFoundEntries);
 
-            echo PHP_EOL . PHP_EOL . 'Actual entries:' . PHP_EOL;
+            echo PHP_EOL.PHP_EOL.'Actual entries:'.PHP_EOL;
             foreach ($actualEntries as $entries) {
                 echo '- ';
                 foreach ($entries as $entry) {
-                    echo $entry->toNQuads() .' ';
+                    echo $entry->toNQuads().' ';
                 }
                 echo PHP_EOL;
                 echo PHP_EOL;
             }
 
-            $this->fail(count($notFoundEntries) .' entries where not found.');
+            $this->fail(count($notFoundEntries).' entries where not found.');
 
         // check variables in the end
         } elseif (0 == count($notFoundEntries)) {
@@ -213,10 +222,13 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      *
      * @param StatementIterator $expected
      * @param StatementIterator $actual
-     * @param boolean $debug optional, default: false
+     * @param bool              $debug    optional, default: false
+     *
      * @todo implement a more precise way to check blank nodes (currently we just count expected
      *       and actual numbers of statements with blank nodes)
+     *
      * @api
+     *
      * @since 0.1
      */
     public function assertStatementIteratorEquals(
@@ -224,7 +236,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         StatementIterator $actual,
         $debug = false
     ) {
-        $entriesToCheck = array();
+        $entriesToCheck = [];
         $expectedStatementsWithBlankNodeCount = 0;
 
         foreach ($expected as $statement) {
@@ -242,14 +254,14 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         }
 
         // contains a list of all entries, which were not found in $expected.
-        $actualEntriesNotFound = array();
-        $notCheckedEntries = array();
-        $foundEntries = array();
+        $actualEntriesNotFound = [];
+        $notCheckedEntries = [];
+        $foundEntries = [];
         $actualStatementsWithBlankNodeCount = 0;
 
         foreach ($actual as $statement) {
             if (!$statement->isConcrete()) {
-                $this->markTestIncomplete("Comparison of variable statements in iterators not yet implemented.");
+                $this->markTestIncomplete('Comparison of variable statements in iterators not yet implemented.');
             }
             $statmentHash = hash('sha256', $statement->toNQuads());
             // statements without blank nodes
@@ -274,17 +286,17 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             $message = 'The StatementIterators are not equal.';
             if (!empty($actualEntriesNotFound)) {
                 if ($debug) {
-                    echo PHP_EOL . 'Following statements where not expected, but found: ';
+                    echo PHP_EOL.'Following statements where not expected, but found: ';
                     var_dump($actualEntriesNotFound);
                 }
-                $message .= ' ' . count($actualEntriesNotFound) . ' Statements where not expected.';
+                $message .= ' '.count($actualEntriesNotFound).' Statements where not expected.';
             }
             if (!empty($notCheckedEntries)) {
                 if ($debug) {
-                    echo PHP_EOL . 'Following statements where not present, but expected: ';
+                    echo PHP_EOL.'Following statements where not present, but expected: ';
                     var_dump($notCheckedEntries);
                 }
-                $message .= ' ' . count($notCheckedEntries) . ' Statements where not present but expected.';
+                $message .= ' '.count($notCheckedEntries).' Statements where not present but expected.';
             }
             $this->assertFalse(!empty($actualEntriesNotFound) || !empty($notCheckedEntries), $message);
 
@@ -293,10 +305,9 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             $this->assertFalse(
                 true,
                 'Some statements with blank nodes where not found. '
-                    . 'Expected: ' . $expectedStatementsWithBlankNodeCount
-                    . 'Actual: ' . $actualStatementsWithBlankNodeCount
+                    .'Expected: '.$expectedStatementsWithBlankNodeCount
+                    .'Actual: '.$actualStatementsWithBlankNodeCount
             );
-
         } else {
             $this->assertTrue(true);
         }
@@ -308,8 +319,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      *
      * @param Result $expected
      * @param Result $actual
-     * @throws \Exception if unknown Result type was given.
+     *
+     * @throws \Exception if unknown Result type was given
+     *
      * @api
+     *
      * @since 0.1
      */
     public function assertResultEquals(Result $expected, Result $actual)
@@ -330,7 +344,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         // value result
         } elseif ($expected->isValueResult()) {
             $this->assertEquals($expected->getValue(), $actual->getValue());
-
         } else {
             throw new \Exception('Unknown Result type given.');
         }
@@ -342,8 +355,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      *
      * The content of the YAML-file will be transformed into an array and stored in $config property.
      *
-     * @param string $configFilePath Path to the config file.
+     * @param string $configFilePath path to the config file
+     *
      * @api
+     *
      * @since 0.1
      */
     protected function loadTestConfiguration($configFilepath)
@@ -362,6 +377,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      * Place to setup stuff for Saft related tests.
      *
      * @api
+     *
      * @since 0.1
      */
     public function setUp()
@@ -370,7 +386,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
         $this->commonNamespaces = new CommonNamespaces();
         $this->rdfHelpers = new RdfHelpers();
-        $this->nodeFactory = new NodeFactoryImpl($this->rdfHelpers);
+        $this->nodeFactory = new NodeFactoryImpl($this->commonNamespaces);
         $this->statementFactory = new StatementFactoryImpl($this->rdfHelpers);
         $this->statementIteratorFactory = new StatementIteratorFactoryImpl();
         $this->testGraph = $this->nodeFactory->createNamedNode('http://localhost/Saft/TestGraph/');
@@ -378,6 +394,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @param Statement $statement
+     *
      * @return bool
      */
     protected function statementContainsNoBlankNodes(Statement $statement)

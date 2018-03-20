@@ -14,26 +14,41 @@ namespace Saft\Rdf\Test;
 
 use Saft\Rdf\BlankNodeImpl;
 use Saft\Rdf\Literal;
-use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNode;
-use Saft\Rdf\NamedNodeImpl;
-use Saft\Test\TestCase;
 
-abstract class NodeFactoryAbstractTest extends TestCase
+abstract class AbstractNodeFactoryTest extends TestCase
 {
     /**
-     * An abstract method which returns new instances of NodeFactory
+     * An abstract method which returns new instances of NodeFactory.
      */
     abstract public function getFixture();
+
+    public function testCreateNamedNodeShortenedUri()
+    {
+        $fixture = $this->getFixture();
+
+        $node = $fixture->createNamedNode('foaf:Person');
+
+        $this->assertTrue($node->isNamed());
+        $this->assertEquals('http://xmlns.com/foaf/0.1/Person', $node->getUri());
+    }
+
+    public function testCreateNamedNodeExtendedUri()
+    {
+        $fixture = $this->getFixture();
+
+        $node = $fixture->createNamedNode('http://xmlns.com/foaf/0.1/Person');
+        $this->assertEquals('http://xmlns.com/foaf/0.1/Person', $node->getUri());
+    }
 
     public function testNamedNodeFromNQuads()
     {
         $fixture = $this->getFixture();
 
-        $node = $fixture->createNodeFromNQuads("<http://example.org/>");
+        $node = $fixture->createNodeFromNQuads('<http://example.org/>');
 
         $this->assertTrue($node->isNamed());
-        $this->assertEquals("http://example.org/", $node->getUri());
+        $this->assertEquals('http://example.org/', $node->getUri());
     }
 
     public function testLiteralsFromNQuads()
@@ -43,21 +58,21 @@ abstract class NodeFactoryAbstractTest extends TestCase
         $node = $fixture->createNodeFromNQuads('"Hallo"');
 
         $this->assertTrue($node->isLiteral());
-        $this->assertEquals("Hallo", $node->getValue());
+        $this->assertEquals('Hallo', $node->getValue());
 
         $nodeLang = $fixture->createNodeFromNQuads('"Hallo"@de');
 
         $this->assertTrue($nodeLang->isLiteral());
-        $this->assertEquals("Hallo", $nodeLang->getValue());
-        $this->assertEquals("de", $nodeLang->getLanguage());
+        $this->assertEquals('Hallo', $nodeLang->getValue());
+        $this->assertEquals('de', $nodeLang->getLanguage());
 
         $nodeTyped = $fixture->createNodeFromNQuads('"Hallo"^^<http://example.org/string>');
 
         $this->assertTrue($nodeTyped->isLiteral());
-        $this->assertEquals("Hallo", $nodeTyped->getValue());
+        $this->assertEquals('Hallo', $nodeTyped->getValue());
 
         $datatype = $nodeTyped->getDatatype();
-        $this->assertEquals("http://example.org/string", $datatype->getUri());
+        $this->assertEquals('http://example.org/string', $datatype->getUri());
     }
 
     public function testBlankNodeFromNQuads()
@@ -67,7 +82,7 @@ abstract class NodeFactoryAbstractTest extends TestCase
         $node = $fixture->createNodeFromNQuads('_:1234');
 
         $this->assertTrue($node->isBlank());
-        $this->assertEquals("1234", $node->getBlankId());
+        $this->assertEquals('1234', $node->getBlankId());
     }
 
     public function testWrongStringFromNQuads()
@@ -102,7 +117,7 @@ abstract class NodeFactoryAbstractTest extends TestCase
 
         $this->assertTrue($node instanceof Literal);
         $this->assertEquals('42', $node->getValue());
-        $this->assertEquals('xsd:int', $node->getDatatype());
+        $this->assertEquals('http://www.w3.org/2001/XMLSchema#int', $node->getDatatype());
     }
 
     public function testCreateNodeInstanceUnknown()

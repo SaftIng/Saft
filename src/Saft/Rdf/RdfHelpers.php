@@ -17,25 +17,14 @@ namespace Saft\Rdf;
  * URI checks.
  *
  * @api
- * @package Saft\Rdf
+ *
  * @since 0.9
  */
 class RdfHelpers
 {
     /**
-     * @param StatementIteratorFactory $statementIteratorFactory optional, if not set Impl variant will be used.
-     */
-    public function __construct(StatementIteratorFactory $statementIteratorFactory = null)
-    {
-        if (null == $statementIteratorFactory) {
-            $this->statementIteratorFactory = new StatementIteratorFactoryImpl();
-        } else {
-            $this->statementIteratorFactory = $statementIteratorFactory;
-        }
-    }
-
-    /**
      * @param string $s
+     *
      * @return string encoded string for n-quads
      */
     public function encodeStringLitralForNQuads($s)
@@ -50,36 +39,40 @@ class RdfHelpers
     }
 
     /**
-     * Returns given Node instance in SPARQL format, which is in NQuads or as Variable
+     * Returns given Node instance in SPARQL format, which is in NQuads or as Variable.
      *
-     * @param Node $node Node instance to format.
-     * @param string $var The variablename, which should be used, if the node is not concrete
-     * @return string Either NQuad notation (if node is concrete) or as variable.
+     * @param Node   $node node instance to format
+     * @param string $var  The variablename, which should be used, if the node is not concrete
+     *
+     * @return string either NQuad notation (if node is concrete) or as variable
      */
     public function getNodeInSparqlFormat(Node $node, $var = null)
     {
         if ($node->isConcrete()) {
             return $node->toNQuads();
         }
-        return '?' . uniqid('tempVar');
+
+        return '?'.uniqid('tempVar');
     }
 
     /**
      * Get type for a given SPARQL query.
      *
-     * @param  string $query
+     * @param string $query
+     *
      * @return string Type, which is either askQuery, describeQuery, graphQuery, updateQuery or selectQuery
-     * @throws \Exception if unknown query type.
+     *
+     * @throws \Exception if unknown query type
      */
     public function getQueryType($query)
     {
         /**
-         * First we get rid of all PREFIX information
+         * First we get rid of all PREFIX information.
          */
         $adaptedQuery = preg_replace('/PREFIX\s+[a-z0-9\-]+\:\s*\<[a-z0-9\:\/\.\#\-\~\_]+\>/si', '', $query);
 
         // remove whitespace lines and trailing whitespaces
-        $adaptedQuery = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "", trim($adaptedQuery));
+        $adaptedQuery = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", '', trim($adaptedQuery));
 
         // only lower chars
         $adaptedQuery = strtolower($adaptedQuery);
@@ -102,7 +95,7 @@ class RdfHelpers
             case 'des':
                 return 'describeQuery';
 
-            /**
+            /*
              * If we land here, we have to use a higher range of characters
              */
             default:
@@ -156,14 +149,15 @@ class RdfHelpers
                 }
         }
 
-        throw new \Exception('Unknown query type "'. $firstPart .'" for query: '. $adaptedQuery);
+        throw new \Exception('Unknown query type "'.$firstPart.'" for query: '.$adaptedQuery);
     }
 
     /**
      * Returns the regex string to get a node from a triple/quad.
      *
-     * @param boolean $useVariables optional, default is false
-     * @param boolean $useNamespacedUri optional, default is false
+     * @param bool $useVariables     optional, default is false
+     * @param bool $useNamespacedUri optional, default is false
+     *
      * @return string
      */
     public function getRegexStringForNodeRecognition(
@@ -213,19 +207,17 @@ class RdfHelpers
      * Returns the value (or URI or ID) for a given node.
      *
      * @param Node $node Node you want the value of. Can be of type NamedNode, BlankNode or Literal.
+     *
      * @return string|null
      */
     public function getValueForNode(Node $node)
     {
         if ($node->isNamed()) {
             return $node->getUri();
-
         } elseif ($node->isLiteral()) {
             return $node->getValue();
-
         } elseif ($node->isBlank()) {
             return $node->getBlankId();
-
         } else {
             return null;
         }
@@ -233,6 +225,7 @@ class RdfHelpers
 
     /**
      * @param string $stringToCheck
+     *
      * @return null|string
      */
     public function guessFormat($stringToCheck)
@@ -263,8 +256,9 @@ class RdfHelpers
      * Checks if a given string is a blank node ID. Blank nodes are usually structured like
      * _:foo, whereas _: comes first always.
      *
-     * @param string $string String to check if its a blank node ID or not.
-     * @return boolean True if given string is a valid blank node ID, false otherwise.
+     * @param string $string string to check if its a blank node ID or not
+     *
+     * @return bool true if given string is a valid blank node ID, false otherwise
      */
     public function simpleCheckBlankNodeId($string)
     {
@@ -277,22 +271,27 @@ class RdfHelpers
      * basic check and if performance is an issuse. In case you need a more precise check, that function is
      * not recommended.
      *
-     * @param string $string String to check if its a URI or not.
-     * @return boolean True if given string is a valid URI, false otherwise.
+     * @param string $string string to check if its a URI or not
+     *
+     * @return bool true if given string is a valid URI, false otherwise
+     *
      * @api
+     *
      * @since 0.1
      */
     public function simpleCheckURI($string)
     {
         $regEx = '/^([a-z]{2,}:[^\s]*)$/';
-        return (1 === preg_match($regEx, (string)$string));
+
+        return 1 === preg_match($regEx, (string) $string);
     }
 
     /**
      * Returns the Statement-Data in sparql-Format.
      *
-     * @param StatementIterator|array $statements List of statements to format as SPARQL string.
-     * @param Node $graph Use if each statement is a triple and to use another graph as the default.
+     * @param StatementIterator|array $statements list of statements to format as SPARQL string
+     * @param Node                    $graph      use if each statement is a triple and to use another graph as the default
+     *
      * @return string Statement data in SPARQL format
      */
     public function statementIteratorToSparqlFormat($statements, Node $graph = null)
@@ -300,9 +299,9 @@ class RdfHelpers
         $query = '';
         foreach ($statements as $statement) {
             if ($statement instanceof Statement) {
-                $con = $this->getNodeInSparqlFormat($statement->getSubject()) . ' ' .
-                       $this->getNodeInSparqlFormat($statement->getPredicate()) . ' ' .
-                       $this->getNodeInSparqlFormat($statement->getObject()) . ' . ';
+                $con = $this->getNodeInSparqlFormat($statement->getSubject()).' '.
+                       $this->getNodeInSparqlFormat($statement->getPredicate()).' '.
+                       $this->getNodeInSparqlFormat($statement->getObject()).' . ';
 
                 $graphToUse = $graph;
                 if ($graph == null && $statement->isQuad()) {
@@ -310,31 +309,33 @@ class RdfHelpers
                 }
 
                 if (null !== $graphToUse) {
-                    $sparqlString = 'Graph '. self::getNodeInSparqlFormat($graphToUse) .' {' . $con .'}';
+                    $sparqlString = 'Graph '.self::getNodeInSparqlFormat($graphToUse).' {'.$con.'}';
                 } else {
                     $sparqlString = $con;
                 }
 
-                $query .= $sparqlString .' ';
+                $query .= $sparqlString.' ';
             } else {
                 throw new \Exception('Not a Statement instance');
             }
         }
+
         return $query;
     }
 
     /**
      * Returns the Statement-Data in sparql-Format.
      *
-     * @param array $statements List of statements to format as SPARQL string.
-     * @param string $graphUri Use if each statement is a triple and to use another graph as
-     *                         the default. (optional)
+     * @param array  $statements list of statements to format as SPARQL string
+     * @param string $graphUri   Use if each statement is a triple and to use another graph as
+     *                           the default. (optional)
+     *
      * @return string Statement data in SPARQL format
      */
     public function statementsToSparqlFormat(array $statements, Node $graph = null)
     {
         return $this->statementIteratorToSparqlFormat(
-            $this->statementIteratorFactory->createStatementIteratorFromArray($statements),
+            $statements,
             $graph
         );
     }

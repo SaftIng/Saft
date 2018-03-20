@@ -13,9 +13,8 @@
 namespace Saft\Rdf\Test;
 
 use Saft\Rdf\StatementIteratorFactoryImpl;
-use Saft\Test\TestCase;
 
-class StatementIteratorFactoryImplTest extends StatementIteratorFactoryAbstractTest
+class StatementIteratorFactoryImplTest extends AbstractStatementIteratorFactoryTest
 {
     /**
      * @return StatementIteratorFactory
