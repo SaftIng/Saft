@@ -60,7 +60,7 @@ class CommonNamespaces
         'xhv'     => 'http://www.w3.org/1999/xhtml/vocab#',
         'xml'     => 'http://www.w3.org/XML/1998/namespace',
         'xsd'     => 'http://www.w3.org/2001/XMLSchema#',
-    );
+    ];
 
     /**
      * @param array $customPrefixes Allows you to pass further prefixes on instantiation
