@@ -13,23 +13,18 @@
 namespace Saft\Addition\Virtuoso\Test;
 
 use Saft\Addition\Virtuoso\Store\Virtuoso;
-use Saft\Rdf\AnyPatternImpl;
-use Saft\Rdf\ArrayStatementIteratorImpl;
-use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
-use Saft\Sparql\SparqlUtils;
 use Saft\Sparql\Query\QueryFactoryImpl;
-use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\ResultFactoryImpl;
-use Saft\Store\Test\StoreAbstractTest;
-use Symfony\Component\Yaml\Parser;
+use Saft\Sparql\Result\SetResultImpl;
+use Saft\Store\Test\AbstractStoreTest;
 
-class VirtuosoTest extends StoreAbstractTest
+class VirtuosoTest extends AbstractStoreTest
 {
     public function setUp()
     {
@@ -40,7 +35,7 @@ class VirtuosoTest extends StoreAbstractTest
         try {
             $this->isTestPossible();
             $this->fixture = new Virtuoso(
-                new NodeFactoryImpl(new RdfHelpers()),
+                new NodeFactoryImpl(),
                 new StatementFactoryImpl(),
                 new QueryFactoryImpl(new RdfHelpers()),
                 new ResultFactoryImpl(),
@@ -48,7 +43,7 @@ class VirtuosoTest extends StoreAbstractTest
                 new RdfHelpers(),
                 $this->configuration['virtuosoConfig']
             );
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $this->markTestSkipped($e->getMessage());
         }
     }
@@ -57,12 +52,11 @@ class VirtuosoTest extends StoreAbstractTest
     {
         if (false === isset($this->configuration['virtuosoConfig'])) {
             throw new \Exception('Array virtuosoConfig is not set in the test-config.yml.');
-
         } else {
             new \PDO(
-                'odbc:' . (string)$this->configuration['virtuosoConfig']['dsn'],
-                (string)$this->configuration['virtuosoConfig']['username'],
-                (string)$this->configuration['virtuosoConfig']['password']
+                'odbc:'.(string) $this->configuration['virtuosoConfig']['dsn'],
+                (string) $this->configuration['virtuosoConfig']['username'],
+                (string) $this->configuration['virtuosoConfig']['password']
             );
         }
 
@@ -91,13 +85,13 @@ class VirtuosoTest extends StoreAbstractTest
     public function testAddStatementsOnDefaultGraphWithException()
     {
         $stmtOne = new StatementImpl(
-            new NamedNodeImpl(new RdfHelpers(), 'http://add/delete/defaultgraph/s/'),
-            new NamedNodeImpl(new RdfHelpers(), 'http://add/delete/defaultgraph/p/'),
-            new NamedNodeImpl(new RdfHelpers(), 'http://add/delete/defaultgraph/o/')
+            new NamedNodeImpl('http://add/delete/defaultgraph/s/'),
+            new NamedNodeImpl('http://add/delete/defaultgraph/p/'),
+            new NamedNodeImpl('http://add/delete/defaultgraph/o/')
         );
 
         $this->setExpectedException('\Exception');
-        $this->fixture->addStatements(array($stmtOne));
+        $this->fixture->addStatements([$stmtOne]);
     }
 
     /*
@@ -111,9 +105,9 @@ class VirtuosoTest extends StoreAbstractTest
     public function testDeleteMatchingStatementsOnDefaultGraphWithException()
     {
         $stmtOne = new StatementImpl(
-            new NamedNodeImpl(new RdfHelpers(), 'http://add/delete/defaultgraph/s/'),
-            new NamedNodeImpl(new RdfHelpers(), 'http://add/delete/defaultgraph/p/'),
-            new NamedNodeImpl(new RdfHelpers(), 'http://add/delete/defaultgraph/o/')
+            new NamedNodeImpl('http://add/delete/defaultgraph/s/'),
+            new NamedNodeImpl('http://add/delete/defaultgraph/p/'),
+            new NamedNodeImpl('http://add/delete/defaultgraph/o/')
         );
 
         $this->setExpectedException('\Exception');
@@ -146,6 +140,45 @@ class VirtuosoTest extends StoreAbstractTest
         $this->markTestSkipped('Virtuoso does not grant write access to the default graph.');
     }
 
+    // test that prefixed URIs added to the store are stored with full length.
+    public function testAddStatementsWithPrefixedUris()
+    {
+        // clear test graph
+        $this->fixture->query('CLEAR GRAPH <'.$this->testGraph->getUri().'>');
+
+        // add triples
+        $this->fixture->addStatements([
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createNamedNode('http://statValue/2'),
+                $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                $this->nodeFactory->createNamedNode('http://stat/StatisticValue'),
+                $this->testGraph
+            ),
+        ]);
+
+        $result = $this->fixture->query('SELECT * FROM <'.$this->testGraph.'> WHERE {?s ?p ?o.}');
+
+        $expectedResult = new SetResultImpl([
+            [
+                's' => $this->nodeFactory->createNamedNode('http://statValue/2'),
+                'p' => $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+                'o' => $this->nodeFactory->createNamedNode('http://stat/StatisticValue'),
+            ],
+        ]);
+        $expectedResult->setVariables(['s', 'p', 'o']);
+
+        $this->assertSetIteratorEquals($expectedResult, $result);
+    }
+
+    // tests how blank nodes are getting handled in the result
+    public function testQueryScenarioBlankNodeHandling()
+    {
+        $this->markTestSkipped(
+            'Virtuoso does not seemed to like BlankNodes in INSERT DATA queries.'
+            .' See for more information: https://github.com/openlink/virtuoso-opensource/issues/126'
+        );
+    }
+
     /*
      * Tests for sqlQuery
      */
@@ -166,15 +199,15 @@ class VirtuosoTest extends StoreAbstractTest
 
     /**
      * Regression test for https://github.com/SaftIng/Saft/issues/61
-     * "Undefined index: xml:lang" in Virtuoso
+     * "Undefined index: xml:lang" in Virtuoso.
      */
     public function testQueryWithoutLanguageTag()
     {
         // create a triple with literal, which is not typed or has a language tag
-        $this->fixture->query('INSERT INTO <'. $this->testGraph .'> {<http://a> <http://b> "foo"}');
+        $this->fixture->query('INSERT INTO <'.$this->testGraph.'> {<http://a> <http://b> "foo"}');
 
         // check if that functions throws a warning about an undefined index xml:lang
-        $result = $this->fixture->query('SELECT * FROM <'. $this->testGraph .'> WHERE {?s ?p ?o.}');
+        $result = $this->fixture->query('SELECT * FROM <'.$this->testGraph.'> WHERE {?s ?p ?o.}');
 
         // check returned result set, to be sure to have the right mapping for the literal
         foreach ($result as $key => $value) {

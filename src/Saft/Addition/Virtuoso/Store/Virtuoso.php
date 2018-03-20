@@ -12,8 +12,6 @@
 
 namespace Saft\Addition\Virtuoso\Store;
 
-use Saft\Rdf\AbstractLiteral;
-use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\RdfHelpers;
@@ -21,19 +19,14 @@ use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
-use Saft\Rdf\Triple;
-use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
-use Saft\Sparql\Result\EmptyResult;
 use Saft\Sparql\Result\ResultFactory;
 use Saft\Sparql\Result\SetResult;
-use Saft\Sparql\Result\StatementResult;
-use Saft\Sparql\Result\ValueResult;
 use Saft\Store\AbstractSparqlStore;
 use Saft\Store\Store;
 
 /**
- * SparqlStore implementation of OpenLink Virtuoso. It supports version 6.1.8+
+ * SparqlStore implementation of OpenLink Virtuoso. It supports version 6.1.8+.
  */
 class Virtuoso extends AbstractSparqlStore
 {
@@ -45,7 +38,7 @@ class Virtuoso extends AbstractSparqlStore
     protected $configuration = null;
 
     /**
-     * PDO ODBC
+     * PDO ODBC.
      *
      * @var \PDO
      */
@@ -85,9 +78,10 @@ class Virtuoso extends AbstractSparqlStore
      * @param ResultFactory            $resultFactory
      * @param StatementIteratorFactory $statementIteratorFactory
      * @param RdfHelpers               $rdfHelpers
-     * @param array                    $adapterOptions Array containing database credentials
-     * @throws \Exception              If PHP ODBC extension was not loaded.
-     * @throws \Exception              If PHP PDO_ODBC extension was not loaded.
+     * @param array                    $adapterOptions           Array containing database credentials
+     *
+     * @throws \Exception if PHP ODBC extension was not loaded
+     * @throws \Exception if PHP PDO_ODBC extension was not loaded
      */
     public function __construct(
         NodeFactory $nodeFactory,
@@ -123,7 +117,7 @@ class Virtuoso extends AbstractSparqlStore
     }
 
     /**
-     * Destructor
+     * Destructor.
      */
     public function __destruct()
     {
@@ -133,15 +127,16 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * Adds multiple Statements to (default-) graph.
      *
-     * @param  StatementIterator|array $statements StatementList instance must contain Statement instances
-     *                                             which are 'concret-' and not 'pattern'-statements.
-     * @param  Node                    $graph      Overrides target graph. If set, all statements
-     *                                             will be add to that graph, if it is available. (optional)
-     * @param  array                   $options    Key-value pairs which provide additional introductions
-     *                                             for the store and/or its adapter(s). (optional)
+     * @param StatementIterator|array $statements statementList instance must contain Statement instances
+     *                                            which are 'concret-' and not 'pattern'-statements
+     * @param Node                    $graph      Overrides target graph. If set, all statements
+     *                                            will be add to that graph, if it is available. (optional)
+     * @param array                   $options    Key-value pairs which provide additional introductions
+     *                                            for the store and/or its adapter(s). (optional)
+     *
      * @todo change that check-loop and make it possible to lazy-load statements from the iterator
      */
-    public function addStatements($statements, Node $graph = null, array $options = array())
+    public function addStatements($statements, Node $graph = null, array $options = [])
     {
         // check if there are triples in $statements and no graph given (and no option set)
         if (null === $graph) {
@@ -163,9 +158,10 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * Checks that all requirements for queries via HTTP are fullfilled.
      *
-     * @return boolean True, if all requirements are fullfilled.
-     * @throws \Exception If PHP ODBC extension was not loaded.
-     * @throws \Exception If PHP PDO-ODBC extension was not loaded.
+     * @return bool true, if all requirements are fullfilled
+     *
+     * @throws \Exception if PHP ODBC extension was not loaded
+     * @throws \Exception if PHP PDO-ODBC extension was not loaded
      */
     public function checkRequirements()
     {
@@ -188,13 +184,13 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * Removes all statements from a (default-) graph which match with given statement.
      *
-     * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  Node      $graph     optional Overrides target graph. If set, all statements will
-     *                                       be delete in that graph.
-     * @param  array     $options   optional Key-value pairs which provide additional introductions
-     *                                       for the store and/or its adapter(s).
+     * @param Statement $statement it can be either a concrete or pattern-statement
+     * @param Node      $graph     optional Overrides target graph. If set, all statements will
+     *                             be delete in that graph.
+     * @param array     $options   optional Key-value pairs which provide additional introductions
+     *                             for the store and/or its adapter(s)
      */
-    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = array())
+    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = [])
     {
         // given $graph forces usage of it and not the graph from the statement instance
         if (null == $graph && null == $statement->getGraph()) {
@@ -211,35 +207,38 @@ class Virtuoso extends AbstractSparqlStore
      * to only returned available graphs in the current context. But that depends on the implementation
      * and can differ.
      *
-     * @return array Simple array of key-value-pairs, which consists of graph URIs as key and NamedNode
-     *               instance as value.
+     * @return array simple array of key-value-pairs, which consists of graph URIs as key and NamedNode
+     *               instance as value
      */
     public function getGraphs()
     {
         $query = $this->sqlQuery(
             'SELECT ID_TO_IRI(REC_GRAPH_IID) AS graph FROM DB.DBA.RDF_EXPLICITLY_CREATED_GRAPH'
         );
-        $graphs = array();
+        $graphs = [];
         foreach ($query->fetchAll(\PDO::FETCH_ASSOC) as $graph) {
             $graphs[$graph['graph']] = $this->nodeFactory->createNamedNode($graph['graph']);
         }
+
         return $graphs;
     }
 
     /**
      * @return array Empty array
+     *
      * @todo implement getStoreDescription
      */
     public function getStoreDescription()
     {
-        return array();
+        return [];
     }
 
     /**
      * Checks if a certain graph is available in the store.
      *
-     * @param  Node $graph URI of the graph to check if it is available.
-     * @return boolean True if graph is available, false otherwise.
+     * @param node $graph URI of the graph to check if it is available
+     *
+     * @return bool true if graph is available, false otherwise
      */
     public function isGraphAvailable(Node $graph)
     {
@@ -254,10 +253,10 @@ class Virtuoso extends AbstractSparqlStore
     public function mergeOptions($options)
     {
         return array_merge(
-            array(
+            [
                 'default_graph_uri' => '',
-                'output_format' => null
-            ),
+                'output_format' => null,
+            ],
             $options
         );
     }
@@ -265,8 +264,9 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * Returns the current connection resource. The resource is created lazily if it doesn't exist.
      *
-     * @return \PDO Instance of \PDO representing an open PDO-ODBC connection.
-     * @throws \PDOException if connection could not be established.
+     * @return \PDO instance of \PDO representing an open PDO-ODBC connection
+     *
+     * @throws \PDOException if connection could not be established
      */
     protected function openConnection()
     {
@@ -288,13 +288,13 @@ class Virtuoso extends AbstractSparqlStore
                 throw new \Exception('Parameter password is not set.');
             }
 
-            /**
+            /*
              * Setup ODBC connection using PDO-ODBC
              */
             $this->connection = new \PDO(
-                'odbc:' . (string)$this->configuration['dsn'],
-                (string)$this->configuration['username'],
-                (string)$this->configuration['password']
+                'odbc:'.(string) $this->configuration['dsn'],
+                (string) $this->configuration['username'],
+                (string) $this->configuration['password']
             );
             $this->connection->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
             $this->connection->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
@@ -307,17 +307,20 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * This method sends a SPARQL query to the store.
      *
-     * @param  string     $query            The SPARQL query to send to the store.
-     * @param  array      $options optional It contains key-value pairs and should provide additional
-     *                                      introductions for the store and/or its adapter(s).
-     * @return Result     Returns result of the query. Its type depends on the type of the query.
-     * @throws \Exception If query is no string.
-     * @throws \Exception If query is malformed.
-     * @throws \Exception If PDO query is false.
+     * @param string $query   the SPARQL query to send to the store
+     * @param array  $options optional It contains key-value pairs and should provide additional
+     *                        introductions for the store and/or its adapter(s)
+     *
+     * @return Result Returns result of the query. Its type depends on the type of the query.
+     *
+     * @throws \Exception if query is no string
+     * @throws \Exception if query is malformed
+     * @throws \Exception if PDO query is false
+     *
      * @todo handle multiple graphs in FROM clause
      * @todo handle construct query
      */
-    public function query($query, array $options = array())
+    public function query($query, array $options = [])
     {
         $options = $this->mergeOptions($options);
 
@@ -325,14 +328,14 @@ class Virtuoso extends AbstractSparqlStore
         $queryParts = $queryObject->getQueryParts();
         $queryType = $this->rdfHelpers->getQueryType($query);
 
-        /**
+        /*
          * SPARQL query (usually to fetch data)
          */
         if ('selectQuery' == $queryType || 'constructQuery' == $queryType) {
             // force extended result to have detailed information about given result entries, such as datatype and
             // language information.
             if ('json' == $options['output_format'] || false == isset($options['output_format'])) {
-                $sparqlQuery = 'define output:format "JSON"' . PHP_EOL . $query;
+                $sparqlQuery = 'define output:format "JSON"'.PHP_EOL.$query;
             } else {
                 $sparqlQuery = $query;
             }
@@ -349,29 +352,28 @@ class Virtuoso extends AbstractSparqlStore
             $graphSpec = '';
             // escape characters that delimit the query within the query
             $sparqlQuery = $graphSpec
-                . 'CALL DB.DBA.SPARQL_EVAL(\''. addcslashes($sparqlQuery, '\'\\') . '\', '
-                . '\''. $graphUri . '\', 0)';
+                .'CALL DB.DBA.SPARQL_EVAL(\''.addcslashes($sparqlQuery, '\'\\').'\', '
+                .'\''.$graphUri.'\', 0)';
 
             // execute query
             try {
                 $pdoQuery = $this->connection->prepare(
                     $sparqlQuery,
-                    array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY)
+                    [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]
                 );
 
                 $pdoQuery->execute();
-
             } catch (\PDOException $e) {
-                throw new \Exception('For query '. $query .' > '. $e->getMessage());
+                throw new \Exception('For query '.$query.' > '.$e->getMessage());
             }
 
-            $entries = array();
+            $entries = [];
 
             // transform result to array in case we fired a non-UPDATE query
             if (false !== $pdoQuery && 'constructQuery' == $queryType) {
                 // TODO test empty CONSTRUCT query results
                 $result = json_decode(current(current($pdoQuery->fetchAll(\PDO::FETCH_ASSOC))), true);
-                $statements = array();
+                $statements = [];
 
                 /*
 
@@ -415,7 +417,6 @@ class Virtuoso extends AbstractSparqlStore
                 }
 
                 return $this->resultFactory->createStatementResult($statements);
-
             } elseif (false !== $pdoQuery && 'selectQuery' == $queryType) {
                 $resultArray = json_decode(current(current($pdoQuery->fetchAll(\PDO::FETCH_ASSOC))), true);
 
@@ -427,7 +428,7 @@ class Virtuoso extends AbstractSparqlStore
                     if (isset($queryParts['variables'])) {
                         $variables = $queryParts['variables'];
                     } else {
-                        $variables = array();
+                        $variables = [];
                     }
                 }
 
@@ -444,9 +445,9 @@ class Virtuoso extends AbstractSparqlStore
                  * )
                  */
                 foreach ($resultArray['results']['bindings'] as $bindingParts) {
-                    $newEntry = array();
+                    $newEntry = [];
 
-                    /**
+                    /*
                      * A part looks like:
                      * array(
                      *      'type' => 'uri',
@@ -462,27 +463,26 @@ class Virtuoso extends AbstractSparqlStore
 
                 $setResult = $this->resultFactory->createSetResult(new \ArrayIterator($entries));
                 $setResult->setVariables($variables);
-                return $setResult;
 
+                return $setResult;
             } else {
                 throw new \Exception('PDO query is false.');
             }
 
-        /**
-         * SPARPQL Update query
-         */
+            /*
+             * SPARPQL Update query
+             */
         } else {
-            $sparqlQuery = 'SPARQL ' . $query;
+            $sparqlQuery = 'SPARQL '.$query;
 
             // execute query
             try {
                 $pdoQuery = $this->connection->prepare(
                     $sparqlQuery,
-                    array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY)
+                    [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]
                 );
 
                 $pdoQuery->execute();
-
             } catch (\PDOException $e) {
                 throw new \Exception($e->getMessage());
             }
@@ -490,6 +490,7 @@ class Virtuoso extends AbstractSparqlStore
             // ask result
             if ('askQuery' == $queryType) {
                 $pdoResult = $pdoQuery->fetchAll(\PDO::FETCH_ASSOC);
+
                 return $this->resultFactory->createValueResult(true !== empty($pdoResult));
             } else {
                 return $this->resultFactory->createEmptyResult();
@@ -500,9 +501,11 @@ class Virtuoso extends AbstractSparqlStore
     /**
      * Executes a SQL query on the database.
      *
-     * @param  string        $queryString SPARQL- or SQL query to execute
-     * @return \PDOStatement Instance of PDOStatement which contains the result of the previous query.
-     * @throws \Exception    If $queryString is invalid
+     * @param string $queryString SPARQL- or SQL query to execute
+     *
+     * @return \PDOStatement instance of PDOStatement which contains the result of the previous query
+     *
+     * @throws \Exception If $queryString is invalid
      */
     public function sqlQuery($queryString)
     {
@@ -510,12 +513,93 @@ class Virtuoso extends AbstractSparqlStore
             // execute query
             $query = $this->connection->prepare(
                 $queryString,
-                array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY)
+                [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]
             );
             $query->execute();
+
             return $query;
         } catch (\PDOException $e) {
             throw new \Exception($e->getMessage());
         }
+    }
+
+    /**
+     * Helper function which transforms an result entry to its proper Node instance.
+     *
+     * @param array $entry
+     *
+     * @return Node instance of Node
+     * @unstable
+     */
+    public function transformEntryToNode($entry)
+    {
+        /*
+         * An $entry looks like:
+         * array(
+         *      'type' => 'uri',
+         *      'value' => '...'
+         * )
+         */
+
+        // it seems that for instance Virtuoso returns type=literal for bnodes,
+        // so we manually fix that here to avoid that problem, if other stores act
+        // the same
+        if (isset($entry['value'])
+            && true === is_string($entry['value'])
+            && false !== strpos($entry['value'], '_:')) {
+            $entry['type'] = 'bnode';
+        }
+
+        $newEntry = null;
+
+        switch ($entry['type']) {
+            /*
+             * Literal (language'd)
+             */
+            case 'literal':
+                if (isset($entry['xml:lang'])) {
+                    $newEntry = $this->nodeFactory->createLiteral(
+                        $entry['value'],
+                        'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
+                        $entry['xml:lang']
+                    );
+                // if a literal was created, but with no language information, it seems to confuse
+                // it when loading, therefor check if lang was explicitly given, otherwise handle it
+                // as it were a normal string.
+                } else {
+                    $newEntry = $this->nodeFactory->createLiteral(
+                        $entry['value']
+                    );
+                }
+
+                break;
+
+            /*
+             * Typed-Literal
+             */
+            case 'typed-literal':
+                $newEntry = $this->nodeFactory->createLiteral($entry['value'], $entry['datatype']);
+                break;
+
+            /*
+             * NamedNode
+             */
+            case 'uri':
+                $newEntry = $this->nodeFactory->createNamedNode($entry['value']);
+                break;
+
+            /*
+             * BlankNode
+             */
+            case 'bnode':
+                $newEntry = $this->nodeFactory->createBlankNode($entry['value']);
+                break;
+
+            default:
+                throw new \Exception('Unknown type given: '.$entry['type']);
+                break;
+        }
+
+        return $newEntry;
     }
 }
