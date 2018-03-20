@@ -962,7 +962,6 @@ abstract class AbstractStoreTest extends TestCase
                 $this->nodeFactory->createNamedNode('http://s/'),
                 $this->nodeFactory->createNamedNode('http://p/'),
                 new LiteralImpl(
-                    new RdfHelpers(),
                     'foobar',
                     $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'),
                     'en'
@@ -987,7 +986,6 @@ abstract class AbstractStoreTest extends TestCase
                     [
                         's' => $this->nodeFactory->createNamedNode('http://s/'),
                         'o' => new LiteralImpl(
-                            new RdfHelpers(),
                             'foobar',
                             $this->nodeFactory->createNamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#langString'),
                             'en'
