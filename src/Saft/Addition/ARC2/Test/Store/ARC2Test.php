@@ -13,35 +13,27 @@
 namespace Saft\Addition\ARC2\Test\Store;
 
 use Saft\Addition\ARC2\Store\ARC2;
-use Saft\Rdf\AnyPatternImpl;
-use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\CommonNamespaces;
-use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNode;
-use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Sparql\Query\QueryFactoryImpl;
-use Saft\Sparql\SparqlUtils;
-use Saft\Sparql\Query\QueryUtils;
 use Saft\Sparql\Result\ResultFactoryImpl;
-use Saft\Sparql\Result\SetResultImpl;
-use Saft\Store\Test\StoreAbstractTest;
-use Symfony\Component\Yaml\Parser;
+use Saft\Store\Test\AbstractStoreTest;
 
-class ARC2Test extends StoreAbstractTest
+class ARC2Test extends AbstractStoreTest
 {
     public function setUp()
     {
         parent::setUp();
 
         if (defined('IN_TRAVIS')) {
-            $this->loadTestConfiguration(__DIR__ .'/../../test-config-travis.yml');
+            $this->loadTestConfiguration(__DIR__.'/../../test-config-travis.yml');
         } else {
-            $this->loadTestConfiguration(__DIR__ .'/../../test-config.yml');
+            $this->loadTestConfiguration(__DIR__.'/../../test-config.yml');
         }
 
         if (true === isset($this->configuration['arc2Config'])) {
@@ -62,7 +54,6 @@ class ARC2Test extends StoreAbstractTest
 
             $this->fixture->dropGraph($this->testGraph);
             $this->fixture->createGraph($this->testGraph);
-
         } else {
             $this->markTestSkipped('Array arc2Config is not set in the test-config.yml.');
         }
@@ -86,12 +77,13 @@ class ARC2Test extends StoreAbstractTest
     protected function countTriples(NamedNode $graph)
     {
         $result = $this->fixture->query(
-            'SELECT COUNT(?s) as ?count FROM <'. $graph->getUri().'> WHERE {?s ?p ?o}'
+            'SELECT COUNT(?s) as ?count FROM <'.$graph->getUri().'> WHERE {?s ?p ?o}'
         );
 
         $variables = $result->getVariables();
         $variable = array_shift($variables);
         $entry = $result->current();
+
         return $entry[$variable]->getValue();
     }
 
@@ -103,41 +95,41 @@ class ARC2Test extends StoreAbstractTest
     // gets deleted.
     public function testDropGraphEffects()
     {
-        $secondGraph = $this->nodeFactory->createNamedNode($this->testGraph->getUri() . '2');
+        $secondGraph = $this->nodeFactory->createNamedNode($this->testGraph->getUri().'2');
 
         $this->fixture->createGraph($secondGraph);
 
-        $this->fixture->query('CLEAR GRAPH <'. $this->testGraph->getUri() .'>');
-        $this->fixture->query('CLEAR GRAPH <'. $secondGraph->getUri() .'>');
+        $this->fixture->query('CLEAR GRAPH <'.$this->testGraph->getUri().'>');
+        $this->fixture->query('CLEAR GRAPH <'.$secondGraph->getUri().'>');
 
         // fill graph 1
         $this->fixture->addStatements(
-            array(
+            [
                 new StatementImpl(
                     $this->testGraph,
                     $this->testGraph,
                     $this->testGraph,
                     $this->testGraph
                 ),
-            )
+            ]
         );
 
         // fill graph 2
         $this->fixture->addStatements(
-            array(
+            [
                 new StatementImpl(
                     $secondGraph,
                     $secondGraph,
                     $secondGraph,
                     $secondGraph
                 ),
-            )
+            ]
         );
 
         // remove graph 1
         $this->fixture->dropGraph($this->testGraph);
 
-        $result = $this->fixture->query('SELECT * FROM <'. $secondGraph->getUri() .'> WHERE {?s ?p ?o}');
+        $result = $this->fixture->query('SELECT * FROM <'.$secondGraph->getUri().'> WHERE {?s ?p ?o}');
 
         $this->fixture->dropGraph($secondGraph);
 
@@ -157,14 +149,14 @@ class ARC2Test extends StoreAbstractTest
         $this->setExpectedException('Exception');
 
         new ARC2(
-            new NodeFactoryImpl(new RdfHelpers()),
+            new NodeFactoryImpl(),
             new StatementFactoryImpl(),
             new QueryFactoryImpl(new RdfHelpers()),
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
             new RdfHelpers(),
             new CommonNamespaces(),
-            array()
+            []
         );
     }
 
@@ -174,14 +166,14 @@ class ARC2Test extends StoreAbstractTest
         $this->setExpectedException('Exception');
 
         new ARC2(
-            new NodeFactoryImpl(new RdfHelpers()),
+            new NodeFactoryImpl(),
             new StatementFactoryImpl(),
             new QueryFactoryImpl(new RdfHelpers()),
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
             new RdfHelpers(),
             new CommonNamespaces(),
-            array('database' => 'saft')
+            ['database' => 'saft']
         );
     }
 
@@ -191,19 +183,19 @@ class ARC2Test extends StoreAbstractTest
         $this->setExpectedException('Exception');
 
         new ARC2(
-            new NodeFactoryImpl(new RdfHelpers()),
+            new NodeFactoryImpl(),
             new StatementFactoryImpl(),
             new QueryFactoryImpl(new RdfHelpers()),
             new ResultFactoryImpl(),
             new StatementIteratorFactoryImpl(),
             new RdfHelpers(),
             new CommonNamespaces(),
-            array('database' => 'saft', 'host' => 'localhost')
+            ['database' => 'saft', 'host' => 'localhost']
         );
     }
 
     /**
-     * Tests for query
+     * Tests for query.
      */
 
     // override test from parent class because Virtuoso does not support what we want to test.
@@ -224,17 +216,17 @@ class ARC2Test extends StoreAbstractTest
         $this->assertEquals(1, count($this->fixture->getGraphs()));
 
         // add data
-        $this->fixture->addStatements(array(
+        $this->fixture->addStatements([
                 $this->statementFactory->createStatement(
                     $this->nodeFactory->createNamedNode('http://foo/1'),
                     $this->nodeFactory->createNamedNode('http://foo/2'),
                     $this->nodeFactory->createNamedNode('http://foo/3')
-                )
-            ),
+                ),
+            ],
             $this->testGraph
         );
 
-        $results = $this->fixture->query('SELECT ?s ?p ?o FROM <'. $this->testGraph .'> WHERE {?s ?p ?o.}');
+        $results = $this->fixture->query('SELECT ?s ?p ?o FROM <'.$this->testGraph.'> WHERE {?s ?p ?o.}');
         $this->assertEquals(1, count($results));
 
         // recreate graph
@@ -243,17 +235,17 @@ class ARC2Test extends StoreAbstractTest
 
         // add data
         $this->fixture->addStatements(
-            array(
+            [
                 $this->statementFactory->createStatement(
-                    $this->nodeFactory->createNamedNode($this->testGraph . '1'),
-                    $this->nodeFactory->createNamedNode($this->testGraph . '2'),
-                    $this->nodeFactory->createNamedNode($this->testGraph . '3')
-                )
-            ),
+                    $this->nodeFactory->createNamedNode($this->testGraph.'1'),
+                    $this->nodeFactory->createNamedNode($this->testGraph.'2'),
+                    $this->nodeFactory->createNamedNode($this->testGraph.'3')
+                ),
+            ],
             $this->testGraph
         );
 
-        $results = $this->fixture->query('SELECT * FROM <'. $this->testGraph .'> WHERE {?s ?p ?o.}');
+        $results = $this->fixture->query('SELECT * FROM <'.$this->testGraph.'> WHERE {?s ?p ?o.}');
         $this->assertEquals(1, count($results));
 
         $this->fixture->dropGraph($this->testGraph);

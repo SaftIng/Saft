@@ -14,22 +14,17 @@ namespace Saft\Addition\ARC2\Store;
 
 use Saft\Rdf\CommonNamespaces;
 use Saft\Rdf\NamedNode;
-use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\Node;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\Statement;
-use Saft\Rdf\StatementImpl;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
 use Saft\Sparql\SparqlUtils;
-use Saft\Sparql\Query\AbstractQuery;
 use Saft\Sparql\Query\QueryFactory;
-use Saft\Sparql\Result\EmptyResultImpl;
 use Saft\Sparql\Result\ResultFactory;
 use Saft\Sparql\Result\SetResult;
-use Saft\Sparql\Result\ValueResult;
 use Saft\Store\AbstractSparqlStore;
 
 class ARC2 extends AbstractSparqlStore
@@ -84,10 +79,10 @@ class ARC2 extends AbstractSparqlStore
      * @param QueryFactory             $queryFactory
      * @param ResultFactory            $resultFactory
      * @param StatementIteratorFactory $statementIteratorFactory
-     * @param RdfHelpers                $rdfHelpers
+     * @param RdfHelpers               $rdfHelpers
      * @param rdfHelpers               $rdfHelpers
      * @param SparqlUtils              $sparqlUtils
-     * @param array                    $configuration Array containing database credentials
+     * @param array                    $configuration            Array containing database credentials
      */
     public function __construct(
         NodeFactory $nodeFactory,
@@ -133,17 +128,18 @@ class ARC2 extends AbstractSparqlStore
      * supports SPARQL+ and not SPARQL Update 1.1, which means an INSERT INTO query has to look like:
      * INSERT INTO <http://graph/> { triple ... }.
      *
-     * @param  StatementIterator|array $statements       StatementList instance must contain Statement
-     *                                                   instances which are 'concret-' and not
-     *                                                   'pattern'-statements.
-     * @param  Node                    $graph   optional Overrides target graph. If set, all statements
-     *                                                   will be add to that graph, if it is available.
-     * @param  array                   $options optional Key-value pairs which provide additional
-     *                                                   introductions for the store and/or its
-     *                                                   adapter(s).
-     * @throws \Exception if one of the given Statements is not concrete.
+     * @param StatementIterator|array $statements statementList instance must contain Statement
+     *                                            instances which are 'concret-' and not
+     *                                            'pattern'-statements
+     * @param Node                    $graph      optional Overrides target graph. If set, all statements
+     *                                            will be add to that graph, if it is available.
+     * @param array                   $options    optional Key-value pairs which provide additional
+     *                                            introductions for the store and/or its
+     *                                            adapter(s)
+     *
+     * @throws \Exception if one of the given Statements is not concrete
      */
-    public function addStatements($statements, Node $graph = null, array $options = array())
+    public function addStatements($statements, Node $graph = null, array $options = [])
     {
         $graphUriToUse = null;
 
@@ -157,7 +153,6 @@ class ARC2 extends AbstractSparqlStore
             if (null !== $graph) {
                 // given $graph forces usage of it and not the graph from the statement instance
                 $graphUriToUse = $graph->getUri();
-
             } elseif (null !== $statement->getGraph()) {
                 // use graphUri from statement
                 $graphUriToUse = $statement->getGraph()->getUri();
@@ -181,17 +176,17 @@ class ARC2 extends AbstractSparqlStore
                 );
             }
 
-            $query = 'INSERT INTO <'. $graphUriToUse .'> {'
-                . $this->rdfHelpers->getNodeInSparqlFormat($s) . ' '
-                . $this->rdfHelpers->getNodeInSparqlFormat($p) . ' '
-                . $this->rdfHelpers->getNodeInSparqlFormat($o) . ' . '
-                . '}';
+            $query = 'INSERT INTO <'.$graphUriToUse.'> {'
+                .$this->rdfHelpers->getNodeInSparqlFormat($s).' '
+                .$this->rdfHelpers->getNodeInSparqlFormat($p).' '
+                .$this->rdfHelpers->getNodeInSparqlFormat($o).' . '
+                .'}';
 
             // execute query
             $res = $this->store->query($query, $options);
 
             if (0 == $res) {
-                throw new \Exception('Insert query failed: '. $query);
+                throw new \Exception('Insert query failed: '.$query);
             }
         }
     }
@@ -199,22 +194,23 @@ class ARC2 extends AbstractSparqlStore
     /**
      * Create a new graph with the URI given as NamedNode.
      *
-     * @param  NamedNode  $graph            Instance of NamedNode containing the URI of the graph to create.
-     * @param  array      $options optional It contains key-value pairs and should provide additional
-     *                                      introductions for the store and/or its adapter(s).
-     * @throws \Exception If the given graph could not be created.
+     * @param NamedNode $graph   instance of NamedNode containing the URI of the graph to create
+     * @param array     $options optional It contains key-value pairs and should provide additional
+     *                           introductions for the store and/or its adapter(s)
+     *
+     * @throws \Exception if the given graph could not be created
      */
-    public function createGraph(NamedNode $graph, array $options = array())
+    public function createGraph(NamedNode $graph, array $options = [])
     {
         if (false === isset($this->getGraphs()[$graph->getUri()])) {
             // table names
-            $g2t = $this->configuration['table-prefix'] . '_g2t';
-            $id2val = $this->configuration['table-prefix'] . '_id2val';
+            $g2t = $this->configuration['table-prefix'].'_g2t';
+            $id2val = $this->configuration['table-prefix'].'_id2val';
 
             /*
              * for id2val table
              */
-            $query = 'INSERT INTO '. $id2val .' (val) VALUES("'. $graph->getUri() .'")';
+            $query = 'INSERT INTO '.$id2val.' (val) VALUES("'.$graph->getUri().'")';
             $this->store->queryDB($query, $this->store->getDBCon());
             $usedId = $this->store->getDBCon()->insert_id;
 
@@ -222,7 +218,7 @@ class ARC2 extends AbstractSparqlStore
              * for g2t table
              */
             $newIdg2t = 1 + $this->getRowCount($g2t);
-            $query = 'INSERT INTO '. $g2t .' (t, g) VALUES('. $newIdg2t .', '. $usedId .')';
+            $query = 'INSERT INTO '.$g2t.' (t, g) VALUES('.$newIdg2t.', '.$usedId.')';
             $this->store->queryDB($query, $this->store->getDBCon());
             $usedId = $this->store->getDBCon()->insert_id;
         }
@@ -231,16 +227,16 @@ class ARC2 extends AbstractSparqlStore
     /**
      * Removes all statements from a (default-) graph which match with given statement.
      *
-     * @param  Statement $statement          It can be either a concrete or pattern-statement.
-     * @param  Node      $graph     optional Overrides target graph. If set, all statements will
-     *                                       be delete in that graph.
-     * @param  array     $options   optional Key-value pairs which provide additional introductions
-     *                                       for the store and/or its adapter(s).
+     * @param Statement $statement it can be either a concrete or pattern-statement
+     * @param Node      $graph     optional Overrides target graph. If set, all statements will
+     *                             be delete in that graph.
+     * @param array     $options   optional Key-value pairs which provide additional introductions
+     *                             for the store and/or its adapter(s)
      */
     public function deleteMatchingStatements(
         Statement $statement,
         Node $graph = null,
-        array $options = array()
+        array $options = []
     ) {
         // given $graph forces usage of it and not the graph from the statement instance
         if (null !== $graph) {
@@ -275,15 +271,15 @@ class ARC2 extends AbstractSparqlStore
         $tripleStatement = $this->statementFactory->createStatement($s, $p, $o);
 
         $statementIterator = $this->statementIteratorFactory->createStatementIteratorFromArray(
-            array($tripleStatement)
+            [$tripleStatement]
         );
 
         $triple = $this->sparqlFormat($statementIterator);
         $query = 'DELETE ';
         if (null !== $graph) {
-            $query .= 'FROM <'. $graph->getUri() .'> ';
+            $query .= 'FROM <'.$graph->getUri().'> ';
         }
-        $query .= '{'. $triple .'} WHERE {'. $triple .'}';
+        $query .= '{'.$triple.'} WHERE {'.$triple.'}';
 
         $this->query($query);
     }
@@ -291,14 +287,15 @@ class ARC2 extends AbstractSparqlStore
     /**
      * Removes the given graph from the store.
      *
-     * @param  NamedNode  $graph            Instance of NamedNode containing the URI of the graph to drop.
-     * @param  array      $options optional It contains key-value pairs and should provide additional
-     *                                      introductions for the store and/or its adapter(s).
+     * @param NamedNode $graph   instance of NamedNode containing the URI of the graph to drop
+     * @param array     $options optional It contains key-value pairs and should provide additional
+     *                           introductions for the store and/or its adapter(s)
+     *
      * @throws \Exception If the given graph could not be droped
      */
-    public function dropGraph(NamedNode $graph, array $options = array())
+    public function dropGraph(NamedNode $graph, array $options = [])
     {
-        $this->store->query('DELETE FROM <'. $graph->getUri() .'>');
+        $this->store->query('DELETE FROM <'.$graph->getUri().'>');
     }
 
     /**
@@ -322,24 +319,24 @@ class ARC2 extends AbstractSparqlStore
      * to only returned available graphs in the current context. But that depends on the implementation
      * and can differ.
      *
-     * @return array Simple array of key-value-pairs, which consists of graph URIs as key and NamedNode
-     *               instance as value.
+     * @return array simple array of key-value-pairs, which consists of graph URIs as key and NamedNode
+     *               instance as value
      */
     public function getGraphs()
     {
-        $g2t = $this->configuration['table-prefix'] . '_g2t';
-        $id2val = $this->configuration['table-prefix'] . '_id2val';
+        $g2t = $this->configuration['table-prefix'].'_g2t';
+        $id2val = $this->configuration['table-prefix'].'_id2val';
 
         // collects all values which have an ID (column g) in the g2t table.
         $query = 'SELECT id2val.val AS graphUri
-            FROM '. $g2t .' g2t
-            LEFT JOIN '. $id2val .' id2val ON g2t.g = id2val.id
+            FROM '.$g2t.' g2t
+            LEFT JOIN '.$id2val.' id2val ON g2t.g = id2val.id
             GROUP BY g';
 
         // send SQL query
         $result = $this->store->queryDB($query, $this->store->getDBCon());
 
-        $graphs = array();
+        $graphs = [];
 
         // collect graph URI's
         while ($row = $result->fetch_assoc()) {
@@ -354,16 +351,18 @@ class ARC2 extends AbstractSparqlStore
     /**
      * Helper function to get the number of rows in a table.
      *
-     * @param  string $tableName
-     * @return int Number of rows in the target table.
+     * @param string $tableName
+     *
+     * @return int number of rows in the target table
      */
     public function getRowCount($tableName)
     {
         $result = $this->store->queryDB(
-            'SELECT COUNT(*) as count FROM '. $tableName,
+            'SELECT COUNT(*) as count FROM '.$tableName,
             $this->store->getDBCon()
         );
         $row = $result->fetch_assoc();
+
         return $row['count'];
     }
 
@@ -379,11 +378,12 @@ class ARC2 extends AbstractSparqlStore
 
     /**
      * @return array Empty array
+     *
      * @todo implement getStoreDescription
      */
     public function getStoreDescription()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -392,13 +392,13 @@ class ARC2 extends AbstractSparqlStore
     protected function openConnection()
     {
         // set standard values
-        $this->configuration = array_merge(array(
+        $this->configuration = array_merge([
             'host' => 'localhost',
             'database' => '',
             'username' => '',
             'password' => '',
-            'table-prefix' => 'saft_'
-        ), $this->configuration);
+            'table-prefix' => 'saft_',
+        ], $this->configuration);
 
         /*
          * check for missing connection credentials
@@ -412,29 +412,32 @@ class ARC2 extends AbstractSparqlStore
         }
 
         // init store
-        $this->store = \ARC2::getStore(array(
+        $this->store = \ARC2::getStore([
             'db_host' => $this->configuration['host'],
             'db_name' => $this->configuration['database'],
             'db_user' => $this->configuration['username'],
             'db_pwd' => $this->configuration['password'],
-            'store_name' => $this->configuration['table-prefix']
-        ));
+            'store_name' => $this->configuration['table-prefix'],
+        ]);
     }
 
     /**
      * This method sends a SPARQL query to the store.
      *
-     * @param  string     $query            The SPARQL query to send to the store.
-     * @param  array      $options optional It contains key-value pairs and should provide additional
-     *                                      introductions for the store and/or its adapter(s).
-     * @return Result     Returns result of the query. Its type depends on the type of the query.
-     * @throws \Exception If query is no string.
-     * @throws \Exception If query is malformed.
+     * @param string $query   the SPARQL query to send to the store
+     * @param array  $options optional It contains key-value pairs and should provide additional
+     *                        introductions for the store and/or its adapter(s)
+     *
+     * @return Result Returns result of the query. Its type depends on the type of the query.
+     *
+     * @throws \Exception if query is no string
+     * @throws \Exception if query is malformed
      * @throws \Exception If query is a DELETE query and contains quads, where the graph of one quad is of type var
-     * @throws \Exception If a non-graph query contains no triples and quads.
+     * @throws \Exception if a non-graph query contains no triples and quads
+     *
      * @todo handle multiple graphs in FROM clause
      */
-    public function query($query, array $options = array())
+    public function query($query, array $options = [])
     {
         $queryObject = $this->queryFactory->createInstanceByQueryString($query);
         $queryParts = $queryObject->getQueryParts();
@@ -464,16 +467,17 @@ class ARC2 extends AbstractSparqlStore
             // build a set result, because the user expects it as result type because a SELECT query
             // was sent.
             $setResult = $this->resultFactory->createSetResult(
-                array(
-                    array(
+                [
+                    [
                         $variable => $this->nodeFactory->createLiteral(
                             $result,
                             'http://www.w3.org/2001/XMLSchema#int'
-                        )
-                    )
-                )
+                        ),
+                    ],
+                ]
             );
-            $setResult->setVariables(array($variable));
+            $setResult->setVariables([$variable]);
+
             return $setResult;
 
         /*
@@ -593,7 +597,7 @@ class ARC2 extends AbstractSparqlStore
             isset($queryParts['quad_pattern']) &&
             'insertData' === $queryParts['sub_type']
         ) {
-            $statements = array();
+            $statements = [];
 
             foreach ($queryParts['quad_pattern'] as $quad) {
                 if ('uri' != $quad['g_type']) {
@@ -636,7 +640,7 @@ class ARC2 extends AbstractSparqlStore
          * CONSTRUCT query
          */
         } elseif ('constructQuery' === $this->rdfHelpers->getQueryType($query)) {
-            $statements = array();
+            $statements = [];
             foreach ($result['result'] as $subjectUri => $predicates) {
                 foreach ($predicates as $predicateUri => $objects) {
                     foreach ($objects as $objectArray) {
@@ -662,9 +666,9 @@ class ARC2 extends AbstractSparqlStore
                 return $this->resultFactory->createStatementResult($statements);
             }
 
-        /*
-         * SELECT query
-         */
+            /*
+             * SELECT query
+             */
         } elseif ('selectQuery' === $this->rdfHelpers->getQueryType($query)) {
             /*
              * For a SELECT query the result looks like:
@@ -683,34 +687,34 @@ class ARC2 extends AbstractSparqlStore
              *                  'o datatype' => "http://www.w3.org/2001/XMLSchema#string"
              *              )
              */
-            $entries = array();
+            $entries = [];
 
             // go through all rows
             if (isset($result['result']['rows'])) {
                 foreach ($result['result']['rows'] as $row) {
-                    $newEntry = array();
+                    $newEntry = [];
 
                     foreach ($result['result']['variables'] as $variable) {
                         // checks for variable type
                         // example: $row['s type']
-                        switch ($row[$variable .' type']) {
+                        switch ($row[$variable.' type']) {
                             // ARC2 does not differenciate between typed literal and literal, like Virtuoso does
                             // for instance. You have to check for lang and datatype key by yourself.
                             case 'literal':
                                 // if language is set
-                                if (isset($row[$variable .' lang'])) {
+                                if (isset($row[$variable.' lang'])) {
                                     $newEntry[$variable] = $this->nodeFactory->createLiteral(
                                         $row[$variable],
                                         // set standard datatype if language tag is given
                                         'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
-                                        $row[$variable .' lang']
+                                        $row[$variable.' lang']
                                     );
 
                                 // if datatype is set
-                                } elseif (isset($row[$variable .' datatype'])) {
+                                } elseif (isset($row[$variable.' datatype'])) {
                                     $newEntry[$variable] = $this->nodeFactory->createLiteral(
                                         $row[$variable],
-                                        $row[$variable .' datatype']
+                                        $row[$variable.' datatype']
                                     );
 
                                 // if neither one is set, we assume its a string and use xsd:string as datatype
@@ -741,7 +745,6 @@ class ARC2 extends AbstractSparqlStore
                                     substr($row[$variable], 2) // use ID without _:
                                 );
                                 break;
-
                         }
                     }
 
@@ -752,12 +755,11 @@ class ARC2 extends AbstractSparqlStore
             // Create and fill SetResult instance
             $setResult = $this->resultFactory->createSetResult($entries);
             $setResult->setVariables($result['result']['variables']);
-            return $setResult;
 
+            return $setResult;
         } else {
             if ('askQuery' === $this->rdfHelpers->getQueryType($query)) {
                 return $this->resultFactory->createValueResult($result['result']);
-
             } else {
                 return $this->resultFactory->createEmptyResult();
             }

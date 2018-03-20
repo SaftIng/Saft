@@ -49,11 +49,11 @@ class NativeARC2Importer
             $chunk .= $file->fgets();
 
             if ($counter > $batch) {
-                $this->store->query('INSERT INTO <'. $graphUri .'> {'. $chunk .'}');
+                $this->store->query('INSERT INTO <'.$graphUri.'> {'.$chunk.'}');
 
                 $chunk = '';
                 $counter = 0;
-                $j++;
+                ++$j;
             }
 
             ++$counter;
@@ -61,7 +61,7 @@ class NativeARC2Importer
 
         // if there is something not inserted yet
         if (0 < $counter) {
-            $this->store->query('INSERT INTO <'. $graphUri .'> {'. $chunk .'}');
+            $this->store->query('INSERT INTO <'.$graphUri.'> {'.$chunk.'}');
         }
 
         // Unset the file to call __destruct(), closing the file handle.
