@@ -192,6 +192,14 @@ class ARC2 extends AbstractSparqlStore
     }
 
     /**
+     * Closes current connection.
+     */
+    public function closeConnection()
+    {
+        $this->store->closeDBCon();
+    }
+
+    /**
      * Create a new graph with the URI given as NamedNode.
      *
      * @param NamedNode $graph   instance of NamedNode containing the URI of the graph to create
