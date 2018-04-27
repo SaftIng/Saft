@@ -53,6 +53,46 @@ class CommonNamespacesTest extends TestCase
     }
 
     /*
+     * Tests for getNamespaces
+     */
+
+    public function testGetNamespaces()
+    {
+        $this->assertTrue(\is_array($this->fixture->getNamespaces()));
+        $this->assertEquals(45, \count($this->fixture->getNamespaces()));
+    }
+
+    /*
+     * Tests for getPrefix
+     */
+
+    public function testGetPrefix()
+    {
+        $this->assertEquals('rdfs', $this->fixture->getPrefix('http://www.w3.org/2000/01/rdf-schema#'));
+        $this->assertEquals(null, $this->fixture->getPrefix('http://not-there'));
+    }
+
+    /*
+     * Tests for getUri
+     */
+
+    public function testGetUri()
+    {
+        $this->assertEquals('http://www.w3.org/2000/01/rdf-schema#', $this->fixture->getUri('rdfs'));
+    }
+
+    /*
+     * Tests for isShortenedUri
+     */
+
+    public function testIsShortenedUri()
+    {
+        $this->assertTrue($this->fixture->isShortenedUri('rdfs:label'));
+
+        $this->assertFalse($this->fixture->isShortenedUri('http://label'));
+    }
+
+    /*
      * Tests for shortenUri
      */
 
@@ -71,5 +111,28 @@ class CommonNamespacesTest extends TestCase
         $this->fixture->add('foo2', 'http://foo/baz/');
 
         $this->assertEquals('foo2:bar', $this->fixture->shortenUri('http://foo/baz/bar'));
+    }
+
+    public function testShortenUriNothingFound()
+    {
+        $this->assertEquals('http://foo/bar', $this->fixture->shortenUri('http://foo/bar'));
+    }
+
+    public function testShortenUriTestCache()
+    {
+        // fresh
+        $this->assertEquals([], $this->fixture->getCache());
+        $this->assertEquals('rdfs:label', $this->fixture->shortenUri('http://www.w3.org/2000/01/rdf-schema#label'));
+
+        $this->assertEquals(
+            [
+                'getPrefix_http://www.w3.org/2000/01/rdf-schema#label' => 'rdfs:label'
+            ],
+            $this->fixture->getCache()
+        );
+
+        // cache hits
+        $this->assertEquals('rdfs:label', $this->fixture->shortenUri('http://www.w3.org/2000/01/rdf-schema#label'));
+        $this->assertEquals('rdfs:label', $this->fixture->shortenUri('http://www.w3.org/2000/01/rdf-schema#label'));
     }
 }
