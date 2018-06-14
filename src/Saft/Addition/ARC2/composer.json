@@ -1,7 +1,7 @@
 {
     "name": "saft/saft-arc2",
     "type": "library",
-    "description": "Adapter to integrate ARC2 store into Saft.",
+    "description": "Adapter to integrate ARC2 RDF store into Saft.",
     "keywords": ["Saft", "Triple Store", "ARC2", "RDF", "MySQL", "SPARQL"],
     "homepage": "https://safting.github.io/",
     "license": "MIT",
@@ -21,7 +21,7 @@
     ],
     "require": {
         "php": ">=5.6",
-        "semsol/arc2": "2.*",
+        "semsol/arc2": "2.3.*",
         "sabre/uri": "1.*",
         "saft/saft-store": ">=1.0"
     },

@@ -52,7 +52,11 @@ class RdfHelpers
             return $node->toNQuads();
         }
 
-        return '?'.uniqid('tempVar');
+        if (null !== $var) {
+            return '?'.$var;
+        } else {
+            return '?'.uniqid('tempVar');
+        }
     }
 
     /**
