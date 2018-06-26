@@ -130,7 +130,7 @@ class LiteralPatternImplTest extends TestCase
         $instanceA = new LiteralPatternImpl('foo', $this->testGraph);
         $instanceB = new AnyPatternImpl();
 
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $instanceA->matches($instanceB);
     }
 
@@ -143,7 +143,7 @@ class LiteralPatternImplTest extends TestCase
         $fixture = new LiteralPatternImpl('foo', $this->testGraph);
 
         // expect exception because LiteralPattern is not valid in NQuads
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $fixture->toNQuads();
     }
 }

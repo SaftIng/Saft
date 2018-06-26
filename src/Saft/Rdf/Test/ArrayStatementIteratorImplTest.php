@@ -13,10 +13,11 @@
 namespace Saft\Rdf\Test;
 
 use Saft\Rdf\ArrayStatementIteratorImpl;
+use Saft\Rdf\StatementIterator;
 
 class ArrayStatementIteratorImplTest extends AbstractStatementIteratorTest
 {
-    public function createInstanceWithArray(array $statements)
+    public function createInstanceWithArray(array $statements): StatementIterator
     {
         return new ArrayStatementIteratorImpl($statements);
     }

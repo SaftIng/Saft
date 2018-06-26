@@ -18,7 +18,7 @@ namespace Saft\Rdf;
  *
  * It is useful in SPARQL queries, to be used as a variable: SELECT ?s WHERE { ?s ?p ?o }
  */
-class AnyPatternImpl implements Node
+class AnyPatternImpl implements AnyPattern
 {
     /**
      * Checks if this instance is a blank node.

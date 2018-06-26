@@ -31,7 +31,7 @@ interface Statement
      *
      * @since 0.1
      */
-    public function getSubject();
+    public function getSubject(): Node;
 
     /**
      * Returns Statements predicate.
@@ -42,7 +42,7 @@ interface Statement
      *
      * @since 0.1
      */
-    public function getPredicate();
+    public function getPredicate(): Node;
 
     /**
      * Returns Statements object.
@@ -53,7 +53,7 @@ interface Statement
      *
      * @since 0.1
      */
-    public function getObject();
+    public function getObject(): Node;
 
     /**
      * Returns Statements graph, if available.
@@ -76,7 +76,7 @@ interface Statement
      *
      * @since 0.1
      */
-    public function isQuad();
+    public function isQuad(): bool;
 
     /**
      * If this statement consists of subject, predicate and object, but no graph, this function returns true,
@@ -88,7 +88,7 @@ interface Statement
      *
      * @since 0.1
      */
-    public function isTriple();
+    public function isTriple(): bool;
 
     /**
      * Returns true if neither subject, predicate, object nor, if available, graph, are patterns.
@@ -100,7 +100,7 @@ interface Statement
      *
      * @since 0.1
      */
-    public function isConcrete();
+    public function isConcrete(): bool;
 
     /**
      * Returns true if at least subject, predicate, object or, if available, graph, are patterns.
@@ -112,7 +112,7 @@ interface Statement
      *
      * @since 0.1
      */
-    public function isPattern();
+    public function isPattern(): bool;
 
     /**
      * Get a valid NQuads serialization of the statement. If the statement is not concrete i.e. it contains variable
@@ -126,7 +126,7 @@ interface Statement
      *
      * @since 0.1
      */
-    public function toNQuads();
+    public function toNQuads(): string;
 
     /**
      * Get a string representation of the current statement. It should contain a human readable description of the parts
@@ -138,7 +138,7 @@ interface Statement
      *
      * @since 0.1
      */
-    public function __toString();
+    public function __toString(): string;
 
     /**
      * Returns true, if the given argument matches the is statement-pattern.
@@ -149,7 +149,7 @@ interface Statement
      *
      * @since 0.1
      */
-    public function matches(Statement $toCompare);
+    public function matches(Statement $toCompare): bool;
 
     /**
      * Checks if a given Statement instance is equal to this instance.
@@ -162,5 +162,17 @@ interface Statement
      *
      * @since 0.1
      */
-    public function equals(Statement $toCompare);
+    public function equals(Statement $toCompare): bool;
+
+    /**
+     * Create an array representation of the Statement instance. Values for s, p, o, g are reduced,
+     * e.g. use only URI if NamedNode.
+     *
+     * @return array
+     *
+     * @api
+     *
+     * @since 2.0.0
+     */
+    public function toArray(): array;
 }

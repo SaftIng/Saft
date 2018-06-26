@@ -12,14 +12,15 @@
 
 namespace Saft\Rdf\Test;
 
+use Saft\Rdf\BlankNode;
 use Saft\Rdf\BlankNodeImpl;
 
 class BlankNodeImplTest extends BlankNodeAbstractTest
 {
     /**
-     * {@inheritdoc}
+     * An abstract method which returns new instances of BlankNode.
      */
-    public function newInstance($id)
+    public function getInstance($id): BlankNode
     {
         return new BlankNodeImpl($id);
     }

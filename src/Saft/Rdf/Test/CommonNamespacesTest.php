@@ -126,7 +126,7 @@ class CommonNamespacesTest extends TestCase
 
         $this->assertEquals(
             [
-                'getPrefix_http://www.w3.org/2000/01/rdf-schema#label' => 'rdfs:label'
+                'getPrefix_http://www.w3.org/2000/01/rdf-schema#label' => 'rdfs:label',
             ],
             $this->fixture->getCache()
         );

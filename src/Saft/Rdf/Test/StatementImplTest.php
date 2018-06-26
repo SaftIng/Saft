@@ -12,35 +12,41 @@
 
 namespace Saft\Rdf\Test;
 
+use Saft\Rdf\AnyPattern;
 use Saft\Rdf\AnyPatternImpl;
+use Saft\Rdf\BlankNode;
 use Saft\Rdf\BlankNodeImpl;
+use Saft\Rdf\Literal;
 use Saft\Rdf\LiteralImpl;
+use Saft\Rdf\NamedNode;
 use Saft\Rdf\NamedNodeImpl;
+use Saft\Rdf\Node;
+use Saft\Rdf\Statement;
 use Saft\Rdf\StatementImpl;
 
 class StatementImplTest extends AbstractStatementTest
 {
-    public function newAnyPatternInstance($value)
+    public function getAnyPatternInstance($value): AnyPattern
     {
         return new AnyPatternImpl($value);
     }
 
-    public function newBlankNodeInstance($blankId)
+    public function getBlankNodeInstance(string $blankId): BlankNode
     {
         return new BlankNodeImpl($blankId);
     }
 
-    public function newInstance($subject, $predicate, $object, $graph = null)
+    public function getInstance(Node $subject, Node $predicate, Node $object, $graph = null): Statement
     {
         return new StatementImpl($subject, $predicate, $object, $graph);
     }
 
-    public function newLiteralInstance($value, $datatype = null, $lang = null)
+    public function getLiteralInstance(string $value, $datatype = null, $lang = null): Literal
     {
         return new LiteralImpl($value, $datatype, $lang);
     }
 
-    public function newNamedNodeInstance($uri)
+    public function getNamedNodeInstance(string $uri): NamedNode
     {
         return new NamedNodeImpl($uri);
     }

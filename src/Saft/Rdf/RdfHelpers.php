@@ -23,208 +23,19 @@ namespace Saft\Rdf;
 class RdfHelpers
 {
     /**
-     * @param string $s
+     * @param string $s Literal string to encode
      *
      * @return string encoded string for n-quads
      */
-    public function encodeStringLitralForNQuads($s)
+    public function encodeStringLiteralForNQuads($s): string
     {
-        $s = str_replace('\\', '\\\\', $s);
-        $s = str_replace("\t", '\t', $s);
-        $s = str_replace("\n", '\n', $s);
-        $s = str_replace("\r", '\r', $s);
-        $s = str_replace('"', '\"', $s);
+        $s = \str_replace('\\', '\\\\', $s);
+        $s = \str_replace("\t", '\t', $s);
+        $s = \str_replace("\n", '\n', $s);
+        $s = \str_replace("\r", '\r', $s);
+        $s = \str_replace('"', '\"', $s);
 
         return $s;
-    }
-
-    /**
-     * Returns given Node instance in SPARQL format, which is in NQuads or as Variable.
-     *
-     * @param Node   $node node instance to format
-     * @param string $var  The variablename, which should be used, if the node is not concrete
-     *
-     * @return string either NQuad notation (if node is concrete) or as variable
-     */
-    public function getNodeInSparqlFormat(Node $node, $var = null)
-    {
-        if ($node->isConcrete()) {
-            return $node->toNQuads();
-        }
-
-        if (null !== $var) {
-            return '?'.$var;
-        } else {
-            return '?'.uniqid('tempVar');
-        }
-    }
-
-    /**
-     * Get type for a given SPARQL query.
-     *
-     * @param string $query
-     *
-     * @return string Type, which is either askQuery, describeQuery, graphQuery, updateQuery or selectQuery
-     *
-     * @throws \Exception if unknown query type
-     */
-    public function getQueryType($query)
-    {
-        /**
-         * First we get rid of all PREFIX information.
-         */
-        $adaptedQuery = preg_replace('/PREFIX\s+[a-z0-9\-]+\:\s*\<[a-z0-9\:\/\.\#\-\~\_]+\>/si', '', $query);
-
-        // remove whitespace lines and trailing whitespaces
-        $adaptedQuery = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", '', trim($adaptedQuery));
-
-        // only lower chars
-        $adaptedQuery = strtolower($adaptedQuery);
-
-        /**
-         * After we know the type, we initiate the according class and return it.
-         */
-        $firstPart = substr($adaptedQuery, 0, 3);
-
-        switch ($firstPart) {
-            // ASK
-            case 'ask':
-                return 'askQuery';
-
-            // CONSTRUCT
-            case 'con':
-                return 'constructQuery';
-
-            // DESCRIBE
-            case 'des':
-                return 'describeQuery';
-
-            /*
-             * If we land here, we have to use a higher range of characters
-             */
-            default:
-                $firstPart = substr($adaptedQuery, 0, 6);
-
-                switch ($firstPart) {
-                    // CLEAR GRAPH
-                    case 'clear ':
-                        return 'graphQuery';
-
-                    // CREATE GRAPH
-                    // CREATE SILENT GRAPH
-                    case 'create':
-                        return 'graphQuery';
-
-                    // DELETE DATA
-                    case 'delete':
-                        return 'updateQuery';
-
-                    // DROP GRAPH
-                    case 'drop g':
-                        return 'graphQuery';
-
-                    // DROP SILENT GRAPH
-                    case 'drop s':
-                        return 'graphQuery';
-
-                    // INSERT DATA
-                    // INSERT INTO
-                    case 'insert':
-                        return 'updateQuery';
-
-                    // SELECT
-                    case 'select':
-                        return 'selectQuery';
-
-                    default:
-                        // check if query is of type: WITH <http:// ... > DELETE { ... } WHERE { ... }
-                        // TODO make it more precise
-                        if (false !== strpos($adaptedQuery, 'with')
-                            && false !== strpos($adaptedQuery, 'delete')
-                            && false !== strpos($adaptedQuery, 'where')) {
-                            return 'updateQuery';
-
-                        // check if query is of type: WITH <http:// ... > DELETE { ... }
-                        // TODO make it more precise
-                        } elseif (false !== strpos($adaptedQuery, 'with')
-                            && false !== strpos($adaptedQuery, 'delete')) {
-                            return 'updateQuery';
-                        }
-                }
-        }
-
-        throw new \Exception('Unknown query type "'.$firstPart.'" for query: '.$adaptedQuery);
-    }
-
-    /**
-     * Returns the regex string to get a node from a triple/quad.
-     *
-     * @param bool $useVariables     optional, default is false
-     * @param bool $useNamespacedUri optional, default is false
-     *
-     * @return string
-     */
-    public function getRegexStringForNodeRecognition(
-        $useBlankNode = false,
-        $useNamespacedUri = false,
-        $useTypedString = false,
-        $useLanguagedString = false,
-        $useSimpleString = false,
-        $useSimpleNumber = false,
-        $useVariables = false
-    ) {
-        $regex = '(<([a-z]{2,}:[^\s]*)>)'; // e.g. <http://foobar/a>
-
-        if (true == $useBlankNode) {
-            $regex .= '|(_:([a-z0-9A-Z_]+))'; // e.g. _:foobar
-        }
-
-        if (true == $useNamespacedUri) {
-            $regex .= '|(([a-z0-9]+)\:([a-z0-9]+))'; // e.g. rdfs:label
-        }
-
-        if (true == $useTypedString) {
-            // e.g. "Foo"^^<http://www.w3.org/2001/XMLSchema#string>
-            $regex .= '|(\"(.*?)\"\^\^\<([^\s]+)\>)';
-        }
-
-        if (true == $useLanguagedString) {
-            $regex .= '|(\"(.*?)\"\@([a-z\-]{2,}))'; // e.g. "Foo"@en
-        }
-
-        if (true == $useSimpleString) {
-            $regex .= '|(\"(.*?)\")'; // e.g. "Foo"
-        }
-
-        if (true == $useSimpleNumber) {
-            $regex .= '|([0-9]{1,})'; // e.g. 42
-        }
-
-        if (true == $useVariables) {
-            $regex .= '|(\?[a-z0-9\_]+)'; // e.g. ?s
-        }
-
-        return $regex;
-    }
-
-    /**
-     * Returns the value (or URI or ID) for a given node.
-     *
-     * @param Node $node Node you want the value of. Can be of type NamedNode, BlankNode or Literal.
-     *
-     * @return string|null
-     */
-    public function getValueForNode(Node $node)
-    {
-        if ($node->isNamed()) {
-            return $node->getUri();
-        } elseif ($node->isLiteral()) {
-            return $node->getValue();
-        } elseif ($node->isBlank()) {
-            return $node->getBlankId();
-        } else {
-            return null;
-        }
     }
 
     /**
@@ -232,24 +43,20 @@ class RdfHelpers
      *
      * @return null|string
      */
-    public function guessFormat($stringToCheck)
+    public function guessFormat(string $stringToCheck)
     {
-        if (false == is_string($stringToCheck)) {
-            throw new \Exception('Invalid $stringToCheck value given. It needs to be a string.');
-        }
-
-        $short = substr($stringToCheck, 0, 1024);
+        $short = \substr($stringToCheck, 0, 1024);
 
         // n-triples/n-quads
-        if (0 < preg_match('/^<.+>/i', $short, $matches)) {
+        if (0 < \preg_match('/^<.+>/i', $short, $matches)) {
             return 'n-triples';
 
         // RDF/XML
-        } elseif (0 < preg_match('/<rdf:/i', $short, $matches)) {
+        } elseif (0 < \preg_match('/<rdf:/i', $short, $matches)) {
             return 'rdf-xml';
 
         // turtle
-        } elseif (0 < preg_match('/@prefix\s|@base\s/i', $short, $matches)) {
+        } elseif (0 < \preg_match('/@prefix\s|@base\s/i', $short, $matches)) {
             return 'turtle';
         }
 
@@ -264,9 +71,9 @@ class RdfHelpers
      *
      * @return bool true if given string is a valid blank node ID, false otherwise
      */
-    public function simpleCheckBlankNodeId($string)
+    public function simpleCheckBlankNodeId($string): bool
     {
-        return '_:' == substr($string, 0, 2);
+        return '_:' == \substr($string, 0, 2);
     }
 
     /**
@@ -283,64 +90,10 @@ class RdfHelpers
      *
      * @since 0.1
      */
-    public function simpleCheckURI($string)
+    public function simpleCheckURI($string): bool
     {
         $regEx = '/^([a-z]{2,}:[^\s]*)$/';
 
-        return 1 === preg_match($regEx, (string) $string);
-    }
-
-    /**
-     * Returns the Statement-Data in sparql-Format.
-     *
-     * @param StatementIterator|array $statements list of statements to format as SPARQL string
-     * @param Node                    $graph      use if each statement is a triple and to use another graph as the default
-     *
-     * @return string Statement data in SPARQL format
-     */
-    public function statementIteratorToSparqlFormat($statements, Node $graph = null)
-    {
-        $query = '';
-        foreach ($statements as $statement) {
-            if ($statement instanceof Statement) {
-                $con = $this->getNodeInSparqlFormat($statement->getSubject()).' '.
-                       $this->getNodeInSparqlFormat($statement->getPredicate()).' '.
-                       $this->getNodeInSparqlFormat($statement->getObject()).' . ';
-
-                $graphToUse = $graph;
-                if ($graph == null && $statement->isQuad()) {
-                    $graphToUse = $statement->getGraph();
-                }
-
-                if (null !== $graphToUse) {
-                    $sparqlString = 'Graph '.self::getNodeInSparqlFormat($graphToUse).' {'.$con.'}';
-                } else {
-                    $sparqlString = $con;
-                }
-
-                $query .= $sparqlString.' ';
-            } else {
-                throw new \Exception('Not a Statement instance');
-            }
-        }
-
-        return $query;
-    }
-
-    /**
-     * Returns the Statement-Data in sparql-Format.
-     *
-     * @param array  $statements list of statements to format as SPARQL string
-     * @param string $graphUri   Use if each statement is a triple and to use another graph as
-     *                           the default. (optional)
-     *
-     * @return string Statement data in SPARQL format
-     */
-    public function statementsToSparqlFormat(array $statements, Node $graph = null)
-    {
-        return $this->statementIteratorToSparqlFormat(
-            $statements,
-            $graph
-        );
+        return 1 === \preg_match($regEx, (string) $string);
     }
 }

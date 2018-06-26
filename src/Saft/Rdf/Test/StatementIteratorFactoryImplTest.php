@@ -12,6 +12,7 @@
 
 namespace Saft\Rdf\Test;
 
+use Saft\Rdf\StatementIteratorFactory;
 use Saft\Rdf\StatementIteratorFactoryImpl;
 
 class StatementIteratorFactoryImplTest extends AbstractStatementIteratorFactoryTest
@@ -19,7 +20,7 @@ class StatementIteratorFactoryImplTest extends AbstractStatementIteratorFactoryT
     /**
      * @return StatementIteratorFactory
      */
-    public function newInstance()
+    public function getInstance(): StatementIteratorFactory
     {
         return new StatementIteratorFactoryImpl();
     }

@@ -27,7 +27,19 @@
         <ini name="intl.error_level" value="0" />
         <ini name="display_errors" value="On"/>
     </php>
-    <!-- Define wich test cases should be executed -->
+    <logging>
+        <log type="coverage-html"
+            target="./gen/coverage"
+            charset="UTF-8"
+            yui="true"
+            highlight="true"
+            showUncoveredFiles="true" />
+    </logging>
+    <filter>
+        <whitelist>
+            <directory>.</directory>
+        </whitelist>
+    </filter>
     <testsuites>
         <testsuite name="Saft-Rdf">
             <directory suffix="Test.php">./Test</directory>

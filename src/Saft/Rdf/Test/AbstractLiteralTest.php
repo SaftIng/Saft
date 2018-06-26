@@ -202,7 +202,7 @@ abstract class AbstractLiteralTest extends TestCase
     public function testInitializationWithLangTagAndWrongDatatype()
     {
         $xsdString = $this->getNodeFactory()->createNamedNode('http://www.w3.org/2001/XMLSchema#string');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
 
         $this->newInstance('foo', $xsdString, 'de');
     }
@@ -210,9 +210,9 @@ abstract class AbstractLiteralTest extends TestCase
     public function testInitializationWithWrongDatatypeType()
     {
         if (class_exists('\TypeError')) {
-            $this->setExpectedException('TypeError');
+            $this->expectException('TypeError');
         } else {
-            $this->setExpectedException('PHPUnit_Framework_Error');
+            $this->expectException('PHPUnit_Framework_Error');
         }
 
         // Should result in a PHP error becauseof wrong argument type
@@ -222,7 +222,7 @@ abstract class AbstractLiteralTest extends TestCase
     // instanciation with null shouldn't be possible
     public function testInitializationUsingNull()
     {
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
 
         $this->newInstance(null);
     }
@@ -391,7 +391,7 @@ abstract class AbstractLiteralTest extends TestCase
      */
     public function testWrongDatatypeLanguageLiteral()
     {
-        $this->setExpectedException(\Exception::class);
+        $this->expectException(\Exception::class);
         $this->nodeFactory->createLiteral('TestLanguage', 'http://www.w3.org/2001/XMLSchema#boolean', 'de');
     }
 
@@ -400,7 +400,7 @@ abstract class AbstractLiteralTest extends TestCase
      */
     public function testNoLanguageTagLiteral()
     {
-        $this->setExpectedException(\Exception::class);
+        $this->expectException(\Exception::class);
         $this->nodeFactory->createLiteral('TestNoLanguage', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString');
     }
 
@@ -409,7 +409,7 @@ abstract class AbstractLiteralTest extends TestCase
      */
     public function testEmptyLanguageTagLiteral()
     {
-        $this->setExpectedException(\Exception::class);
+        $this->expectException(\Exception::class);
         $this->nodeFactory->createLiteral('TestEmptyLanguage', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString', '');
     }
 }

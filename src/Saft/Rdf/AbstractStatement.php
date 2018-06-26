@@ -29,7 +29,7 @@ abstract class AbstractStatement implements Statement
      *
      * @since 0.1
      */
-    public function isConcrete()
+    public function isConcrete(): bool
     {
         if ($this->isQuad() && !$this->getGraph()->isConcrete()) {
             return false;
@@ -50,9 +50,9 @@ abstract class AbstractStatement implements Statement
      *
      * @since 0.1
      */
-    public function isPattern()
+    public function isPattern(): bool
     {
-        return !$this->isConcrete();
+        return false === $this->isConcrete();
     }
 
     /**
@@ -66,7 +66,7 @@ abstract class AbstractStatement implements Statement
      *
      * @since 0.1
      */
-    public function toNQuads()
+    public function toNQuads(): string
     {
         if ($this->isConcrete()) {
             if ($this->isQuad()) {
@@ -95,7 +95,7 @@ abstract class AbstractStatement implements Statement
      *
      * @since 0.1
      */
-    public function toNTriples()
+    public function toNTriples(): string
     {
         if ($this->isConcrete()) {
             return $this->getSubject()->toNQuads().' '.
@@ -116,7 +116,7 @@ abstract class AbstractStatement implements Statement
      *
      * @since 0.1
      */
-    public function __toString()
+    public function __toString(): string
     {
         $string = sprintf('s: %s, p: %s, o: %s', $this->getSubject(), $this->getPredicate(), $this->getObject());
         if ($this->isQuad()) {
@@ -137,7 +137,7 @@ abstract class AbstractStatement implements Statement
      *
      * @since 0.1
      */
-    public function equals(Statement $toTest)
+    public function equals(Statement $toTest): bool
     {
         if ($toTest instanceof Statement &&
             $this->getSubject()->equals($toTest->getSubject()) &&
@@ -165,7 +165,7 @@ abstract class AbstractStatement implements Statement
      *
      * @since 0.1
      */
-    public function matches(Statement $toTest)
+    public function matches(Statement $toTest): bool
     {
         if ($this->isConcrete() && $this->equals($toTest)) {
             return true;

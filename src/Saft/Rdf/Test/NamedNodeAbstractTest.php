@@ -12,6 +12,8 @@
 
 namespace Saft\Rdf\Test;
 
+use Saft\Rdf\NamedNode;
+
 abstract class NamedNodeAbstractTest extends TestCase
 {
     /**
@@ -19,13 +21,13 @@ abstract class NamedNodeAbstractTest extends TestCase
      *
      * @todo The factory method approach could also be extended to use a factory object
      */
-    abstract public function newInstance($uri);
+    abstract public function getInstance($uri): NamedNode;
 
     public function testEquals()
     {
-        $fixtureA = $this->newInstance('http://saft/test');
-        $fixtureB = $this->newInstance('http://saft/test');
-        $fixtureC = $this->newInstance('http://saft/testOther');
+        $fixtureA = $this->getInstance('http://saft/test');
+        $fixtureB = $this->getInstance('http://saft/test');
+        $fixtureC = $this->getInstance('http://saft/testOther');
 
         // TODO compare with literal, pattern, blanknode
 
@@ -40,22 +42,22 @@ abstract class NamedNodeAbstractTest extends TestCase
 
     public function testInstanciationInvalidUri()
     {
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
 
-        $this->newInstance('foo');
+        $this->getInstance('foo');
     }
 
     public function testInstanciationNull()
     {
         // instanciation with null shouldn't be possible and has to lead to an exception
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
 
-        $this->newInstance(null);
+        $this->getInstance(null);
     }
 
     public function testInstanciationValidUri()
     {
-        $fixture = $this->newInstance('http://saft/test');
+        $fixture = $this->getInstance('http://saft/test');
         $this->assertEquals('http://saft/test', $fixture->getUri());
     }
 
@@ -65,7 +67,7 @@ abstract class NamedNodeAbstractTest extends TestCase
 
     public function testIsBlank()
     {
-        $fixture = $this->newInstance('http://saft/test');
+        $fixture = $this->getInstance('http://saft/test');
         $this->assertFalse($fixture->isBlank());
     }
 
@@ -75,7 +77,7 @@ abstract class NamedNodeAbstractTest extends TestCase
 
     public function testIsConcrete()
     {
-        $fixture = $this->newInstance('http://saft/test');
+        $fixture = $this->getInstance('http://saft/test');
         $this->assertTrue($fixture->isConcrete());
     }
 
@@ -85,7 +87,7 @@ abstract class NamedNodeAbstractTest extends TestCase
 
     public function testIsLiteral()
     {
-        $fixture = $this->newInstance('http://saft/test');
+        $fixture = $this->getInstance('http://saft/test');
         $this->assertFalse($fixture->isLiteral());
     }
 
@@ -95,7 +97,7 @@ abstract class NamedNodeAbstractTest extends TestCase
 
     public function testIsNamed()
     {
-        $fixture = $this->newInstance('http://saft/test');
+        $fixture = $this->getInstance('http://saft/test');
         $this->assertTrue($fixture->isNamed());
     }
 
@@ -105,7 +107,7 @@ abstract class NamedNodeAbstractTest extends TestCase
 
     public function testIsPattern()
     {
-        $fixture = $this->newInstance('http://saft/test');
+        $fixture = $this->getInstance('http://saft/test');
         $this->assertFalse($fixture->isPattern());
     }
 }

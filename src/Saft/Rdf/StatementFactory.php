@@ -36,5 +36,5 @@ interface StatementFactory
      *
      * @since 0.1
      */
-    public function createStatement(Node $subject, Node $predicate, Node $object, Node $graph = null);
+    public function createStatement(Node $subject, Node $predicate, Node $object, Node $graph = null): Statement;
 }

@@ -42,19 +42,19 @@ class StatementImpl extends AbstractStatement
      * @param Node $object
      * @param Node $graph
      */
-    public function __construct(Node $subject, Node $predicate, Node $object, Node $graph = null)
+    public function __construct(Node $subject, Node $predicate, Node $object, Node $graph = \null)
     {
         $this->subject = $subject;
         $this->predicate = $predicate;
         $this->object = $object;
 
-        if (null !== $graph) {
+        if (\null !== $graph) {
             $this->graph = $graph;
         }
     }
 
     /**
-     * @return NamedNode
+     * @return Node|null
      */
     public function getGraph()
     {
@@ -64,15 +64,15 @@ class StatementImpl extends AbstractStatement
     /**
      * @return NamedNode|BlankNode
      */
-    public function getSubject()
+    public function getSubject(): Node
     {
         return $this->subject;
     }
 
     /**
-     * @return NamedNode
+     * @return Node
      */
-    public function getPredicate()
+    public function getPredicate(): Node
     {
         return $this->predicate;
     }
@@ -80,7 +80,7 @@ class StatementImpl extends AbstractStatement
     /**
      * @return Node
      */
-    public function getObject()
+    public function getObject(): Node
     {
         return $this->object;
     }
@@ -88,7 +88,7 @@ class StatementImpl extends AbstractStatement
     /**
      * @return bool
      */
-    public function isQuad()
+    public function isQuad(): bool
     {
         return null !== $this->graph;
     }
@@ -96,8 +96,38 @@ class StatementImpl extends AbstractStatement
     /**
      * @return bool
      */
-    public function isTriple()
+    public function isTriple(): bool
     {
         return null === $this->graph;
+    }
+
+    /**
+     * Transforms the Statement object into an array with a structure like:
+     *
+     *      array(
+     *          's' => 'http://foo'
+     *      )
+     *
+     * @return array Array representation of the Statement.
+     */
+    public function toArray(): array
+    {
+        if ($this->isConcrete()) {
+            $stmt = [
+                's' => (string) $this->getSubject(),
+                'p' => (string) $this->getPredicate(),
+                'o' => (string) $this->getObject(),
+            ];
+
+            // if graph is available, but is not a pattern
+            if ($this->getGraph() instanceof Node && false === $this->getGraph()->isPattern()) {
+                $stmt['g'] = (string) $this->getGraph();
+            }
+
+            return $stmt;
+
+        } else {
+            throw new \Exception('Only concrete statements are supported. Yours contains at least one AnyPattern instance.');
+        }
     }
 }

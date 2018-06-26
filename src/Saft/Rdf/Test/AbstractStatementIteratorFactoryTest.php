@@ -12,6 +12,7 @@
 
 namespace Saft\Rdf\Test;
 
+use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
 
 abstract class AbstractStatementIteratorFactoryTest extends TestCase
@@ -19,7 +20,7 @@ abstract class AbstractStatementIteratorFactoryTest extends TestCase
     /**
      * @return StatementIteratorFactory
      */
-    abstract public function newInstance();
+    abstract public function getInstance(): StatementIteratorFactory;
 
     /*
      * Tests createStatementIteratorFromArray
@@ -27,20 +28,16 @@ abstract class AbstractStatementIteratorFactoryTest extends TestCase
 
     public function testCreateStatementIteratorFromArrayArrayGiven()
     {
-        $this->fixture = $this->newInstance();
-        $parameter = [];
-
-        $this->assertClassOfInstanceImplements(
-            $this->fixture->createStatementIteratorFromArray($parameter),
-            'Saft\Rdf\StatementIterator'
+        $this->assertTrue(
+            $this->getInstance()->createStatementIteratorFromArray([]) instanceof StatementIterator
         );
     }
 
     public function testCreateStatementIteratorFromArrayInvalidParameterGiven()
     {
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
 
         $parameter = ['invalid parameter'];
-        $this->newInstance()->createStatementIteratorFromArray($parameter);
+        $this->getInstance()->createStatementIteratorFromArray($parameter);
     }
 }

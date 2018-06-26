@@ -12,6 +12,7 @@
 
 namespace Saft\Rdf\Test;
 
+use Saft\Rdf\BlankNode;
 use Saft\Rdf\LiteralImpl;
 
 abstract class BlankNodeAbstractTest extends TestCase
@@ -19,7 +20,16 @@ abstract class BlankNodeAbstractTest extends TestCase
     /**
      * An abstract method which returns new instances of BlankNode.
      */
-    abstract public function newInstance($blankId);
+    abstract public function getInstance($blankId): BlankNode;
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Blank nodes have to have a string as $blankId.
+     */
+    public function testConstructorNonStringAsId()
+    {
+        $this->getInstance(123);
+    }
 
     /*
      * Tests for equals
@@ -27,23 +37,23 @@ abstract class BlankNodeAbstractTest extends TestCase
 
     public function testEquals2EqualBlankNodeInstances()
     {
-        $instanceA = $this->newInstance('foo');
-        $instanceB = $this->newInstance('foo');
+        $instanceA = $this->getInstance('foo');
+        $instanceB = $this->getInstance('foo');
 
         $this->assertTrue($instanceA->equals($instanceB));
     }
 
     public function testEquals2UnequalBlankNodeInstances()
     {
-        $instanceA = $this->newInstance('foo');
-        $instanceB = $this->newInstance('bar');
+        $instanceA = $this->getInstance('foo');
+        $instanceB = $this->getInstance('bar');
 
         $this->assertFalse($instanceA->equals($instanceB));
     }
 
     public function testEqualsCheckBlankNodeAndLiteral()
     {
-        $instanceA = $this->newInstance('foo');
+        $instanceA = $this->getInstance('foo');
         $instanceB = new LiteralImpl('foo');
 
         $this->assertFalse($instanceA->equals($instanceB));
@@ -55,7 +65,7 @@ abstract class BlankNodeAbstractTest extends TestCase
 
     public function testIsBlank()
     {
-        $this->assertTrue($this->newInstance('foo')->isBlank());
+        $this->assertTrue($this->getInstance('foo')->isBlank());
     }
 
     /*
@@ -64,7 +74,7 @@ abstract class BlankNodeAbstractTest extends TestCase
 
     public function testIsConcrete()
     {
-        $this->assertTrue($this->newInstance('foo')->isConcrete());
+        $this->assertTrue($this->getInstance('foo')->isConcrete());
     }
 
     /*
@@ -73,7 +83,7 @@ abstract class BlankNodeAbstractTest extends TestCase
 
     public function testIsLiteral()
     {
-        $this->assertFalse($this->newInstance('foo')->isLiteral());
+        $this->assertFalse($this->getInstance('foo')->isLiteral());
     }
 
     /*
@@ -82,7 +92,7 @@ abstract class BlankNodeAbstractTest extends TestCase
 
     public function testIsNamed()
     {
-        $this->assertFalse($this->newInstance('foo')->isNamed());
+        $this->assertFalse($this->getInstance('foo')->isNamed());
     }
 
     /*
@@ -91,7 +101,7 @@ abstract class BlankNodeAbstractTest extends TestCase
 
     public function testIsPattern()
     {
-        $this->assertFalse($this->newInstance('foo')->isPattern());
+        $this->assertFalse($this->getInstance('foo')->isPattern());
     }
 
     /*
@@ -100,9 +110,9 @@ abstract class BlankNodeAbstractTest extends TestCase
 
     public function testMatches()
     {
-        $fixtureA = $this->newInstance('foo');
-        $fixtureB = $this->newInstance('foo');
-        $fixtureC = $this->newInstance('bar');
+        $fixtureA = $this->getInstance('foo');
+        $fixtureB = $this->getInstance('foo');
+        $fixtureC = $this->getInstance('bar');
 
         $this->assertTrue($fixtureA->matches($fixtureB));
         $this->assertFalse($fixtureA->matches($fixtureC));
@@ -114,7 +124,7 @@ abstract class BlankNodeAbstractTest extends TestCase
 
     public function testToNQuads()
     {
-        $this->assertEquals('_:foo', $this->newInstance('foo')->toNQuads());
+        $this->assertEquals('_:foo', $this->getInstance('foo')->toNQuads());
     }
 
     /*
@@ -123,6 +133,6 @@ abstract class BlankNodeAbstractTest extends TestCase
 
     public function testToString()
     {
-        $this->assertEquals('_:foo', $this->newInstance('foo')->__toString());
+        $this->assertEquals('_:foo', $this->getInstance('foo')->__toString());
     }
 }

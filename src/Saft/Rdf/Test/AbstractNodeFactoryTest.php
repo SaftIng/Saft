@@ -12,20 +12,22 @@
 
 namespace Saft\Rdf\Test;
 
-use Saft\Rdf\BlankNodeImpl;
+use Saft\Rdf\AnyPattern;
+use Saft\Rdf\BlankNode;
 use Saft\Rdf\Literal;
 use Saft\Rdf\NamedNode;
+use Saft\Rdf\NodeFactory;
 
 abstract class AbstractNodeFactoryTest extends TestCase
 {
     /**
      * An abstract method which returns new instances of NodeFactory.
      */
-    abstract public function getFixture();
+    abstract public function getInstance(): NodeFactory;
 
     public function testCreateNamedNodeShortenedUri()
     {
-        $fixture = $this->getFixture();
+        $fixture = $this->getInstance();
 
         $node = $fixture->createNamedNode('foaf:Person');
 
@@ -35,110 +37,39 @@ abstract class AbstractNodeFactoryTest extends TestCase
 
     public function testCreateNamedNodeExtendedUri()
     {
-        $fixture = $this->getFixture();
+        $fixture = $this->getInstance();
 
         $node = $fixture->createNamedNode('http://xmlns.com/foaf/0.1/Person');
+        $this->assertTrue($node instanceof NamedNode);
         $this->assertEquals('http://xmlns.com/foaf/0.1/Person', $node->getUri());
     }
 
-    public function testNamedNodeFromNQuads()
+    public function testCreateNamedNode()
     {
-        $fixture = $this->getFixture();
-
-        $node = $fixture->createNodeFromNQuads('<http://example.org/>');
-
-        $this->assertTrue($node->isNamed());
-        $this->assertEquals('http://example.org/', $node->getUri());
+        $this->assertTrue($this->getInstance()->createNamedNode('http://foo') instanceof NamedNode);
     }
 
-    public function testLiteralsFromNQuads()
+    public function testCreateLiteral()
     {
-        $fixture = $this->getFixture();
-
-        $node = $fixture->createNodeFromNQuads('"Hallo"');
-
-        $this->assertTrue($node->isLiteral());
-        $this->assertEquals('Hallo', $node->getValue());
-
-        $nodeLang = $fixture->createNodeFromNQuads('"Hallo"@de');
-
-        $this->assertTrue($nodeLang->isLiteral());
-        $this->assertEquals('Hallo', $nodeLang->getValue());
-        $this->assertEquals('de', $nodeLang->getLanguage());
-
-        $nodeTyped = $fixture->createNodeFromNQuads('"Hallo"^^<http://example.org/string>');
-
-        $this->assertTrue($nodeTyped->isLiteral());
-        $this->assertEquals('Hallo', $nodeTyped->getValue());
-
-        $datatype = $nodeTyped->getDatatype();
-        $this->assertEquals('http://example.org/string', $datatype->getUri());
+        $this->assertTrue($this->getInstance()->createLiteral('ff') instanceof Literal);
     }
 
-    public function testBlankNodeFromNQuads()
-    {
-        $fixture = $this->getFixture();
-
-        $node = $fixture->createNodeFromNQuads('_:1234');
-
-        $this->assertTrue($node->isBlank());
-        $this->assertEquals('1234', $node->getBlankId());
-    }
-
-    public function testWrongStringFromNQuads()
-    {
-        $fixture = $this->getFixture();
-
-        $this->setExpectedException('Exception');
-        $fixture->createNodeFromNQuads('http://example.org/blabla?argument=value#something');
-    }
-
-    /*
-     * Tests for createNodeInstanceFromNodeParameter
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Argument datatype has to be a named node.
      */
-
-    public function testCreateNodeInstanceBNode()
+    public function testCreateLiteralDatatypeNotNamedNode()
     {
-        $node = $this->getFixture()->createNodeInstanceFromNodeParameter(
-            'bid',
-            'bnode'
-        );
-
-        $this->assertEquals(new BlankNodeImpl('bid'), $node);
+        $this->getInstance()->createLiteral('ff', $this->getInstance()->createAnyPattern('ff'));
     }
 
-    public function testCreateNodeInstanceLiteral()
+    public function testCreateBlankNode()
     {
-        $node = $this->getFixture()->createNodeInstanceFromNodeParameter(
-            '42',
-            'literal',
-            'xsd:int'
-        );
-
-        $this->assertTrue($node instanceof Literal);
-        $this->assertEquals('42', $node->getValue());
-        $this->assertEquals('http://www.w3.org/2001/XMLSchema#int', $node->getDatatype());
+        $this->assertTrue($this->getInstance()->createBlankNode('ff') instanceof BlankNode);
     }
 
-    public function testCreateNodeInstanceUnknown()
+    public function testCreateAnyPattern()
     {
-        // expect exception, because given type is unknown
-        $this->setExpectedException('\Exception');
-
-        $node = $this->getFixture()->createNodeInstanceFromNodeParameter(
-            null,
-            'unknown'
-        );
-    }
-
-    public function testCreateNodeInstanceUri()
-    {
-        $node = $this->getFixture()->createNodeInstanceFromNodeParameter(
-            'http://foo',
-            'uri'
-        );
-
-        $this->assertTrue($node instanceof NamedNode);
-        $this->assertEquals('http://foo', $node->getUri());
+        $this->assertTrue($this->getInstance()->createAnyPattern('ff') instanceof AnyPattern);
     }
 }
