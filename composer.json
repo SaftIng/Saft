@@ -22,7 +22,6 @@
     "replace": {
         "saft/saft-arc2": "self.version",
         "saft/saft-data": "self.version",
-        "saft/saft-easyrdf": "self.version",
         "saft/saft-rdf": "self.version",
         "saft/saft-sparql": "self.version",
         "saft/saft-store": "self.version",
@@ -32,7 +31,6 @@
     },
     "require": {
         "php": ">=5.6",
-        "easyrdf/easyrdf": "0.9.*",
         "php-curl-class/php-curl-class": "4.*",
         "sabre/xml": "1.*",
         "semsol/arc2": "2.*",

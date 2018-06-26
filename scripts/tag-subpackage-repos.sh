@@ -19,7 +19,6 @@ repos[saft.store]=src/Saft/Store
 # additional packages
 repos[saft.arc2]=src/Saft/Addition/ARC2
 repos[saft.hardf]=src/Saft/Addition/hardf
-repos[saft.easyrdf]=src/Saft/Addition/EasyRdf
 repos[saft.store.http]=src/Saft/Addition/HttpStore
 repos[saft.store.virtuoso]=src/Saft/Addition/Virtuoso
 
