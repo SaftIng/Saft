@@ -30,7 +30,7 @@ interface StatementIterator extends \Iterator
      *
      * @since 0.1
      */
-    public function current();
+    public function current(): Statement;
 
     /**
      * Get key of current Statement.
@@ -70,7 +70,7 @@ interface StatementIterator extends \Iterator
      *
      * @since 0.1
      */
-    public function valid();
+    public function valid(): bool;
 
     /**
      * Returns an array with a very simplified representation of its statements.
@@ -81,5 +81,5 @@ interface StatementIterator extends \Iterator
      *
      * @since 2.0.0
      */
-    public function toArray();
+    public function toArray(): array;
 }

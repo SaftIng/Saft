@@ -31,7 +31,7 @@ interface Literal extends Node
      *
      * @since 0.1
      */
-    public function getValue();
+    public function getValue(): string;
 
     /**
      * Get the datatype URI of the Literal (this is always set according to the

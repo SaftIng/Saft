@@ -28,7 +28,7 @@ interface Node
      *
      * @since 0.1
      */
-    public function isLiteral();
+    public function isLiteral(): bool;
 
     /**
      * Checks if this instance is a named node.
@@ -39,7 +39,7 @@ interface Node
      *
      * @since 0.1
      */
-    public function isNamed();
+    public function isNamed(): bool;
 
     /**
      * Checks if this instance is a blank node.
@@ -50,7 +50,7 @@ interface Node
      *
      * @since 0.1
      */
-    public function isBlank();
+    public function isBlank(): bool;
 
     /**
      * Checks if this instance is concrete, which means it does not contain pattern.
@@ -61,7 +61,7 @@ interface Node
      *
      * @since 0.1
      */
-    public function isConcrete();
+    public function isConcrete(): bool;
 
     /**
      * Checks if this instance is a pattern. It can either be a pattern or concrete.
@@ -72,7 +72,7 @@ interface Node
      *
      * @since 0.1
      */
-    public function isPattern();
+    public function isPattern(): bool;
 
     /**
      * Transform this Node instance to a n-quads string, if possible.
@@ -85,7 +85,7 @@ interface Node
      *
      * @since 0.1
      */
-    public function toNQuads();
+    public function toNQuads(): string;
 
     /**
      * This method is ment for getting some kind of human readable string
@@ -98,7 +98,7 @@ interface Node
      *
      * @since 0.1
      */
-    public function __toString();
+    public function __toString(): string;
 
     /**
      * Check if a given instance of Node is equal to this instance.
@@ -111,7 +111,7 @@ interface Node
      *
      * @since 0.1
      */
-    public function equals(Node $toCompare);
+    public function equals(Node $toCompare): bool;
 
     /**
      * Returns true, if this pattern matches the given node. This method is the same as equals for concrete nodes
@@ -125,5 +125,5 @@ interface Node
      *
      * @since 0.1
      */
-    public function matches(Node $toMatch);
+    public function matches(Node $toMatch): bool;
 }

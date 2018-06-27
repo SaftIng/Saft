@@ -28,7 +28,7 @@ abstract class AbstractLiteral implements Literal
      *
      * @since 0.1
      */
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->getValue();
     }
@@ -44,7 +44,7 @@ abstract class AbstractLiteral implements Literal
      *
      * @since 0.1
      */
-    public function equals(Node $toCompare)
+    public function equals(Node $toCompare): bool
     {
         // Only compare, if given instance is a literal
         if ($toCompare->isLiteral() && $this->getDatatype()->equals($toCompare->getDatatype())) {
@@ -68,7 +68,7 @@ abstract class AbstractLiteral implements Literal
      *
      * @since 0.1
      */
-    public function matches(Node $toMatch)
+    public function matches(Node $toMatch): bool
     {
         return $this->equals($toMatch);
     }
@@ -82,7 +82,7 @@ abstract class AbstractLiteral implements Literal
      *
      * @since 0.1
      */
-    public function isBlank()
+    public function isBlank(): bool
     {
         return false;
     }
@@ -96,7 +96,7 @@ abstract class AbstractLiteral implements Literal
      *
      * @since 0.1
      */
-    public function isConcrete()
+    public function isConcrete(): bool
     {
         return true;
     }
@@ -110,7 +110,7 @@ abstract class AbstractLiteral implements Literal
      *
      * @since 0.1
      */
-    public function isLiteral()
+    public function isLiteral(): bool
     {
         return true;
     }
@@ -124,7 +124,7 @@ abstract class AbstractLiteral implements Literal
      *
      * @since 0.1
      */
-    public function isNamed()
+    public function isNamed(): bool
     {
         return false;
     }
@@ -138,7 +138,7 @@ abstract class AbstractLiteral implements Literal
      *
      * @since 0.1
      */
-    public function isPattern()
+    public function isPattern(): bool
     {
         return false;
     }
@@ -152,7 +152,7 @@ abstract class AbstractLiteral implements Literal
      *
      * @since 0.1
      */
-    public function toNQuads()
+    public function toNQuads(): string
     {
         $string = '"'.$this->encodeStringLitralForNQuads($this->getValue()).'"';
 
@@ -170,7 +170,7 @@ abstract class AbstractLiteral implements Literal
      *
      * @return string encoded string for n-quads
      */
-    protected function encodeStringLitralForNQuads($s)
+    protected function encodeStringLitralForNQuads($s): string
     {
         $s = str_replace('\\', '\\\\', $s);
         $s = str_replace("\t", '\t', $s);

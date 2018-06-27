@@ -92,7 +92,7 @@ class CommonNamespaces
      *
      * @return string
      */
-    public function extendUri($shortenedUri)
+    public function extendUri($shortenedUri): string
     {
         $cacheId = 'extendUri_'.$shortenedUri;
 
@@ -114,7 +114,7 @@ class CommonNamespaces
     /**
      * @return cache
      */
-    public function getCache()
+    public function getCache(): array
     {
         return $this->cache;
     }
@@ -122,7 +122,7 @@ class CommonNamespaces
     /**
      * @return array
      */
-    public function getNamespaces()
+    public function getNamespaces(): array
     {
         return $this->namespaces;
     }
@@ -163,7 +163,7 @@ class CommonNamespaces
      *
      * @return bool
      */
-    public function isShortenedUri($string)
+    public function isShortenedUri($string): bool
     {
         return false == \strpos($string, '://') && false !== \strpos($string, ':');
     }
@@ -173,7 +173,7 @@ class CommonNamespaces
      *
      * @return string
      */
-    public function shortenUri($uri)
+    public function shortenUri($uri): string
     {
         $cacheId = 'getPrefix_'.$uri;
 

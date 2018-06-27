@@ -30,7 +30,7 @@ abstract class AbstractBlankNode implements BlankNode
      *
      * @since 0.1
      */
-    public function equals(Node $toCompare)
+    public function equals(Node $toCompare): bool
     {
         if ($toCompare instanceof BlankNode) {
             return $this->getBlankId() === $toCompare->getBlankId();
@@ -51,7 +51,7 @@ abstract class AbstractBlankNode implements BlankNode
      *
      * @since 0.1
      */
-    public function matches(Node $toMatch)
+    public function matches(Node $toMatch): bool
     {
         return $this->equals($toMatch);
     }
@@ -65,7 +65,7 @@ abstract class AbstractBlankNode implements BlankNode
      *
      * @since 0.1
      */
-    public function isConcrete()
+    public function isConcrete(): bool
     {
         return true;
     }
@@ -79,7 +79,7 @@ abstract class AbstractBlankNode implements BlankNode
      *
      * @since 0.1
      */
-    public function isLiteral()
+    public function isLiteral(): bool
     {
         return false;
     }
@@ -93,7 +93,7 @@ abstract class AbstractBlankNode implements BlankNode
      *
      * @since 0.1
      */
-    public function isNamed()
+    public function isNamed(): bool
     {
         return false;
     }
@@ -107,7 +107,7 @@ abstract class AbstractBlankNode implements BlankNode
      *
      * @since 0.1
      */
-    public function isBlank()
+    public function isBlank(): bool
     {
         return true;
     }
@@ -121,7 +121,7 @@ abstract class AbstractBlankNode implements BlankNode
      *
      * @since 0.1
      */
-    public function isPattern()
+    public function isPattern(): bool
     {
         return false;
     }
@@ -135,7 +135,7 @@ abstract class AbstractBlankNode implements BlankNode
      *
      * @since 0.1
      */
-    public function toNQuads()
+    public function toNQuads(): string
     {
         return '_:'.$this->getBlankId();
     }
@@ -150,7 +150,7 @@ abstract class AbstractBlankNode implements BlankNode
      *
      * @since 0.1
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->toNQuads();
     }

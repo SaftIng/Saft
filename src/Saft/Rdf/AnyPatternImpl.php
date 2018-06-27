@@ -25,7 +25,7 @@ class AnyPatternImpl implements AnyPattern
      *
      * @return bool true, if this instance is a blank node, false otherwise
      */
-    public function isBlank()
+    public function isBlank(): bool
     {
         return false;
     }
@@ -35,7 +35,7 @@ class AnyPatternImpl implements AnyPattern
      *
      * @return bool true, if this instance is concrete, false otherwise
      */
-    public function isConcrete()
+    public function isConcrete(): bool
     {
         return false;
     }
@@ -45,7 +45,7 @@ class AnyPatternImpl implements AnyPattern
      *
      * @return bool true, if it is a literal, false otherwise
      */
-    public function isLiteral()
+    public function isLiteral(): bool
     {
         return false;
     }
@@ -55,7 +55,7 @@ class AnyPatternImpl implements AnyPattern
      *
      * @return bool true, if it is a named node, false otherwise
      */
-    public function isNamed()
+    public function isNamed(): bool
     {
         return false;
     }
@@ -65,7 +65,7 @@ class AnyPatternImpl implements AnyPattern
      *
      * @return bool true, if this instance is a pattern, false otherwise
      */
-    public function isPattern()
+    public function isPattern(): bool
     {
         return true;
     }
@@ -77,7 +77,7 @@ class AnyPatternImpl implements AnyPattern
      *
      * @return bool true, if both instances are semantically equal, false otherwise
      */
-    public function equals(Node $toCompare)
+    public function equals(Node $toCompare): bool
     {
         // Only compare, if given instance is an AnyPattern too
         return $toCompare instanceof AnyPatternImpl;
@@ -90,7 +90,7 @@ class AnyPatternImpl implements AnyPattern
      *
      * @return bool always true
      */
-    public function matches(Node $toMatch)
+    public function matches(Node $toMatch): bool
     {
         return true;
     }
@@ -101,7 +101,7 @@ class AnyPatternImpl implements AnyPattern
      *
      * @return string a human readable string representation of the node
      */
-    public function __toString()
+    public function __toString(): string
     {
         return 'ANY';
     }
@@ -113,7 +113,7 @@ class AnyPatternImpl implements AnyPattern
      *
      * @throws \Exception if no n-quads representation is available
      */
-    public function toNQuads()
+    public function toNQuads(): string
     {
         throw new \Exception('The AnyPattern is not valid in NQuads');
     }

@@ -31,5 +31,5 @@ interface BlankNode extends Node
      *
      * @since 0.1
      */
-    public function getBlankId();
+    public function getBlankId(): string;
 }

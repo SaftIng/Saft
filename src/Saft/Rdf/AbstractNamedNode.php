@@ -29,7 +29,7 @@ abstract class AbstractNamedNode implements NamedNode
      *
      * @since 0.1
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getUri();
     }
@@ -45,7 +45,7 @@ abstract class AbstractNamedNode implements NamedNode
      *
      * @since 0.1
      */
-    public function equals(Node $toCompare)
+    public function equals(Node $toCompare): bool
     {
         // It only compares URIs, everything else will be quit with false.
         if ($toCompare->isNamed()) {
@@ -67,7 +67,7 @@ abstract class AbstractNamedNode implements NamedNode
      *
      * @since 0.1
      */
-    public function matches(Node $toMatch)
+    public function matches(Node $toMatch): bool
     {
         return $this->equals($toMatch);
     }
@@ -81,7 +81,7 @@ abstract class AbstractNamedNode implements NamedNode
      *
      * @since 0.1
      */
-    public function isConcrete()
+    public function isConcrete(): bool
     {
         return true;
     }
@@ -95,7 +95,7 @@ abstract class AbstractNamedNode implements NamedNode
      *
      * @since 0.1
      */
-    public function isLiteral()
+    public function isLiteral(): bool
     {
         return false;
     }
@@ -109,7 +109,7 @@ abstract class AbstractNamedNode implements NamedNode
      *
      * @since 0.1
      */
-    public function isNamed()
+    public function isNamed(): bool
     {
         return true;
     }
@@ -123,7 +123,7 @@ abstract class AbstractNamedNode implements NamedNode
      *
      * @since 0.1
      */
-    public function isBlank()
+    public function isBlank(): bool
     {
         return false;
     }
@@ -137,7 +137,7 @@ abstract class AbstractNamedNode implements NamedNode
      *
      * @since 0.1
      */
-    public function isPattern()
+    public function isPattern(): bool
     {
         return false;
     }
@@ -151,7 +151,7 @@ abstract class AbstractNamedNode implements NamedNode
      *
      * @since 0.1
      */
-    public function toNQuads()
+    public function toNQuads(): string
     {
         return '<'.$this->getUri().'>';
     }

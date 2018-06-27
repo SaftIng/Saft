@@ -28,7 +28,7 @@ class BlankNodeImpl extends AbstractBlankNode
         }
     }
 
-    public function getBlankId()
+    public function getBlankId(): string
     {
         return $this->blankId;
     }
