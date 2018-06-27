@@ -24,10 +24,35 @@ class AnyPatternImplTest extends TestCase
         return new AnyPatternImpl();
     }
 
-    final public function testIsBlank()
+    public function testIsBlank()
     {
         $fixtureA = $this->newInstance();
 
         $this->assertFalse($fixtureA->isBlank());
+    }
+
+    public function testIsLiteral()
+    {
+        $fixtureA = $this->newInstance();
+
+        $this->assertFalse($fixtureA->isLiteral());
+    }
+
+    public function testToString()
+    {
+        $fixtureA = $this->newInstance();
+
+        $this->assertEquals('ANY', (string)$fixtureA);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage The AnyPattern is not valid in NQuads
+     */
+    public function testToNQuads()
+    {
+        $fixtureA = $this->newInstance();
+
+        $fixtureA->toNQuads();
     }
 }

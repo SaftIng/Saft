@@ -44,14 +44,8 @@ class LiteralImpl extends AbstractLiteral
      * @param NamedNode $datatype The datatype of the Literal (respectively defaults to xsd:string or rdf:langString)
      * @param string    $lang     The language tag of the Literal (optional)
      */
-    public function __construct($value, NamedNode $datatype = null, $lang = null)
+    public function __construct(string $value, NamedNode $datatype = null, $lang = null)
     {
-        if ($value === null) {
-            throw new \Exception('Literal value can\'t be null. Please use AnyPattern if you need a variable.');
-        } elseif (!is_string($value)) {
-            throw new \Exception('The literal value has to be of type string');
-        }
-
         $this->value = $value;
 
         if ($lang !== null) {

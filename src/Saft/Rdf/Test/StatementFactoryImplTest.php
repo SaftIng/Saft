@@ -12,21 +12,20 @@
 
 namespace Saft\Rdf\Test;
 
-use Saft\Rdf\LiteralImpl;
-use Saft\Rdf\Node;
+use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeFactoryImpl;
+use Saft\Rdf\Statement;
+use Saft\Rdf\StatementFactory;
+use Saft\Rdf\StatementFactoryImpl;
 
-class LiteralImplTest extends AbstractLiteralTest
+class StatementFactoryImplTest extends AbstractStatementFactoryTest
 {
-    /**
-     * Return a new instance of LiteralImpl.
-     */
-    public function getInstance($value, Node $datatype = null, $lang = null)
+    public function getInstance(): StatementFactory
     {
-        return new LiteralImpl($value, $datatype, $lang);
+        return new StatementFactoryImpl();
     }
 
-    public function getNodeFactory()
+    public function getNodeFactory(): NodeFactory
     {
         return new NodeFactoryImpl();
     }

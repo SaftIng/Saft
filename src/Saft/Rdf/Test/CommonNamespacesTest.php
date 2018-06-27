@@ -24,6 +24,19 @@ class CommonNamespacesTest extends TestCase
     }
 
     /*
+     * Tests for __construct
+     */
+
+    public function testConstructAddingNewPrefixes()
+    {
+        $this->fixture = new CommonNamespaces([
+            'foo' => 'http://bar'
+        ]);
+
+        $this->assertEquals('http://bar', $this->fixture->getUri('foo'));
+    }
+
+    /*
      * Tests for extendUri
      */
 

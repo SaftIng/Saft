@@ -49,13 +49,13 @@ class ArrayStatementIteratorImpl implements StatementIterator
             }
         }
 
-        $this->arrayIterator = new \ArrayIterator(array_values($checkedStatements));
+        $this->arrayIterator = new \ArrayIterator(\array_values($checkedStatements));
     }
 
     /**
      * @return Statement
      */
-    public function current()
+    public function current(): Statement
     {
         return $this->arrayIterator->current();
     }
@@ -79,7 +79,7 @@ class ArrayStatementIteratorImpl implements StatementIterator
     /**
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->arrayIterator->valid();
     }
@@ -87,5 +87,16 @@ class ArrayStatementIteratorImpl implements StatementIterator
     public function rewind()
     {
         $this->arrayIterator->rewind();
+    }
+
+    public function toArray(): array
+    {
+        $stmts = [];
+
+        foreach ($this->arrayIterator as $stmt) {
+            $stmts[] = $stmt->toArray();
+        }
+
+        return $stmts;
     }
 }

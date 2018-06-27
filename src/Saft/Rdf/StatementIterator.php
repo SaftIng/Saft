@@ -71,4 +71,15 @@ interface StatementIterator extends \Iterator
      * @since 0.1
      */
     public function valid();
+
+    /**
+     * Returns an array with a very simplified representation of its statements.
+     *
+     * @return array
+     *
+     * @api
+     *
+     * @since 2.0.0
+     */
+    public function toArray();
 }
