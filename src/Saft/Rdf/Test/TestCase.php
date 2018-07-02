@@ -28,8 +28,6 @@ use Symfony\Component\Yaml\Parser;
  * @api
  *
  * @since 0.1
- *
- * @codeCoverageIgnore
  */
 abstract class TestCase extends PHPUnitTestCase
 {
