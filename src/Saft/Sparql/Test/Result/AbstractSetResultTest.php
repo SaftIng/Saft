@@ -47,7 +47,7 @@ abstract class AbstractSetResultTest extends TestCase
     public function testConstructorInvalidList2()
     {
         $this->getInstance([
-            [1]
+            [1],
         ]);
     }
 
@@ -87,7 +87,6 @@ abstract class AbstractSetResultTest extends TestCase
         $this->assertFalse($this->fixture->isValueResult());
     }
 
-
     public function testSetGetVariables()
     {
         $this->assertTrue(empty($this->fixture->getVariables()));
@@ -103,7 +102,7 @@ abstract class AbstractSetResultTest extends TestCase
                 's' => $this->nodeFactory->createNamedNode('http://s'),
                 'p1' => $this->nodeFactory->createNamedNode('http://p'),
                 'o' => $this->nodeFactory->createNamedNode('http://o'),
-            ]
+            ],
         ]);
 
         $this->fixture->setVariables(['s', 'p1', 'o']);
@@ -114,7 +113,7 @@ abstract class AbstractSetResultTest extends TestCase
                     's' => 'http://s',
                     'p1' => 'http://p',
                     'o' => 'http://o',
-                ]
+                ],
             ],
             $this->fixture->toArray()
         );
@@ -127,7 +126,7 @@ abstract class AbstractSetResultTest extends TestCase
                 's' => $this->nodeFactory->createNamedNode('http://s'),
                 'p1' => $this->nodeFactory->createNamedNode('http://p'),
                 'o' => $this->nodeFactory->createNamedNode('http://o'),
-            ]
+            ],
         ]);
 
         $this->assertEquals([], $this->fixture->toArray());

@@ -37,7 +37,7 @@ abstract class AbstractStatementResultTest extends TestCase
     public function testConstructor()
     {
         $this->getInstance([
-            [1]
+            [1],
         ]);
     }
 
@@ -77,7 +77,6 @@ abstract class AbstractStatementResultTest extends TestCase
         $this->assertFalse($this->fixture->isValueResult());
     }
 
-
     public function testCurrentAndNextAndValid()
     {
         $this->fixture = $this->getInstance([
@@ -85,7 +84,7 @@ abstract class AbstractStatementResultTest extends TestCase
                 $this->nodeFactory->createNamedNode('http://s'),
                 $this->nodeFactory->createNamedNode('http://p'),
                 $this->nodeFactory->createNamedNode('http://o')
-            )
+            ),
         ]);
 
         $this->assertTrue($this->fixture->current() instanceof Statement);
@@ -103,7 +102,7 @@ abstract class AbstractStatementResultTest extends TestCase
                 $this->nodeFactory->createNamedNode('http://s'),
                 $this->nodeFactory->createNamedNode('http://p'),
                 $this->nodeFactory->createNamedNode('http://o')
-            )
+            ),
         ]);
 
         $this->assertEquals(
@@ -112,7 +111,7 @@ abstract class AbstractStatementResultTest extends TestCase
                     's' => 'http://s',
                     'p' => 'http://p',
                     'o' => 'http://o',
-                ]
+                ],
             ],
             $this->fixture->toArray()
         );
