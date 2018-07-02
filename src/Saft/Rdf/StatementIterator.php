@@ -24,13 +24,13 @@ interface StatementIterator extends \Iterator
     /**
      * Get current Statement instance.
      *
-     * @return Statement
+     * @return Statement|null
      *
      * @api
      *
-     * @since 0.1
+     * @since 1.0
      */
-    public function current(): Statement;
+    public function current(): ?Statement;
 
     /**
      * Get key of current Statement.
