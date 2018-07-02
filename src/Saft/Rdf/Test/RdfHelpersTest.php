@@ -12,12 +12,7 @@
 
 namespace Saft\Rdf\Test;
 
-use Saft\Rdf\AnyPatternImpl;
-use Saft\Rdf\BlankNodeImpl;
-use Saft\Rdf\LiteralImpl;
-use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\RdfHelpers;
-use Saft\Rdf\StatementImpl;
 
 class RdfHelpersTest extends TestCase
 {

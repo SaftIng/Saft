@@ -42,7 +42,7 @@ class AnyPatternImplTest extends TestCase
     {
         $fixtureA = $this->newInstance();
 
-        $this->assertEquals('ANY', (string)$fixtureA);
+        $this->assertEquals('ANY', (string) $fixtureA);
     }
 
     /**

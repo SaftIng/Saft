@@ -13,15 +13,11 @@
 namespace Saft\Rdf\Test;
 
 use Saft\Rdf\AnyPattern;
-use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\BlankNode;
 use Saft\Rdf\Literal;
-use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNode;
-use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\Node;
 use Saft\Rdf\Statement;
-use Saft\Rdf\StatementImpl;
 
 abstract class AbstractStatementTest extends TestCase
 {

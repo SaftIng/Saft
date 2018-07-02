@@ -12,7 +12,6 @@
 
 namespace Saft\Rdf\Test;
 
-use Saft\Rdf\AnyPatternImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
 use Saft\Rdf\NodeFactory;
@@ -32,6 +31,7 @@ abstract class AbstractStatementIteratorTest extends TestCase
     abstract public function createInstanceWithArray(array $statements): StatementIterator;
 
     abstract public function getNodeFactory(): NodeFactory;
+
     abstract public function getStatementFactory(): StatementFactory;
 
     /*

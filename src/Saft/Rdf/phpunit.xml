@@ -19,7 +19,6 @@
     convertWarningsToExceptions="true"
     processIsolation="false"
     stopOnFailure="false"
-    syntaxCheck="false"
     verbose="true"
     >
     <php>
@@ -30,9 +29,6 @@
     <logging>
         <log type="coverage-html"
             target="./gen/coverage"
-            charset="UTF-8"
-            yui="true"
-            highlight="true"
             showUncoveredFiles="true" />
     </logging>
     <filter>

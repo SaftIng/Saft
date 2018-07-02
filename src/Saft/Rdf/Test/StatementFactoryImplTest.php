@@ -14,7 +14,6 @@ namespace Saft\Rdf\Test;
 
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactory;
 use Saft\Rdf\StatementFactoryImpl;
 

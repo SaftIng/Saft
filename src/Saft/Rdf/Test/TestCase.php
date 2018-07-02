@@ -16,13 +16,8 @@ use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use Saft\Rdf\CommonNamespaces;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\RdfHelpers;
-use Saft\Rdf\Statement;
 use Saft\Rdf\StatementFactoryImpl;
-use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactoryImpl;
-use Saft\Sparql\Result\Result;
-use Saft\Sparql\Result\SetResult;
-use Symfony\Component\Yaml\Parser;
 
 /**
  * @api

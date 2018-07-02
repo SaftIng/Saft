@@ -102,13 +102,13 @@ class StatementImpl extends AbstractStatement
     }
 
     /**
-     * Transforms the Statement object into an array with a structure like:
+     * Transforms the Statement object into an array with a structure like:.
      *
      *      array(
      *          's' => 'http://foo'
      *      )
      *
-     * @return array Array representation of the Statement.
+     * @return array array representation of the Statement
      */
     public function toArray(): array
     {
@@ -125,7 +125,6 @@ class StatementImpl extends AbstractStatement
             }
 
             return $stmt;
-
         } else {
             throw new \Exception('Only concrete statements are supported. Yours contains at least one AnyPattern instance.');
         }

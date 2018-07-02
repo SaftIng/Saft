@@ -30,7 +30,7 @@ class CommonNamespacesTest extends TestCase
     public function testConstructAddingNewPrefixes()
     {
         $this->fixture = new CommonNamespaces([
-            'foo' => 'http://bar'
+            'foo' => 'http://bar',
         ]);
 
         $this->assertEquals('http://bar', $this->fixture->getUri('foo'));
