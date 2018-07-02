@@ -13,6 +13,7 @@
 namespace Saft\Data\Test;
 
 use Saft\Data\Parser;
+use Saft\Data\ParserFactory;
 use Saft\Rdf\Test\TestCase;
 
 /**
@@ -31,7 +32,7 @@ abstract class AbstractParserFactoryTest extends TestCase
     /**
      * @return ParserFactory
      */
-    abstract protected function getInstance(): Parser;
+    abstract protected function getInstance(): ParserFactory;
 
     /*
      * Tests for createParserFor
