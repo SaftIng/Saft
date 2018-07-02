@@ -10,12 +10,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Saft\Data;
+namespace Saft\Data\Parser;
 
+use Saft\Data\Parser;
 use Sabre\Xml\Service;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactory;
+use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
 
 /**
@@ -35,7 +37,7 @@ class RDFXMLParser implements Parser
      * @param NodeFactory              $nodeFactory
      * @param StatementFactory         $statementFactory
      * @param StatementIteratorFactory $statementIteratorFactory
-     * @param NodeUtils                $rdfHelpers
+     * @param RdfHelpers               $rdfHelpers
      */
     public function __construct(
         NodeFactory $nodeFactory,
@@ -55,7 +57,7 @@ class RDFXMLParser implements Parser
      * @return array An associative array with a prefix mapping of the prefixes parsed so far. The key
      *               will be the prefix, while the values contains the according namespace URI.
      */
-    public function getCurrentPrefixList()
+    public function getCurrentPrefixList(): array
     {
         // TODO implement a way to get a list of all namespaces used in the last parsed datastring/file.
         throw new \Exception('Not implemented yet.');
@@ -73,10 +75,10 @@ class RDFXMLParser implements Parser
      *
      * @throws \Exception if the base URI $baseUri is no valid URI
      */
-    public function parseStringToIterator($inputString, $baseUri = null)
+    public function parseStringToIterator(string $inputString, string $baseUri = null): StatementIterator
     {
         // check $baseUri
-        if (null !== $baseUri && false == $this->rdfHelpers->simpleCheckURI($baseUri)) {
+        if (null !== $baseUri) {
             throw new \Exception('No base URI support for now. To continue, just leave $baseUri = null.');
         }
 
@@ -86,6 +88,7 @@ class RDFXMLParser implements Parser
         $rdfAboutString = '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about';
         $rdfDatatypeString = '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}datatype';
         $rdfDescriptionString = '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}Description';
+        $nodeIDString = '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}nodeID';
         $rdfResourceString = '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource';
         $xmlNamespaceLangString = '{http://www.w3.org/XML/1998/namespace}lang';
 
@@ -95,10 +98,21 @@ class RDFXMLParser implements Parser
         foreach ($xmlArray as $rdfDescription) {
             // if its a rdf:Description element
             if ($rdfDescription['name'] == $rdfDescriptionString) {
-                // create subject
-                $subject = $this->nodeFactory->createNamedNode(
-                    $rdfDescription['attributes'][$rdfAboutString]
-                );
+                /*
+                 * create subject
+                 */
+                // subject is a named node
+                if (isset($rdfDescription['attributes'][$rdfAboutString])) {
+                    $subject = $this->nodeFactory->createNamedNode(
+                        $rdfDescription['attributes'][$rdfAboutString]
+                    );
+
+                // subject is a blank node
+                } elseif (isset($rdfDescription['attributes'][$nodeIDString])) {
+                    $subject = $this->nodeFactory->createBlankNode(
+                        $rdfDescription['attributes'][$nodeIDString]
+                    );
+                }
 
                 foreach ($rdfDescription['value'] as $value) {
                     // if object is a resource
@@ -106,7 +120,7 @@ class RDFXMLParser implements Parser
                         && $value['attributes'][$rdfResourceString]) {
                         // create predicate
                         $predicate = $this->nodeFactory->createNamedNode(
-                            str_replace(['{', '}'], '', $value['name'])
+                            \str_replace(['{', '}'], '', $value['name'])
                         );
 
                         // we know that the object can only be a named node, so add triple
@@ -126,7 +140,7 @@ class RDFXMLParser implements Parser
                         && $rdfDescription['attributes'][$rdfAboutString]) {
                         foreach ($rdfDescription['value'] as $objectValue) {
                             $predicate = $this->nodeFactory->createNamedNode(
-                                str_replace(['{', '}'], '', $objectValue['name'])
+                                \str_replace(['{', '}'], '', $objectValue['name'])
                             );
 
                             // object is URI
@@ -139,8 +153,9 @@ class RDFXMLParser implements Parser
                                 );
 
                             // object is blank node
-                            } elseif ($this->rdfHelpers->simpleCheckBlankNodeId($objectValue['value'])) {
-                                $object = $this->nodeFactory->createBlankNode($objectValue['value']);
+                            } elseif (null == $objectValue['value']
+                                && isset($objectValue['attributes'][$nodeIDString])) {
+                                $object = $this->nodeFactory->createBlankNode($objectValue['attributes'][$nodeIDString]);
 
                             // guess object is of type literal
                             } else {
@@ -156,7 +171,7 @@ class RDFXMLParser implements Parser
                                 }
 
                                 $object = $this->nodeFactory->createLiteral(
-                                    str_replace(['{', '}'], '', $objectValue['value']),
+                                    \str_replace(['{', '}'], '', $objectValue['value']),
                                     $datatype,
                                     $lang
                                 );
@@ -194,10 +209,10 @@ class RDFXMLParser implements Parser
      *
      * @api
      *
-     * @since 0.1
+     * @since 2.0.0
      */
-    public function parseStreamToIterator($inputStream, $baseUri = null)
+    public function parseStreamToIterator(string $inputStream, string $baseUri = null): StatementIterator
     {
-        return $this->parseStringToIterator(file_get_contents($inputStream), $baseUri);
+        return $this->parseStringToIterator(\file_get_contents($inputStream), $baseUri);
     }
 }

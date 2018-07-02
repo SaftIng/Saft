@@ -35,7 +35,7 @@ interface ParserFactory
      *
      * @since 0.1
      */
-    public function createParserFor($serialization);
+    public function createParserFor($serialization): Parser;
 
     /**
      * Returns an array which contains supported serializations.
@@ -46,5 +46,5 @@ interface ParserFactory
      *
      * @since 0.1
      */
-    public function getSupportedSerializations();
+    public function getSupportedSerializations(): array;
 }

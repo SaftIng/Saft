@@ -62,7 +62,7 @@ interface Serializer
      *
      * @api
      *
-     * @since 0.1
+     * @since 2.0.0
      */
-    public function getSupportedSerializations();
+    public function getSupportedSerializations(): array
 }

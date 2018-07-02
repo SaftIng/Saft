@@ -34,9 +34,9 @@ interface SerializerFactory
      *
      * @api
      *
-     * @since 0.1
+     * @since 2.0.0
      */
-    public function createSerializerFor($serialization);
+    public function createSerializerFor($serialization): Serializer
 
     /**
      * Returns a list of all supported serialization types.
@@ -45,7 +45,7 @@ interface SerializerFactory
      *
      * @api
      *
-     * @since 0.1
+     * @since 2.0.0
      */
-    public function getSupportedSerializations();
+    public function getSupportedSerializations(): array
 }

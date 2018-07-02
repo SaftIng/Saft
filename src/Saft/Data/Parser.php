@@ -12,6 +12,8 @@
 
 namespace Saft\Data;
 
+use Saft\Rdf\StatementIterator;
+
 /**
  * The Parser interface describes what methods a RDF parser should provide. An instance of Parser must be initialized
  * with a certain serialization the parser is able to parse. That means, that you have to create different instances
@@ -19,7 +21,7 @@ namespace Saft\Data;
  *
  * @api
  *
- * @since 0.1
+ * @since 2.0.0
  */
 interface Parser
 {
@@ -35,12 +37,13 @@ interface Parser
      *                           parser to far
      *
      * @throws \Exception if the base URI $baseUri is no valid URI
+     * @throws \Exception if the base URI support is not implemented
      *
      * @api
      *
-     * @since 0.1
+     * @since 2.0.0
      */
-    public function parseStringToIterator($inputString, $baseUri = null);
+    public function parseStringToIterator(string $inputString, string $baseUri = null): StatementIterator;
 
     /**
      * Parses a given stream and returns an iterator containing Statement instances representing the
@@ -56,9 +59,9 @@ interface Parser
      *
      * @api
      *
-     * @since 0.1
+     * @since 2.0.0
      */
-    public function parseStreamToIterator($inputStream, $baseUri = null);
+    public function parseStreamToIterator(string $inputStream, string $baseUri = null): StatementIterator;
 
     /**
      * Returns an array of prefixes which where found during the last parsing. Might also be any other prefix list
@@ -69,7 +72,7 @@ interface Parser
      *
      * @api
      *
-     * @since 0.1
+     * @since 2.0.0
      */
-    public function getCurrentPrefixList();
+    public function getCurrentPrefixList(): array;
 }

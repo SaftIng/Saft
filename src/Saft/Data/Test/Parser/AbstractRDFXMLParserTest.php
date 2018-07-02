@@ -10,29 +10,24 @@
  * file that was distributed with this source code.
  */
 
-namespace Saft\Data\Test\Integration;
+namespace Saft\Data\Test\Parser;
 
-use Saft\Data\RDFXMLParser;
+use Saft\Data\Parser;
 use Saft\Rdf\ArrayStatementIteratorImpl;
 use Saft\Rdf\LiteralImpl;
 use Saft\Rdf\NamedNodeImpl;
-use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\RdfHelpers;
-use Saft\Rdf\StatementFactoryImpl;
 use Saft\Rdf\StatementImpl;
-use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Rdf\Test\TestCase;
 
-class RDFXMLParserTest extends TestCase
+abstract class AbstractRDFXMLParserTest extends TestCase
 {
+    abstract protected function getInstance(): Parser;
+
     public function setUp()
     {
-        $this->fixture = new RDFXMLParser(
-            new NodeFactoryImpl(),
-            new StatementFactoryImpl(),
-            new StatementIteratorFactoryImpl(),
-            new RdfHelpers()
-        );
+        parent::setUp();
+
+        $this->fixture = $this->getInstance();
     }
 
     /*
@@ -43,7 +38,7 @@ class RDFXMLParserTest extends TestCase
     {
         $result = $this->fixture->parseStreamToIterator(__DIR__.'/../../resources/dbpedia-leipzig-part.rdf');
 
-        $this->assertStatementIteratorEquals(
+        $this->assertEquals(
             new ArrayStatementIteratorImpl([
                 new StatementImpl(
                     new NamedNodeImpl('http://dbpedia.org/resource/2015–16_MSV_Duisburg_season'),
@@ -115,6 +110,27 @@ class RDFXMLParserTest extends TestCase
         );
     }
 
+    public function testParseStreamToIteratorCheckBlankNodeHandling()
+    {
+        $result = $this->fixture->parseStreamToIterator(__DIR__.'/../../resources/blank-node-example.rdf');
+
+        $this->assertEquals(
+            $this->statementIteratorFactory->createStatementIteratorFromArray([
+                $this->statementFactory->createStatement(
+                    $this->nodeFactory->createNamedNode('http://www.w3.org/TR/rdf-syntax-grammar'),
+                    $this->nodeFactory->createNamedNode('http://example.org/stuff/1.0/editor'),
+                    $this->nodeFactory->createBlankNode('abc')
+                ),
+                $this->statementFactory->createStatement(
+                    $this->nodeFactory->createBlankNode('abc'),
+                    $this->nodeFactory->createNamedNode('http://example.org/stuff/1.0/homePage'),
+                    $this->nodeFactory->createNamedNode('http://purl.org/net/dajobe/')
+                ),
+            ]),
+            $result
+        );
+    }
+
     /*
      * Tests for parseStringToIterator
      */
@@ -124,7 +140,7 @@ class RDFXMLParserTest extends TestCase
         $data = file_get_contents(__DIR__.'/../../resources/dbpedia-leipzig-part.rdf');
         $result = $this->fixture->parseStringToIterator($data);
 
-        $this->assertStatementIteratorEquals(
+        $this->assertEquals(
             new ArrayStatementIteratorImpl([
                 new StatementImpl(
                     new NamedNodeImpl('http://dbpedia.org/resource/2015–16_MSV_Duisburg_season'),

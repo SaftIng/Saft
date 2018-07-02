@@ -12,6 +12,7 @@
 
 namespace Saft\Data\Test;
 
+use Saft\Data\Parser;
 use Saft\Rdf\Test\TestCase;
 
 /**
@@ -30,7 +31,7 @@ abstract class AbstractParserFactoryTest extends TestCase
     /**
      * @return ParserFactory
      */
-    abstract protected function newInstance();
+    abstract protected function getInstance(): Parser;
 
     /*
      * Tests for createParserFor
@@ -44,18 +45,18 @@ abstract class AbstractParserFactoryTest extends TestCase
             $this->markTestSkipped('Array $availableSerializations contains no entries.');
         }
 
-        $this->fixture = $this->newInstance();
+        $this->fixture = $this->getInstance();
 
         foreach ($this->availableSerializations as $serialization) {
-            $this->assertTrue(is_object($this->fixture->createParserFor($serialization)));
+            $this->assertTrue($this->fixture->createParserFor($serialization) instanceof Parser);
         }
     }
 
+    /**
+     * @expectedException \Exception
+     */
     public function testCreateParserForRequestInvalidSerialization()
     {
-        // expected exception because invalid serialization was given
-        $this->setExpectedException('\Exception');
-
-        $this->newInstance()->createParserFor('invalid serialization');
+        $this->getInstance()->createParserFor('invalid serialization');
     }
 }

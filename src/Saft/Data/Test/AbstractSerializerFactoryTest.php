@@ -12,11 +12,9 @@
 
 namespace Saft\Data\Test;
 
+use Saft\Data\Serializer;
 use Saft\Rdf\Test\TestCase;
 
-/**
- * @codeCoverageIgnore
- */
 abstract class AbstractSerializerFactoryTest extends TestCase
 {
     /**
@@ -30,7 +28,7 @@ abstract class AbstractSerializerFactoryTest extends TestCase
     /**
      * @return SerializerFactory
      */
-    abstract protected function newInstance();
+    abstract protected function getInstance(): Serializer;
 
     /*
      * Tests for createSerializerFor
@@ -40,18 +38,18 @@ abstract class AbstractSerializerFactoryTest extends TestCase
     // is returned by the SerializerFactory instance.
     public function testCreateSerializerFor()
     {
-        $this->fixture = $this->newInstance();
+        $this->fixture = $this->getInstance();
 
         foreach ($this->fixture->getSupportedSerializations() as $serialization) {
-            $this->assertTrue(is_object($this->fixture->createSerializerFor($serialization)));
+            $this->assertTrue($this->fixture->createSerializerFor($serialization) instanceof Serializer);
         }
     }
 
+    /**
+     * @expectedException \Exception
+     */
     public function testCreateSerializerForRequestInvalidSerialization()
     {
-        // expected exception because invalid serialization was given
-        $this->setExpectedException('\Exception');
-
-        $this->newInstance()->createSerializerFor('invalid serialization');
+        $this->getInstance()->createSerializerFor('invalid serialization');
     }
 }

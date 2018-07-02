@@ -1,5 +1,0 @@
-<http://dbpedia.org/resource/Leipzig> <http://dbpedia.org/property/janLowC> "-2.2"^^<http://www.w3.org/2001/XMLSchema#double> <http://graph/2> .
-<http://dbpedia.org/resource/Leipzig> <http://dbpedia.org/ontology/leaderTitle> "Oberb\u00FCrgermeister"@en <http://graph/1> .
-<http://dbpedia.org/resource/Leipzig> <http://bnode/test> _:bnode <http://graph/1> .
-_:bnode <http://bnode/test> <http://dbpedia.org/resource/Leipzig> <http://graph/1> .
-<http://dbpedia.org/resource/Leipzig> <http://www.w3.org/2000/01/rdf-schema#comment> "Leipzig (/\u02C8la\u026Aps\u026A\u0261/; German: [\u02C8la\u026Apts\u026A\u00E7]) is the largest city in the federal state of Saxony, Germany. It has a population of 544,479 inhabitants (1,001,220 residents in the larger urban zone). Leipzig is located about 150 kilometers (93 miles) south of Berlin at the confluence of the White Elster, Pleisse, and Parthe rivers at the southerly end of the North German Plain.Leipzig has been a trade city since at least the time of the Holy Roman Empire. Some ' test.'"@en <http://graph/2> .
