@@ -92,4 +92,22 @@ class StatementResultImpl extends SetResultImpl implements StatementResult, Stat
     {
         return parent::valid();
     }
+
+    /**
+     * @return array
+     *
+     * @api
+     *
+     * @since 2.0.0
+     */
+    public function toArray(): array
+    {
+        $stmts = [];
+
+        foreach ($this as $stmt) {
+            $stmts[] = $stmt->toArray();
+        }
+
+        return $stmts;
+    }
 }

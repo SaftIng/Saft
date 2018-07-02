@@ -12,6 +12,8 @@
 
 namespace Saft\Sparql\Result;
 
+use Saft\Rdf\Node;
+
 /**
  * This class represents a result set. Each entry is an associative array with binding + according Node.
  */
@@ -112,6 +114,18 @@ class SetResultImpl extends \ArrayIterator implements SetResult
      */
     public function toArray(): array
     {
+        $entries = [];
 
+        if (0 < \count($this->variables)) {
+            foreach ($this as $entry) {
+                $newEntry = [];
+                foreach ($this->variables as $var) {
+                    $newEntry[$var] = (string) $entry[$var];
+                }
+                $entries[] = $newEntry;
+            }
+        }
+
+        return $entries;
     }
 }

@@ -95,4 +95,26 @@ abstract class AbstractStatementResultTest extends TestCase
         $this->assertFalse($this->fixture->valid());
         $this->assertNull($this->fixture->current());
     }
+
+    public function testToArray()
+    {
+        $this->fixture = $this->getInstance([
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createNamedNode('http://s'),
+                $this->nodeFactory->createNamedNode('http://p'),
+                $this->nodeFactory->createNamedNode('http://o')
+            )
+        ]);
+
+        $this->assertEquals(
+            [
+                [
+                    's' => 'http://s',
+                    'p' => 'http://p',
+                    'o' => 'http://o',
+                ]
+            ],
+            $this->fixture->toArray()
+        );
+    }
 }

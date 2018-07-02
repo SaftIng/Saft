@@ -95,4 +95,41 @@ abstract class AbstractSetResultTest extends TestCase
         $this->fixture->setVariables(['s', 'p']);
         $this->assertEquals(['s', 'p'], $this->fixture->getVariables());
     }
+
+    public function testToArray()
+    {
+        $this->fixture = $this->getInstance([
+            [
+                's' => $this->nodeFactory->createNamedNode('http://s'),
+                'p1' => $this->nodeFactory->createNamedNode('http://p'),
+                'o' => $this->nodeFactory->createNamedNode('http://o'),
+            ]
+        ]);
+
+        $this->fixture->setVariables(['s', 'p1', 'o']);
+
+        $this->assertEquals(
+            [
+                [
+                    's' => 'http://s',
+                    'p1' => 'http://p',
+                    'o' => 'http://o',
+                ]
+            ],
+            $this->fixture->toArray()
+        );
+    }
+
+    public function testToArrayNoVariables()
+    {
+        $this->fixture = $this->getInstance([
+            [
+                's' => $this->nodeFactory->createNamedNode('http://s'),
+                'p1' => $this->nodeFactory->createNamedNode('http://p'),
+                'o' => $this->nodeFactory->createNamedNode('http://o'),
+            ]
+        ]);
+
+        $this->assertEquals([], $this->fixture->toArray());
+    }
 }
