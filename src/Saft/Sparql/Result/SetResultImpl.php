@@ -40,8 +40,17 @@ class SetResultImpl extends \ArrayIterator implements SetResult
 
         // check that each entry of $array is an array to
         foreach ($array as $entry) {
-            if (false === is_array($entry)) {
+            // is entry an array?
+            if (\false === \is_array($entry)) {
                 throw new \Exception('Parameter $array must only contain arrays.');
+            }
+            // does the array only contains entries of type Node?
+            // TODO remove that, if performance drops too heavily. also, this makes it impossible to use
+            //      chunk-based reading, because we load everything in the memory anyway.
+            foreach ($entry as $key => $value) {
+                if (false === $value instanceof Node) {
+                    throw new \Exception('$array contains entries which are not of type Saft/Rdf/Node.');
+                }
             }
         }
     }
@@ -49,7 +58,7 @@ class SetResultImpl extends \ArrayIterator implements SetResult
     /**
      * @return array
      */
-    public function getVariables()
+    public function getVariables(): array
     {
         return $this->variables;
     }
@@ -57,7 +66,7 @@ class SetResultImpl extends \ArrayIterator implements SetResult
     /**
      * @return bool True
      */
-    public function isEmptyResult()
+    public function isEmptyResult(): bool
     {
         return false;
     }
@@ -65,7 +74,7 @@ class SetResultImpl extends \ArrayIterator implements SetResult
     /**
      * @return bool True
      */
-    public function isSetResult()
+    public function isSetResult(): bool
     {
         return true;
     }
@@ -73,7 +82,7 @@ class SetResultImpl extends \ArrayIterator implements SetResult
     /**
      * @return bool False
      */
-    public function isStatementSetResult()
+    public function isStatementSetResult(): bool
     {
         return false;
     }
@@ -81,7 +90,7 @@ class SetResultImpl extends \ArrayIterator implements SetResult
     /**
      * @return bool True
      */
-    public function isValueResult()
+    public function isValueResult(): bool
     {
         return false;
     }
@@ -89,8 +98,20 @@ class SetResultImpl extends \ArrayIterator implements SetResult
     /**
      * @param array $variables
      */
-    public function setVariables($variables)
+    public function setVariables(array $variables)
     {
         $this->variables = $variables;
+    }
+
+    /**
+     * @return array
+     *
+     * @api
+     *
+     * @since 2.0.0
+     */
+    public function toArray(): array
+    {
+
     }
 }

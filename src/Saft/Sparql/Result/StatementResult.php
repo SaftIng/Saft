@@ -12,18 +12,20 @@
 
 namespace Saft\Sparql\Result;
 
+use Saft\Rdf\Statement;
+
 /**
- * This class represents a result set.
+ * This class represents a result set containing only Statement instances.
  */
-interface SetResult extends \Iterator, Result
+interface StatementResult extends SetResult
 {
     /**
-     * @return array
+     * @return Statement|null
      */
-    public function getVariables(): array;
+    public function current(): ?Statement;
 
     /**
-     * @param array $variables
+     * @return bool
      */
-    public function setVariables(array $variables);
+    public function valid(): bool;
 }

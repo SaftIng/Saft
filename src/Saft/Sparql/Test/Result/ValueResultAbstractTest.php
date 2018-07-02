@@ -38,10 +38,12 @@ abstract class ValueResultAbstractTest extends TestCase
         $this->assertEquals(0, $this->fixture->getValue());
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage The fist argument of the constructor has to be a scalar.
+     */
     public function testConstructorNonScalarParameter()
     {
-        $this->setExpectedException('Exception');
-
         $this->fixture = new ValueResultImpl([]);
     }
 

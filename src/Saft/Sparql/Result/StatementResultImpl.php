@@ -16,9 +16,9 @@ use Saft\Rdf\Statement;
 use Saft\Rdf\StatementIterator;
 
 /**
- * This class is a certain kind of SetResult, it only contains Statements.
+ * This class is of type SetResult, but it only contains Statement instances.
  */
-class StatementSetResultImpl extends SetResultImpl implements StatementIterator
+class StatementResultImpl extends SetResultImpl implements StatementResult, StatementIterator
 {
     /**
      * Constructor.
@@ -48,7 +48,7 @@ class StatementSetResultImpl extends SetResultImpl implements StatementIterator
     /**
      * @return bool False
      */
-    public function isEmptyResult()
+    public function isEmptyResult(): bool
     {
         return false;
     }
@@ -56,7 +56,7 @@ class StatementSetResultImpl extends SetResultImpl implements StatementIterator
     /**
      * @return bool False
      */
-    public function isSetResult()
+    public function isSetResult(): bool
     {
         return false;
     }
@@ -64,7 +64,7 @@ class StatementSetResultImpl extends SetResultImpl implements StatementIterator
     /**
      * @return bool True
      */
-    public function isStatementSetResult()
+    public function isStatementSetResult(): bool
     {
         return true;
     }
@@ -72,8 +72,24 @@ class StatementSetResultImpl extends SetResultImpl implements StatementIterator
     /**
      * @return bool False
      */
-    public function isValueResult()
+    public function isValueResult(): bool
     {
         return false;
+    }
+
+    /**
+     * @return null|Statement
+     */
+    public function current(): ?Statement
+    {
+        return parent::current();
+    }
+
+    /**
+     * @return bool
+     */
+    public function valid(): bool
+    {
+        return parent::valid();
     }
 }

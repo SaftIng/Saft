@@ -17,17 +17,17 @@ class ResultFactoryImpl implements ResultFactory
     /**
      * @return EmptyResult
      */
-    public function createEmptyResult()
+    public function createEmptyResult(): EmptyResult
     {
         return new EmptyResultImpl();
     }
 
     /**
-     * @param \Iterator|array|null $list optional, default is array()
+     * @param \Iterator|array|null $list optional, default is []
      *
      * @return SetResult
      */
-    public function createSetResult($list = [])
+    public function createSetResult($list = []): SetResult
     {
         return new SetResultImpl($list);
     }
@@ -35,11 +35,11 @@ class ResultFactoryImpl implements ResultFactory
     /**
      * @param \Iterator|array|null $list optional, default is array()
      *
-     * @return SetResult
+     * @return StatementResult
      */
-    public function createStatementResult($list = [])
+    public function createStatementResult($list = []): StatementResult
     {
-        return new StatementSetResultImpl($list);
+        return new StatementResultImpl($list);
     }
 
     /**
@@ -47,7 +47,7 @@ class ResultFactoryImpl implements ResultFactory
      *
      * @return ValueResult
      */
-    public function createValueResult($scalar)
+    public function createValueResult($scalar): ValueResult
     {
         return new ValueResultImpl($scalar);
     }

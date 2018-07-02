@@ -15,20 +15,12 @@ namespace Saft\Sparql\Result;
 /**
  * Represents an empty result, usually after an INSERT or UPDATE SPARQL query.
  */
-class EmptyResultImpl implements Result
+class EmptyResultImpl implements EmptyResult
 {
-    /**
-     * @return array
-     */
-    public function getVariables()
-    {
-        return [];
-    }
-
     /**
      * @return bool True
      */
-    public function isEmptyResult()
+    public function isEmptyResult(): bool
     {
         return true;
     }
@@ -36,7 +28,7 @@ class EmptyResultImpl implements Result
     /**
      * @return bool False
      */
-    public function isSetResult()
+    public function isSetResult(): bool
     {
         return false;
     }
@@ -44,7 +36,7 @@ class EmptyResultImpl implements Result
     /**
      * @return bool False
      */
-    public function isStatementSetResult()
+    public function isStatementSetResult(): bool
     {
         return false;
     }
@@ -52,7 +44,7 @@ class EmptyResultImpl implements Result
     /**
      * @return bool False
      */
-    public function isValueResult()
+    public function isValueResult(): bool
     {
         return false;
     }

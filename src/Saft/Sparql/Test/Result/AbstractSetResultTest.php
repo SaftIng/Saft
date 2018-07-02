@@ -15,14 +15,41 @@ namespace Saft\Sparql\Test\Result;
 use Saft\Rdf\Test\TestCase;
 use Saft\Sparql\Result\SetResult;
 
-abstract class SetResultAbstractTest extends TestCase
+abstract class AbstractSetResultTest extends TestCase
 {
     /**
      * @param \Iterator $list
      *
      * @return SetResult
      */
-    abstract public function newInstance($list);
+    abstract public function getInstance($list = []): SetResult;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->fixture = $this->getInstance();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage $array must only contain arrays.
+     */
+    public function testConstructorInvalidList()
+    {
+        $this->getInstance([1]);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage $array contains entries which are not of type Saft/Rdf/Node.
+     */
+    public function testConstructorInvalidList2()
+    {
+        $this->getInstance([
+            [1]
+        ]);
+    }
 
     /*
      * Tests for isEmptyResult
@@ -30,9 +57,6 @@ abstract class SetResultAbstractTest extends TestCase
 
     public function testIsEmptyResult()
     {
-        $list = $this->getMockForAbstractClass('\Iterator');
-        $this->fixture = $this->newInstance($list);
-
         $this->assertFalse($this->fixture->isEmptyResult());
     }
 
@@ -42,9 +66,6 @@ abstract class SetResultAbstractTest extends TestCase
 
     public function testIsSetResult()
     {
-        $list = $this->getMockForAbstractClass('\Iterator');
-        $this->fixture = $this->newInstance($list);
-
         $this->assertTrue($this->fixture->isSetResult());
     }
 
@@ -54,9 +75,6 @@ abstract class SetResultAbstractTest extends TestCase
 
     public function testIsStatementSetResult()
     {
-        $list = $this->getMockForAbstractClass('\Iterator');
-        $this->fixture = $this->newInstance($list);
-
         $this->assertFalse($this->fixture->isStatementSetResult());
     }
 
@@ -66,9 +84,15 @@ abstract class SetResultAbstractTest extends TestCase
 
     public function testIsValueResult()
     {
-        $list = $this->getMockForAbstractClass('\Iterator');
-        $this->fixture = $this->newInstance($list);
-
         $this->assertFalse($this->fixture->isValueResult());
+    }
+
+
+    public function testSetGetVariables()
+    {
+        $this->assertTrue(empty($this->fixture->getVariables()));
+
+        $this->fixture->setVariables(['s', 'p']);
+        $this->assertEquals(['s', 'p'], $this->fixture->getVariables());
     }
 }

@@ -12,18 +12,13 @@
 
 namespace Saft\Sparql\Test\Result;
 
-use Saft\Sparql\Result\SetResult;
-use Saft\Sparql\Result\SetResultImpl;
+use Saft\Sparql\Result\ResultFactory;
+use Saft\Sparql\Result\ResultFactoryImpl;
 
-class SetResultImplTest extends AbstractSetResultTest
+class ResultFactoryImplTest extends AbstractResultFactoryTest
 {
-    /**
-     * @param \Iterator $list Default is []
-     *
-     * @return SetResult
-     */
-    public function getInstance($list = []): SetResult
+    protected function getInstance(): ResultFactory
     {
-        return new SetResultImpl($list);
+        return new ResultFactoryImpl();
     }
 }

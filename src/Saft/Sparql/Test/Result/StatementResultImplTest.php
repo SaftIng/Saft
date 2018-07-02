@@ -12,15 +12,16 @@
 
 namespace Saft\Sparql\Test\Result;
 
-use Saft\Sparql\Result\StatementSetResultImpl;
+use Saft\Sparql\Result\StatementResult;
+use Saft\Sparql\Result\StatementResultImpl;
 
-class StatementSetResultImplTest extends StatementSetResultAbstractTest
+class StatementResultImplTest extends AbstractStatementResultTest
 {
     /**
      * @return StatementResult
      */
-    public function newInstance($list)
+    protected function getInstance($list = []): StatementResult
     {
-        return new StatementSetResultImpl($list);
+        return new StatementResultImpl($list);
     }
 }

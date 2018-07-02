@@ -20,20 +20,20 @@ interface Result
     /**
      * @return bool true, if this instance represents an empty result
      */
-    public function isEmptyResult();
+    public function isEmptyResult(): bool;
 
     /**
      * @return bool true, if this instance represents a set result, which is a list of associative arrays
      */
-    public function isSetResult();
+    public function isSetResult(): bool;
 
     /**
      * @return bool true, if this instance represents a statement set result, which is a list of statements
      */
-    public function isStatementSetResult();
+    public function isStatementSetResult(): bool;
 
     /**
      * @return bool True, if this instance is a ValueResult
      */
-    public function isValueResult();
+    public function isValueResult(): bool;
 }

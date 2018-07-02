@@ -17,26 +17,26 @@ interface ResultFactory
     /**
      * @return Result
      */
-    public function createEmptyResult();
+    public function createEmptyResult(): EmptyResult;
 
     /**
      * @param \Iterator|array|null $list optional
      *
      * @return SetResult
      */
-    public function createSetResult($list);
+    public function createSetResult($list = []): SetResult;
 
     /**
      * @param \Iterator|array|null $list optional
      *
-     * @return SetResult
+     * @return StatementResult
      */
-    public function createStatementResult($list);
+    public function createStatementResult($list = []): StatementResult;
 
     /**
      * @param mixed $scalar
      *
      * @return ValueResult
      */
-    public function createValueResult($scalar);
+    public function createValueResult($scalar): ValueResult;
 }

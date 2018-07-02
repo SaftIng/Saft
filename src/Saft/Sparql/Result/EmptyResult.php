@@ -13,17 +13,8 @@
 namespace Saft\Sparql\Result;
 
 /**
- * This class represents a result set.
+ * This class represents an empty result of a store operation.
  */
-interface SetResult extends \Iterator, Result
+interface EmptyResult extends Result
 {
-    /**
-     * @return array
-     */
-    public function getVariables(): array;
-
-    /**
-     * @param array $variables
-     */
-    public function setVariables(array $variables);
 }

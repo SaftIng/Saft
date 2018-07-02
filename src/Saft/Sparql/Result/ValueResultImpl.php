@@ -24,7 +24,7 @@ class ValueResultImpl implements ValueResult
      */
     public function __construct($value)
     {
-        if (!is_scalar($value)) {
+        if (!\is_scalar($value)) {
             throw new \Exception('The fist argument of the constructor has to be a scalar.');
         }
 
@@ -42,7 +42,7 @@ class ValueResultImpl implements ValueResult
     /**
      * @return bool False
      */
-    public function isEmptyResult()
+    public function isEmptyResult(): bool
     {
         return false;
     }
@@ -50,7 +50,7 @@ class ValueResultImpl implements ValueResult
     /**
      * @return bool False
      */
-    public function isSetResult()
+    public function isSetResult(): bool
     {
         return false;
     }
@@ -58,7 +58,7 @@ class ValueResultImpl implements ValueResult
     /**
      * @return bool False
      */
-    public function isStatementSetResult()
+    public function isStatementSetResult(): bool
     {
         return false;
     }
@@ -66,7 +66,7 @@ class ValueResultImpl implements ValueResult
     /**
      * @return bool True
      */
-    public function isValueResult()
+    public function isValueResult(): bool
     {
         return true;
     }
