@@ -16,7 +16,7 @@
             "name": "Konrad Abicht",
             "homepage": "http://www.inspirito.de",
             "email": "hi@inspirito.de",
-            "role": "Developer"
+            "role": "Maintainer, Developer"
         }
     ],
     "replace": {
@@ -29,15 +29,15 @@
         "saft/saft-store-virtuoso": "self.version"
     },
     "require": {
-        "php": ">=7.0",
-        "php-curl-class/php-curl-class": "4.*",
-        "sabre/xml": "1.*",
-        "semsol/arc2": "2.*",
-        "symfony/yaml": "2.*"
+        "php": "^7.1",
+        "php-curl-class/php-curl-class": "^8.0",
+        "sabre/xml": "^2.0",
+        "semsol/arc2": "^2.4"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "*",
-        "sami/sami": "3.2.*"
+        "phpunit/phpunit": "^7.0",
+        "sami/sami": "^3.2"
     },
     "autoload": {
         "psr-4": {
