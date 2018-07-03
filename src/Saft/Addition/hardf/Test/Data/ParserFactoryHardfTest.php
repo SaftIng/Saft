@@ -10,9 +10,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Saft\Addition\hardf\Test;
+namespace Saft\Addition\hardf\Test\Data;
 
 use Saft\Addition\hardf\Data\ParserFactoryHardf;
+use Saft\Data\ParserFactory;
 use Saft\Data\Test\AbstractParserFactoryTest;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\RdfHelpers;
@@ -36,13 +37,13 @@ class ParserFactoryHardfTest extends AbstractParserFactoryTest
     /**
      * @return ParserFactory
      */
-    protected function newInstance()
+    protected function getInstance(): ParserFactory
     {
         return new ParserFactoryHardf(
-            new NodeFactoryImpl(),
-            new StatementFactoryImpl(),
-            new StatementIteratorFactoryImpl(),
-            new RdfHelpers()
+            $this->nodeFactory,
+            $this->statementFactory,
+            $this->statementIteratorFactory,
+            $this->rdfHelpers
         );
     }
 }

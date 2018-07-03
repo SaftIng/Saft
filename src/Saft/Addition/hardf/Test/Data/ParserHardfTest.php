@@ -10,43 +10,74 @@
  * file that was distributed with this source code.
  */
 
-namespace Saft\Addition\hardf\Test;
+namespace Saft\Addition\hardf\Test\Data;
 
-use Saft\Addition\hardf\Data\ParserFactoryHardf;
-use Saft\Data\Test\AbstractParserTest;
+use Saft\Addition\hardf\Data\ParserHardf;
+use Saft\Addition\hardf\Rdf\LazyStatementIterator;
+use Saft\Data\Parser;
 use Saft\Rdf\NodeFactoryImpl;
 use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactoryImpl;
+use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactoryImpl;
+use Saft\Rdf\Test\TestCase;
 
-class ParserHardfTest extends AbstractParserTest
+class ParserHardfTest extends TestCase
 {
-    protected $factory;
-
     public function setUp()
     {
         parent::setUp();
 
-        $this->factory = new ParserFactoryHardf(
-            new NodeFactoryImpl(),
-            new StatementFactoryImpl(),
-            new StatementIteratorFactoryImpl(),
-            new RdfHelpers()
+        $this->fixture = $this->getInstance('turtle');
+    }
+
+    protected function getInstance(string $serialization): Parser
+    {
+        return new ParserHardf(
+            $this->nodeFactory,
+            $this->statementFactory,
+            $this->statementIteratorFactory,
+            $this->rdfHelpers,
+            $serialization
         );
     }
 
-    /**
-     * @return Parser
+    /*
+     * Tests for __construct
      */
-    protected function newInstance($serialization)
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testConstructorInvalidSerialization()
     {
-        return $this->factory->createParserFor($serialization);
+        $this->getInstance('unknown');
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Currently not implemented.
+     */
+    public function testGetCurrentPrefixList()
+    {
+        $this->getInstance('n-triples')->getCurrentPrefixList();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage $baseUri is not a valid URI.
+     */
+    public function testParseStringToIteratorInvalidBaseUri()
+    {
+        $this->getInstance('n-triples')->parseStringToIterator('foo',
+            'invalid'
+        );
     }
 
     // test a special case in a foreign application which uses this functionality
     public function testParseStringToIteratorForTurtle()
     {
-        $iterator = $this->newInstance('turtle')->parseStringToIterator('
+        $iterator = $this->getInstance('turtle')->parseStringToIterator('
             @prefix foo: <http://foo/> .
             foo:bar1 a foo:bar2 ;
                 foo:bar2 "baz" ;
@@ -118,8 +149,47 @@ class ParserHardfTest extends AbstractParserTest
     // test that guessFormat doesn't confuse n-triples with turtle
     public function testParseStringToIteratorRegression1()
     {
-        $fileContent = file_get_contents(__DIR__.'/resources/guessFormat-regression1.ttl');
+        $fileContent = file_get_contents(__DIR__.'/../resources/guessFormat-regression1.ttl');
 
-        $this->assertCountStatementIterator(1165, $this->newInstance('turtle')->parseStringToIterator($fileContent));
+        $iterator = $this->getInstance('turtle')->parseStringToIterator($fileContent);
+
+        $counter = 0;
+        foreach ($iterator as $key => $value) {
+            ++$counter;
+        }
+
+        $this->assertEquals(149, $counter);
+    }
+
+    /*
+     * Tests for parseStreamToIterator
+     */
+
+    public function testParseStreamToIteratorLazyStatementIterator()
+    {
+        $iterator = $this->getInstance('n-triples')->parseStreamToIterator(__DIR__.'/../resources/n-triples-example.nt');
+
+        $this->assertTrue($iterator instanceof LazyStatementIterator);
+
+        $counter = 0;
+        foreach ($iterator as $value) {
+            ++$counter;
+        }
+
+        $this->assertEquals(5, $counter);
+    }
+
+    public function testParseStreamToIteratorArrayBasedStatementIterator()
+    {
+        $iterator = $this->getInstance('turtle')->parseStreamToIterator(__DIR__.'/../resources/guessFormat-regression1.ttl');
+
+        $this->assertTrue($iterator instanceof StatementIterator);
+
+        $counter = 0;
+        foreach ($iterator as $value) {
+            ++$counter;
+        }
+
+        $this->assertEquals(149, $counter);
     }
 }

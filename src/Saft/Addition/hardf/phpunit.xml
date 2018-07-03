@@ -19,7 +19,6 @@
     convertWarningsToExceptions="true"
     processIsolation="false"
     stopOnFailure="false"
-    syntaxCheck="false"
     verbose="true"
     >
     <php>
@@ -27,9 +26,19 @@
         <ini name="intl.error_level" value="0" />
         <ini name="display_errors" value="On"/>
     </php>
-    <!-- Define wich test cases should be executed -->
+    <logging>
+        <log type="coverage-html"
+            target="./gen/coverage"
+            showUncoveredFiles="true" />
+    </logging>
+    <filter>
+        <whitelist>
+            <directory>Data</directory>
+            <directory>Rdf</directory>
+        </whitelist>
+    </filter>
     <testsuites>
-        <testsuite name="Saft-Addition-Hardf">
+        <testsuite name="Saft-Addition-hardf">
             <directory suffix="Test.php">./Test</directory>
         </testsuite>
     </testsuites>

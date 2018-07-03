@@ -12,6 +12,7 @@
 
 namespace Saft\Addition\hardf\Data;
 
+use Saft\Data\Parser;
 use Saft\Data\ParserFactory;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\RdfHelpers;
@@ -64,12 +65,12 @@ class ParserFactoryHardf implements ParserFactory
      *
      * @throws \Exception if parser for requested serialization is not available
      */
-    public function createParserFor($serialization)
+    public function createParserFor($serialization): Parser
     {
         if (!in_array($serialization, $this->getSupportedSerializations())) {
             throw new \Exception(
                 'Requested serialization '.$serialization.' is not available in: '.
-                implode(', ', $this->getSupportedSerializations())
+                \implode(', ', $this->getSupportedSerializations())
             );
         }
 
@@ -87,8 +88,8 @@ class ParserFactoryHardf implements ParserFactory
      *
      * @return array array of supported serializations which are understood by this parser
      */
-    public function getSupportedSerializations()
+    public function getSupportedSerializations(): array
     {
-        return array_keys($this->serializationMap);
+        return \array_keys($this->serializationMap);
     }
 }

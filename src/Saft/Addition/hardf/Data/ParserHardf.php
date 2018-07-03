@@ -14,10 +14,12 @@ namespace Saft\Addition\hardf\Data;
 
 use pietercolpaert\hardf\TriGParser;
 use pietercolpaert\hardf\Util;
+use Saft\Addition\hardf\Rdf\LazyStatementIterator;
 use Saft\Data\Parser;
 use Saft\Rdf\NodeFactory;
 use Saft\Rdf\RdfHelpers;
 use Saft\Rdf\StatementFactory;
+use Saft\Rdf\StatementIterator;
 use Saft\Rdf\StatementIteratorFactory;
 
 class ParserHardf implements Parser
@@ -63,7 +65,7 @@ class ParserHardf implements Parser
         StatementFactory $statementFactory,
         StatementIteratorFactory $statementIteratorFactory,
         RdfHelpers $rdfHelpers,
-        $serialization
+        string $serialization
     ) {
         $this->RdfHelpers = $rdfHelpers;
 
@@ -71,19 +73,23 @@ class ParserHardf implements Parser
         $this->statementFactory = $statementFactory;
         $this->statementIteratorFactory = $statementIteratorFactory;
 
+        // for more information look near:
+        // https://github.com/pietercolpaert/hardf/blob/master/src/TriGParser.php#L50
         $this->serializationMap = [
             'n-triples' => 'triple',
             'n-quads' => 'quad',
+            'n3' => 'n3',
             'turtle' => 'turtle',
+            'trig' => 'trig',
         ];
-
-        $this->serialization = $this->serializationMap[$serialization];
 
         if (false == isset($this->serializationMap[$serialization])) {
             throw new \Exception(
                 'Unknown serialization format given: '.$serialization.'. Supported are only '.
-                implode(', ', array_keys($this->serializationMap))
+                \implode(', ', \array_keys($this->serializationMap))
             );
+        } else {
+            $this->serialization = $this->serializationMap[$serialization];
         }
     }
 
@@ -95,7 +101,7 @@ class ParserHardf implements Parser
      *
      * @throws \Exception currently not implemented
      */
-    public function getCurrentPrefixList()
+    public function getCurrentPrefixList(): array
     {
         throw new \Exception('Currently not implemented.');
     }
@@ -112,7 +118,7 @@ class ParserHardf implements Parser
      *
      * @throws \Exception if the base URI $baseUri is no valid URI
      */
-    public function parseStringToIterator($inputString, $baseUri = null)
+    public function parseStringToIterator(string $inputString, string $baseUri = null): StatementIterator
     {
         // check $baseUri
         if (null !== $baseUri && false == $this->RdfHelpers->simpleCheckURI($baseUri)) {
@@ -125,90 +131,40 @@ class ParserHardf implements Parser
         $triples = $parser->parse($inputString);
 
         foreach ($triples as $triple) {
-            /*
-             * handle subject
-             */
-            $subject = null;
-            if (Util::isIRI($triple['subject'])) {
-                $subject = $this->nodeFactory->createNamedNode($triple['subject']);
-            } elseif (Util::isBlank($triple['subject'])) {
-                $subject = $this->nodeFactory->createBlankNode(substr($triple['subject'], 2));
-            } else {
-                throw new \Exception('Invalid node type for subject found: '.$triple['subject']);
-            }
-
-            /*
-             * handle predicate
-             */
-            $predicate = null;
-            if (Util::isIRI($triple['predicate'])) {
-                $predicate = $this->nodeFactory->createNamedNode($triple['predicate']);
-            } else {
-                throw new \Exception('Invalid node type for predicate found: '.$triple['predicate']);
-            }
-
-            /*
-             * handle object
-             */
-            $object = null;
-            if (Util::isIRI($triple['object'])) {
-                $object = $this->nodeFactory->createNamedNode($triple['object']);
-            } elseif (Util::isBlank($triple['object'])) {
-                $object = $this->nodeFactory->createBlankNode(substr($triple['object'], 2));
-            } elseif (Util::isLiteral($triple['object'])) {
-                // safety check, to avoid fatal error about missing Error class in hardf
-                // FYI: https://github.com/pietercolpaert/hardf/pull/12
-                // TODO: remove this here, if fixed
-                $int = preg_match('/"(\n+\s*.*\n+\s*)"/si', $triple['object'], $match);
-                if (0 < $int) {
-                    $value = $match[1];
-                    $lang = null;
-                    $datatype = null;
-
-                /*
-                 * normal case
-                 */
-                } else {
-                    // get value
-                    preg_match('/"(.*)"/si', $triple['object'], $match);
-                    $value = $match[1];
-
-                    $lang = Util::getLiteralLanguage($triple['object']);
-                    $lang = '' == $lang ? null : $lang;
-                    $datatype = Util::getLiteralType($triple['object']);
-                }
-
-                $object = $this->nodeFactory->createLiteral($value, $datatype, $lang);
-            } else {
-                throw new \Exception('Invalid node type for object found: '.$triple['object']);
-            }
-
             // add statement
-            $statements[] = $this->statementFactory->createStatement($subject, $predicate, $object);
+            $statements[] = saftAdditionHardfTripleToStatement($triple, $this->nodeFactory, $this->statementFactory);
         }
 
         return $this->statementIteratorFactory->createStatementIteratorFromArray($statements);
     }
 
     /**
-     * Parses a given stream and returns an iterator containing Statement instances representing the
-     * previously read data. The stream parses the data not as a whole but in chunks.
+     * Parses a given stream and returns an iterator previously read data. Stream is parsed in
+     * chunks and returned StatementIterator instance operates on chunks.
      *
      * @param string $inputStream filename of the stream to parse which contains RDF serialized data
      * @param string $baseUri     The base URI of the parsed content. If this URI is null the inputStreams URL
      *                            is taken as base URI.
      *
-     * @return StatementIterator a StatementIterator containing all the Statements parsed by the parser to far
+     * @return StatementIterator LazyStatementIterator instance
      *
      * @throws \Exception if the base URI $baseUri is no valid URI
      */
-    public function parseStreamToIterator($inputStream, $baseUri = null)
+    public function parseStreamToIterator(string $inputStream, string $baseUri = null): StatementIterator
     {
-        // check $baseUri
-        if (null !== $baseUri && false == $this->RdfHelpers->simpleCheckURI($baseUri)) {
-            throw new \Exception('Parameter $baseUri is not a valid URI.');
-        }
+        // because n-triples is line based we can work with chunks very easily
+        if (\in_array($this->serialization, ['triple', 'quad'])) {
+            return new LazyStatementIterator(
+                $inputStream,
+                $this->serialization,
+                $this->nodeFactory,
+                $this->statementFactory,
+                $baseUri
+            );
 
-        return $this->parseStringToIterator(file_get_contents($inputStream), $baseUri);
+        // for quads and turtle/n3
+        } else {
+            return $this->parseStringToIterator(\file_get_contents($inputStream), $baseUri);
+        }
     }
 }
