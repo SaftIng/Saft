@@ -23,7 +23,7 @@ use Saft\Sparql\Result\Result;
  *
  * @api
  *
- * @since 0.1
+ * @since 2.0.0
  */
 interface Store
 {
@@ -39,9 +39,9 @@ interface Store
      *
      * @api
      *
-     * @since 0.1
+     * @since 1.0
      */
-    public function addStatements($statements, Node $graph = null, array $options = []);
+    public function addStatements(iterable $statements, Node $graph = null, array $options = []);
 
     /**
      * Removes all statements from a (default-) graph which match with given statement.
@@ -56,11 +56,7 @@ interface Store
      *
      * @since 0.1
      */
-    public function deleteMatchingStatements(
-        Statement $statement,
-        Node $graph = null,
-        array $options = []
-    );
+    public function deleteMatchingStatements(Statement $statement, Node $graph = null, array $options = []);
 
     /**
      * It gets all statements of a given graph which match the following conditions:
@@ -82,7 +78,7 @@ interface Store
      *
      * @since 0.1
      */
-    public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = []);
+    public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = []): StatementIterator;
 
     /**
      * Returns true or false depending on whether or not the statements pattern
@@ -99,7 +95,7 @@ interface Store
      *
      * @since 0.1
      */
-    public function hasMatchingStatement(Statement $statement, Node $graph = null, array $options = []);
+    public function hasMatchingStatement(Statement $statement, Node $graph = null, array $options = []): bool;
 
     /**
      * This method sends a SPARQL query to the store.
@@ -119,17 +115,6 @@ interface Store
     public function query($query, array $options = []);
 
     /**
-     * Get information about the store and its features.
-     *
-     * @return array array which contains information about the store and its features
-     *
-     * @api
-     *
-     * @since 0.1
-     */
-    public function getStoreDescription();
-
-    /**
      * Returns a list of all available graph URIs of the store. It can also respect access control,
      * to only returned available graphs in the current context. But that depends on the implementation
      * and can differ.
@@ -138,9 +123,9 @@ interface Store
      *
      * @api
      *
-     * @since 0.1
+     * @since 2.0.0
      */
-    public function getGraphs();
+    public function getGraphs(): iterable;
 
     /**
      * Create a new graph with the URI given as Node. If the underlying store implementation doesn't
