@@ -164,47 +164,6 @@ class HttpStore extends AbstractSparqlStore
     }
 
     /**
-     * Determines the type of a given query.
-     *
-     * Returns either:
-     * - construct,
-     * - select,
-     * - insert-data
-     * - update-data
-     * - null, if unknown
-     *
-     * @param string $query
-     *
-     * @return string|null
-     */
-    public function getQueryType(string $query): ?string
-    {
-        // remove PREFIX entries at the beginning
-        $query = \preg_replace('/PREFIX\s+[a-z]+:\s*<.*?>/im', '', $query);
-
-        $query = \ltrim(\strtolower($query));
-
-        // CONSTRUCT
-        if ('construct' == \substr($query, 0, 9)) {
-            return 'construct';
-
-        // SELECT
-        } elseif ('select' == \substr($query, 0, 6)) {
-            return 'select';
-
-        // INSERT DATA
-        } elseif ('insert data' == \substr($query, 0, 11)) {
-            return 'insert-data';
-
-        // DELETE DATA
-        } elseif ('delete data' == \substr($query, 0, 11)) {
-            return 'delete-data';
-        }
-
-        return null;
-    }
-
-    /**
      * This method sends a SPARQL query to the store.
      *
      * @param string $query   the SPARQL query to send to the store

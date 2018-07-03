@@ -139,10 +139,15 @@ abstract class AbstractSparqlStore implements Store
         foreach ($batchStatements as $graphUriToUse => $batch) {
             $content = '';
 
+            $graph = null;
+            if (null !== $graphUriToUse) {
+                $graph = $this->nodeFactory->createNamedNode($graphUriToUse);
+            }
+
             foreach ($batch as $batchEntries) {
                 $content .= $this->sparqlFormat(
                     $this->statementIteratorFactory->createStatementIteratorFromArray([$batchEntries]),
-                    $graphUriToUse
+                    $graph
                 ).' ';
             }
 
@@ -167,7 +172,7 @@ abstract class AbstractSparqlStore implements Store
      */
     public function createGraph(NamedNode $graph, array $options = [])
     {
-        $this->query('CREATE GRAPH <'.$graph->getUri().'>');
+        $this->query('CREATE SILENT GRAPH <'.$graph->getUri().'>');
     }
 
     /**
@@ -218,7 +223,7 @@ abstract class AbstractSparqlStore implements Store
      */
     public function dropGraph(NamedNode $graph, array $options = [])
     {
-        $this->query('DROP GRAPH <'.$graph->getUri().'>');
+        $this->query('DROP SILENT GRAPH <'.$graph->getUri().'>');
     }
 
     /**
@@ -270,7 +275,7 @@ abstract class AbstractSparqlStore implements Store
      * @todo check if graph URI is valid
      * @todo make it possible to read graphUri from $statement, if given $graphUri is null
      */
-    public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = [])
+    public function getMatchingStatements(Statement $statement, Node $graph = null, array $options = []): StatementIterator
     {
         // otherwise check, if graph was set in the statement and it is a named node and use it, if so.
         if (null === $graph && $statement->isQuad()) {
@@ -314,7 +319,6 @@ abstract class AbstractSparqlStore implements Store
         $query .= '}';
 
         // execute query and save result
-        // TODO transform getMatchingStatements into lazy loading, so a batch loading is possible
         $result = $this->query($query, $options);
 
         /*
@@ -342,6 +346,51 @@ abstract class AbstractSparqlStore implements Store
 
         // return a StatementIterator which contains the matching statements
         return $this->statementIteratorFactory->createStatementIteratorFromArray($statementList);
+    }
+
+    /**
+     * Determines the type of a given query in a very basic way.
+     *
+     * Returns either:
+     * - construct,
+     * - select,
+     * - insert-data
+     * - update-data
+     * - null, if unknown
+     *
+     * @param string $query
+     *
+     * @return string|null
+     *
+     * @unstable
+     *
+     * @since 2.0.0
+     */
+    public function getQueryType(string $query): ?string
+    {
+        // remove PREFIX entries at the beginning
+        $query = \preg_replace('/PREFIX\s+[a-z]+:\s*<.*?>/im', '', $query);
+
+        $query = \ltrim(\strtolower($query));
+
+        // CONSTRUCT
+        if ('construct' == \substr($query, 0, 9)) {
+            return 'construct';
+
+        // SELECT
+        } elseif ('select' == \substr($query, 0, 6)) {
+            return 'select';
+
+        // INSERT DATA
+        } elseif ('insert data' == \substr($query, 0, 11)) {
+            return 'insert-data';
+
+        // DELETE DATA
+        } elseif ('delete data' == \substr($query, 0, 11)) {
+            return 'delete-data';
+        }
+
+        return null;
     }
 
     /**

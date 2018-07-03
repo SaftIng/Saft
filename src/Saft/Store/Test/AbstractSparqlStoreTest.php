@@ -10,36 +10,39 @@
  * file that was distributed with this source code.
  */
 
-namespace Saft\Addition\HttpStore\Test\Unit;
+namespace Saft\Store\Test;
 
-use Curl\Curl;
-use Saft\Addition\HttpStore\Store\HttpStore;
-use Saft\Rdf\NodeFactoryImpl;
-use Saft\Rdf\RdfHelpers;
-use Saft\Rdf\StatementFactoryImpl;
-use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Rdf\Test\TestCase;
+use Saft\Sparql\Result\Result;
 use Saft\Sparql\Result\ResultFactoryImpl;
-use Symfony\Component\Yaml\Yaml;
+use Saft\Store\ChainableStore;
+use Saft\Store\AbstractSparqlStore;
 
-class HttpTest extends TestCase
+/**
+ * The only purpose of this class to make AbstractSparqlStore testable. Using mocks/stubs
+ * lead to problems, therefore this "workaround".
+ */
+class TestableSparqlStore extends AbstractSparqlStore
+{
+    public function query(string $query, array $options = []): Result { }
+}
+
+/**
+ * The actual test
+ */
+class AbstractSparqlStoreTest extends TestCase
 {
     public function setUp()
     {
-        global $config;
-
         parent::setUp();
 
-        // init fixture
-        $this->fixture = new HttpStore(
-            new NodeFactoryImpl(),
-            new StatementFactoryImpl(),
+        $this->fixture = new TestableSparqlStore(
+            $this->nodeFactory,
+            $this->statementFactory,
             new ResultFactoryImpl(),
-            new StatementIteratorFactoryImpl(),
-            new RdfHelpers(),
-            $config
+            $this->statementIteratorFactory,
+            $this->rdfHelpers
         );
-        $this->fixture->setClient(new Curl());
     }
 
     public function testGetQueryTypeConstruct()
@@ -48,6 +51,7 @@ class HttpTest extends TestCase
 PREFIX vcard:   <http://www.w3.org/2001/vcard-rdf/3.0#>
 CONSTRUCT   { <http://example.org/person#Alice> vcard:FN ?name }
 WHERE       { ?x foaf:name ?name }';
+
         $this->assertEquals('construct', $this->fixture->getQueryType($query));
     }
 

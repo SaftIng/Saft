@@ -112,7 +112,7 @@ interface Store
      *
      * @since 0.1
      */
-    public function query($query, array $options = []);
+    public function query(string $query, array $options = []): Result;
 
     /**
      * Returns a list of all available graph URIs of the store. It can also respect access control,
