@@ -1,8 +1,8 @@
 {
     "name": "saft/saft-store-http",
     "type": "library",
-    "description": "HTTP/REST store implementation.",
-    "keywords": ["Saft", "REST", "HTTP", "Store", "RDF", "Triple Store"],
+    "description": "Provides functionality to interact with a SPARQL endpoint via HTTP/REST.",
+    "keywords": ["Saft", "REST", "HTTP", "Store", "RDF", "Triple Store", "SPARQL Endpoint"],
     "homepage": "https://safting.github.io/",
     "license": "MIT",
     "authors": [
@@ -16,23 +16,24 @@
             "name": "Konrad Abicht",
             "homepage": "http://www.inspirito.de",
             "email": "hi@inspirito.de",
-            "role": "Developer"
+            "role": "Maintainer, Developer"
         }
     ],
     "require": {
-        "php": ">=5.6",
-        "php-curl-class/php-curl-class": "4.*",
-        "saft/saft-store": ">=0.9"
+        "php": "^7.1",
+        "php-curl-class/php-curl-class": "^8.0",
+        "saft/saft-store": "2.x-dev"
     },
     "require-dev": {
-        "mockery/mockery": "0.9.*",
-        "phpunit/phpunit": "4.8.*",
-        "saft/saft-test": ">=0.9"
+        "phpunit/phpunit": "^7.0",
+        "symfony/yaml": "^4.1"
     },
     "autoload": {
         "psr-4": {
             "Saft\\Addition\\HttpStore\\": "."
         }
     },
-    "prefer-stable": true
+    "prefer-stable": true,
+
+    "minimum-stability": "dev"
 }

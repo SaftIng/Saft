@@ -1,4 +1,6 @@
 composer.lock
 /gen
+/Test/config.php
+
 /tmp
 /vendor
