@@ -1,6 +1,6 @@
 {
     "name": "saft/saft-data",
-    "description": "Data interface for parsind and serializing RDF data for the Saft library.",
+    "description": "Data interfaces for parsing and serializing RDF data.",
     "keywords": ["Saft", "Linked Data", "Semantic Web", "RDF", "Parser", "Serializer"],
     "homepage": "https://safting.github.io/",
     "license": "MIT",
@@ -15,12 +15,12 @@
             "name": "Konrad Abicht",
             "homepage": "http://www.inspirito.de",
             "email": "hi@inspirito.de",
-            "role": "Developer"
+            "role": "Maintainer, Developer"
         }
     ],
     "require": {
         "php": "^7.1",
-        "sabre/xml": "1.*",
+        "sabre/xml": "^2.0",
         "saft/saft-rdf": "2.0.0-alpha2"
     },
     "require-dev": {
