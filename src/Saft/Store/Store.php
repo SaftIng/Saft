@@ -119,7 +119,7 @@ interface Store
      * to only returned available graphs in the current context. But that depends on the implementation
      * and can differ.
      *
-     * @return array array with the graph URI as key and a NamedNode as value for each graph
+     * @return iterable array with the graph URI as key and a NamedNode as value for each graph
      *
      * @api
      *
