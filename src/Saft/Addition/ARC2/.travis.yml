@@ -35,7 +35,7 @@ cache:
 
 before_install:
     - mysql -e 'CREATE DATABASE IF NOT EXISTS testdb;'
-    - travis_retry composer install --dev --no-interaction --pref-dist
+    - travis_retry composer install --dev --no-interaction --prefer-dist
     # Install coveralls.phar
     - wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v1.1.0/coveralls.phar
     - chmod +x coveralls.phar
