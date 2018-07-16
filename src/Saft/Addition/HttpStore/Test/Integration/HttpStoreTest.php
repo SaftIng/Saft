@@ -21,9 +21,10 @@ use Saft\Rdf\StatementIteratorFactoryImpl;
 use Saft\Rdf\Test\TestCase;
 use Saft\Sparql\Result\ResultFactoryImpl;
 use Saft\Sparql\Result\SetResult;
+use Saft\Sparql\Result\ValueResult;
 use Symfony\Component\Yaml\Yaml;
 
-class HttpTest extends TestCase
+class HttpStoreTest extends TestCase
 {
     public function setUp()
     {
@@ -50,9 +51,23 @@ class HttpTest extends TestCase
             $config
         );
         $this->fixture->setClient($curl);
+    }
 
-        // $this->fixture->dropGraph($this->testGraph);
-        // $this->fixture->createGraph($this->testGraph);
+    public function testQueryAsk()
+    {
+        $this->fixture->addStatements([
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createNamedNode('http://a'),
+                $this->nodeFactory->createNamedNode('http://b'),
+                $this->nodeFactory->createNamedNode('http://c'),
+                $this->testGraph
+            )
+        ]);
+
+        $result = $this->fixture->query('ASK FROM <'.$this->testGraph.'> WHERE {?s ?p ?o.}');
+
+        $this->assertTrue($result instanceof ValueResult);
+        $this->assertEquals(true, $result->getValue());
     }
 
     public function testQuery()
@@ -79,5 +94,14 @@ class HttpTest extends TestCase
             ],
             $result[0]
         );
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Virtuoso 37000 Error SP030: SPARQL compiler, line 1: syntax error at 'invalid' before '}' SPARQL query: define sql:big-data-const 0 SELECT * FROM <http://localhost/Saft/TestGraph/> WHERE {?s ?p ?o. invalid
+     */
+    public function testQueryInvalidSelectQuery()
+    {
+        $result = $this->fixture->query('SELECT * FROM <'.$this->testGraph.'> WHERE {?s ?p ?o. invalid');
     }
 }

@@ -171,6 +171,8 @@ class HttpStore extends AbstractSparqlStore
      *                        introductions for the store and/or its adapter(s)
      *
      * @return Result Returns result of the query. Its type depends on the type of the query.
+     *
+     * @throws \Exception if an error during query processing occured
      */
     public function query(string $query, array $options = []): Result
     {
@@ -209,42 +211,66 @@ class HttpStore extends AbstractSparqlStore
         } elseif ('select' == $queryType) {
             $receivedResult = $this->sendSparqlSelectQuery($this->configuration['query-url'], $query);
 
-            $resultArray = $this->transformResultToArray($receivedResult);
-
-            $entries = [];
-
-            /**
-             * go through all bindings and create according objects for SetResult instance.
-             *
-             * $bindingParts will look like:
-             *
-             * array(
-             *      's' => array(
-             *          'type' => 'uri',
-             *          'value' => '...'
-             *      ), ...
-             * )
+            /*
+             * invalid query or error found
              */
-            foreach ($resultArray['results']['bindings'] as $bindingParts) {
-                $newEntry = [];
+            if (\is_string($receivedResult)) {
+                // nice up error message:
+                // - make it a one liner
+                // - remove multiple whitespaces
+                $receivedResult = \str_replace(
+                    [
+                        PHP_EOL,
+                        "\n"
+                    ],
+                    ' ',
+                    $receivedResult
+                );
+                $receivedResult = preg_replace('/\s+/', ' ', $receivedResult);
+                throw new \Exception($receivedResult);
 
-                foreach ($bindingParts as $variable => $part) {
-                    $newEntry[$variable] = $this->transformEntryToNode($part);
+            /*
+             * no errors, compute result
+             */
+            } else {
+                $resultArray = $this->transformResultToArray($receivedResult);
+
+                $entries = [];
+
+                /**
+                 * go through all bindings and create according objects for SetResult instance.
+                 *
+                 * $bindingParts will look like:
+                 *
+                 * array(
+                 *      's' => array(
+                 *          'type' => 'uri',
+                 *          'value' => '...'
+                 *      ), ...
+                 * )
+                 */
+                foreach ($resultArray['results']['bindings'] as $bindingParts) {
+                    $newEntry = [];
+
+                    foreach ($bindingParts as $variable => $part) {
+                        $newEntry[$variable] = $this->transformEntryToNode($part);
+                    }
+
+                    $entries[] = $newEntry;
                 }
 
-                $entries[] = $newEntry;
+                $return = $this->resultFactory->createSetResult($entries);
+                $return->setVariables($resultArray['head']['vars']);
+
+                return $return;
             }
 
-            $return = $this->resultFactory->createSetResult($entries);
-            $return->setVariables($resultArray['head']['vars']);
-
-            return $return;
-
         /*
-         * SPARPQL Update query
+         * SPARPQL ASK or Update query
          */
         } else { // update
             $receivedResult = $this->sendSparqlUpdateQuery($this->configuration['query-url'], $query);
+
             // transform object to array
             if (\is_object($receivedResult)) {
                 $decodedResult = \json_decode(\json_encode($receivedResult), true);
@@ -253,7 +279,10 @@ class HttpStore extends AbstractSparqlStore
                 $decodedResult = \json_decode($receivedResult, true);
             }
 
-            if ('askQuery' === $queryType) {
+            /*
+             * ASK query
+             */
+            if ('ask' === $queryType) {
                 if (true === isset($decodedResult['boolean'])) {
                     return $this->resultFactory->createValueResult($decodedResult['boolean']);
 
@@ -264,9 +293,17 @@ class HttpStore extends AbstractSparqlStore
                     return $this->resultFactory->createEmptyResult();
                 }
 
-            // usually a SPARQL result does not return a string. if it does anyway, assume there is an error.
+            /*
+             * Query failed:
+             *
+             * usually a SPARQL result does not return a string. if it does anyway, assume there is an error.
+             */
             } elseif (null === $decodedResult && 0 < \strlen($receivedResult)) {
                 throw new \Exception($receivedResult);
+
+            /*
+             * SPARQL UPDATE query, usually returns value
+             */
             } else {
                 return $this->resultFactory->createEmptyResult();
             }
