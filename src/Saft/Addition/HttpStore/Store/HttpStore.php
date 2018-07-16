@@ -74,6 +74,7 @@ class HttpStore extends AbstractSparqlStore
      * @param StatementIteratorFactory $statementIteratorFactory
      * @param RdfHelpers               $rdfHelpers
      * @param array                    $configuration            Optional, array containing database credentials
+     * @param Curl                     $httpClient
      *
      * @throws \Exception if HTTP store requires the PHP ODBC extension to be loaded
      */
@@ -83,19 +84,26 @@ class HttpStore extends AbstractSparqlStore
         ResultFactory $resultFactory,
         StatementIteratorFactory $statementIteratorFactory,
         RdfHelpers $rdfHelpers,
-        array $configuration = []
+        array $configuration = [],
+        Curl $httpClient = null
     ) {
         $this->RdfHelpers = $rdfHelpers;
-
         $this->configuration = $configuration;
-
-        // Open connection and, if possible, authenticate on server
-        $this->openConnection();
-
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
         $this->resultFactory = $resultFactory;
         $this->statementIteratorFactory = $statementIteratorFactory;
+
+        // Open connection and, if possible, authenticate on server
+        if (null == $httpClient) {
+            $httpClient = new Curl();
+            $httpClient->setOpt(\CURLOPT_FOLLOWLOCATION, true);
+            $httpClient->setOpt(\CURLOPT_TIMEOUT, 10);
+            $httpClient->verbose();
+        }
+        $this->httpClient = $httpClient;
+
+        $this->openConnection();
     }
 
     /**
@@ -111,11 +119,11 @@ class HttpStore extends AbstractSparqlStore
     {
         $response = $this->sendDigestAuthentication($authUrl, $username, $password);
 
-        $httpCode = $response->getHttpCode();
+        $httpCode = $this->httpClient->httpStatusCode;
 
         // If status code is not 200, something went wrong
         if (200 !== $httpCode) {
-            throw new \Exception('Response with Status Code ['.$httpCode.'].', $httpCode);
+            throw new \Exception('Response with Status Code: '.$httpCode, $httpCode);
         }
     }
 
@@ -134,33 +142,40 @@ class HttpStore extends AbstractSparqlStore
      */
     public function openConnection()
     {
-        if (null == $this->httpClient) {
-            return false;
-        }
-
         $configuration = \array_merge([
-            'auth-url' => '',
-            'password' => '',
             'query-url' => '',
+            // auth related
+            'password' => '',
             'username' => '',
         ], $this->configuration);
 
         /*
          * authenticate only if an auth-url was given.
          */
-        if ($this->RdfHelpers->simpleCheckURI($configuration['auth-url'])) {
-            $this->authenticateOnServer(
-                $configuration['auth-url'],
-                $configuration['username'],
-                $configuration['password']
-            );
+        if (isset($configuration['username']) && isset($configuration['password'])) {
+            $this->useDigestAuthentication($configuration['username'], $configuration['password']);
         }
 
         // check query URL
-        if (false === isset($configuration['query-url'])
-            || false === $this->rdfHelpers->simpleCheckURI($configuration['query-url'])) {
-            throw new \Exception('$configuration field "query-url" is not an URI or empty: '.$configuration['query-url']);
+        if (false === isset($configuration['query-url'])) {
+            throw new \Exception('$configuration field "query-url" is not set: '.$configuration['query-url']);
         }
+    }
+
+    protected function niceUpErrorMessage(string $err): string
+    {
+        // nice up error message:
+        // - make it a one liner
+        // - remove multiple whitespaces
+        $err = \str_replace(
+            [
+                PHP_EOL,
+                "\n"
+            ],
+            ' ',
+            $err
+        );
+        return preg_replace('/\s+/', ' ', $err);
     }
 
     /**
@@ -215,19 +230,7 @@ class HttpStore extends AbstractSparqlStore
              * invalid query or error found
              */
             if (\is_string($receivedResult)) {
-                // nice up error message:
-                // - make it a one liner
-                // - remove multiple whitespaces
-                $receivedResult = \str_replace(
-                    [
-                        PHP_EOL,
-                        "\n"
-                    ],
-                    ' ',
-                    $receivedResult
-                );
-                $receivedResult = preg_replace('/\s+/', ' ', $receivedResult);
-                throw new \Exception($receivedResult);
+                throw new \Exception($this->niceUpErrorMessage($receivedResult));
 
             /*
              * no errors, compute result
@@ -299,7 +302,7 @@ class HttpStore extends AbstractSparqlStore
              * usually a SPARQL result does not return a string. if it does anyway, assume there is an error.
              */
             } elseif (null === $decodedResult && 0 < \strlen($receivedResult)) {
-                throw new \Exception($receivedResult);
+                throw new \Exception($this->niceUpErrorMessage($receivedResult));
 
             /*
              * SPARQL UPDATE query, usually returns value
@@ -308,21 +311,6 @@ class HttpStore extends AbstractSparqlStore
                 return $this->resultFactory->createEmptyResult();
             }
         }
-    }
-
-    /**
-     * Send digest authentication to the server via GET.
-     *
-     * @param string $username
-     * @param string $password optional
-     *
-     * @return string
-     */
-    public function sendDigestAuthentication($url, $username, $password = null): string
-    {
-        $this->httpClient->setDigestAuthentication($username, $password);
-
-        return $this->httpClient->get($url);
     }
 
     /**
@@ -338,7 +326,7 @@ class HttpStore extends AbstractSparqlStore
         $this->httpClient->setHeader('Accept', 'application/sparql-results+json');
         $this->httpClient->setHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        return $this->httpClient->post($url, ['query' => $query]);
+        return $this->httpClient->get($url, ['query' => $query]);
     }
 
     /**
@@ -355,15 +343,9 @@ class HttpStore extends AbstractSparqlStore
         $this->httpClient->setHeader('Accept', 'application/sparql-results+json');
         $this->httpClient->setHeader('Content-Type', 'application/sparql-update');
 
-        return $this->httpClient->get($url, ['query' => $query]);
-    }
+        $result = $this->httpClient->get($url, ['query' => $query]);
 
-    /**
-     * @param \Curl\Curl $httpClient
-     */
-    public function setClient(Curl $httpClient)
-    {
-        $this->httpClient = $httpClient;
+        return $result;
     }
 
     /**
@@ -459,5 +441,23 @@ class HttpStore extends AbstractSparqlStore
         }
 
         return $newEntry;
+    }
+
+    /**
+     * Use digest authentication if you send queries to the server.
+     *
+     * @param string $username
+     * @param string $password
+     */
+    public function useDigestAuthentication($username, $password)
+    {
+        $this->httpClient->setDigestAuthentication($username, $password);
+
+        // if you use GET here, it seems to not work with CURL
+        $this->httpClient->post($this->configuration['query-url']);
+
+        if (200 != $this->httpClient->httpStatusCode) {
+            throw new \Exception($this->httpClient->errorMessage);
+        }
     }
 }

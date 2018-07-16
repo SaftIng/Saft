@@ -32,14 +32,21 @@ class HttpStoreTest extends TestCase
 
         parent::setUp();
 
+        $this->setInstance();
+    }
+
+    protected function setInstance(array $customConfig = null)
+    {
+        if (null == $customConfig) {
+            global $config;
+        } else {
+            $config = $customConfig;
+        }
+
         /*
          * first check, if target server is online
          */
         $curl = new Curl();
-        $curl->get($config['query-url']);
-        if ($curl->error) {
-            $this->markTestSkipped('Query URL '.$config['query-url'].' is not reachable: '. $curl->errorMessage);
-        }
 
         // init fixture
         $this->fixture = new HttpStore(
@@ -48,9 +55,68 @@ class HttpStoreTest extends TestCase
             new ResultFactoryImpl(),
             $this->statementIteratorFactory,
             $this->rdfHelpers,
-            $config
+            $config,
+            $curl
         );
-        $this->fixture->setClient($curl);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage HTTP/1.1 401 Unauthorized
+     */
+    public function testAuthNoAccess()
+    {
+        $this->setInstance([
+            'query-url' => 'http://virtuoso-auth-required:8890/sparql'
+        ]);
+
+        // will throw an exception cause no write access
+        $this->fixture->addStatements([
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createNamedNode('http://a'),
+                $this->nodeFactory->createNamedNode('http://b'),
+                $this->nodeFactory->createNamedNode('http://c'),
+                $this->testGraph
+            )
+        ]);
+    }
+
+    /**
+     * Requires a certain user on the target server to test auth.
+     */
+    public function testAuthOnServer()
+    {
+        if (isset($_ENV['TRAVIS'])) {
+            $this->markTestSkipped('We need a pre-configured Virtuoso server for this test. Test only runs locally.');
+        }
+
+        $this->setInstance([
+            'query-url' => 'http://virtuoso-auth-required:8890/sparql',
+            'username' => 'test1',
+            'password' => 'test1',
+        ]);
+
+        // will throw an exception cause no write access
+        $this->fixture->dropGraph($this->testGraph);
+        $this->fixture->createGraph($this->testGraph);
+
+        // check that graph is empty
+        $result = $this->fixture->query('ASK FROM <'.$this->testGraph.'> WHERE {?s ?p ?o.}');
+        $this->assertFalse($result->getValue());
+
+        // add 1 triple
+        $this->fixture->addStatements([
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createNamedNode('http://a'),
+                $this->nodeFactory->createNamedNode('http://b'),
+                $this->nodeFactory->createNamedNode('http://c'),
+                $this->testGraph
+            )
+        ]);
+
+        // check that triple was created
+        $result = $this->fixture->query('ASK FROM <'.$this->testGraph.'> WHERE {?s ?p ?o.}');
+        $this->assertTrue($result->getValue());
     }
 
     public function testQueryAsk()

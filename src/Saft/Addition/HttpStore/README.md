@@ -28,3 +28,11 @@ GRANT SPARQL_UPDATE to "SPARQL";
 GRANT SPARQL_SPONGE to "SPARQL";
 ```
 They give the `SPARQL` user the rights to run read and write SPARQL queries.
+
+#### .. or use Virtuoso docker instead
+
+You can use the Virtuoso docker container, provided by tenforce:
+
+https://hub.docker.com/r/tenforce/virtuoso/
+
+It allows you to simply set the environment variable `SPARQL_UPDATE` to `true`, which has the same effect as the SQL query above.
