@@ -45,6 +45,16 @@ class AbstractSparqlStoreTest extends TestCase
         );
     }
 
+    public function testGetQueryTypeAsk()
+    {
+        $query = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX vcard:   <http://www.w3.org/2001/vcard-rdf/3.0#>
+ASK FROM <http://foo>
+WHERE       { ?x foaf:name ?name }';
+
+        $this->assertEquals('ask', $this->fixture->getQueryType($query));
+    }
+
     public function testGetQueryTypeConstruct()
     {
         $query = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>

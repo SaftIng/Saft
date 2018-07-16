@@ -381,6 +381,10 @@ abstract class AbstractSparqlStore implements Store
         } elseif ('select' == \substr($query, 0, 6)) {
             return 'select';
 
+        // ASK
+        } elseif ('ask' == \substr($query, 0, 3)) {
+            return 'ask';
+
         // INSERT DATA
         } elseif ('insert data' == \substr($query, 0, 11)) {
             return 'insert-data';
