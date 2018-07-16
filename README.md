@@ -1,33 +1,37 @@
 # Saft
 
-Saft stands for **S**emantic **A**pplication **F**ramework Saf**t** and is a PHP framework, which provides RDF handling and support for Semantic Web technologies. It consists of the core library (_Saft.data_, _Saft.rdf_, _Saft.sparql_ and _Saft.store_) and some additions (e.g. adapter for triple stores or integration of libraries like ARC2 and EasyRdf), which extend the core with application specific code.
+#### About
 
-There are currently 4 other RDF-libraries for PHP available (EasyRdf, Erfurt, hardf, ARC2). Each implements different areas with various quality and feature-coverage. Combined, they provide a rich feature-set from RDF data handling, serialization and parsing to database access. With Saft we aim to provide an integration layer to enable the usage of most of these libraries at the same time.
+Saft stands for **S**emantic **A**pplication **F**ramework Saf**t** and is a PHP framework, which provides RDF handling and support for Semantic Web technologies. It consists of the core library (RDF, Data, Sparql and Store) and additions (e.g. adapter for triple stores or integration of libraries like ARC2 and hardf). An addition uses the core library and provides an adapter for a certain application-specific system. We use additions to integrate foreign libraries.
 
-### Build status and code coverage
+#### Why another PHP library?
 
-| Core Component | Composer Package | Build Status                                                                                                              | Code Coverage                                                                                                                                                      |
-|:---------------|:-----------------|:--------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Data           | saft/saft-data   | [![Build Status](https://travis-ci.org/SaftIng/Saft.data.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.data)     | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.data/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.data?branch=master)     |
-| Rdf            | saft/saft-rdf    | [![Build Status](https://travis-ci.org/SaftIng/Saft.rdf.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.rdf)       | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.rdf/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.rdf?branch=master)       |
-| Sparql         | saft/saft-sparql | [![Build Status](https://travis-ci.org/SaftIng/Saft.sparql.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.sparql) | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.sparql/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.sparql?branch=master) |
-| Store          | saft/saft-store  | [![Build Status](https://travis-ci.org/SaftIng/Saft.store.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.store)   | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.store/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.store?branch=master)   |
+Due the lack of a major library written in PHP, like Jena in Java, we decided to provide an integration layer for all existing libraries. These are ARC2, EasyRdf, hardf and Erfurt. Each has its own strength, but also lacks certain functionality. The idea with Saft was, to seamlessly integrate required libraries and cherry pick what you need from them.
 
-| Addition | Composer Package         | Build Status                                                                                                                              | Code Coverage                                                                                                                                                                      |
-|:---------|:-------------------------|:------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ARC2     | saft/saft-arc2           | [![Build Status](https://travis-ci.org/SaftIng/Saft.arc2.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.arc2)                     | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.arc2/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.arc2?branch=master)                     |
-| hardf    | saft/saft-hardf          | [![Build Status](https://travis-ci.org/SaftIng/Saft.hardf.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.hardf)                   | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.hardf/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.hardf?branch=master)                   |
-| Virtuoso | saft/saft-store-virtuoso | [![Build Status](https://travis-ci.org/SaftIng/Saft.store.virtuoso.svg?branch=master)](https://travis-ci.org/SaftIng/Saft.store.virtuoso) | [![Coverage Status](https://coveralls.io/repos/github/SaftIng/Saft.store.virtuoso/badge.svg?branch=master)](https://coveralls.io/github/SaftIng/Saft.store.virtuoso?branch=master) |
+## Core components
+
+| Core Component | Composer Package | Info                           |
+|:---------------|:-----------------|:-------------------------------|
+| Rdf            | saft/saft-rdf    | Major RDF entities             |
+| Data           | saft/saft-data   | Serialisation and Parsing      |
+| Sparql         | saft/saft-sparql | SPARQL results (Store related) |
+| Store          | saft/saft-store  | RDF Store related              |
+
+Each core components provides major functionality for a certain area. The idea is to provide interfaces and for each interface a standard implementation. Use our implementation or write your own, based on our interfaces. This allows the integration of your code into our infrastructure. For instance: Use the hardf addition to parse files and load RDF in a store, via an adapter of yours.
+
+## Additions
+
+| Addition   | Composer Package         | Info                                          |
+|:-----------|:-------------------------|:----------------------------------------------|
+| ARC2       | saft/saft-arc2           | Integrates ARC2's RDF Store                   |
+| hardf      | saft/saft-hardf          | Integrates hardf parser and serializer parser |
+| Http Store | saft/saft-store-http     | Enables you to query SPARQL endpoints.        |
+| Virtuoso   | saft/saft-store-virtuoso | Connection to Virtuoso Server¹ via ODBC       |
+
+¹ https://virtuoso.openlinksw.com
+
+Additions use the core library and add further functionality. This approach allows us to be flexible and integrate foreign code by keeping a certain amount of semantic stability. Also, you can combine additions and add your own code. For instance, use hardf to parse RDF files and store RDF using the Virtuoso addition.
 
 ## License
 
-Copyright (C) 2017 by Konrad Abicht, Natanael Arndt and the individual [contributors](CONTRIBUTORS)
-
-This program is licensed under the terms of the [MIT license](https://github.com/SaftIng/Saft/blob/master/LICENSE).
-
-## Current development status
-
-Saft provides (basic) support for the following foreign PHP RDF libraries:
-
-* ARC2 (currently only data storage)
-* hardf (parser and serializer)
+Copyright (C) 2017 by Konrad Abicht, Natanael Arndt and the individual [contributors](CONTRIBUTORS). This program is licensed under the terms of the [MIT license](https://github.com/SaftIng/Saft/blob/master/LICENSE).
