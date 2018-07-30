@@ -86,7 +86,7 @@ class HttpStoreTest extends TestCase
      */
     public function testAuthOnServer()
     {
-        if (isset($_ENV['TRAVIS'])) {
+        if (getenv('TRAVIS')) {
             $this->markTestSkipped('We need a pre-configured Virtuoso server for this test. Test only runs locally.');
         }
 
@@ -162,6 +162,32 @@ class HttpStoreTest extends TestCase
         );
     }
 
+    public function testQueryInsertBlankNodes()
+    {
+        $this->fixture->addStatements([
+            $this->statementFactory->createStatement(
+                $this->nodeFactory->createBlankNode('b0'),
+                $this->nodeFactory->createNamedNode('http://b'),
+                $this->nodeFactory->createNamedNode('http://c'),
+                $this->testGraph
+            )
+        ]);
+
+        $result = $this->fixture->query('SELECT * FROM <'.$this->testGraph.'> WHERE {?s ?p ?o.}');
+
+        $this->assertTrue($result instanceof SetResult);
+        $this->assertEquals(1, \count($result));
+
+        $this->assertEquals(
+            [
+                's' => $this->nodeFactory->createNamedNode('http://a'),
+                'p' => $this->nodeFactory->createNamedNode('http://b'),
+                'o' => $this->nodeFactory->createNamedNode('http://c'),
+            ],
+            $result[0]
+        );
+    }
+
     /**
      * @expectedException \Exception
      * @expectedExceptionMessage Virtuoso 37000 Error SP030: SPARQL compiler, line 1: syntax error at 'invalid' before '}' SPARQL query: define sql:big-data-const 0 SELECT * FROM <http://localhost/Saft/TestGraph/> WHERE {?s ?p ?o. invalid
@@ -169,5 +195,41 @@ class HttpStoreTest extends TestCase
     public function testQueryInvalidSelectQuery()
     {
         $result = $this->fixture->query('SELECT * FROM <'.$this->testGraph.'> WHERE {?s ?p ?o. invalid');
+    }
+
+    /**
+     * This tests uses an existing Virtuoso installation to check if everything is fine. Besides simple tests its
+     * mostly to see, if errors are produced.
+     */
+    public function testQueryingExternalVirtuosoServer()
+    {
+        $this->setInstance([
+            'query-url' => 'https://opendata.leipzig.de/virt-sparql'
+        ]);
+
+        $graph = 'https://opendata.leipzig.de/bvlplaces/';
+
+        $this->commonNamespaces->add('p', 'https://github.com/AKSW/leds-asp-f-ontologies/raw/master/ontologies/place/ontology.ttl#');
+
+        $result = $this->fixture->query('
+            PREFIX p: <'.$this->commonNamespaces->getUri('p').'>
+            PREFIX rdf: <'.$this->commonNamespaces->getUri('rdf').'>
+            SELECT ?s
+              FROM <'.$graph.'>
+            WHERE { ?s rdf:type p:Place. }
+            OFFSET 0 LIMIT 20
+        ');
+
+        $this->assertEquals(20, \count($result));
+
+        foreach ($result as $entry) {
+            $details = $this->fixture->query('
+                SELECT ?p ?o
+                  FROM <'.$graph.'>
+                WHERE { <'.$entry['s']->getUri().'> ?p ?o. }
+            ');
+
+            $this->assertEquals(72, \count($details));
+        }
     }
 }

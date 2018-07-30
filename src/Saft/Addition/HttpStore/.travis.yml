@@ -46,7 +46,7 @@ before_script:
     - chmod +x coveralls.phar
     - php coveralls.phar --version
 
-script: vendor/bin/phpunit --coverage-clover gen/coverage/clover.xml
+script: vendor/bin/phpunit --bootstrap Test/boostrap-travis.php --coverage-clover gen/coverage/clover.xml
 
 after_success:
     # Submit coverage report to Coveralls servers, see .coveralls.yml

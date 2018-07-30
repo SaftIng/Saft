@@ -87,7 +87,7 @@ class HttpStore extends AbstractSparqlStore
         array $configuration = [],
         Curl $httpClient = null
     ) {
-        $this->RdfHelpers = $rdfHelpers;
+        $this->rdfHelpers = $rdfHelpers;
         $this->configuration = $configuration;
         $this->nodeFactory = $nodeFactory;
         $this->statementFactory = $statementFactory;
@@ -99,11 +99,94 @@ class HttpStore extends AbstractSparqlStore
             $httpClient = new Curl();
             $httpClient->setOpt(\CURLOPT_FOLLOWLOCATION, true);
             $httpClient->setOpt(\CURLOPT_TIMEOUT, 10);
-            $httpClient->verbose();
         }
         $this->httpClient = $httpClient;
 
         $this->openConnection();
+    }
+
+    /**
+     * Adds multiple Statements to (default-) graph.
+     *
+     * @param StatementIterator|array $statements statementList instance must contain Statement instances which
+     *                                            are 'concret-' and not 'pattern'-statements
+     * @param Node                    $graph      Overrides target graph. If set, all statements will be add to
+     *                                            that graph, if it is available. (optional)
+     * @param array                   $options    Key-value pairs which provide additional introductions for the
+     *                                            store and/or its adapter(s). (optional)
+     *
+     * @api
+     *
+     * @since 0.1
+     */
+    public function addStatements(iterable $statements, Node $graph = null, array $options = [])
+    {
+        if ($this->configuration)
+
+        $graphUriToUse = null;
+
+        /**
+         * Create batches out of given statements to improve statement throughput.
+         */
+        $counter = 1;
+        $batchSize = 100;
+        $batchStatements = [];
+
+        foreach ($statements as $statement) {
+            // non-concrete Statement instances not allowed
+            if (false === $statement->isConcrete()) {
+                // We would need a rollback here, but we don't have any transactions so far
+                throw new \Exception('At least one Statement is not concrete: '.$statement->toNTriples());
+            }
+
+            // given $graph forces usage of it and not the graph from the statement instance
+            if ($graph instanceof NamedNode) {
+                $graphUriToUse = $graph->getUri();
+            // use graph from statement
+            } elseif ($statement->getGraph() instanceof NamedNode) {
+                $graphUriToUse = $statement->getGraph()->getUri();
+            // no graph, therefore store decides
+            } else {
+                $graphUriToUse = null;
+            }
+
+            // init batch entry for the current graph URI, if not set yet.
+            if (false === isset($batchStatements[$graphUriToUse])) {
+                $batchStatements[$graphUriToUse] = [];
+            }
+
+            $batchStatements[$graphUriToUse][] = $statement;
+        }
+
+        /**
+         * $batchStatements is an array with graphUri('s) as key(s) and iterator instances as value.
+         * Each entry is related to a certain graph and contains a bunch of statement instances.
+         */
+        foreach ($batchStatements as $graphUriToUse => $batch) {
+            $content = '';
+
+            $graph = null;
+            if (null !== $graphUriToUse) {
+                $graph = $this->nodeFactory->createNamedNode($graphUriToUse);
+            }
+
+            foreach ($batch as $batchEntries) {
+                $content .= $this->sparqlFormat(
+                    $this->statementIteratorFactory->createStatementIteratorFromArray([$batchEntries]),
+                    $graph
+                ).' ';
+            }
+
+            $this->query(
+                'INSERT {'.$content.'}
+                WHERE {
+                  SELECT * {
+                    OPTIONAL { ?s ?p ?o . }
+                  } LIMIT 1
+                }',
+                $options
+            );
+        }
     }
 
     /**
@@ -401,16 +484,17 @@ class HttpStore extends AbstractSparqlStore
              * Literal (language'd)
              */
             case 'literal':
-                $lang = null;
+                // only if a language was explicitly given, use related datatype URI ...
                 if (isset($entry['xml:lang'])) {
                     $lang = $entry['xml:lang'];
+                    $datatype = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString';
+                // ... otherwise assume its a simple string
+                } else {
+                    $lang = null;
+                    $datatype = 'http://www.w3.org/2001/XMLSchema#string';
                 }
 
-                $newEntry = $this->nodeFactory->createLiteral(
-                    $entry['value'],
-                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString',
-                    $lang
-                );
+                $newEntry = $this->nodeFactory->createLiteral($entry['value'], $datatype, $lang);
 
                 break;
 
