@@ -235,7 +235,7 @@ class HttpStore extends AbstractSparqlStore
         /*
          * authenticate only if an auth-url was given.
          */
-        if (isset($configuration['username']) && isset($configuration['password'])) {
+        if (!empty($configuration['username']) && !empty($configuration['password'])) {
             $this->useDigestAuthentication($configuration['username'], $configuration['password']);
         }
 
