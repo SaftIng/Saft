@@ -28,6 +28,8 @@ use Saft\Store\AbstractSparqlStore;
  */
 class HttpStore extends AbstractSparqlStore
 {
+    protected $additionalParameters = [];
+
     /**
      * Adapter options.
      *
@@ -75,6 +77,7 @@ class HttpStore extends AbstractSparqlStore
      * @param RdfHelpers               $rdfHelpers
      * @param array                    $configuration            Optional, array containing database credentials
      * @param Curl                     $httpClient
+     * @param array                    $additionalParameters
      *
      * @throws \Exception if HTTP store requires the PHP ODBC extension to be loaded
      */
@@ -85,7 +88,8 @@ class HttpStore extends AbstractSparqlStore
         StatementIteratorFactory $statementIteratorFactory,
         RdfHelpers $rdfHelpers,
         array $configuration = [],
-        Curl $httpClient = null
+        Curl $httpClient = null,
+        array $additionalParameters = []
     ) {
         $this->rdfHelpers = $rdfHelpers;
         $this->configuration = $configuration;
@@ -101,6 +105,8 @@ class HttpStore extends AbstractSparqlStore
             $httpClient->setOpt(\CURLOPT_TIMEOUT, 10);
         }
         $this->httpClient = $httpClient;
+
+        $this->additionalParameters = $additionalParameters;
 
         $this->openConnection();
     }
@@ -409,7 +415,9 @@ class HttpStore extends AbstractSparqlStore
         $this->httpClient->setHeader('Accept', 'application/sparql-results+json');
         $this->httpClient->setHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        return $this->httpClient->get($url, ['query' => $query]);
+        $parameters = \array_merge($this->additionalParameters, ['query' => $query]);
+
+        return $this->httpClient->post($url, $parameters);
     }
 
     /**
@@ -426,7 +434,9 @@ class HttpStore extends AbstractSparqlStore
         $this->httpClient->setHeader('Accept', 'application/sparql-results+json');
         $this->httpClient->setHeader('Content-Type', 'application/sparql-update');
 
-        $result = $this->httpClient->get($url, ['query' => $query]);
+        $parameters = \array_merge($this->additionalParameters, ['query' => $query]);
+
+        $result = $this->httpClient->post($url, $parameters);
 
         return $result;
     }
